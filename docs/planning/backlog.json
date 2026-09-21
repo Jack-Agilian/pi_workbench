@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "status": "proposed_not_created_on_github",
-  "source": "../startup/docs/08-delivery-and-references.md",
-  "normalization": "Number-only dependencies resolved to BOOT IDs; QA-01 depends on preceding P0 items. Roles are not assigned people.",
+  "status": "reuse_first_planned_not_created_on_github",
+  "source": "../ssot/reuse-first.md",
+  "normalization": "保持原28项ID和依赖；当前验收按复用优先SSOT更新。Roles不是已分配的人；没有创建GitHub Issues。",
   "items": [
     {
       "id": "BOOT-01",
@@ -12,7 +12,11 @@
       "githubIssueNumber": null,
       "dependencies": [],
       "sourceDependencyText": "无",
-      "workAndAcceptance": "冻结 ADR 与产品协议；未决项有 owner 和判定依据"
+      "workAndAcceptance": "收敛复用优先SSOT与最小产品契约；禁止重写上游能力；社区代码有来源准入",
+      "reuseRefs": [
+        "product-coordination"
+      ],
+      "implementationStatus": "not_implemented"
     },
     {
       "id": "BOOT-02",
@@ -24,7 +28,12 @@
         "BOOT-01"
       ],
       "sourceDependencyText": "01",
-      "workAndAcceptance": "建立 macOS/Windows CI，打包空壳，签名链路可验证"
+      "workAndAcceptance": "复用Electron工具链/社区构建模式；建立两平台空壳和原生模块CI，不声明尚未完成签名",
+      "reuseRefs": [
+        "community-ui",
+        "terminal"
+      ],
+      "implementationStatus": "not_implemented"
     },
     {
       "id": "BOOT-03",
@@ -36,7 +45,12 @@
         "BOOT-01"
       ],
       "sourceDependencyText": "01",
-      "workAndAcceptance": "锁定 Pi 精确发布包与 SHA，保存原始事件 fixture"
+      "workAndAcceptance": "核对Pi发行包/exports/Node并锁定；运行SDK接入探针；真实fixture与Mock隔离",
+      "reuseRefs": [
+        "agent-session",
+        "native-history"
+      ],
+      "implementationStatus": "not_implemented"
     },
     {
       "id": "BOOT-04",
@@ -48,7 +62,12 @@
         "BOOT-01"
       ],
       "sourceDependencyText": "01",
-      "workAndAcceptance": "Mock Runtime 驱动全部 Run 状态，无真实模型也可演示"
+      "workAndAcceptance": "Mock只覆盖产品与边界故障；不实现替代Agent Loop；与SDK探针并行",
+      "reuseRefs": [
+        "product-coordination",
+        "agent-session"
+      ],
+      "implementationStatus": "not_implemented"
     },
     {
       "id": "BOOT-05",
@@ -60,7 +79,12 @@
         "BOOT-02"
       ],
       "sourceDependencyText": "02",
-      "workAndAcceptance": "Windows 中文路径 + PowerShell/Git Bash + kill tree 技术验证"
+      "workAndAcceptance": "复用Pi Shell/Operations及node-pty；仅补Windows路径/受管进程清理，实测中文路径与取消",
+      "reuseRefs": [
+        "shell",
+        "terminal"
+      ],
+      "implementationStatus": "not_implemented"
     },
     {
       "id": "CORE-01",
@@ -72,7 +96,12 @@
         "BOOT-01"
       ],
       "sourceDependencyText": "01",
-      "workAndAcceptance": "SQLite migration、Project/Workspace/Thread/Run、单写入与重启恢复"
+      "workAndAcceptance": "Pi SessionManager拥有原生历史；SQLite只存产品状态/索引，检验恢复与映射",
+      "reuseRefs": [
+        "native-history",
+        "product-coordination"
+      ],
+      "implementationStatus": "not_implemented"
     },
     {
       "id": "CORE-02",
@@ -84,7 +113,13 @@
         "BOOT-03"
       ],
       "sourceDependencyText": "03",
-      "workAndAcceptance": "Pi Adapter 创建/恢复/取消/最终状态，SDK 版本差异测试"
+      "workAndAcceptance": "薄适配公开Pi SDK与SessionRuntime，不复制会话/Provider；验证替换后订阅和取消",
+      "reuseRefs": [
+        "agent-session",
+        "native-history",
+        "models-auth"
+      ],
+      "implementationStatus": "not_implemented"
     },
     {
       "id": "CORE-03",
@@ -96,7 +131,12 @@
         "CORE-01"
       ],
       "sourceDependencyText": "CORE-01",
-      "workAndAcceptance": "eventId/seq/epoch、去重、重连补发、投影重建"
+      "workAndAcceptance": "产品独立任务队列与Pi steer/followUp单一归属；原生重试留Pi；幂等取消/结算",
+      "reuseRefs": [
+        "in-run-queue",
+        "product-coordination"
+      ],
+      "implementationStatus": "not_implemented"
     },
     {
       "id": "CORE-04",
@@ -108,7 +148,13 @@
         "BOOT-05"
       ],
       "sourceDependencyText": "05",
-      "workAndAcceptance": "CommandRunner 与 PTY 分开，取消后无子进程/占用端口"
+      "workAndAcceptance": "包装Pi同名工具/Operations；保留schema/results/patch/cancel，审批拒绝零副作用",
+      "reuseRefs": [
+        "read-search",
+        "edit-write",
+        "shell"
+      ],
+      "implementationStatus": "not_implemented"
     },
     {
       "id": "SEC-01",
@@ -120,7 +166,12 @@
         "BOOT-02"
       ],
       "sourceDependencyText": "02",
-      "workAndAcceptance": "CSP、IPC 校验、Renderer 无文件/Shell/secret 直接访问"
+      "workAndAcceptance": "复用Electron安全IPC与社区边界测试模式；CSP/来源/schema验证，Renderer不直接碰FS/Shell/secret",
+      "reuseRefs": [
+        "community-ui",
+        "product-coordination"
+      ],
+      "implementationStatus": "not_implemented"
     },
     {
       "id": "SEC-02",
@@ -132,7 +183,13 @@
         "CORE-02"
       ],
       "sourceDependencyText": "CORE-02",
-      "workAndAcceptance": "宿主工具 Broker、审批绑定参数/epoch，过期审批拒绝"
+      "workAndAcceptance": "Pi同名工具wrapper与Operations接入宿主批准；绑定参数/epoch/截止时间，过期或取消零执行",
+      "reuseRefs": [
+        "read-search",
+        "edit-write",
+        "shell"
+      ],
+      "implementationStatus": "not_implemented"
     },
     {
       "id": "SEC-03",
@@ -144,7 +201,12 @@
         "SEC-01"
       ],
       "sourceDependencyText": "SEC-01",
-      "workAndAcceptance": "凭据安全存储、日志脱敏、配置导入预览"
+      "workAndAcceptance": "ModelRuntime与CredentialStore适配系统存储；不重写Provider登录；验证刷新/flush/脱敏/配置预览",
+      "reuseRefs": [
+        "models-auth",
+        "pi-settings"
+      ],
+      "implementationStatus": "not_implemented"
     },
     {
       "id": "UI-01",
@@ -157,7 +219,12 @@
         "CORE-03"
       ],
       "sourceDependencyText": "04,CORE-03",
-      "workAndAcceptance": "三栏布局、Thread 切换、流式/错误/未知工具卡"
+      "workAndAcceptance": "定向复用pi-gui工作台/时间线模式；固定来源后局部移植，不依赖Pi内部类型",
+      "reuseRefs": [
+        "community-ui",
+        "product-coordination"
+      ],
+      "implementationStatus": "not_implemented"
     },
     {
       "id": "UI-02",
@@ -170,7 +237,13 @@
         "SEC-02"
       ],
       "sourceDependencyText": "UI-01,SEC-02",
-      "workAndAcceptance": "Composer、Stop、审批、排队状态、IME 组合输入"
+      "workAndAcceptance": "社区Composer/工具卡/diff；Pi交互seam；delta/累计结果一致，TUI不能当React",
+      "reuseRefs": [
+        "community-ui",
+        "extension-ui",
+        "output-diff"
+      ],
+      "implementationStatus": "not_implemented"
     },
     {
       "id": "GIT-01",
@@ -182,7 +255,12 @@
         "CORE-04"
       ],
       "sourceDependencyText": "CORE-04",
-      "workAndAcceptance": "baseline diff、用户修改区分、非 Git 工作区可用"
+      "workAndAcceptance": "工作区真实diff调用Git；单次edit用Pi patch；复用社区diff视图，区分用户修改，非Git目录可用",
+      "reuseRefs": [
+        "output-diff",
+        "community-ui"
+      ],
+      "implementationStatus": "not_implemented"
     },
     {
       "id": "ART-01",
@@ -194,7 +272,11 @@
         "CORE-01"
       ],
       "sourceDependencyText": "CORE-01",
-      "workAndAcceptance": "ArtifactVersion、hash、基础预览、外部修改和另存为"
+      "workAndAcceptance": "ArtifactVersion、hash、基础预览、外部修改和另存为；优先按SSOT复用已验证上游/社区实现，仅实现本项产品增量，测试与未测边界明确",
+      "reuseRefs": [
+        "artifact"
+      ],
+      "implementationStatus": "not_implemented"
     },
     {
       "id": "SKL-01",
@@ -206,7 +288,12 @@
         "CORE-02"
       ],
       "sourceDependencyText": "CORE-02",
-      "workAndAcceptance": "SKILL.md 解析、显式选择、受控 ResourceLoader、3 个内置技能"
+      "workAndAcceptance": "复用Pi技能加载和ResourceLoader；安全筛选在执行factory前；无全局/项目未知扩展",
+      "reuseRefs": [
+        "skills",
+        "resources"
+      ],
+      "implementationStatus": "not_implemented"
     },
     {
       "id": "QA-01",
@@ -234,7 +321,15 @@
         "SKL-01"
       ],
       "sourceDependencyText": "上述 P0",
-      "workAndAcceptance": "两条端到端验收、崩溃/取消/跨线程安全回归"
+      "workAndAcceptance": "两条端到端验收、崩溃/取消/跨线程安全回归；优先按SSOT复用已验证上游/社区实现，仅实现本项产品增量，测试与未测边界明确",
+      "reuseRefs": [
+        "agent-session",
+        "native-history",
+        "resources",
+        "package-manager",
+        "terminal"
+      ],
+      "implementationStatus": "not_implemented"
     },
     {
       "id": "PKG-01",
@@ -247,7 +342,12 @@
         "SEC-02"
       ],
       "sourceDependencyText": "SKL-01,SEC-02",
-      "workAndAcceptance": "Manifest/安全解包/内容 Store/原子激活和失败回滚"
+      "workAndAcceptance": "优先Pi包来源/资源入口/PackageManager；受控安装事务，不复制npm/git解析",
+      "reuseRefs": [
+        "package-manager",
+        "market-governance"
+      ],
+      "implementationStatus": "not_implemented"
     },
     {
       "id": "PKG-02",
@@ -259,7 +359,12 @@
         "PKG-01"
       ],
       "sourceDependencyText": "PKG-01",
-      "workAndAcceptance": "签名选编索引、缓存、兼容过滤、撤销和离线说明"
+      "workAndAcceptance": "补签名/撤销/回滚与权限差异；验证各安装分支脚本/依赖/离线resolve，不自动放行",
+      "reuseRefs": [
+        "package-manager",
+        "market-governance"
+      ],
+      "implementationStatus": "not_implemented"
     },
     {
       "id": "SKL-02",
@@ -271,7 +376,12 @@
         "PKG-01"
       ],
       "sourceDependencyText": "PKG-01",
-      "workAndAcceptance": "技能作用域、冲突、个人副本、测试和版本锁"
+      "workAndAcceptance": "Pi解析+产品scope/个人副本/快照；更新不改当前Run，不另写SKILL.md parser",
+      "reuseRefs": [
+        "skills",
+        "market-governance"
+      ],
+      "implementationStatus": "not_implemented"
     },
     {
       "id": "UI-03",
@@ -284,7 +394,13 @@
         "SKL-02"
       ],
       "sourceDependencyText": "PKG-02,SKL-02",
-      "workAndAcceptance": "市场/技能库分离、安装四步、更新权限 diff"
+      "workAndAcceptance": "参考OpenPi Customizations；展示Pi资源列表+产品scope/version/approval；不重做格式",
+      "reuseRefs": [
+        "community-ui",
+        "skills",
+        "package-manager"
+      ],
+      "implementationStatus": "not_implemented"
     },
     {
       "id": "CORE-05",
@@ -296,7 +412,13 @@
         "QA-01"
       ],
       "sourceDependencyText": "QA-01",
-      "workAndAcceptance": "多 Workspace 并发、Worktree 与写锁，事件互不污染"
+      "workAndAcceptance": "Pi Session负责会话；产品补Workspace并发/Worktree跨Worker锁，原生工具锁不冒充跨进程锁",
+      "reuseRefs": [
+        "native-history",
+        "product-coordination",
+        "edit-write"
+      ],
+      "implementationStatus": "not_implemented"
     },
     {
       "id": "CON-01",
@@ -308,7 +430,12 @@
         "SEC-03"
       ],
       "sourceDependencyText": "SEC-03",
-      "workAndAcceptance": "一个只读 Connector、账户绑定、过期重连和审计"
+      "workAndAcceptance": "一个只读Connector优先依赖服务官方SDK/标准MCP客户端；产品只补账户绑定/审计；不得误用模型Provider凭据",
+      "reuseRefs": [
+        "extension-ui",
+        "product-coordination"
+      ],
+      "implementationStatus": "not_implemented"
     },
     {
       "id": "ART-02",
@@ -320,7 +447,11 @@
         "ART-01"
       ],
       "sourceDependencyText": "ART-01",
-      "workAndAcceptance": "选一个 Office 格式，从生成到校验/预览完整链路"
+      "workAndAcceptance": "选一个 Office 格式，从生成到校验/预览完整链路；优先按SSOT复用已验证上游/社区实现，仅实现本项产品增量，测试与未测边界明确",
+      "reuseRefs": [
+        "artifact"
+      ],
+      "implementationStatus": "not_implemented"
     },
     {
       "id": "PRE-01",
@@ -333,7 +464,13 @@
         "CON-01"
       ],
       "sourceDependencyText": "SKL-02,CON-01",
-      "workAndAcceptance": "3 个专家预设和 3 个案例，创建前预览资源需求"
+      "workAndAcceptance": "预设引用Pi技能/模型/工具配置，不是新Agent引擎；3个专家与案例创建前展示资源及权限",
+      "reuseRefs": [
+        "skills",
+        "resources",
+        "market-governance"
+      ],
+      "implementationStatus": "not_implemented"
     },
     {
       "id": "ISO-01",
@@ -346,7 +483,13 @@
         "PKG-02"
       ],
       "sourceDependencyText": "CORE-04,PKG-02",
-      "workAndAcceptance": "整个 Worker 隔离、网络/文件/秘密能力测试"
+      "workAndAcceptance": "优先评估现有整Worker隔离后端；不自研VM或声称Operations/PTY是沙箱，按OS证据展示能力",
+      "reuseRefs": [
+        "shell",
+        "terminal",
+        "product-coordination"
+      ],
+      "implementationStatus": "not_implemented"
     },
     {
       "id": "AUTO-01",
@@ -359,7 +502,15 @@
         "CON-01"
       ],
       "sourceDependencyText": "ISO-01,CON-01",
-      "workAndAcceptance": "时区/漏跑/重试/去重/待审批，离线行为明确"
+      "workAndAcceptance": "时区/漏跑/重试/去重/待审批，离线行为明确；优先按SSOT复用已验证上游/社区实现，仅实现本项产品增量，测试与未测边界明确",
+      "reuseRefs": [
+        "product-coordination",
+        "in-run-queue"
+      ],
+      "implementationStatus": "not_implemented"
     }
-  ]
+  ],
+  "decisionSource": "../ssot/README.md",
+  "historicalSource": "../startup/docs/08-delivery-and-references.md",
+  "updatedOn": "2026-09-21"
 }

@@ -1,5 +1,7 @@
 # 开发环境、检查与发布
 
+当前实现决策以 [复用优先 SSOT](ssot/README.md) 为准。修改当前文档或 Backlog 后运行 `python scripts/check-ssot.py`；该检查只验证文档/JSON一致性，不安装或测试 Pi。
+
 ## 1. 当前初始化范围
 
 本脚本只初始化文档检查环境，不安装 Pi、Electron、Node 工具链或系统包。需要 Python 3.10+；Git 和 OpenSSH 只在克隆/发布时需要。应用依赖将在 BOOT-03 中核验并固定。

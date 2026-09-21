@@ -4,7 +4,10 @@
 
 ## 修改与验证
 
-- 先阅读 `docs/README.md` 和 `docs/planning/NEXT_STEPS.md`。
+- 先阅读 `docs/ssot/README.md`、`docs/README.md` 和 `docs/planning/NEXT_STEPS.md`。当前复用与接入决策以 `docs/ssot/` 为准。
+- 新能力先查 `docs/ssot/reuse-map.json`；优先 Pi 公开导出、Operations 和经审核社区模块。不得重写 Agent Loop、原生 Session/Compaction、Provider/OAuth、技能解析及基础工具。
+- Pi 类型允许存在于适配包内部；不得渗入 Renderer/产品持久协议。禁止未经评审 deep-import 上游内部源码。
+- 同步更新文档和 `backlog.json`，运行 `python scripts/check-ssot.py`。
 - `docs/startup/` 是原始资料快照，由原包 MANIFEST 校验。不要直接改写其中的文件或历史测试报告；新的规格/决策放到快照目录之外。确需改变快照策略，先记录来源和摘要迁移方案。
 - 结构检查：`python scripts/check-docs.py --structural-only`。
 - 完整示例检查：`python scripts/check-docs.py --typecheck`；需要 jsonschema 和已安装的 tsc。

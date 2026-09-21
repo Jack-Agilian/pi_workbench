@@ -1,0 +1,367 @@
+{
+  "schemaVersion": 1,
+  "decision": "reuse-first",
+  "reviewedOn": "2026-09-21",
+  "projectBaseCommit": "43e50c80a7938ea60fcf49813cc0809e872d31fa",
+  "upstream": {
+    "repository": "earendil-works/pi",
+    "sourceCommit": "466db0fecdc20996a553116984d18c0d362b035a",
+    "manifestVersion": "0.86.1",
+    "nodeRequirement": ">=22.19.0",
+    "releaseTarballVerified": false,
+    "npmVersionPinned": null
+  },
+  "evidenceDocument": "upstream-evidence.md",
+  "implementationStatus": "documentation_only",
+  "items": [
+    {
+      "id": "agent-session",
+      "mode": "direct",
+      "evidence": [
+        "P01",
+        "P02"
+      ],
+      "upstreamSymbolsOrPaths": [
+        "createAgentSession",
+        "AgentSession"
+      ],
+      "reuse": "工具循环、原生重试/压缩保持上游",
+      "productDelta": "Worker 监督和产品 Run 结算",
+      "acceptanceGate": "session 与事件探针",
+      "implementationState": "not_implemented"
+    },
+    {
+      "id": "native-history",
+      "mode": "direct",
+      "evidence": [
+        "P01",
+        "P02"
+      ],
+      "upstreamSymbolsOrPaths": [
+        "SessionManager",
+        "AgentSessionRuntime"
+      ],
+      "reuse": "JSONL、分支、恢复保持 Pi",
+      "productDelta": "Thread 绑定和可重建索引",
+      "acceptanceGate": "保存/恢复/Fork后不双写且订阅更新",
+      "implementationState": "not_implemented"
+    },
+    {
+      "id": "models-auth",
+      "mode": "adapt",
+      "evidence": [
+        "P01",
+        "P14"
+      ],
+      "upstreamSymbolsOrPaths": [
+        "ModelRuntime",
+        "CredentialStore"
+      ],
+      "reuse": "Provider、目录、登录/刷新复用",
+      "productDelta": "系统凭据与桌面交互",
+      "acceptanceGate": "secret 不进Renderer/日志/子进程env",
+      "implementationState": "not_implemented"
+    },
+    {
+      "id": "pi-settings",
+      "mode": "adapt",
+      "evidence": [
+        "P01",
+        "P02"
+      ],
+      "upstreamSymbolsOrPaths": [
+        "SettingsManager"
+      ],
+      "reuse": "复用 Pi 设置解析/持久",
+      "productDelta": "隔离配置路径与产品偏好",
+      "acceptanceGate": "无全局未知设置泄入；flush错误处理",
+      "implementationState": "not_implemented"
+    },
+    {
+      "id": "skills",
+      "mode": "adapt",
+      "evidence": [
+        "P01",
+        "P04"
+      ],
+      "upstreamSymbolsOrPaths": [
+        "loadSkillsFromDir",
+        "loadSkills",
+        "formatSkillsForPrompt"
+      ],
+      "reuse": "复用格式/诊断/按需装配",
+      "productDelta": "作用域、内容副本、版本锁",
+      "acceptanceGate": "坏技能诊断/更新不改变当前Run",
+      "implementationState": "not_implemented"
+    },
+    {
+      "id": "resources",
+      "mode": "adapt",
+      "evidence": [
+        "P01",
+        "P02",
+        "P05"
+      ],
+      "upstreamSymbolsOrPaths": [
+        "ResourceLoader",
+        "DefaultResourceLoader"
+      ],
+      "reuse": "复用资源模型与受支持加载入口",
+      "productDelta": "预先批准目录，不自动发现/执行未知扩展",
+      "acceptanceGate": "恶意global/project factory从未执行",
+      "implementationState": "not_implemented"
+    },
+    {
+      "id": "package-manager",
+      "mode": "adapt",
+      "evidence": [
+        "P01",
+        "P03",
+        "P06"
+      ],
+      "upstreamSymbolsOrPaths": [
+        "DefaultPackageManager",
+        "PackageManager"
+      ],
+      "reuse": "复用npm/git/local解析与可用安装能力",
+      "productDelta": "审核/签名/事务/快照/撤销",
+      "acceptanceGate": "所有安装分支副作用和离线resolve测试",
+      "implementationState": "not_implemented"
+    },
+    {
+      "id": "read-search",
+      "mode": "adapt",
+      "evidence": [
+        "P01",
+        "P05",
+        "P07"
+      ],
+      "upstreamSymbolsOrPaths": [
+        "createReadTool",
+        "createGrepTool",
+        "createFindTool",
+        "createLsTool"
+      ],
+      "reuse": "保留名称schema结果与裁剪",
+      "productDelta": "Operations和许可",
+      "acceptanceGate": "路径/工具输出/辅助I/O覆盖",
+      "implementationState": "not_implemented"
+    },
+    {
+      "id": "edit-write",
+      "mode": "adapt",
+      "evidence": [
+        "P01",
+        "P05",
+        "P07"
+      ],
+      "upstreamSymbolsOrPaths": [
+        "createEditTool",
+        "createWriteTool",
+        "withFileMutationQueue"
+      ],
+      "reuse": "保留匹配/patch/文件级队列",
+      "productDelta": "操作context/许可/跨Worker锁",
+      "acceptanceGate": "拒绝零写入/并发context不串/冲突可见",
+      "implementationState": "not_implemented"
+    },
+    {
+      "id": "shell",
+      "mode": "adapt",
+      "evidence": [
+        "P01",
+        "P05",
+        "P07"
+      ],
+      "upstreamSymbolsOrPaths": [
+        "createBashTool",
+        "createPowerShellTool",
+        "BashOperations",
+        "PowerShellOperations"
+      ],
+      "reuse": "保留Shell语义和工具结果",
+      "productDelta": "受管进程与OS策略",
+      "acceptanceGate": "取消和超时/中文路径/残留可见",
+      "implementationState": "not_implemented"
+    },
+    {
+      "id": "output-diff",
+      "mode": "direct",
+      "evidence": [
+        "P01",
+        "P02"
+      ],
+      "upstreamSymbolsOrPaths": [
+        "truncateHead",
+        "truncateTail",
+        "generateUnifiedPatch"
+      ],
+      "reuse": "复用截断/单次修改patch",
+      "productDelta": "真实Git diff视图和大日志Blob",
+      "acceptanceGate": "累计输出不重复；Git状态独立验证",
+      "implementationState": "not_implemented"
+    },
+    {
+      "id": "in-run-queue",
+      "mode": "direct",
+      "evidence": [
+        "P02",
+        "P13"
+      ],
+      "upstreamSymbolsOrPaths": [
+        "AgentSession.steer",
+        "AgentSession.followUp"
+      ],
+      "reuse": "复用运行内队列",
+      "productDelta": "独立任务由产品排队",
+      "acceptanceGate": "输入唯一归属不双投递",
+      "implementationState": "not_implemented"
+    },
+    {
+      "id": "extension-ui",
+      "mode": "adapt",
+      "evidence": [
+        "P01",
+        "P05"
+      ],
+      "upstreamSymbolsOrPaths": [
+        "ExtensionUIContext"
+      ],
+      "reuse": "复用声明性交互seam",
+      "productDelta": "桌面select/input/notify和授权区分",
+      "acceptanceGate": "TUI custom不注入Renderer",
+      "implementationState": "not_implemented"
+    },
+    {
+      "id": "tui-components",
+      "mode": "evaluate",
+      "evidence": [
+        "P01"
+      ],
+      "upstreamSymbolsOrPaths": [
+        "AssistantMessageComponent",
+        "ToolExecutionComponent"
+      ],
+      "reuse": "仅行为参考，不当React组件导入",
+      "productDelta": "桌面视图",
+      "acceptanceGate": "组件框架/运行环境匹配",
+      "implementationState": "not_implemented"
+    },
+    {
+      "id": "community-ui",
+      "mode": "selective-port",
+      "evidence": [
+        "C01",
+        "C02"
+      ],
+      "upstreamSymbolsOrPaths": [
+        "packages/pi-sdk-driver",
+        "timeline",
+        "customizations"
+      ],
+      "reuse": "定向选社区模块，不整仓拼装",
+      "productDelta": "品牌/产品协议/安全边界",
+      "acceptanceGate": "固定commit/许可证/最小组件验证",
+      "implementationState": "not_implemented"
+    },
+    {
+      "id": "terminal",
+      "mode": "adapt",
+      "evidence": [
+        "L01",
+        "L02"
+      ],
+      "upstreamSymbolsOrPaths": [
+        "xterm.js",
+        "node-pty"
+      ],
+      "reuse": "终端显示与PTY库复用",
+      "productDelta": "生命周期、权限、平台测试",
+      "acceptanceGate": "Electron ABI/resize/cleanup双平台",
+      "implementationState": "not_implemented"
+    },
+    {
+      "id": "experimental-service",
+      "mode": "evaluate",
+      "evidence": [
+        "P09",
+        "P10"
+      ],
+      "upstreamSymbolsOrPaths": [
+        "pi-server",
+        "pi-client",
+        "pi-protocol"
+      ],
+      "reuse": "先评估路由/订阅/transport",
+      "productDelta": "应用认证和Session管理",
+      "acceptanceGate": "发布导出/跨平台/受控工具和资源",
+      "implementationState": "not_implemented"
+    },
+    {
+      "id": "composition",
+      "mode": "evaluate",
+      "evidence": [
+        "P11"
+      ],
+      "upstreamSymbolsOrPaths": [
+        "@earendil-works/chord"
+      ],
+      "reuse": "不造平行plugin/replica框架",
+      "productDelta": "无需要时仅模块调用",
+      "acceptanceGate": "真实需求和接缝收益证据",
+      "implementationState": "not_implemented"
+    },
+    {
+      "id": "durable",
+      "mode": "evaluate",
+      "evidence": [
+        "P12"
+      ],
+      "upstreamSymbolsOrPaths": [
+        "MemoryStorage"
+      ],
+      "reuse": "不可假定已完成磁盘持久化",
+      "productDelta": "产品磁盘恢复和索引",
+      "acceptanceGate": "公开持久后端/迁移/恢复实测后晋级",
+      "implementationState": "not_implemented"
+    },
+    {
+      "id": "product-coordination",
+      "mode": "own",
+      "evidence": [
+        "P02",
+        "P09"
+      ],
+      "upstreamSymbolsOrPaths": [],
+      "reuse": "复用Pi原生任务执行，不重写",
+      "productDelta": "项目/独立Run/审批/操作意图",
+      "acceptanceGate": "幂等/取消/外部结果未知处理",
+      "implementationState": "not_implemented"
+    },
+    {
+      "id": "artifact",
+      "mode": "own",
+      "evidence": [
+        "P02"
+      ],
+      "upstreamSymbolsOrPaths": [],
+      "reuse": "复用文件库/预览器而非模型文字猜测",
+      "productDelta": "真实文件/版本/来源/验证",
+      "acceptanceGate": "missing file拒绝与安全预览",
+      "implementationState": "not_implemented"
+    },
+    {
+      "id": "market-governance",
+      "mode": "own",
+      "evidence": [
+        "P03",
+        "P06"
+      ],
+      "upstreamSymbolsOrPaths": [],
+      "reuse": "依附Pi包格式与管理器",
+      "productDelta": "catalog/作用域/审核/撤销/事务",
+      "acceptanceGate": "更新和撤销不默改活动Run",
+      "implementationState": "not_implemented"
+    }
+  ]
+}

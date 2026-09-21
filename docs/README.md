@@ -2,7 +2,13 @@
 
 **使用版本：用户重新上传的 Pi Workbench Startup Pack v0.1。**完整原包保存在 `startup/`，其内层 `docs/` 是原包目录结构，保留它是为了不破坏引用、测试路径和 SHA-256 清单。
 
-## 产品与技术规格
+## 当前实施基线
+
+**[复用优先 SSOT](ssot/README.md)** · [架构与替代决策](ssot/reuse-first.md) · [模块接入](ssot/integration-contracts.md) · [上游证据](ssot/upstream-evidence.md) · [复用清单](ssot/reuse-map.json)
+
+当前设计不再把 Pi 已提供的 Session、工具、模型、技能解析和包管理列为自研引擎；自有实现聚焦产品治理和桌面体验。`ssot/` 指定的替代范围优先于原始快照。
+
+## 原始产品与技术规格（历史快照）
 
 | 专题 | 文档 |
 |---|---|
@@ -22,4 +28,4 @@
 
 [开发与初始化](DEVELOPMENT.md) · [导入记录](IMPORT.md) · [本次验证结果](VALIDATION.md) · [下一步开发路线](planning/NEXT_STEPS.md) · [结构化 Backlog](planning/backlog.json)
 
-原包发布日期、依赖候选版本和原始测试报告均按历史资料处理。本次没有重新研究 Pi 当前 API，也没有恢复后一套未上传的 Pi Desktop 专题资料。
+原包发布日期、依赖候选版本和原始测试报告均按历史资料处理。2026-09-21 的新核验与实施决策见 `ssot/`；没有恢复后一套未上传的 Pi Desktop 专题资料。

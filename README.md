@@ -1,5 +1,7 @@
 # Pi Workbench
 
+**当前实施入口：[复用优先 SSOT](docs/ssot/README.md)。** Pi 现有能力优先直接依赖或薄适配；原启动包保留为历史快照。
+
 基于 Pi 的跨平台桌面 Agent 工作台，面向代码任务与通用知识工作。
 
 **当前阶段：项目启动文档与开发准备，尚非已实现的桌面应用。**
@@ -24,6 +26,7 @@
 ```bash
 bash scripts/bootstrap.sh --offline
 .venv/bin/python scripts/check-docs.py --structural-only
+.venv/bin/python scripts/check-ssot.py
 ```
 
 完整示例测试需要依赖；有网络时显式安装：
