@@ -1,0 +1,18 @@
+flowchart TB
+  UI[React Renderer] -->|Typed IPC| Host[Electron Host / Preload]
+  Host -->|Private local protocol| App[App Server]
+  App --> Product[(SQLite product state)]
+  App --> Resolver[Package / Skill Resolver]
+  Resolver --> Lock[Immutable Run ResourceLock]
+  App --> Worker[Dedicated Pi Worker]
+  Lock --> Worker
+  Worker --> Native[(Pi-owned transcripts)]
+  Worker -->|Controlled tools| Broker[Policy / Tool / Connector Brokers]
+  Broker --> Backend[ExecutionBackend]
+  Backend --> Mac[macOS host]
+  Backend --> Win[Windows host]
+  Backend --> WSL[WSL runtime - not a sandbox]
+  Backend --> Iso[Isolated backend - verified capabilities]
+  Broker --> Artifact[Artifact Service / Blob Store]
+  Host --> Secret[OS Secret Store]
+  App -. optional .-> Registry[Signed catalog and revocations]

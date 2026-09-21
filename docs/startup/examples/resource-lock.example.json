@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "0.1",
+  "runId": "example-run-not-executed",
+  "runtime": {
+    "engine": "pi",
+    "sdkVersion": null,
+    "verification": "not-run"
+  },
+  "resources": [
+    {
+      "resourceId": "example.weekly-report/weekly-report",
+      "packageVersion": "0.1.0",
+      "contentSha256": "6142e4d052c3120e769ea24e23005fba6c0388262aedbb229c7bced5d10c4ead",
+      "path": "weekly-report/skills/weekly-report/SKILL.md"
+    }
+  ],
+  "effectiveCapabilities": [],
+  "approvalState": "not-granted"
+}

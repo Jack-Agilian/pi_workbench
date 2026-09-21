@@ -1,0 +1,365 @@
+{
+  "schemaVersion": 1,
+  "status": "proposed_not_created_on_github",
+  "source": "../startup/docs/08-delivery-and-references.md",
+  "normalization": "Number-only dependencies resolved to BOOT IDs; QA-01 depends on preceding P0 items. Roles are not assigned people.",
+  "items": [
+    {
+      "id": "BOOT-01",
+      "priority": "P0",
+      "ownerRole": "Tech Lead",
+      "state": "proposed",
+      "githubIssueNumber": null,
+      "dependencies": [],
+      "sourceDependencyText": "无",
+      "workAndAcceptance": "冻结 ADR 与产品协议；未决项有 owner 和判定依据"
+    },
+    {
+      "id": "BOOT-02",
+      "priority": "P0",
+      "ownerRole": "Desktop",
+      "state": "proposed",
+      "githubIssueNumber": null,
+      "dependencies": [
+        "BOOT-01"
+      ],
+      "sourceDependencyText": "01",
+      "workAndAcceptance": "建立 macOS/Windows CI，打包空壳，签名链路可验证"
+    },
+    {
+      "id": "BOOT-03",
+      "priority": "P0",
+      "ownerRole": "Runtime",
+      "state": "proposed",
+      "githubIssueNumber": null,
+      "dependencies": [
+        "BOOT-01"
+      ],
+      "sourceDependencyText": "01",
+      "workAndAcceptance": "锁定 Pi 精确发布包与 SHA，保存原始事件 fixture"
+    },
+    {
+      "id": "BOOT-04",
+      "priority": "P0",
+      "ownerRole": "Frontend",
+      "state": "proposed",
+      "githubIssueNumber": null,
+      "dependencies": [
+        "BOOT-01"
+      ],
+      "sourceDependencyText": "01",
+      "workAndAcceptance": "Mock Runtime 驱动全部 Run 状态，无真实模型也可演示"
+    },
+    {
+      "id": "BOOT-05",
+      "priority": "P0",
+      "ownerRole": "Platform",
+      "state": "proposed",
+      "githubIssueNumber": null,
+      "dependencies": [
+        "BOOT-02"
+      ],
+      "sourceDependencyText": "02",
+      "workAndAcceptance": "Windows 中文路径 + PowerShell/Git Bash + kill tree 技术验证"
+    },
+    {
+      "id": "CORE-01",
+      "priority": "P0",
+      "ownerRole": "Backend",
+      "state": "proposed",
+      "githubIssueNumber": null,
+      "dependencies": [
+        "BOOT-01"
+      ],
+      "sourceDependencyText": "01",
+      "workAndAcceptance": "SQLite migration、Project/Workspace/Thread/Run、单写入与重启恢复"
+    },
+    {
+      "id": "CORE-02",
+      "priority": "P0",
+      "ownerRole": "Runtime",
+      "state": "proposed",
+      "githubIssueNumber": null,
+      "dependencies": [
+        "BOOT-03"
+      ],
+      "sourceDependencyText": "03",
+      "workAndAcceptance": "Pi Adapter 创建/恢复/取消/最终状态，SDK 版本差异测试"
+    },
+    {
+      "id": "CORE-03",
+      "priority": "P0",
+      "ownerRole": "Backend",
+      "state": "proposed",
+      "githubIssueNumber": null,
+      "dependencies": [
+        "CORE-01"
+      ],
+      "sourceDependencyText": "CORE-01",
+      "workAndAcceptance": "eventId/seq/epoch、去重、重连补发、投影重建"
+    },
+    {
+      "id": "CORE-04",
+      "priority": "P0",
+      "ownerRole": "Platform",
+      "state": "proposed",
+      "githubIssueNumber": null,
+      "dependencies": [
+        "BOOT-05"
+      ],
+      "sourceDependencyText": "05",
+      "workAndAcceptance": "CommandRunner 与 PTY 分开，取消后无子进程/占用端口"
+    },
+    {
+      "id": "SEC-01",
+      "priority": "P0",
+      "ownerRole": "Desktop",
+      "state": "proposed",
+      "githubIssueNumber": null,
+      "dependencies": [
+        "BOOT-02"
+      ],
+      "sourceDependencyText": "02",
+      "workAndAcceptance": "CSP、IPC 校验、Renderer 无文件/Shell/secret 直接访问"
+    },
+    {
+      "id": "SEC-02",
+      "priority": "P0",
+      "ownerRole": "Security",
+      "state": "proposed",
+      "githubIssueNumber": null,
+      "dependencies": [
+        "CORE-02"
+      ],
+      "sourceDependencyText": "CORE-02",
+      "workAndAcceptance": "宿主工具 Broker、审批绑定参数/epoch，过期审批拒绝"
+    },
+    {
+      "id": "SEC-03",
+      "priority": "P0",
+      "ownerRole": "Desktop",
+      "state": "proposed",
+      "githubIssueNumber": null,
+      "dependencies": [
+        "SEC-01"
+      ],
+      "sourceDependencyText": "SEC-01",
+      "workAndAcceptance": "凭据安全存储、日志脱敏、配置导入预览"
+    },
+    {
+      "id": "UI-01",
+      "priority": "P0",
+      "ownerRole": "Frontend",
+      "state": "proposed",
+      "githubIssueNumber": null,
+      "dependencies": [
+        "BOOT-04",
+        "CORE-03"
+      ],
+      "sourceDependencyText": "04,CORE-03",
+      "workAndAcceptance": "三栏布局、Thread 切换、流式/错误/未知工具卡"
+    },
+    {
+      "id": "UI-02",
+      "priority": "P0",
+      "ownerRole": "Frontend",
+      "state": "proposed",
+      "githubIssueNumber": null,
+      "dependencies": [
+        "UI-01",
+        "SEC-02"
+      ],
+      "sourceDependencyText": "UI-01,SEC-02",
+      "workAndAcceptance": "Composer、Stop、审批、排队状态、IME 组合输入"
+    },
+    {
+      "id": "GIT-01",
+      "priority": "P0",
+      "ownerRole": "Platform",
+      "state": "proposed",
+      "githubIssueNumber": null,
+      "dependencies": [
+        "CORE-04"
+      ],
+      "sourceDependencyText": "CORE-04",
+      "workAndAcceptance": "baseline diff、用户修改区分、非 Git 工作区可用"
+    },
+    {
+      "id": "ART-01",
+      "priority": "P0",
+      "ownerRole": "Backend",
+      "state": "proposed",
+      "githubIssueNumber": null,
+      "dependencies": [
+        "CORE-01"
+      ],
+      "sourceDependencyText": "CORE-01",
+      "workAndAcceptance": "ArtifactVersion、hash、基础预览、外部修改和另存为"
+    },
+    {
+      "id": "SKL-01",
+      "priority": "P0",
+      "ownerRole": "Agent",
+      "state": "proposed",
+      "githubIssueNumber": null,
+      "dependencies": [
+        "CORE-02"
+      ],
+      "sourceDependencyText": "CORE-02",
+      "workAndAcceptance": "SKILL.md 解析、显式选择、受控 ResourceLoader、3 个内置技能"
+    },
+    {
+      "id": "QA-01",
+      "priority": "P0",
+      "ownerRole": "QA",
+      "state": "proposed",
+      "githubIssueNumber": null,
+      "dependencies": [
+        "BOOT-01",
+        "BOOT-02",
+        "BOOT-03",
+        "BOOT-04",
+        "BOOT-05",
+        "CORE-01",
+        "CORE-02",
+        "CORE-03",
+        "CORE-04",
+        "SEC-01",
+        "SEC-02",
+        "SEC-03",
+        "UI-01",
+        "UI-02",
+        "GIT-01",
+        "ART-01",
+        "SKL-01"
+      ],
+      "sourceDependencyText": "上述 P0",
+      "workAndAcceptance": "两条端到端验收、崩溃/取消/跨线程安全回归"
+    },
+    {
+      "id": "PKG-01",
+      "priority": "P1",
+      "ownerRole": "Platform",
+      "state": "proposed",
+      "githubIssueNumber": null,
+      "dependencies": [
+        "SKL-01",
+        "SEC-02"
+      ],
+      "sourceDependencyText": "SKL-01,SEC-02",
+      "workAndAcceptance": "Manifest/安全解包/内容 Store/原子激活和失败回滚"
+    },
+    {
+      "id": "PKG-02",
+      "priority": "P1",
+      "ownerRole": "Backend",
+      "state": "proposed",
+      "githubIssueNumber": null,
+      "dependencies": [
+        "PKG-01"
+      ],
+      "sourceDependencyText": "PKG-01",
+      "workAndAcceptance": "签名选编索引、缓存、兼容过滤、撤销和离线说明"
+    },
+    {
+      "id": "SKL-02",
+      "priority": "P1",
+      "ownerRole": "Agent",
+      "state": "proposed",
+      "githubIssueNumber": null,
+      "dependencies": [
+        "PKG-01"
+      ],
+      "sourceDependencyText": "PKG-01",
+      "workAndAcceptance": "技能作用域、冲突、个人副本、测试和版本锁"
+    },
+    {
+      "id": "UI-03",
+      "priority": "P1",
+      "ownerRole": "Frontend",
+      "state": "proposed",
+      "githubIssueNumber": null,
+      "dependencies": [
+        "PKG-02",
+        "SKL-02"
+      ],
+      "sourceDependencyText": "PKG-02,SKL-02",
+      "workAndAcceptance": "市场/技能库分离、安装四步、更新权限 diff"
+    },
+    {
+      "id": "CORE-05",
+      "priority": "P1",
+      "ownerRole": "Platform",
+      "state": "proposed",
+      "githubIssueNumber": null,
+      "dependencies": [
+        "QA-01"
+      ],
+      "sourceDependencyText": "QA-01",
+      "workAndAcceptance": "多 Workspace 并发、Worktree 与写锁，事件互不污染"
+    },
+    {
+      "id": "CON-01",
+      "priority": "P1",
+      "ownerRole": "Backend",
+      "state": "proposed",
+      "githubIssueNumber": null,
+      "dependencies": [
+        "SEC-03"
+      ],
+      "sourceDependencyText": "SEC-03",
+      "workAndAcceptance": "一个只读 Connector、账户绑定、过期重连和审计"
+    },
+    {
+      "id": "ART-02",
+      "priority": "P1",
+      "ownerRole": "Agent",
+      "state": "proposed",
+      "githubIssueNumber": null,
+      "dependencies": [
+        "ART-01"
+      ],
+      "sourceDependencyText": "ART-01",
+      "workAndAcceptance": "选一个 Office 格式，从生成到校验/预览完整链路"
+    },
+    {
+      "id": "PRE-01",
+      "priority": "P1",
+      "ownerRole": "Product",
+      "state": "proposed",
+      "githubIssueNumber": null,
+      "dependencies": [
+        "SKL-02",
+        "CON-01"
+      ],
+      "sourceDependencyText": "SKL-02,CON-01",
+      "workAndAcceptance": "3 个专家预设和 3 个案例，创建前预览资源需求"
+    },
+    {
+      "id": "ISO-01",
+      "priority": "P2",
+      "ownerRole": "Security",
+      "state": "proposed",
+      "githubIssueNumber": null,
+      "dependencies": [
+        "CORE-04",
+        "PKG-02"
+      ],
+      "sourceDependencyText": "CORE-04,PKG-02",
+      "workAndAcceptance": "整个 Worker 隔离、网络/文件/秘密能力测试"
+    },
+    {
+      "id": "AUTO-01",
+      "priority": "P2",
+      "ownerRole": "Backend",
+      "state": "proposed",
+      "githubIssueNumber": null,
+      "dependencies": [
+        "ISO-01",
+        "CON-01"
+      ],
+      "sourceDependencyText": "ISO-01,CON-01",
+      "workAndAcceptance": "时区/漏跑/重试/去重/待审批，离线行为明确"
+    }
+  ]
+}

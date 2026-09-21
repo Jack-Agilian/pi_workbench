@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "0.1",
+  "id": "example.weekly-report",
+  "version": "0.1.0",
+  "displayName": "材料周报整理（本地草案）",
+  "description": "从用户授权的材料中生成可追溯的 Markdown 周报，不发送邮件、不发布、不执行任意脚本。",
+  "publisher": {
+    "id": "example",
+    "displayName": "本地示例作者"
+  },
+  "license": "LicenseRef-Local-Draft",
+  "compatibility": {
+    "hostApi": "0.1",
+    "declaredPlatforms": [
+      "darwin-arm64",
+      "win32-x64"
+    ],
+    "verification": "unverified",
+    "piSdkVersions": []
+  },
+  "contributes": {
+    "skills": [
+      {
+        "id": "weekly-report",
+        "path": "skills/weekly-report/SKILL.md"
+      }
+    ]
+  },
+  "requestedCapabilities": [
+    {
+      "name": "workspace.read",
+      "scope": "user-selected-inputs"
+    },
+    {
+      "name": "run-output.write",
+      "scope": "run-output"
+    }
+  ]
+}

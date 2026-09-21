@@ -1,0 +1,7 @@
+{
+  "command": "tsc --noEmit --strict --target ES2022 --module NodeNext --moduleResolution NodeNext contracts/app-protocol.ts",
+  "compiler": "Version 5.8.3",
+  "exitCode": 0,
+  "status": "passed",
+  "scope": "Standalone proposed contract typecheck only; no Pi dependency/runtime or Electron application built."
+}

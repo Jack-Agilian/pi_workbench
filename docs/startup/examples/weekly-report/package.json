@@ -1,0 +1,10 @@
+{
+  "name": "workbench-example-weekly-report",
+  "version": "0.1.0",
+  "private": true,
+  "pi": {
+    "skills": [
+      "./skills"
+    ]
+  }
+}

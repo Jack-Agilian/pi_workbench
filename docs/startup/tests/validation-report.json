@@ -1,0 +1,71 @@
+{
+  "scope": "Design-example validation only; no runtime, OS or sandbox implementation tested",
+  "checks": [
+    {
+      "name": "JSON Schema is valid Draft 2020-12",
+      "status": "passed"
+    },
+    {
+      "name": "Sample manifest conforms to schema",
+      "status": "passed"
+    },
+    {
+      "name": "Reject unknown manifest property",
+      "status": "passed"
+    },
+    {
+      "name": "Reject directory traversal resource path",
+      "status": "passed"
+    },
+    {
+      "name": "Reject Windows absolute resource path",
+      "status": "passed"
+    },
+    {
+      "name": "Reject POSIX absolute resource path",
+      "status": "passed"
+    },
+    {
+      "name": "All contributed resources exist inside example package",
+      "status": "passed"
+    },
+    {
+      "name": "Example resource lock matches exact skill bytes",
+      "status": "passed"
+    },
+    {
+      "name": "SQLite initial schema executes",
+      "status": "passed"
+    },
+    {
+      "name": "Create minimal linked product records",
+      "status": "passed"
+    },
+    {
+      "name": "Reject second active Run on same Thread",
+      "status": "passed"
+    },
+    {
+      "name": "Reject invalid Run state",
+      "status": "passed"
+    },
+    {
+      "name": "Reject orphan Thread",
+      "status": "passed"
+    },
+    {
+      "name": "Reject duplicate product sequence number",
+      "status": "passed"
+    },
+    {
+      "name": "No direct long-lived secret columns in sample SQL",
+      "status": "passed"
+    },
+    {
+      "name": "All source IDs have a source catalog entry",
+      "status": "passed"
+    }
+  ],
+  "passed": 16,
+  "failed": 0
+}
