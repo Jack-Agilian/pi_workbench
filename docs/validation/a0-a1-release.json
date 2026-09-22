@@ -1,0 +1,149 @@
+{
+  "recordedAt": "2026-09-22T09:47:19.611870+00:00",
+  "testedCommit": "7fad5e9d3af4ef70d72f71c58782f577e4aa0aca",
+  "node": {
+    "version": "24.21.0",
+    "npm": "11.19.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "lts": "Krypton",
+    "url": "https://nodejs.org/dist/v24.21.0/node-v24.21.0-darwin-arm64.tar.gz",
+    "sha256": "bed7eea5325e1108f32ce5228ddd6a5f0f08a499ee42aa7442aea583702f6057",
+    "bytes": 52909993,
+    "checksumSource": "https://nodejs.org/dist/v24.21.0/SHASUMS256.txt",
+    "selectionSource": "https://nodejs.org/dist/index.json",
+    "ltsSource": "https://nodejs.org/en/about/previous-releases",
+    "scope": "Official HTTPS archive SHA-256 comparison, no independent signature verification"
+  },
+  "piRelease": "https://github.com/earendil-works/pi/releases/tag/v0.87.0",
+  "piRegistryPublishedAt": "2026-09-21T16:51:53.584Z",
+  "lockfile": "package-lock.json",
+  "lockfileSha256": "e1740140e48a9dd03d166e73a842e72cd13b1e0b5bce272f6734dfd6992cf878",
+  "directDependencies": [
+    {
+      "package": "@earendil-works/pi-ai",
+      "version": "0.87.0",
+      "metadataUrl": "https://registry.npmjs.org/%40earendil-works%2Fpi-ai/0.87.0",
+      "tarballUrl": "https://registry.npmjs.org/@earendil-works/pi-ai/-/pi-ai-0.87.0.tgz",
+      "integrity": "sha512-lbRm+EMY6Jx3l+HLpbqbm9Yrhkc5u7EffLk2id+zJQEoBuR5I+tijGiZU8zlnuuCclmQOgH0PVjL9PLbeqJ9MQ==",
+      "bytes": 836978,
+      "sha256": "f2adf9de809d035f76f8dadf3d148720ebeef4606a848ab36ee834d895ae812f",
+      "installedFilesChecked": 772,
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "import": "./dist/index.js"
+        },
+        "./api/*": {
+          "types": "./dist/api/*.d.ts",
+          "import": "./dist/api/*.js"
+        },
+        "./oauth": {
+          "types": "./dist/oauth.d.ts",
+          "import": "./dist/oauth.js"
+        },
+        "./compat": {
+          "types": "./dist/compat.d.ts",
+          "import": "./dist/compat.js"
+        },
+        "./utils/*": {
+          "types": "./dist/utils/*.d.ts",
+          "import": "./dist/utils/*.js"
+        },
+        "./bun-oauth": {
+          "types": "./dist/bun-oauth.d.ts",
+          "import": "./dist/bun-oauth.js"
+        },
+        "./providers/*": {
+          "types": "./dist/providers/*.d.ts",
+          "import": "./dist/providers/*.js"
+        },
+        "./bedrock-provider": {
+          "types": "./dist/bedrock-provider.d.ts",
+          "import": "./dist/bedrock-provider.js"
+        }
+      },
+      "engines": {
+        "node": ">=22.19.0"
+      },
+      "scope": "HTTPS registry/lock/download SRI and installed package files; registry signatures not independently verified"
+    },
+    {
+      "package": "@earendil-works/pi-coding-agent",
+      "version": "0.87.0",
+      "metadataUrl": "https://registry.npmjs.org/%40earendil-works%2Fpi-coding-agent/0.87.0",
+      "tarballUrl": "https://registry.npmjs.org/@earendil-works/pi-coding-agent/-/pi-coding-agent-0.87.0.tgz",
+      "integrity": "sha512-S9JJVGHya/h0e0M+zwPTB6RkPe7PmLLqfBUTssFYW5mxAti6oZEILn4jvaUImENRC3U9RwXAB6H4gw8xj2J0GQ==",
+      "bytes": 7227603,
+      "sha256": "9a6733c0e6a31d592b53dc60df43dd0c26fa793ccf2384ed123fc17b0448866a",
+      "installedFilesChecked": 1100,
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "import": "./dist/index.js"
+        },
+        "./client": {
+          "source": "./src/client/index.ts"
+        },
+        "./rpc-entry": {
+          "import": "./dist/bundle/rpc-entry.js"
+        },
+        "./experimental/plugin": {
+          "source": "./src/experimental/plugin.ts"
+        }
+      },
+      "engines": {
+        "node": ">=22.19.0"
+      },
+      "scope": "HTTPS registry/lock/download SRI and installed package files; registry signatures not independently verified"
+    },
+    {
+      "package": "@types/node",
+      "version": "24.13.6",
+      "metadataUrl": "https://registry.npmjs.org/%40types%2Fnode/24.13.6",
+      "tarballUrl": "https://registry.npmjs.org/@types/node/-/node-24.13.6.tgz",
+      "integrity": "sha512-SGrw/h3KPFshy3OE6ZL53LMBG5vGQQ8/gIpiqz/kRZhPJ7HgwCEs8LBuNtWLa8dvGZVpSF7+Bf+c11HUrCb/yg==",
+      "bytes": 461826,
+      "sha256": "755b5147491e323c24541830f8eba438c1d1ef8931de725fc613b5439708464a",
+      "installedFilesChecked": 75,
+      "exports": null,
+      "engines": null,
+      "scope": "HTTPS registry/lock/download SRI and installed package files; registry signatures not independently verified"
+    },
+    {
+      "package": "typescript",
+      "version": "7.0.2",
+      "metadataUrl": "https://registry.npmjs.org/typescript/7.0.2",
+      "tarballUrl": "https://registry.npmjs.org/typescript/-/typescript-7.0.2.tgz",
+      "integrity": "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA==",
+      "bytes": 365612,
+      "sha256": "da2513f4b95176d6dde8b51aab7afe8a927656c9d277369793f77f7e59371c08",
+      "installedFilesChecked": 416,
+      "exports": {
+        ".": "./lib/version.cjs",
+        "./unstable/fs": "./dist/api/fs.js",
+        "./package.json": "./package.json",
+        "./unstable/ast": "./dist/ast/index.js",
+        "./unstable/sync": "./dist/api/sync/api.js",
+        "./unstable/async": "./dist/api/async/api.js",
+        "./unstable/proto": "./dist/api/proto.js",
+        "./unstable/ast/is": "./dist/ast/is.js",
+        "./unstable/ast/clone": "./dist/ast/clone.js",
+        "./unstable/ast/utils": "./dist/ast/utils.js",
+        "./unstable/ast/factory": "./dist/ast/factory.generated.js",
+        "./unstable/ast/scanner": "./dist/ast/scanner.js",
+        "./unstable/ast/visitor": "./dist/ast/visitor.js"
+      },
+      "engines": {
+        "node": ">=16.20.0"
+      },
+      "scope": "HTTPS registry/lock/download SRI and installed package files; registry signatures not independently verified"
+    }
+  ],
+  "lifecycleScriptsExecuted": [],
+  "skippedLifecyclePackages": [
+    "@google/genai@2.21.0",
+    "esbuild@0.28.2",
+    "protobufjs@7.6.6"
+  ]
+}

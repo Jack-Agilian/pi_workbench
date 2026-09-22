@@ -1,6 +1,8 @@
 # 上游证据与核验边界
 
-核验日期：2026-09-21。项目基线：`43e50c80a7938ea60fcf49813cc0809e872d31fa`。
+下文源码阅读是历史记录；当前发行选择与实际验证见文末 A0/A1。
+
+源码核验日期：2026-09-21。项目基线：`43e50c80a7938ea60fcf49813cc0809e872d31fa`。
 
 ## Pi 源码快照
 
@@ -64,3 +66,11 @@ P04/P05/P06/P07/P13 的固定源码链接是复查入口，不声称逐字核验
 | U04 | [包管理 1010–1250 行](https://github.com/earendil-works/pi/blob/466db0fecdc20996a553116984d18c0d362b035a/packages/coding-agent/src/core/package-manager.ts#L1010-L1250) | 固定 npm 版本跳过一般更新、Git ref 不同策略、显式 install/remove；未审计全部安装分支。 |
 
 当前修订基于产品提交 `be9e1f0858e9188131c959d2438dede73c0e2215`；上文的项目基线及环境为先前核验的历史记录。新的实际发行版本和运行证据填写到 reuse-map 的 adoption/evidenceRecords，不能将本文源码版本当发行锁。
+
+## A0/A1 实际发行验证（2026-09-22）
+
+已采用 Pi **0.87.0** / Node **24.21.0** LTS / npm **11.19.0**。实际输入及字节校验见 [发行包记录](../validation/a0-a1-release.json)，被测提交 `7fad5e9d3af4ef70d72f71c58782f577e4aa0aca` 的命令、平台和结果见 [A0/A1 报告](../validation/a0-a1-2026-09-22.md)。0.86.1 与 466db0f 源码索引仍保留为历史资料，未冒充当前发行锁。
+
+实际根 ESM import 与 10 项零模型 Session 探针通过；严格传递声明检查失败，缺口包括 JSON 类型导入和缺失的可选 MCP 类型模块，详见 [G01–G03](../validation/a0-a1-gaps.md)。已区分运行时导出、类型声明、类方法和 source-only/experimental 子入口。未读取 source 条件执行源码、未 deep-import、未修改上游。
+
+本轮只有内存配置/凭据和空资源注入，不验证 Provider/OAuth 或完整技能资源策略。reuse-map 中 verificationStatus=verified 仅指其 evidenceRecords.scope 明确限定的探针接缝；implementationState 仍为 in_progress，不能据此宣布完整模型/资源/配置能力可用。没有真实模型事件 fixture 或 A2 工具测试。

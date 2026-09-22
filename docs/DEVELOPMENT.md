@@ -143,3 +143,5 @@ export PATH="$PWD/node_modules/.bin:$PATH"
 ```
 
 下载审计对四个直接依赖比较 registry/lock/SRI/实际 tarball 字节，以及安装文件；输出仅在 `.artifacts/a0-a1/`。SDK tests 仅写入明确的合成记录，不调用 prompt/Provider；没有真实模型 fixture。订阅重放与注入故障也明确是合成测试。A0/A1 的阶段结果不代表 CORE-02、M0-SDK、M0-Pi 完成；本轮不进入 A2。
+
+本轮可定位结果：[A0/A1 验证报告](validation/a0-a1-2026-09-22.md)、[下载完整性记录](validation/a0-a1-release.json)。报告引用先提交后实测的代码 SHA；文档提交不冒充被测代码提交。

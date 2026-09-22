@@ -103,7 +103,11 @@
             "release-imports",
             "runtime-matrix"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-A0-RELEASE-20260922",
+            "EV-A0-BOOTSTRAP-20260922",
+            "EV-A0-DECLARATIONS-20260922"
+          ]
         },
         {
           "id": "BOOT-03-A02",
@@ -111,7 +115,10 @@
           "plannedChecks": [
             "evidence-levels"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-A1-SDK-20260922",
+            "EV-A0-REPO-20260922"
+          ]
         }
       ],
       "statusReason": "A0/A1零模型探针已建立；严格NodeNext声明检查被Pi 0.87.0传递声明的TS1543及TS2307阻塞，详见docs/validation/a0-a1-gaps.md；不放宽类型检查。"
@@ -255,7 +262,9 @@
             "binding-late-run",
             "binding-session-replacement"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-A1-SDK-20260922"
+          ]
         },
         {
           "id": "CORE-02-A02",
@@ -265,7 +274,9 @@
             "replacement-factory-failure",
             "replacement-rebind-failure"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-A1-SDK-20260922"
+          ]
         }
       ]
     },

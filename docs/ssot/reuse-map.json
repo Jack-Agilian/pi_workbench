@@ -8,9 +8,19 @@
     "sourceCommit": "466db0fecdc20996a553116984d18c0d362b035a",
     "manifestVersion": "0.86.1",
     "nodeRequirement": ">=22.19.0",
-    "releaseTarballVerified": false,
+    "releaseTarballVerified": true,
     "npmVersionPinned": "0.87.0",
-    "releaseArtifact": null
+    "releaseArtifact": {
+      "package": "@earendil-works/pi-coding-agent",
+      "version": "0.87.0",
+      "tarballUrl": "https://registry.npmjs.org/@earendil-works/pi-coding-agent/-/pi-coding-agent-0.87.0.tgz",
+      "integrity": "sha512-S9JJVGHya/h0e0M+zwPTB6RkPe7PmLLqfBUTssFYW5mxAti6oZEILn4jvaUImENRC3U9RwXAB6H4gw8xj2J0GQ==",
+      "nodeVersion": "24.21.0",
+      "lockfilePath": "package-lock.json",
+      "evidenceRefs": [
+        "EV-A0-RELEASE-20260922"
+      ]
+    }
   },
   "evidenceDocument": "upstream-evidence.md",
   "implementationStatus": "in_progress",
@@ -54,8 +64,11 @@
           }
         ],
         "selectedSourceCommit": null,
-        "verificationStatus": "unverified",
-        "testEvidence": []
+        "verificationStatus": "verified",
+        "testEvidence": [
+          "EV-A0-RELEASE-20260922",
+          "EV-A1-SDK-20260922"
+        ]
       }
     },
     {
@@ -106,8 +119,11 @@
           }
         ],
         "selectedSourceCommit": null,
-        "verificationStatus": "unverified",
-        "testEvidence": []
+        "verificationStatus": "verified",
+        "testEvidence": [
+          "EV-A0-RELEASE-20260922",
+          "EV-A1-SDK-20260922"
+        ]
       }
     },
     {
@@ -156,8 +172,11 @@
           }
         ],
         "selectedSourceCommit": null,
-        "verificationStatus": "unverified",
-        "testEvidence": []
+        "verificationStatus": "verified",
+        "testEvidence": [
+          "EV-A0-RELEASE-20260922",
+          "EV-A1-SDK-20260922"
+        ]
       }
     },
     {
@@ -190,8 +209,11 @@
           }
         ],
         "selectedSourceCommit": null,
-        "verificationStatus": "unverified",
-        "testEvidence": []
+        "verificationStatus": "verified",
+        "testEvidence": [
+          "EV-A0-RELEASE-20260922",
+          "EV-A1-SDK-20260922"
+        ]
       }
     },
     {
@@ -274,8 +296,11 @@
           }
         ],
         "selectedSourceCommit": null,
-        "verificationStatus": "unverified",
-        "testEvidence": []
+        "verificationStatus": "verified",
+        "testEvidence": [
+          "EV-A0-RELEASE-20260922",
+          "EV-A1-SDK-20260922"
+        ]
       }
     },
     {
@@ -792,5 +817,66 @@
       }
     }
   ],
-  "evidenceRecords": []
+  "evidenceRecords": [
+    {
+      "id": "EV-A0-RELEASE-20260922",
+      "kind": "release",
+      "result": "passed",
+      "scope": "Pi 0.87.0两个公开包与四个直接依赖的registry/lock/SRI/实际tarball/安装文件；Node 24.21.0 darwin-arm64 SHA256及实际根ESM导出。仅发行完整性与运行时导出；严格传递声明检查失败另记，不证明模型或发行签名。",
+      "commit": "7fad5e9d3af4ef70d72f71c58782f577e4aa0aca",
+      "recordedAt": "2026-09-22T09:51:31.717235+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/a0-a1-2026-09-22.md"
+    },
+    {
+      "id": "EV-A1-SDK-20260922",
+      "kind": "sdk",
+      "result": "passed",
+      "scope": "真实Pi 0.87.0零模型探针10/10：空资源/内存设置凭据、合成记录的内存与磁盘保存重开、订阅释放、Runtime fork/new/switch、不可复用Session绑定与三类合成替换故障、原生引用恢复；5项网络负向自检和文件/进程边界。无Provider调用；不涵盖真实运行取消、跨Run归属、A2工具或完整M0-SDK。",
+      "commit": "7fad5e9d3af4ef70d72f71c58782f577e4aa0aca",
+      "recordedAt": "2026-09-22T09:51:31.717235+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/a0-a1-2026-09-22.md"
+    },
+    {
+      "id": "EV-A0-DECLARATIONS-20260922",
+      "kind": "static",
+      "result": "failed",
+      "scope": "npm run typecheck在严格NodeNext/完整声明检查下exit 1：41项TS1543来自Pi嵌套pi-ai的JSON声明导入，1项TS2307来自google/genai的MCP声明引用。未跳过声明、未改上游、未使用any/ts-ignore。",
+      "commit": "7fad5e9d3af4ef70d72f71c58782f577e4aa0aca",
+      "recordedAt": "2026-09-22T09:51:31.717235+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/a0-a1-2026-09-22.md"
+    },
+    {
+      "id": "EV-A0-REPO-20260922",
+      "kind": "static",
+      "result": "passed",
+      "scope": "干净代码提交上的SSOT 60项、工具15项、结构检查、历史示例16项和历史协议类型检查通过；27个startup摘要不变。不是应用类型检查或产品E2E。",
+      "commit": "7fad5e9d3af4ef70d72f71c58782f577e4aa0aca",
+      "recordedAt": "2026-09-22T09:51:31.717235+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/a0-a1-2026-09-22.md"
+    },
+    {
+      "id": "EV-A0-BOOTSTRAP-20260922",
+      "kind": "platform",
+      "result": "passed",
+      "scope": "仅macOS 27.0 arm64：已有工作区默认文档/显式app初始化各重复两次；代码提交全新git archive副本显式下载Node后初始化，再offline初始化，锁不变，仓库外cwd两次探针10/10。未测试Windows/Linux或Electron/Worker ABI。",
+      "commit": "7fad5e9d3af4ef70d72f71c58782f577e4aa0aca",
+      "recordedAt": "2026-09-22T09:51:31.717235+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/a0-a1-2026-09-22.md"
+    }
+  ]
 }

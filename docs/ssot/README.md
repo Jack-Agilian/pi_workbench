@@ -31,3 +31,7 @@ python scripts/test-tools.py
 ```
 
 完整原始设计示例检查仍可用 `python scripts/check-docs.py --typecheck`，其通过不能代替真实 Pi 与 macOS/Windows 测试。检查结果生成到 `.artifacts/`，不覆盖快照里的旧报告。
+
+## A0/A1 实际进度
+
+[被测提交与脱敏报告](../validation/a0-a1-2026-09-22.md) · [发行包完整性](../validation/a0-a1-release.json) · [公开入口缺口](../validation/a0-a1-gaps.md)。Pi 0.87.0 / Node 24.21.0 的零模型 Session 探针通过；严格应用类型检查仍失败。BOOT-03 blocked、CORE-02 in_progress，M0 三个 Gate pending，本轮未进入 A2。
