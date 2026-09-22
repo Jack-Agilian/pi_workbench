@@ -308,6 +308,17 @@
             "EV-A1-SDK-20260922",
             "EV-A1-CLOSEOUT-SDK-20260922"
           ]
+        },
+        {
+          "id": "CORE-02-A03",
+          "requirement": "关闭与替换串行结算；factory/rebind期间关闭不发布迟到实例；并发关闭共享清理完成或失败结果",
+          "plannedChecks": [
+            "close-during-factory",
+            "close-during-rebind",
+            "concurrent-close",
+            "close-from-subscription-hook"
+          ],
+          "evidenceRefs": []
         }
       ]
     },
@@ -589,6 +600,16 @@
             "EV-A4-AUTH-20260922",
             "EV-A4-MAC-ISOLATION-20260922"
           ]
+        },
+        {
+          "id": "SEC-03-A03",
+          "requirement": "M0同provider单账户；固定账户/provider白名单拒绝别名和未知账户；UI异步状态按请求/账户generation阻止旧投影",
+          "plannedChecks": [
+            "single-account-per-provider",
+            "auth-selection-immutable",
+            "auth-view-generation"
+          ],
+          "evidenceRefs": []
         }
       ],
       "statusReason": "A4仅验证公开ModelRuntime/内存CredentialStore及合成认证并发、脱敏投影和隔离环境；系统Keychain/DPAPI、退出flush、真实OAuth、Renderer/IPC和产品日志未实现，前置与完整验收未完成。"
@@ -788,7 +809,8 @@
           "requirement": "快照含模板/脚本/批准资料闭包；禁用不擦除transcript，也不替代授权",
           "plannedChecks": [
             "resource-snapshot-closure",
-            "resource-disable"
+            "resource-disable",
+            "resource-containment-path-flavors"
           ],
           "evidenceRefs": [
             "EV-A3-RESOURCES-20260922"

@@ -89,6 +89,8 @@ export class ProbeBinding {
   private current?: Binding;
   private replacing = false;
   private closed = false;
+  private replacement?: Promise<unknown>;
+  private closePromise?: Promise<void>;
   lastNativeSessionFile?: string;
   readonly runtime: AgentSessionRuntime;
   private readonly observe: (observation: Observation) => void;
@@ -140,6 +142,7 @@ export class ProbeBinding {
   }
 
   private async bind(session: AgentSession): Promise<void> {
+    if (this.closed) throw new Error('session_unavailable');
     this.invalidate();
     const binding: Binding = {
       id: randomUUID(), session, nativeSessionId: session.sessionId,
@@ -147,6 +150,7 @@ export class ProbeBinding {
     };
     try {
       await session.bindExtensions({});
+      if (this.closed) throw new Error('session_unavailable');
       const callback = (event: AgentSessionEvent) => {
         // Capture immutable identity, never fill in "current session" at delivery time.
         if (!binding.active || this.current !== binding || this.closed) return;
@@ -154,11 +158,13 @@ export class ProbeBinding {
       };
       binding.unsubscribe = session.subscribe(callback);
       this.afterSubscribe?.(callback);
+      if (this.closed) throw new Error('session_unavailable');
       this.current = binding;
     } catch (error) {
       binding.active = false;
       binding.unsubscribe();
-      session.dispose();
+      // During close the runtime remains the owner, and disposes after replacement settles.
+      if (!this.closed) session.dispose();
       throw error;
     }
   }
@@ -177,8 +183,14 @@ export class ProbeBinding {
   private async replace(action: () => Promise<unknown>): Promise<void> {
     if (!this.available) throw new Error('session_unavailable');
     this.replacing = true;
-    try { await action(); }
-    finally { this.replacing = false; }
+    // Register ownership before entering any factory/rebind callback (which may call close).
+    const pending = Promise.resolve().then(() => {
+      if (this.closed) throw new Error('session_unavailable');
+      return action();
+    });
+    this.replacement = pending;
+    try { await pending; }
+    finally { this.replacement = undefined; this.replacing = false; }
     // A failure before invalidation retains the old binding; after invalidation
     // current stays absent. No rollback to Pi's disposed runtime.session object.
   }
@@ -191,10 +203,17 @@ export class ProbeBinding {
     await this.replace(() => this.runtime.switchSession(path));
   }
 
-  async close(): Promise<void> {
-    if (this.closed) return;
+  close(): Promise<void> {
+    if (this.closePromise) return this.closePromise;
     this.closed = true;
+    const pending = this.replacement;
+    this.closePromise = Promise.resolve().then(async () => {
+      // Replacement reports its own error. Its late instance must still be reclaimed.
+      try { await pending; } catch { /* Always proceed to runtime cleanup. */ }
+      await this.runtime.dispose();
+    });
     this.invalidate();
-    await this.runtime.dispose();
+    // Keep the same completion/rejection for every caller; never report an early success.
+    return this.closePromise;
   }
 }

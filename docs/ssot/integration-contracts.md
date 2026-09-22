@@ -32,6 +32,8 @@ UI 发送输入、Thread、附件引用和选择；App Server 核验并生成 Ru
 
 Session 替换不是自动回滚事务：所核查的 Pi Runtime 先 teardown 旧实例，再创建新实例。[U01] 宿主在替换前保留最后可恢复的 nativeSessionRef，用公开失效/重新绑定回调管理有效性。失效前失败可保留仍有效旧实例；失效后 factory 失败进入 `session_unavailable`，禁止向旧 disposed 对象发送。新实例创建成功但 UI/订阅 rebind 失败时也先阻断新运行，清理不完整绑定后重试绑定或按原生引用恢复，不能制造双实例/双订阅。恢复仍走 Pi SessionManager/Runtime，不自行编辑原生历史。覆盖三种失败点：前置检查、旧实例失效后的创建、创建后的 rebind。
 
+关闭请求立即阻止新绑定/调用，并等待在途替换的 factory/rebind 结算后，由 Runtime 回收最后实例。重复关闭共享同一个清理完成/失败结果，不因已设置 closed 就提前返回成功。绑定入口、异步绑定后及发布前都检查关闭状态；迟到实例不能重新发布，清理失败不假报已退出。
+
 `AgentSessionEvent` 和工具详情可在 adapter 内直接使用；传往 UI 只暴露已脱敏、大小受限、可序列化的必要字段。保留 `source.type` 和未知事件的 diagnostic fallback，不以重写 Pi 的整个 event union 作为接入前置条件。
 
 ### 2.3 Operation 接缝
@@ -90,6 +92,8 @@ A3 的 [限定证据](../validation/a3-2026-09-22.md) 已用实际 Pi reload 验
 ## 6. 模型与凭据接口
 
 用 `ModelRuntime` / pi-ai 提供模型目录、认证/刷新与请求协议。宿主适配公开 `CredentialStore`，不复制 Provider OAuth 协议。前端只收账户 ID/状态、模型展示字段与受控登录交互，不收原始 token。[P14]
+
+M0 明确同 provider 只允许一个配置账户。accountId 是产品标识，不是 Pi 凭据命名空间；宿主在查询前一次性登记完整且不可变的账户/provider 白名单，拒绝重复账户、同 provider 的第二个账户和未知账户查询。logout 只改变凭据，不解除该绑定。多个 Runtime 若共享 store 仍共享凭据，不能据此宣称多账户隔离。当前探针只强制单 Runtime 的配置边界；未来设置/IPC 层须落实同一产品约束。真实多账户需要独立存储命名空间及 Runtime scope，另行验证。UI 异步投影还需请求/账户 generation，旧页面结果不得覆盖新选择。
 
 CredentialStore 桥接成功也不代表 Pi Worker 永远接触不到凭据。需要向模型 Provider 发请求的进程可能使用凭据；受信任/隔离范围必须说明。Shell 子进程不继承所有账户环境变量。Keychain/DPAPI 适配、并发登录/刷新、退出前 flush 与错误脱敏需实测，不把 Pi 的文件存储直接称作系统密钥库。
 

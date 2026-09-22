@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { afterEach, test } from 'node:test';
 import * as ai from '@earendil-works/pi-ai';
 import * as pi from '@earendil-works/pi-coding-agent';
-import { createAuthProbe, projectAuthChange, readAuthView, type AuthSelection } from './auth-probe.ts';
+import { createAuthProbe, projectAuthChange, createAuthViewReader, type AuthSelection } from './auth-probe.ts';
 import { createProbeServices } from './probe.ts';
 
 const root = process.env.PI_PROBE_ROOT;
@@ -78,7 +78,8 @@ async function fixture(store: ai.CredentialStore = new ai.InMemoryCredentialStor
   const selection: AuthSelection = { accountId: 'synthetic-account', providerId,
     models: [{ id: 'synthetic-model', providerModelId: model.id, label: 'Synthetic model (no inference)' }] };
   const interaction = { signal: signal(), prompt: async () => value, notify: () => {} };
-  return { runtime, provider, providerId, store, modelsStore, model, value, state, calls, oauth, selection, interaction };
+  const read = createAuthViewReader(runtime, [selection]);
+  return { runtime, provider, providerId, store, modelsStore, model, value, state, calls, oauth, selection, interaction, read };
 }
 
 probe('A4 public release exports, type-only interfaces and class methods remain distinct', async () => {
@@ -109,15 +110,15 @@ probe('injected stores ignore synthetic auth/models files; empty store does not 
 
 probe('API-key login, runtime override, removal and logout reuse Pi; DTO excludes raw metadata', async () => {
   const f = await fixture();
-  assert.equal((await readAuthView(f.runtime, f.selection, signal())).state, 'unconfigured');
+  assert.equal((await f.read(f.selection.accountId, signal())).state, 'unconfigured');
   assert.equal(await projectAuthChange(() => f.runtime.login(f.providerId, 'api_key', f.interaction)), 'synchronized');
   assert.equal(f.calls.login, 1);
-  const view = await readAuthView(f.runtime, f.selection, signal());
+  const view = await f.read(f.selection.accountId, signal());
   assert.deepEqual(view, { accountId: 'synthetic-account', state: 'configured', method: 'api_key',
     models: [{ id: 'synthetic-model', label: 'Synthetic model (no inference)', available: true }] });
   assert.equal(JSON.stringify(view).includes('A4_SYNTHETIC_SECRET_'), false);
   f.state.checkFailure = true;
-  assert.equal((await readAuthView(f.runtime, f.selection, signal())).state, 'unavailable');
+  assert.equal((await f.read(f.selection.accountId, signal())).state, 'unavailable');
   f.state.checkFailure = false;
   assert.deepEqual(await f.runtime.listCredentials(), [{ providerId: f.providerId, type: 'api_key' }]);
   const override = secret();
@@ -140,7 +141,7 @@ probe('configured status does not refresh expired OAuth; concurrent auth resolut
   await f.store.modify(f.providerId, async () => expired);
   const started = gate(); const release = gate();
   f.provider.auth.oauth!.refresh = async () => { f.calls.refresh++; started.open(); await release.promise; return f.oauth(); };
-  const before = await readAuthView(f.runtime, f.selection, signal());
+  const before = await f.read(f.selection.accountId, signal());
   assert.equal(before.state, 'configured');
   assert.equal(before.method, 'oauth');
   assert.equal(f.calls.refresh, 0, 'Display must not refresh tokens');
@@ -277,7 +278,7 @@ probe('store rejection before or after write is unknown; safe status projection 
     assert.equal(await projectAuthChange(() => f.runtime.login(f.providerId, 'api_key', f.interaction)), 'unknown');
     assert.equal(Boolean(await backing.read(f.providerId)), afterCommit, 'Error alone cannot prove persistence outcome');
     failRead = true;
-    const view = await readAuthView(f.runtime, f.selection, signal());
+    const view = await f.read(f.selection.accountId, signal());
     assert.equal(view.state, 'unavailable');
     assert.equal(view.models[0]!.available, false);
     assert.equal(JSON.stringify(view).includes('A4_SYNTHETIC_SECRET_'), false);
@@ -339,4 +340,42 @@ probe('superseded offline catalog publication cannot overwrite newer models or p
   assert.equal(f.runtime.getModel(f.providerId, 'synthetic-old'), undefined);
   assert.ok(f.runtime.getModel(f.providerId, 'synthetic-new'));
   assert.equal((await f.modelsStore.read(f.providerId))?.models[0]?.id, 'synthetic-new');
+});
+
+probe('M0 account allowlist rejects provider/account aliases before reading credentials', async () => {
+  const runtime = await createAuthProbe(new ai.InMemoryCredentialStore());
+  const a = { accountId: 'synthetic-account-a', providerId: 'synthetic-provider-a', models: [] };
+  const b = { ...a, accountId: 'synthetic-account-b' };
+  let checks = 0;
+  const check = runtime.checkAuth.bind(runtime);
+  runtime.checkAuth = async (...args) => { checks++; return check(...args); };
+  assert.throws(() => createAuthViewReader(runtime, [a, b]), /multiple_accounts_per_provider_not_supported/);
+  assert.throws(() => createAuthViewReader(runtime, [a, { ...a, providerId: 'synthetic-provider-b' }]), /duplicate_account_id/);
+  const read = createAuthViewReader(runtime, [a]); // Invalid configuration must not consume the registry.
+  assert.throws(() => createAuthViewReader(runtime, [b]), /auth_accounts_already_bound/);
+  await assert.rejects(read(b.accountId, signal()), /unknown_auth_account/);
+  assert.equal(checks, 0, 'Rejected aliases must not query any provider or credential');
+});
+
+probe('M0 fixed account selection survives caller mutation; Pi login/logout stay scoped to that provider', async () => {
+  const f = await fixture();
+  // A separate sterile Runtime for this explicit host configuration, using the approved synthetic provider.
+  const runtime = await createAuthProbe(new ai.InMemoryCredentialStore());
+  runtime.registerNativeProvider(f.provider);
+  const configured = { accountId: 'synthetic-account-a', providerId: f.providerId,
+    models: [{ id: 'safe-id', providerModelId: f.model.id, label: 'Synthetic safe label' }] };
+  const read = createAuthViewReader(runtime, [configured]);
+  configured.accountId = 'synthetic-account-b'; configured.providerId = 'synthetic-unapproved';
+  configured.models[0].label = 'MUTATED'; configured.models.length = 0;
+  assert.equal((await read('synthetic-account-a', signal())).state, 'unconfigured');
+  await runtime.login(f.providerId, 'api_key', f.interaction);
+  const view = await read('synthetic-account-a', signal());
+  assert.equal(view.accountId, 'synthetic-account-a');
+  assert.equal(view.state, 'configured');
+  assert.equal(view.models[0].label, 'Synthetic safe label');
+  await assert.rejects(read('synthetic-account-b', signal()), /unknown_auth_account/);
+  await runtime.logout(f.providerId, { signal: signal() });
+  assert.equal((await read('synthetic-account-a', signal())).state, 'unconfigured');
+  assert.throws(() => createAuthViewReader(runtime, [configured]), /auth_accounts_already_bound/,
+    'Logout clears credentials, not the fixed product identity; rebinding is not supported');
 });

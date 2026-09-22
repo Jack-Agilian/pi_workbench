@@ -2,6 +2,12 @@
 
 状态：A0–A4 限定无模型探针通过；B 最小产品核心及同进程 Pi 接入已验证，真实 Worker/IPC 和完整恢复仍待实施。决策依据：[SSOT](../ssot/README.md)。工作项见 [backlog.json](backlog.json)；历史原始范围见[原始 Backlog](../startup/docs/08-delivery-and-references.md)。尚未创建 GitHub Issues。
 
+## 当前唯一开发项：B 的进程接缝与失败恢复
+
+B 的最小持久核心已经落地，仍缺实际 Worker 生命周期、受限 IPC、资源/权限绑定及清理证据。先修正 A4 审核指出的关闭/替换竞态、跨盘范围判断，并固定 M0 同 provider 单账户约束；之后连接真实 Worker，覆盖实际进程中断、替换三类失败和原生引用恢复。不得把合成 hostClean/崩溃输入当作进程监督，也不自动重发 unknown 操作。
+
+Node SQLite 的权限缺口与候选 API 稳定性继续按 [B 边界](../validation/b-boundaries.md) 验证。完成 B 接缝后再进入 C；当前不安装 Electron/React，不使用真实账户或模型。以下 A0–A4/B 小节是阶段记录，其中历史状态不能替代本栏的当前顺序。
+
 ## 1. 下一增量不是再造平台
 
 **M0-A：Pi 公开 API 接入探针 + 最小桌面/产品契约。**先证明能复用，再逐步连接 UI，不先编写独立 Agent Runtime、技能解析器或工具库。Mock 保留为确定性测试与演示手段，不能成为另一套算法或伪造真实 Pi 事件。
@@ -60,32 +66,32 @@ CORE-04 的工具接缝验收增加 BOOT-03/CORE-02/SEC-02；SEC-03 的凭据验
 
 本轮修订范围及 planned 用例见 [R01–R08](../ssot/review-fixes.md)；可持续状态与证据规范见 [SSOT 维护](../ssot/maintenance.md)。
 
-## A0/A1 已验证范围（2026-09-22）
+## 阶段记录：A0/A1（2026-09-22）
 
 已固定 Node 24.21.0 / npm 11.19.0 / Pi 0.87.0；新增最小 `packages/pi-adapter`、显式应用初始化、离线探针和下载审计。严格 NodeNext 类型检查通过 [ADR-A0](../ssot/adr-a0-pi-types.md) 固定声明补丁与精确 MCP 类型 peer 解除阻塞，BOOT-03 改为 in_progress。CORE-02 仅推进 Session 绑定、替换和三类失败探针，仍为 in_progress；未完成产品 Run 归属。当前被测提交与证据见 [收尾报告](../validation/a0-a1-closeout-2026-09-22.md)，原始发行缺口和历史失败保留。
 
 M0-UI、M0-SDK、M0-Pi 保持 pending。A0/A1 原交付停止在其限定范围；后续 A2 记录如下。
 
-## A2 本轮范围与下一步（2026-09-22）
+## 阶段记录：A2（2026-09-22）
 
 继续采用 Pi 0.87.0 的公开 read/edit/write/bash 工厂与 Operations，新增每次调用的固定身份/批准快照、写入前置条件与隔离测试。19 项工具测试、4 项真实 macOS Bash 测试、A1 回归及新副本重跑通过，见 [实际证据](../validation/a2-2026-09-22.md)。CORE-04、SEC-02 从 proposed 推进到 in_progress，BOOT-03/CORE-02 仍 in_progress；前置任务和完整产品验收未被跳过。
 
-辅助 I/O、非原子文件检查、宿主 executeBash 与未覆盖平台的限制见 [A2 边界](../validation/a2-boundaries.md)。本轮在 A2 停止。下一轮进入 A3 受控资源/包探针，仍先复用公开 Skill/ResourceLoader/PackageManager；不提前开启未知扩展、模型调用或整个市场实现。三个 M0 Gate 继续 pending。
+辅助 I/O、非原子文件检查、宿主 executeBash 与未覆盖平台的限制见 [A2 边界](../validation/a2-boundaries.md)。A2 当时的交付止于工具探针；后续 A3/A4 和 B 的证据分别列于下文。三个 M0 Gate 继续 pending。
 
-## A3 后续范围与下一步（2026-09-22）
+## 阶段记录：A3（2026-09-22）
 
 A3 已在 Pi 0.87.0 验证受控技能快照/原生刷新 9 项，以及真实离线 npm/Git 安装 8 项，见 [报告](../validation/a3-2026-09-22.md)。缺包解析策略、默认加载器隐式安装、祖先发现和原地更新等限制见 [边界](../validation/a3-boundaries.md)。没有复制 Pi 的技能或包来源解析器。新副本独立初始化、外部 cwd 连续两轮通过。
 
-SKL-01、PKG-01 仅进入 in_progress，完整产品启用、签名/撤销、活动引用管理和 CLI 对账仍待实施。BOOT-03 继续 in_progress，三个 Gate 仍 pending。本轮停止于 A3；下一轮按顺序进入 **A4 凭据/模型公开入口的零真实模型探针**，继续空/合成凭据隔离，不自动使用真实账户或调用 Provider。
+SKL-01、PKG-01 仅进入 in_progress，完整产品启用、签名/撤销、活动引用管理和 CLI 对账仍待实施。BOOT-03 继续 in_progress，三个 Gate 仍 pending。A3 当时未包含 A4；后续凭据/模型探针的实际证据列于下文，仍未使用真实账户或 Provider。
 
-## A4 后续范围与下一步（2026-09-22）
+## 阶段记录：A4（2026-09-22）
 
 A4 使用真实 Pi 0.87.0 ModelRuntime/内存 CredentialStore 完成 16 项合成认证接缝测试：状态白名单、临时 key、刷新/登录/注销竞争、取消、提交后同步失败和目录发布；完整回归、重复初始化及新副本两轮通过，见 [报告](../validation/a4-2026-09-22.md)。[边界](../validation/a4-boundaries.md) 明确异常可能含密钥、取消不代表底层已结束、系统存储/flush 未实现；没有真实 OAuth 或模型调用。
 
-SEC-03 进入 in_progress；BOOT-03/CORE-02 仍 in_progress，三个 M0 Gate 仍 pending。本轮停止于 A4，下一轮进入 **B：最小产品协调与持久化**，先收敛 BOOT-01 的最小产品契约，复用已验证 Pi 入口承接产品身份、事件和操作结算；不另造 Session 树、认证协议或 Harness，也不自动进入真实模型验收。
+SEC-03 进入 in_progress；BOOT-03/CORE-02 仍 in_progress，三个 M0 Gate 仍 pending。A4 当时的交付止于认证接缝；后续 B 已采用这些公开入口，没有另造 Session 树、认证协议或 Harness。
 
-## B 最小核心与下一增量（2026-09-22）
+## 阶段记录：B 最小核心（2026-09-22）
 
 [最小契约](../ssot/b-minimal-contract.md) 收敛了产品命令/身份/事务/事件和真实文件成果；采用固定 Node 的公开 SQLite 候选入口，没有新增依赖或重写 Pi 原生历史。17 项核心测试和 5 项 Pi 接入测试、全部前序回归、新副本两轮与重复初始化通过，见 [报告](../validation/b-2026-09-22.md)。BOOT-01、CORE-01、CORE-03、ART-01 进入 in_progress；B 及三个 M0 Gate 均未完成。
 
-下一增量继续 B：连接实际 Worker 生命周期和受限 IPC，使产品绑定、批准/操作结算、资源锁和清理证据跨进程成立；覆盖实际进程中断、替换三类失败与原生引用恢复。Node SQLite 文件访问的权限缺口与候选 API 稳定性须按 [边界记录](../validation/b-boundaries.md) 继续验证。不得把本轮合成 hostClean/崩溃输入当作实际监督，也不自动重发 unknown 操作。完成这些接缝后再进入 C；当前不安装 Electron/React，不使用真实账户或模型。
+后续范围以本文顶部“当前唯一开发项”为准；本段仅记录 B 的模块级交付。

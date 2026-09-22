@@ -20,8 +20,33 @@ export interface AuthView {
   models: { id: string; label: string; available: boolean }[];
 }
 
+const boundRuntimes = new WeakSet<ModelRuntime>();
+
+/** M0: one fixed product account per provider in a Runtime. accountId is not a credential namespace.
+ * Register the complete host allowlist once, before queries. Login/refresh/logout remain Pi-owned.
+ */
+export function createAuthViewReader(runtime: ModelRuntime, selections: readonly AuthSelection[]) {
+  if (boundRuntimes.has(runtime)) throw new Error('auth_accounts_already_bound');
+  const accounts = new Map<string, AuthSelection>();
+  const providers = new Set<string>();
+  for (const selection of selections) {
+    if (!selection.accountId || !selection.providerId) throw new Error('invalid_auth_selection');
+    if (accounts.has(selection.accountId)) throw new Error('duplicate_account_id');
+    if (providers.has(selection.providerId)) throw new Error('multiple_accounts_per_provider_not_supported');
+    providers.add(selection.providerId);
+    accounts.set(selection.accountId, Object.freeze({ accountId: selection.accountId, providerId: selection.providerId,
+      models: Object.freeze(selection.models.map(model => Object.freeze({ ...model }))) }));
+  }
+  boundRuntimes.add(runtime);
+  return async (accountId: string, signal: AbortSignal): Promise<AuthView> => {
+    const selection = accounts.get(accountId);
+    if (!selection) throw new Error('unknown_auth_account');
+    return readAuthView(runtime, selection, signal);
+  };
+}
+
 /** Configuration is not token validity. checkAuth intentionally does not refresh OAuth. */
-export async function readAuthView(runtime: ModelRuntime, selection: AuthSelection, signal: AbortSignal): Promise<AuthView> {
+async function readAuthView(runtime: ModelRuntime, selection: AuthSelection, signal: AbortSignal): Promise<AuthView> {
   const models = selection.models.map(({ id, label }) => ({ id, label, available: false }));
   try {
     const check = await runtime.checkAuth(selection.providerId, { signal });

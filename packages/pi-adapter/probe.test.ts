@@ -283,3 +283,113 @@ test('repeat-lifecycle: repeated create/replace/close leaves no probe timers or 
   assert.deepEqual(process.getActiveResourcesInfo().filter(x => /Timeout|TCP|UDP|Process|Worker/.test(x)), before);
   // No idle abort assertion: running model cancellation is deliberately untested.
 });
+
+function lifecycleGate() {
+  let release!: () => void;
+  const promise = new Promise<void>(resolve => { release = resolve; });
+  return { promise, release };
+}
+function trackSession(session: pi.AgentSession) {
+  // Delegate to the actual SDK. Only the counters and gates are synthetic.
+  const state = { disposals: 0, subscriptions: new Set<(event: AgentSessionEvent) => void>() };
+  const subscribe = session.subscribe.bind(session);
+  session.subscribe = callback => {
+    state.subscriptions.add(callback);
+    const unsubscribe = subscribe(callback);
+    return () => { state.subscriptions.delete(callback); unsubscribe(); };
+  };
+  const dispose = session.dispose.bind(session);
+  session.dispose = () => { dispose(); state.disposals++; state.subscriptions.clear(); };
+  return state;
+}
+
+for (const phase of ['factory', 'rebind'] as const) test(`close-during-${phase}: late real Session is disposed without republishing a binding`, { timeout: 10_000 }, async () => {
+  const entered = lifecycleGate(); const release = lifecycleGate();
+  const tracked: ReturnType<typeof trackSession>[] = [];
+  let calls = 0;
+  const factory: CreateAgentSessionRuntimeFactory = async options => {
+    const replacing = ++calls === 2;
+    if (replacing && phase === 'factory') { entered.release(); await release.promise; }
+    const result = await createProbeRuntime(options);
+    tracked.push(trackSession(result.session));
+    if (replacing && phase === 'rebind') {
+      const bind = result.session.bindExtensions.bind(result.session);
+      result.session.bindExtensions = async handlers => {
+        await bind(handlers); entered.release(); await release.promise;
+      };
+    }
+    return result;
+  };
+  const callbacks: Array<(event: AgentSessionEvent) => void> = [];
+  const { host, observations } = await open(paths(), false, { factory, afterSubscribe: cb => callbacks.push(cb) });
+  await host.appendSynthetic(host.bindingId!, 'SYNTHETIC before close/replacement race');
+  const event = observations[0].event;
+  // Attach the rejection handler immediately: the close fence must reject this replacement.
+  const replacement = assert.rejects(host.newSession(), /session_unavailable/);
+  await entered.promise;
+  let closed = false;
+  const closing = host.close().then(() => { closed = true; });
+  try {
+    await new Promise<void>(resolve => setImmediate(resolve));
+    assert.equal(closed, false, 'close must wait for factory/rebind ownership to settle');
+    assert.equal(host.available, false);
+    assert.equal(host.bindingId, undefined);
+  } finally { release.release(); await Promise.all([replacement, closing]); }
+  assert.equal(tracked.length, 2);
+  assert.ok(tracked.every(state => state.disposals > 0 && state.subscriptions.size === 0));
+  assert.equal(callbacks.length, 1, 'Closing must prevent subscription to the late instance');
+  callbacks[0](event);
+  assert.equal(observations.length, 2, 'Queued old observation stays fenced');
+  assert.equal(host.bindingId, undefined);
+  await host.close();
+  await assert.rejects(host.newSession(), /session_unavailable/);
+});
+
+for (const fail of [false, true]) test(`concurrent-close: all callers await the same ${fail ? 'failed' : 'successful'} cleanup`, { timeout: 10_000 }, async () => {
+  const { host } = await open();
+  const entered = lifecycleGate(); const release = lifecycleGate();
+  const dispose = host.runtime.dispose.bind(host.runtime);
+  let cleanups = 0;
+  host.runtime.dispose = async () => {
+    cleanups++; entered.release(); await release.promise;
+    if (fail) throw new Error('SYNTHETIC_CLEANUP_FAILURE');
+    await dispose();
+  };
+  const first = host.close();
+  const second = host.close();
+  const settled: string[] = [];
+  const outcomes = [first, second].map((promise, index) => promise.then(
+    () => { settled.push(`resolved-${index}`); },
+    error => { assert.match(String(error), /SYNTHETIC_CLEANUP_FAILURE/); settled.push(`rejected-${index}`); },
+  ));
+  try {
+    await entered.promise;
+    await new Promise<void>(resolve => setImmediate(resolve));
+    assert.equal(first, second, 'One shared completion, including a retained cleanup rejection');
+    assert.deepEqual(settled, [], 'Neither close caller can return before cleanup');
+  } finally { release.release(); await Promise.all(outcomes); if (fail) await dispose(); }
+  assert.equal(cleanups, 1);
+  assert.deepEqual(settled.sort(), fail ? ['rejected-0', 'rejected-1'] : ['resolved-0', 'resolved-1']);
+  if (fail) await assert.rejects(host.close(), /SYNTHETIC_CLEANUP_FAILURE/);
+  else await host.close();
+  assert.equal(cleanups, 1, 'Repeated close must not silently retry cleanup');
+  assert.equal(host.bindingId, undefined);
+});
+
+test('close-from-subscription-hook: synchronous close cannot publish the partial binding', async () => {
+  let host: ProbeBinding | undefined;
+  let closing: Promise<void> | undefined;
+  const tracked: ReturnType<typeof trackSession>[] = [];
+  const factory: CreateAgentSessionRuntimeFactory = async options => {
+    const result = await createProbeRuntime(options); tracked.push(trackSession(result.session)); return result;
+  };
+  ({ host } = await open(paths(), false, { factory, afterSubscribe: () => {
+    if (host) closing = host.close(); // Explicit synthetic reentrant host hook, not an extension.
+  } }));
+  await assert.rejects(host.newSession(), /session_unavailable/);
+  assert.ok(closing);
+  await closing;
+  assert.equal(host.bindingId, undefined);
+  assert.equal(host.available, false);
+  assert.ok(tracked.every(state => state.disposals > 0 && state.subscriptions.size === 0));
+});

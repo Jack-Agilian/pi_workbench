@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { dirname, join, posix, win32 } from 'node:path';
 import { test } from 'node:test';
 import * as pi from '@earendil-works/pi-coding-agent';
 import { createProbeServices } from './probe.ts';
-import { contentId, contentLoader, inspectContent, materializeContent, ResourceAdmission } from './resource-probe.ts';
+import { contentId, contentLoader, inside, inspectContent, materializeContent, ResourceAdmission } from './resource-probe.ts';
 
 const root = process.env.PI_PROBE_ROOT;
 assert.ok(root, 'Use npm run test:pi-resources');
@@ -227,4 +227,26 @@ test('snapshot tampering after load is detected at admission', async () => {
     chmodSync(file, 0o644); writeFileSync(file, 'SYNTHETIC owner tampering');
     assert.throws(() => p.admission.requireReady(a.id), /integrity_failure/);
   } finally { p.session.dispose(); }
+});
+
+// Path flavor tests run on macOS too; these are NOT Windows filesystem/sandbox evidence.
+test('resource-containment: POSIX root, descendants and parent/sibling rejection', () => {
+  for (const [path, expected] of [
+    ['/approved', true], ['/approved/SKILL.md', true], ['/approved/nested/../SKILL.md', true],
+    ['/', false], ['/outside/SKILL.md', false], ['/approved-other/SKILL.md', false],
+  ] as const) assert.equal(inside('/approved', path, posix), expected, path);
+});
+test('resource-containment: Windows same drive and cross-drive rejection', () => {
+  for (const [path, expected] of [
+    ['C:\\approved', true], ['C:\\approved\\SKILL.md', true], ['c:/approved/nested/../SKILL.md', true],
+    ['C:\\', false], ['C:\\outside\\SKILL.md', false], ['C:\\approved-other\\SKILL.md', false],
+    ['D:\\outside\\SKILL.md', false], ['D:\\approved\\SKILL.md', false],
+  ] as const) assert.equal(inside('C:\\approved', path, win32), expected, path);
+});
+test('resource-containment: UNC same share, other share/server and drive rejection', () => {
+  for (const [path, expected] of [
+    ['\\\\server\\share\\approved', true], ['\\\\server\\share\\approved\\SKILL.md', true],
+    ['\\\\server\\share\\outside\\SKILL.md', false], ['\\\\server\\other\\SKILL.md', false],
+    ['\\\\other\\share\\approved\\SKILL.md', false], ['C:\\approved\\SKILL.md', false],
+  ] as const) assert.equal(inside('\\\\server\\share\\approved', path, win32), expected, path);
 });
