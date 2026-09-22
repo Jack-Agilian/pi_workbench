@@ -314,7 +314,7 @@ probe('offline catalog cache and Session model selection use public APIs without
 probe('superseded offline catalog publication cannot overwrite newer models or persisted cache', async () => {
   const f = await fixture();
   const started = gate(); const release = gate(); const settled = gate();
-  let phase = 0; let oldPublished: boolean | undefined;
+  let phase = 0; let oldOutcome: string | undefined;
   let catalog: readonly ai.Model<ai.Api>[] = [f.model];
   f.provider.getModels = () => catalog;
   f.provider.refreshModels = async context => {
@@ -322,15 +322,20 @@ probe('superseded offline catalog publication cannot overwrite newer models or p
     const old = ++phase === 1;
     if (old) { started.open(); await release.promise; }
     const models = [{ ...f.model, id: old ? 'synthetic-old' : 'synthetic-new' }];
-    const published = await context.publish({ persist: { models, checkedAt: old ? 1 : 2 }, update: () => { catalog = models; } });
-    if (old) { oldPublished = published; settled.open(); }
+    const publication = context.publish({ persist: { models, checkedAt: old ? 1 : 2 }, update: () => { catalog = models; } });
+    if (old) {
+      // This release rejects an already-aborted publication, rather than returning false.
+      oldOutcome = await publication.then(value => value ? 'published' : 'rejected',
+        error => error instanceof Error ? error.name : 'unknown');
+      settled.open();
+    } else assert.equal(await publication, true);
   };
   const first = f.runtime.refresh({ providers: [f.providerId], allowNetwork: false, signal: signal() });
   await started.promise;
   const second = await f.runtime.refresh({ providers: [f.providerId], allowNetwork: false, signal: signal() });
   assert.equal(second.errors.size, 0);
   release.open(); await settled.promise; await first;
-  assert.equal(oldPublished, false, 'Pi rejects stale generation before publishing');
+  assert.equal(oldOutcome, 'AbortError', 'Pi aborts the superseded publication');
   assert.equal(f.runtime.getModel(f.providerId, 'synthetic-old'), undefined);
   assert.ok(f.runtime.getModel(f.providerId, 'synthetic-new'));
   assert.equal((await f.modelsStore.read(f.providerId))?.models[0]?.id, 'synthetic-new');
