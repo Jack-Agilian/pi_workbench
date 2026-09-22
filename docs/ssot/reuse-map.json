@@ -244,20 +244,20 @@
       "reuse": "复用格式/诊断/按需装配",
       "productDelta": "作用域、内容副本、版本锁",
       "acceptanceGate": "A/B连续Run资源快照与模板闭包；新版加载失败阻断；禁用不误称删除原生历史",
-      "implementationState": "not_implemented",
+      "implementationState": "in_progress",
       "adoption": {
-        "status": "candidate",
+        "status": "selected",
         "imports": [
           {
             "package": "@earendil-works/pi-coding-agent",
             "importFrom": "@earendil-works/pi-coding-agent",
             "exports": [
               {
-                "name": "loadSkillsFromDir",
+                "name": "loadSkills",
                 "kind": "runtime"
               },
               {
-                "name": "loadSkills",
+                "name": "loadSkillsFromDir",
                 "kind": "runtime"
               },
               {
@@ -265,12 +265,15 @@
                 "kind": "runtime"
               }
             ],
-            "selectedVersion": null
+            "selectedVersion": "0.87.0"
           }
         ],
         "selectedSourceCommit": null,
-        "verificationStatus": "source_reviewed",
-        "testEvidence": []
+        "verificationStatus": "verified",
+        "testEvidence": [
+          "EV-A3-INPUTS-20260922",
+          "EV-A3-RESOURCES-20260922"
+        ]
       }
     },
     {
@@ -303,6 +306,10 @@
               {
                 "name": "createExtensionRuntime",
                 "kind": "runtime"
+              },
+              {
+                "name": "DefaultResourceLoader",
+                "kind": "runtime"
               }
             ],
             "selectedVersion": "0.87.0"
@@ -315,7 +322,9 @@
           "EV-A1-SDK-20260922",
           "EV-A0-CLOSEOUT-RELEASE-20260922",
           "EV-A0-CLOSEOUT-TYPES-20260922",
-          "EV-A1-CLOSEOUT-SDK-20260922"
+          "EV-A1-CLOSEOUT-SDK-20260922",
+          "EV-A3-INPUTS-20260922",
+          "EV-A3-RESOURCES-20260922"
         ]
       }
     },
@@ -335,9 +344,9 @@
       "reuse": "复用npm/git/local解析与可用安装能力",
       "productDelta": "审核/签名/事务/快照/撤销",
       "acceptanceGate": "固定npm显式目标升级/Git ref/受控新根/离线缺包/共享依赖；失败保留旧激活",
-      "implementationState": "not_implemented",
+      "implementationState": "in_progress",
       "adoption": {
-        "status": "candidate",
+        "status": "selected",
         "imports": [
           {
             "package": "@earendil-works/pi-coding-agent",
@@ -348,16 +357,20 @@
                 "kind": "runtime"
               },
               {
-                "name": "PackageManager",
+                "name": "ProgressEvent",
                 "kind": "type"
               }
             ],
-            "selectedVersion": null
+            "selectedVersion": "0.87.0"
           }
         ],
         "selectedSourceCommit": null,
-        "verificationStatus": "source_reviewed",
-        "testEvidence": []
+        "verificationStatus": "verified",
+        "testEvidence": [
+          "EV-A3-INPUTS-20260922",
+          "EV-A3-PACKAGES-20260922",
+          "EV-A3-MAC-INSTALL-20260922"
+        ]
       }
     },
     {
@@ -1018,6 +1031,66 @@
         "darwin"
       ],
       "locator": "docs/validation/a2-2026-09-22.md"
+    },
+    {
+      "id": "EV-A3-INPUTS-20260922",
+      "kind": "release",
+      "result": "passed",
+      "scope": "Pi 0.87.0缓存官方tarball SRI及16个采用文件逐字节核对；应用lock未变。3个仅安装测试输入从实际registry按精确版本/SRI/字节/SHA-256验证，从不import，不是新增应用依赖；未验证签名。",
+      "commit": "c2378dd0a9c2f54daa50bc4cf843e044d3c484b2",
+      "recordedAt": "2026-09-22T12:26:19.611223+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/a3-2026-09-22.md"
+    },
+    {
+      "id": "EV-A3-RESOURCES-20260922",
+      "kind": "sdk",
+      "result": "passed",
+      "scope": "真实Pi资源探针9/9：加载前批准factory、合成全局/项目陷阱不执行、原生技能解析/格式、完整模板脚本只读快照、实际Session reload与loaded锁、缺失/解析/持久化/重入失败阻断、禁用保留历史。host settled/持久化为合成输入，不代表产品Run/DB或恶意插件沙箱。",
+      "commit": "c2378dd0a9c2f54daa50bc4cf843e044d3c484b2",
+      "recordedAt": "2026-09-22T12:26:19.611420+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/a3-2026-09-22.md"
+    },
+    {
+      "id": "EV-A3-PACKAGES-20260922",
+      "kind": "sdk",
+      "result": "passed",
+      "scope": "真实Pi DefaultPackageManager与离线npm/Git 8/8：固定版本双根、pinned update跳过、共享依赖与SRI、skip/error和离线缺包、local可变引用、Git本地合成ref/失败清理、4种lifecycle禁用。实际复现DefaultResourceLoader隐式安装；未完成签名/撤销/CLI对账/激活事务。",
+      "commit": "c2378dd0a9c2f54daa50bc4cf843e044d3c484b2",
+      "recordedAt": "2026-09-22T12:26:19.611422+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/a3-2026-09-22.md"
+    },
+    {
+      "id": "EV-A3-MAC-INSTALL-20260922",
+      "kind": "platform",
+      "result": "passed",
+      "scope": "macOS 27.0 arm64：真实npm 11.19.0/Git 2.55.0子进程临时根安装，npm宽Node读权限仍被OS内容白名单/禁网约束；canary及/etc/passwd拒绝、子Node socket内核拒绝、Node写入/addon/worker拒绝。Git仅file transport，无SSH/HTTPS拉取、Windows或通用恶意包隔离证据。",
+      "commit": "c2378dd0a9c2f54daa50bc4cf843e044d3c484b2",
+      "recordedAt": "2026-09-22T12:26:19.611423+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/a3-2026-09-22.md"
+    },
+    {
+      "id": "EV-A3-REGRESSION-20260922",
+      "kind": "static",
+      "result": "passed",
+      "scope": "代码提交上typecheck、类型10、A1 10、A2工具19/Mac Shell4、A3资源9/包8及原SSOT60/脚本15/历史16与协议检查通过；重复文档/应用初始化锁不变。干净git archive副本独立下载Node/准备缓存后，从外部cwd两轮类型/A1/A2/A3通过。startup27摘要不变。",
+      "commit": "c2378dd0a9c2f54daa50bc4cf843e044d3c484b2",
+      "recordedAt": "2026-09-22T12:26:19.611424+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/a3-2026-09-22.md"
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "status": "a0_a1_probe_in_progress_not_created_on_github",
+  "status": "a0_a3_probe_in_progress_not_created_on_github",
   "source": "../ssot/reuse-first.md",
   "normalization": "保留原28项ID作为历史锚点；允许新增任务和状态推进。dependencies为开发前置，acceptanceDependencies为额外集成验收前置；sourceDependencyText仅历史记录。角色未分配，完成须逐条证据，离线校验不证明GitHub Issue存在。",
   "items": [
@@ -111,7 +111,8 @@
             "EV-A0-CLOSEOUT-TYPES-20260922",
             "EV-A0-CLOSEOUT-BOOTSTRAP-20260922",
             "EV-A2-INPUTS-20260922",
-            "EV-A2-MAC-SHELL-20260922"
+            "EV-A2-MAC-SHELL-20260922",
+            "EV-A3-INPUTS-20260922"
           ]
         },
         {
@@ -126,11 +127,14 @@
             "EV-A1-CLOSEOUT-SDK-20260922",
             "EV-A0-CLOSEOUT-REPO-20260922",
             "EV-A2-SDK-20260922",
-            "EV-A2-REGRESSION-20260922"
+            "EV-A2-REGRESSION-20260922",
+            "EV-A3-RESOURCES-20260922",
+            "EV-A3-PACKAGES-20260922",
+            "EV-A3-REGRESSION-20260922"
           ]
         }
       ],
-      "statusReason": "A0/A1及A2限定工具探针通过；A0固定声明补丁保留，A2辅助I/O和平台限制见docs/validation/a2-boundaries.md。A3–A4、BOOT-01及打包Worker运行时尚未验收，不能标done。"
+      "statusReason": "A0–A3限定探针通过；A0声明补丁与A2/A3公开边界均保留。A4、BOOT-01及打包Worker/完整产品接缝未验收，不能标done。"
     },
     {
       "id": "BOOT-04",
@@ -701,7 +705,7 @@
       "id": "SKL-01",
       "priority": "P0",
       "ownerRole": "Agent",
-      "state": "proposed",
+      "state": "in_progress",
       "githubIssueNumber": null,
       "dependencies": [
         "CORE-02"
@@ -712,7 +716,7 @@
         "skills",
         "resources"
       ],
-      "implementationStatus": "not_implemented",
+      "implementationStatus": "in_progress",
       "githubIssueUrl": null,
       "issueVerificationStatus": "not_checked",
       "issueEvidence": [],
@@ -727,7 +731,10 @@
           "plannedChecks": [
             "resource-preload-allowlist"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-A3-RESOURCES-20260922",
+            "EV-A3-PACKAGES-20260922"
+          ]
         },
         {
           "id": "SKL-01-A02",
@@ -736,7 +743,9 @@
             "resource-next-run",
             "resource-load-failure"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-A3-RESOURCES-20260922"
+          ]
         },
         {
           "id": "SKL-01-A03",
@@ -745,9 +754,12 @@
             "resource-snapshot-closure",
             "resource-disable"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-A3-RESOURCES-20260922"
+          ]
         }
-      ]
+      ],
+      "statusReason": "A3真实SDK资源9项及包缺失策略探针通过；仅合成准入和持久化回调，完整产品Run、作用域/审批集成及CORE-02尚未完成。"
     },
     {
       "id": "QA-01",
@@ -821,7 +833,7 @@
       "id": "PKG-01",
       "priority": "P1",
       "ownerRole": "Platform",
-      "state": "proposed",
+      "state": "in_progress",
       "githubIssueNumber": null,
       "dependencies": [
         "SKL-01",
@@ -833,7 +845,7 @@
         "package-manager",
         "market-governance"
       ],
-      "implementationStatus": "not_implemented",
+      "implementationStatus": "in_progress",
       "githubIssueUrl": null,
       "issueVerificationStatus": "not_checked",
       "issueEvidence": [],
@@ -848,7 +860,10 @@
           "plannedChecks": [
             "package-staging"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-A3-PACKAGES-20260922",
+            "EV-A3-MAC-INSTALL-20260922"
+          ]
         },
         {
           "id": "PKG-01-A02",
@@ -857,9 +872,13 @@
             "package-pinned-upgrade",
             "package-resolution-cases"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-A3-PACKAGES-20260922",
+            "EV-A3-MAC-INSTALL-20260922"
+          ]
         }
-      ]
+      ],
+      "statusReason": "A3真实离线npm/Git/local探针8项通过，受控新根/固定目标/共享依赖/缺包/失败清理已验证；仅macOS本地Git transport与审核测试包，完整P1安装交付和前置验收未完成。"
     },
     {
       "id": "PKG-02",

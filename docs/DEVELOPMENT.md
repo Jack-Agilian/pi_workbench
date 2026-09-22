@@ -172,3 +172,25 @@ npm run test:pi-probe
 审批回调、不可复用操作身份、Operations 和观察只用于探针；测试保留 Pi 的参数准备、schema、元数据、diff、裁剪与结果形状。完整采用边界、辅助 I/O 与竞争窗口见 [A2 边界记录](validation/a2-boundaries.md)。原始运行日志位于忽略的 `.artifacts/a2/`。
 
 A2 的实际被测 SHA、命令和新副本结果见 [脱敏验证报告](validation/a2-2026-09-22.md)，采用文件摘要见 [输入记录](validation/a2-inputs.json)。
+
+## 11. A3 受控资源与包探针
+
+沿用已有项目工具链和应用依赖，默认文档初始化不变。资源测试不需要下载新的测试输入：
+
+```bash
+npm run typecheck
+npm run test:pi-resources
+```
+
+包测试使用实际 npm/Git，只安装指定数据输入和合成本地 Git 包，从不导入这些包为扩展。先在独立、可联网的准备阶段核验 registry/SRI/字节并让 npm 建立缓存，再运行禁网 SDK 测试：
+
+```bash
+npm run prepare:pi-packages
+npm run test:pi-packages
+```
+
+准备入口仅写 `<repo>/.artifacts/a3/package-inputs/`，可重复执行；测试入口不会自动补下载，缺缓存即失败。清单位于 [测试输入](../packages/pi-adapter/package-fixtures.json)，不改应用依赖或根锁。测试每次复制缓存到新的受管理临时目录，使用空 HOME、临时 npm/Git 配置、--offline 和 --ignore-scripts，不继承账户环境或真实全局配置。
+
+`test:pi-packages` 目前要求 macOS 和本机已有 Git；系统 profile 对 npm/Git 子进程限制文件与网络，失败不回退。npm 需要的祖先 metadata 权限、只读快照限制和默认资源加载器的隐式安装复现见 [A3 边界](validation/a3-boundaries.md)。测试未授权真实模型、未知扩展或用户包脚本。
+
+结果见 [A3 报告](validation/a3-2026-09-22.md) 和 [完整性摘要](validation/a3-inputs.json)。原始输出位于忽略的 `.artifacts/a3/`；本轮停止于 A3，A4 与三个 M0 Gate 尚未完成。

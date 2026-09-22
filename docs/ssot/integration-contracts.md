@@ -85,6 +85,8 @@ Skill facade：以 Pi Skill/diagnostic 为输入建立产品列表，只加 ID�
 
 验收：连续 A/B Run，A 始终使用旧快照，B 成功切换新版；禁用后 B 不加载；刷新/重建失败阻断；共享模板更改不污染 A。刷新若导致 Session 失效，适用第 2.2 节恢复契约。
 
+A3 的 [限定证据](../validation/a3-2026-09-22.md) 已用实际 Pi reload 验证加载锁/快照和合成故障，用实际离线 npm/Git 验证新根准备。host settled/保存回调仍为合成测试，没有完成上述产品 Run/数据库事务、CLI 对账与活动引用管理；[默认加载器/安装边界](../validation/a3-boundaries.md) 必须继续保留。
+
 ## 6. 模型与凭据接口
 
 用 `ModelRuntime` / pi-ai 提供模型目录、认证/刷新与请求协议。宿主适配公开 `CredentialStore`，不复制 Provider OAuth 协议。前端只收账户 ID/状态、模型展示字段与受控登录交互，不收原始 token。[P14]

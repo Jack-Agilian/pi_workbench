@@ -39,3 +39,7 @@ python scripts/test-tools.py
 ## A2 实际进度
 
 [被测提交与工具报告](../validation/a2-2026-09-22.md) · [输入摘要](../validation/a2-inputs.json) · [辅助 I/O 与平台边界](../validation/a2-boundaries.md)。19 项工具接缝与 4 项真实 macOS Bash 测试通过，A1 回归仍通过；没有新增依赖或改动 Pi 运行时代码。read/edit/write/bash 仅采用公开工厂与 Operations。CORE-04、SEC-02 及三项相关能力进入 in_progress；不把探针称为完整权限/平台系统。三个 M0 Gate 仍 pending，本轮未进入 A3/A4。
+
+## A3 实际进度
+
+[被测提交与资源/包报告](../validation/a3-2026-09-22.md) · [输入摘要](../validation/a3-inputs.json) · [缺口与边界](../validation/a3-boundaries.md)。9 项资源、8 项实际 npm/Git 探针及干净副本两轮回归通过。复用 Pi 解析/安装/Session 刷新，只新增批准快照和准入检查；默认加载器缺包隐式安装等行为已复现，运行时不采用该路径。skills/package-manager 与 SKL-01/PKG-01 进入 in_progress；resources/BOOT-03 追加限定证据，三个 M0 Gate 保持 pending。本轮停止于 A3，未进入 A4。

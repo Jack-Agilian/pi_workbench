@@ -4,7 +4,7 @@
 
 基于 Pi 的跨平台桌面 Agent 工作台，面向代码任务与通用知识工作。
 
-**当前阶段：A0–A2 零模型 Pi Session/工具探针通过，严格声明检查经固定类型补丁通过；桌面应用尚未实现。** 当前证据见 [A2 报告](docs/validation/a2-2026-09-22.md)，前序见 [A0/A1 收尾](docs/validation/a0-a1-closeout-2026-09-22.md)。
+**当前阶段：A0–A3 限定的零模型 Pi Session/工具/资源包探针通过，严格声明检查经固定类型补丁通过；桌面应用尚未实现。** 当前证据见 [A3 报告](docs/validation/a3-2026-09-22.md)，前序见 [A2](docs/validation/a2-2026-09-22.md) 与 [A0/A1 收尾](docs/validation/a0-a1-closeout-2026-09-22.md)。
 
 ## 从这里开始
 

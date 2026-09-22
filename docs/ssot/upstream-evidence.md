@@ -82,3 +82,11 @@ P04/P05/P06/P07/P13 的固定源码链接是复查入口，不声称逐字核验
 代码提交 `23ba1bdc54188ee3dbbd0a744800ffea84f855ec` 实测同一 Pi 0.87.0 发行包的四个公开 ToolDefinition 工厂、defineTool、公开参数校验、MIME helper 和本地 Bash Operations。工具/Session 入口继续通过包根 ESM 导入，Pi 类型留在 adapter 和测试内部；详见 [A2 报告](../validation/a2-2026-09-22.md)。
 
 [A2 输入审计](../validation/a2-inputs.json) 重新核对缓存官方 tarball SRI 和 12 个安装文件的原始字节，无新依赖或运行时补丁。read 的路径辅助探测、bash 的临时日志及实际宿主入口边界见 [可复现记录](../validation/a2-boundaries.md)。这不把源文件中存在但未采用的 grep/find/ls/PowerShell 标为已验证。
+
+## A3 已采用的资源与包入口（2026-09-22）
+
+代码提交 `c2378dd0a9c2f54daa50bc4cf843e044d3c484b2` 使用 Pi 0.87.0 根公开 Skill 加载/格式接口、ResourceLoader、DefaultResourceLoader、DefaultPackageManager 与 Session.reload/waitForIdle；类型与类方法不冒充根运行时导出，见 [9+8 项实测](../validation/a3-2026-09-22.md)。
+
+本轮通过 Context7 阅读官方 [SDK 文档](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/sdk.md) 和 [包文档](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/packages.md) 定位示例；实际行为以 [输入摘要](../validation/a3-inputs.json) 中经 SRI 核对的发行 tarball、16 个安装文件和运行结果为准。没有把 main 或文档旧版 Skill 字段替代已安装类型。
+
+原 U04 的 pinned npm/Git 差异现已在离线真实 npm/Git 探针复现；local 包仍是引用，默认 ResourceLoader no* 标志不阻止隐式安装，具体复现和候选公开改进见 [A3 边界](../validation/a3-boundaries.md)。仅安装测试输入另有精确 registry/SRI 记录，从未作为扩展或业务模块加载；不表示采用新的产品依赖。没有上游 Fork、任意扩展启用或真实模型调用。

@@ -1,0 +1,132 @@
+{
+  "scope": "A3 installed release files byte-compared with cached official tarball; test-only packages separately registry/SRI verified, never imported. No release signature claim.",
+  "testedCommit": "c2378dd0a9c2f54daa50bc4cf843e044d3c484b2",
+  "recordedAt": "2026-09-22T12:22:43.652675+00:00",
+  "lockSha256": "7cd35e4fc73c7e0b61112b515c6389505baf7d541e638bd7cf0ffe2dbf6e8e44",
+  "pi": {
+    "package": "@earendil-works/pi-coding-agent",
+    "version": "0.87.0",
+    "tarballUrl": "https://registry.npmjs.org/@earendil-works/pi-coding-agent/-/pi-coding-agent-0.87.0.tgz",
+    "integrity": "sha512-S9JJVGHya/h0e0M+zwPTB6RkPe7PmLLqfBUTssFYW5mxAti6oZEILn4jvaUImENRC3U9RwXAB6H4gw8xj2J0GQ==",
+    "tarballBytes": 7227603,
+    "files": [
+      {
+        "path": "dist/index.js",
+        "bytes": 4742,
+        "sha256": "1e3601da1e18a7be4dfdcc625d7a7fb942cc095a5d737bb1b70211af33b61e05"
+      },
+      {
+        "path": "dist/index.d.ts",
+        "bytes": 10697,
+        "sha256": "1e89f64c284248e8004bc040be1b8d886f20c158091d4e466cb130fa9d13d458"
+      },
+      {
+        "path": "dist/core/resource-loader.js",
+        "bytes": 39300,
+        "sha256": "70632ebde9a89178ef560f0c0b68ce87d82008dd43d0fa9bf5a909c909a18a8a"
+      },
+      {
+        "path": "dist/core/resource-loader.d.ts",
+        "bytes": 6831,
+        "sha256": "f7c1dac7b3d661dff5fbfe51d1b50dff12b4c4329ae29a280ae713740b162493"
+      },
+      {
+        "path": "dist/core/package-manager.js",
+        "bytes": 88203,
+        "sha256": "26aa8adf255f7b1ebf9b00732d2e9a1648e38b76a10eedcd443131e3708b6e88"
+      },
+      {
+        "path": "dist/core/package-manager.d.ts",
+        "bytes": 7471,
+        "sha256": "1e942503f3e3d826a82650e081a24841acdbed1a86be08f2e278d1a4dc8e037d"
+      },
+      {
+        "path": "dist/core/skills.js",
+        "bytes": 15387,
+        "sha256": "3b7cc3997c630553eb88931de978e0db623ce51fbf7356e0ab922183885e208c"
+      },
+      {
+        "path": "dist/core/skills.d.ts",
+        "bytes": 2029,
+        "sha256": "8230b7f16b693ce3fbdf814d537105b3539ce7c07ba6cfef9605bf35695cdf58"
+      },
+      {
+        "path": "dist/core/system-prompt.js",
+        "bytes": 7667,
+        "sha256": "c6b7bc71a76a7901a10bc89f0452508cb3be4bc112ae5f883e4edadc938080aa"
+      },
+      {
+        "path": "dist/core/settings-manager.js",
+        "bytes": 39673,
+        "sha256": "5368b155ec26d88374cec9e66b8e588b5041a0fb0047414f70b34e13892c4f48"
+      },
+      {
+        "path": "dist/core/agent-session.js",
+        "bytes": 146265,
+        "sha256": "5ebfae51db5a900596145159428e7cb57d195af9d54a28f41d4ac8ff1bfd5729"
+      },
+      {
+        "path": "dist/core/agent-session.d.ts",
+        "bytes": 31089,
+        "sha256": "ee0b9c2c2fefeef292c9da884b92c0fa5fce73f04bc834655720253d477f391d"
+      },
+      {
+        "path": "dist/utils/git.js",
+        "bytes": 6597,
+        "sha256": "ff37bd23b2a2b39478e8f6959812ccc9c9b36ed87782894475b96945fb7bf35b"
+      },
+      {
+        "path": "docs/sdk.md",
+        "bytes": 39211,
+        "sha256": "d3ae431453e8da71d38da833ad43713bca6d537af53e4e0f3ebaef87c14c6732"
+      },
+      {
+        "path": "docs/packages.md",
+        "bytes": 9295,
+        "sha256": "1067eae058c5ce980a21b04c51ce6d38e201e51197807037d0a063ac3c769b46"
+      },
+      {
+        "path": "examples/sdk/04-skills.ts",
+        "bytes": 1452,
+        "sha256": "4cbf189bf88d14155281349d4d39cc236066d98095aae2d184d4ba7267ab5e42"
+      }
+    ]
+  },
+  "installationOnlyInputs": {
+    "node": "v24.21.0",
+    "npm": "11.19.0",
+    "scope": "Registry metadata, tarball bytes and npm cache preparation only; no SDK import or model call.",
+    "packages": [
+      {
+        "name": "is-number",
+        "version": "6.0.0",
+        "metadataUrl": "https://registry.npmjs.org/is-number/6.0.0",
+        "tarballUrl": "https://registry.npmjs.org/is-number/-/is-number-6.0.0.tgz",
+        "integrity": "sha512-Wu1VHeILBK8KAWJUAiSZQX94GmOE45Rg6/538fKwiloUu21KncEkYGPqob2oSZ5mUT73vLGrHQjKw3KMPwfDzg==",
+        "bytes": 3474,
+        "sha256": "62589f25115042c4d34863bc8e6ab4790a8920b811949c30e0ebc5733aca66cb",
+        "verified": true
+      },
+      {
+        "name": "is-number",
+        "version": "7.0.0",
+        "metadataUrl": "https://registry.npmjs.org/is-number/7.0.0",
+        "tarballUrl": "https://registry.npmjs.org/is-number/-/is-number-7.0.0.tgz",
+        "integrity": "sha512-41Cifkg6e8TylSpdtTpeLVMqvSBEVzTttHvERD741+pnZ8ANv0004MRL43QKPDlK9cGvNp6NZWZUBlbGXYxxng==",
+        "bytes": 3730,
+        "sha256": "7b75c1057198cf97696909a9bee176c9c5e9bcb5b03bf3ecef2f484defadd51e",
+        "verified": true
+      },
+      {
+        "name": "is-odd",
+        "version": "3.0.1",
+        "metadataUrl": "https://registry.npmjs.org/is-odd/3.0.1",
+        "tarballUrl": "https://registry.npmjs.org/is-odd/-/is-odd-3.0.1.tgz",
+        "integrity": "sha512-CQpnWPrDwmP1+SMHXZhtLtJv90yiyVfluGsX5iNCVkrhQtU3TQHsUWPG9wkdk9Lgd5yNpAg9jQEo90CBaXgWMA==",
+        "bytes": 2774,
+        "sha256": "13c23b3f1f3a5c146b8906e23c8e674f8e4a6ff44b77720e1d4bddb7b2caf312",
+        "verified": true
+      }
+    ]
+  }
+}
