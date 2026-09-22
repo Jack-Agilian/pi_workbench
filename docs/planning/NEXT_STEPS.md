@@ -1,6 +1,6 @@
 # 从文档到可运行产品：复用优先
 
-状态：当前计划，尚未实现。决策依据：[SSOT](../ssot/README.md)。工作项见 [backlog.json](backlog.json)；历史原始范围见[原始 Backlog](../startup/docs/08-delivery-and-references.md)。尚未创建 GitHub Issues。
+状态：A0/A1 探针已实现，发行声明检查阻塞；产品阶段仍待实施。决策依据：[SSOT](../ssot/README.md)。工作项见 [backlog.json](backlog.json)；历史原始范围见[原始 Backlog](../startup/docs/08-delivery-and-references.md)。尚未创建 GitHub Issues。
 
 ## 1. 下一增量不是再造平台
 
@@ -59,3 +59,9 @@ CORE-04 的工具接缝验收增加 BOOT-03/CORE-02/SEC-02；SEC-03 的凭据验
 每个PR列出“复用了什么 / 只新增了什么 / 对应证据与测试 / 尚未验证的平台”。文档检查、真实SDK、真实模型与平台E2E分别记录。未完成任务不得改为done；远端提交必须独立读回确认。
 
 本轮修订范围及 planned 用例见 [R01–R08](../ssot/review-fixes.md)；可持续状态与证据规范见 [SSOT 维护](../ssot/maintenance.md)。
+
+## A0/A1 本轮范围（2026-09-22）
+
+已固定 Node 24.21.0 / npm 11.19.0 / Pi 0.87.0；新增最小 `packages/pi-adapter`、显式应用初始化、离线探针和下载审计。BOOT-03 为 blocked：严格 NodeNext 类型检查遇到发行声明缺口，见 [复现与候选方案](../validation/a0-a1-gaps.md)。CORE-02 仅推进 Session 绑定、替换和三类失败探针，状态 in_progress；未完成产品 Run 归属。A0/A1 可运行部分的被测提交与证据由后续验证记录提供。
+
+M0-UI、M0-SDK、M0-Pi 保持 pending。A2 未开始；本轮交付可验证部分与上游缺口后停止，不绕过类型门槛推进工具接缝。

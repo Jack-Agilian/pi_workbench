@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "status": "reuse_first_planned_not_created_on_github",
+  "status": "a0_a1_probe_in_progress_not_created_on_github",
   "source": "../ssot/reuse-first.md",
   "normalization": "保留原28项ID作为历史锚点；允许新增任务和状态推进。dependencies为开发前置，acceptanceDependencies为额外集成验收前置；sourceDependencyText仅历史记录。角色未分配，完成须逐条证据，离线校验不证明GitHub Issue存在。",
   "items": [
@@ -75,7 +75,7 @@
       "id": "BOOT-03",
       "priority": "P0",
       "ownerRole": "Runtime",
-      "state": "proposed",
+      "state": "blocked",
       "githubIssueNumber": null,
       "dependencies": [
         "BOOT-01"
@@ -86,7 +86,7 @@
         "agent-session",
         "native-history"
       ],
-      "implementationStatus": "not_implemented",
+      "implementationStatus": "in_progress",
       "githubIssueUrl": null,
       "issueVerificationStatus": "not_checked",
       "issueEvidence": [],
@@ -113,7 +113,8 @@
           ],
           "evidenceRefs": []
         }
-      ]
+      ],
+      "statusReason": "A0/A1零模型探针已建立；严格NodeNext声明检查被Pi 0.87.0传递声明的TS1543及TS2307阻塞，详见docs/validation/a0-a1-gaps.md；不放宽类型检查。"
     },
     {
       "id": "BOOT-04",
@@ -226,7 +227,7 @@
       "id": "CORE-02",
       "priority": "P0",
       "ownerRole": "Runtime",
-      "state": "proposed",
+      "state": "in_progress",
       "githubIssueNumber": null,
       "dependencies": [
         "BOOT-03"
@@ -238,7 +239,7 @@
         "native-history",
         "models-auth"
       ],
-      "implementationStatus": "not_implemented",
+      "implementationStatus": "in_progress",
       "githubIssueUrl": null,
       "issueVerificationStatus": "not_checked",
       "issueEvidence": [],

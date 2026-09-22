@@ -9,11 +9,11 @@
     "manifestVersion": "0.86.1",
     "nodeRequirement": ">=22.19.0",
     "releaseTarballVerified": false,
-    "npmVersionPinned": null,
+    "npmVersionPinned": "0.87.0",
     "releaseArtifact": null
   },
   "evidenceDocument": "upstream-evidence.md",
-  "implementationStatus": "documentation_only",
+  "implementationStatus": "in_progress",
   "items": [
     {
       "id": "agent-session",
@@ -29,9 +29,9 @@
       "reuse": "工具循环、原生重试/压缩保持上游",
       "productDelta": "Worker 监督和产品 Run 结算",
       "acceptanceGate": "原生 SDK 探针；运行绑定在派发时固定；同 Worker 迟到观察不归入新 Run",
-      "implementationState": "not_implemented",
+      "implementationState": "in_progress",
       "adoption": {
-        "status": "candidate",
+        "status": "selected",
         "imports": [
           {
             "package": "@earendil-works/pi-coding-agent",
@@ -44,13 +44,17 @@
               {
                 "name": "AgentSession",
                 "kind": "runtime"
+              },
+              {
+                "name": "AgentSessionEvent",
+                "kind": "type"
               }
             ],
-            "selectedVersion": null
+            "selectedVersion": "0.87.0"
           }
         ],
         "selectedSourceCommit": null,
-        "verificationStatus": "source_reviewed",
+        "verificationStatus": "unverified",
         "testEvidence": []
       }
     },
@@ -69,9 +73,9 @@
       "reuse": "JSONL、分支、恢复保持 Pi",
       "productDelta": "Thread 绑定和可重建索引",
       "acceptanceGate": "保存/恢复/Fork不双写；替换前三类失败点和重绑定；失效旧对象不可继续使用",
-      "implementationState": "not_implemented",
+      "implementationState": "in_progress",
       "adoption": {
-        "status": "candidate",
+        "status": "selected",
         "imports": [
           {
             "package": "@earendil-works/pi-coding-agent",
@@ -84,13 +88,25 @@
               {
                 "name": "AgentSessionRuntime",
                 "kind": "runtime"
+              },
+              {
+                "name": "createAgentSessionRuntime",
+                "kind": "runtime"
+              },
+              {
+                "name": "CreateAgentSessionRuntimeFactory",
+                "kind": "type"
+              },
+              {
+                "name": "AgentSessionServices",
+                "kind": "type"
               }
             ],
-            "selectedVersion": null
+            "selectedVersion": "0.87.0"
           }
         ],
         "selectedSourceCommit": null,
-        "verificationStatus": "source_reviewed",
+        "verificationStatus": "unverified",
         "testEvidence": []
       }
     },
@@ -108,9 +124,9 @@
       "reuse": "Provider、目录、登录/刷新复用",
       "productDelta": "系统凭据与桌面交互",
       "acceptanceGate": "secret 不进Renderer/日志/子进程env",
-      "implementationState": "not_implemented",
+      "implementationState": "in_progress",
       "adoption": {
-        "status": "candidate",
+        "status": "selected",
         "imports": [
           {
             "package": "@earendil-works/pi-coding-agent",
@@ -121,22 +137,26 @@
                 "kind": "runtime"
               }
             ],
-            "selectedVersion": null
+            "selectedVersion": "0.87.0"
           },
           {
             "package": "@earendil-works/pi-ai",
             "importFrom": "@earendil-works/pi-ai",
             "exports": [
               {
-                "name": "CredentialStore",
-                "kind": "type"
+                "name": "InMemoryCredentialStore",
+                "kind": "runtime"
+              },
+              {
+                "name": "InMemoryModelsStore",
+                "kind": "runtime"
               }
             ],
-            "selectedVersion": null
+            "selectedVersion": "0.87.0"
           }
         ],
         "selectedSourceCommit": null,
-        "verificationStatus": "source_reviewed",
+        "verificationStatus": "unverified",
         "testEvidence": []
       }
     },
@@ -153,9 +173,9 @@
       "reuse": "复用 Pi 设置解析/持久",
       "productDelta": "隔离配置路径与产品偏好",
       "acceptanceGate": "无全局未知设置泄入；flush错误处理",
-      "implementationState": "not_implemented",
+      "implementationState": "in_progress",
       "adoption": {
-        "status": "candidate",
+        "status": "selected",
         "imports": [
           {
             "package": "@earendil-works/pi-coding-agent",
@@ -166,11 +186,11 @@
                 "kind": "runtime"
               }
             ],
-            "selectedVersion": null
+            "selectedVersion": "0.87.0"
           }
         ],
         "selectedSourceCommit": null,
-        "verificationStatus": "source_reviewed",
+        "verificationStatus": "unverified",
         "testEvidence": []
       }
     },
@@ -233,9 +253,9 @@
       "reuse": "复用资源模型与受支持加载入口",
       "productDelta": "预先批准目录，不自动发现/执行未知扩展",
       "acceptanceGate": "预批准factory/实际loadedResourceLockId；刷新或重建在settled边界确认后start",
-      "implementationState": "not_implemented",
+      "implementationState": "in_progress",
       "adoption": {
-        "status": "candidate",
+        "status": "selected",
         "imports": [
           {
             "package": "@earendil-works/pi-coding-agent",
@@ -246,15 +266,15 @@
                 "kind": "type"
               },
               {
-                "name": "DefaultResourceLoader",
+                "name": "createExtensionRuntime",
                 "kind": "runtime"
               }
             ],
-            "selectedVersion": null
+            "selectedVersion": "0.87.0"
           }
         ],
         "selectedSourceCommit": null,
-        "verificationStatus": "source_reviewed",
+        "verificationStatus": "unverified",
         "testEvidence": []
       }
     },

@@ -128,7 +128,13 @@ def main() -> int:
             if not compiler:
                 raise RuntimeError('tsc is not installed; typecheck was explicitly requested.')
             version = subprocess.check_output([compiler, '--version'], text=True, encoding='utf-8').strip()
-            proc = subprocess.run([compiler, '--noEmit', '--strict', '--target', 'ES2022', '--module', 'NodeNext', '--moduleResolution', 'NodeNext', str(source/'contracts/app-protocol.ts')], cwd=ROOT, text=True, encoding='utf-8', errors='replace', capture_output=True, timeout=60)
+            # Check the historical example independently of the new app tsconfig.
+            # TypeScript 7 rejects explicit input files when cwd has a tsconfig.
+            # Copying also prevents app @types packages from changing this baseline.
+            with tempfile.TemporaryDirectory(prefix='pi-protocol-typecheck-') as tmp:
+                contract = Path(tmp) / 'app-protocol.ts'
+                shutil.copyfile(source/'contracts/app-protocol.ts', contract)
+                proc = subprocess.run([compiler, '--noEmit', '--strict', '--target', 'ES2022', '--module', 'NodeNext', '--moduleResolution', 'NodeNext', str(contract)], cwd=tmp, text=True, encoding='utf-8', errors='replace', capture_output=True, timeout=60)
             if proc.returncode:
                 raise RuntimeError((proc.stdout+proc.stderr)[-6000:])
             return {'compiler': version, 'runtime_tested': False}

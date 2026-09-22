@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Idempotent document-tool environment. Does not install app runtimes or alter global settings."""
+"""Idempotent document environment by default; --app explicitly selects the A0/A1 probe."""
 from __future__ import annotations
 import argparse
 import importlib.metadata
@@ -15,12 +15,25 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--app', action='store_true', help='Explicitly initialize pinned A0/A1 npm dependencies instead of the document environment.')
+    parser.add_argument('--install-node', action='store_true', help='With --app, download pinned Node into .artifacts/toolchains.')
     parser.add_argument('--install-test-deps', action='store_true', help='Opt in to installing pinned document-test dependencies into .venv.')
     parser.add_argument('--offline', action='store_true', help='Forbid dependency downloads; use a local wheelhouse when installing.')
     parser.add_argument('--wheelhouse', type=Path, help='Local wheel directory for offline dependency installation.')
     args = parser.parse_args()
     if sys.version_info < (3, 10):
         parser.error('Python 3.10+ is required.')
+    if args.app:
+        if args.install_test_deps or args.wheelhouse:
+            parser.error('--app cannot be combined with document dependency options.')
+        command = [sys.executable, str(ROOT / 'scripts/bootstrap-app.py')]
+        if args.install_node:
+            command.append('--install-node')
+        if args.offline:
+            command.append('--offline')
+        return subprocess.run(command, check=True).returncode
+    if args.install_node:
+        parser.error('--install-node requires --app.')
     if args.offline and args.install_test_deps and not args.wheelhouse:
         parser.error('--offline --install-test-deps requires --wheelhouse.')
     if args.wheelhouse and not args.wheelhouse.is_dir():

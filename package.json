@@ -1,0 +1,21 @@
+{
+  "name": "pi-workbench-probe",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": "24.21.0", "npm": "11.19.0" },
+  "packageManager": "npm@11.19.0",
+  "scripts": {
+    "check:environment": "node scripts/check-environment.mjs",
+    "typecheck": "node scripts/check-environment.mjs --versions-only && tsc --noEmit",
+    "test:pi-probe": "node scripts/run-pi-probe.mjs"
+  },
+  "dependencies": {
+    "@earendil-works/pi-ai": "0.87.0",
+    "@earendil-works/pi-coding-agent": "0.87.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.6",
+    "typescript": "7.0.2"
+  }
+}
