@@ -7,16 +7,22 @@ import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-assert.ok(process.argv.length === 2 || (process.argv.length === 3 && ['--tools', '--shell', '--resources', '--packages'].includes(process.argv[2])), 'Unknown probe mode');
+assert.ok(process.argv.length === 2 || (process.argv.length === 3 && ['--tools', '--shell', '--resources', '--packages', '--auth'].includes(process.argv[2])), 'Unknown probe mode');
 const shellMode = process.argv[2] === '--shell';
 const packageMode = process.argv[2] === '--packages';
 const childMode = shellMode || packageMode;
+if (shellMode || process.argv[2] === '--auth') {
+  // Positive canaries in this launcher process only. Children must receive none of them.
+  for (const name of ['OPENAI_API_KEY', 'ANTHROPIC_API_KEY', 'GOOGLE_API_KEY', 'AWS_ACCESS_KEY_ID',
+    'GOOGLE_APPLICATION_CREDENTIALS', 'BASH_ENV']) process.env[name] = 'A4_SYNTHETIC_SECRET_PARENT_ENV';
+}
 if (childMode) assert.equal(process.platform, 'darwin', 'Child-process probes currently require the verified macOS sandbox profile');
 const gitPath = packageMode ? (process.env.PATH ?? '').split(delimiter).map(path => join(path, 'git')).find(existsSync) : undefined;
 if (packageMode) assert.ok(gitPath, 'An existing Git executable is required');
 if (packageMode) assert.ok(existsSync(join(root, '.artifacts/a3/package-inputs/cache')), 'Run npm run prepare:pi-packages separately before the offline SDK test');
 const suite = shellMode ? 'shell-probe.test.ts' : process.argv[2] === '--tools' ? 'tool-probe.test.ts'
-  : process.argv[2] === '--resources' ? 'resource-probe.test.ts' : packageMode ? 'package-probe.test.ts' : 'probe.test.ts';
+  : process.argv[2] === '--resources' ? 'resource-probe.test.ts' : packageMode ? 'package-probe.test.ts'
+  : process.argv[2] === '--auth' ? 'auth-probe.test.ts' : 'probe.test.ts';
 const temporary = realpathSync(mkdtempSync(join(tmpdir(), 'pi-sdk-probe-')));
 const denied = childMode ? realpathSync(mkdtempSync(join(tmpdir(), 'pi-child-denied-'))) : undefined;
 if (denied) writeFileSync(join(denied, 'synthetic-canary.txt'), 'SYNTHETIC filesystem boundary canary');
@@ -145,6 +151,12 @@ try {
   // node:test also runs from an explicit entrypoint; avoid the CLI's directory
   // glob discovery (and test subprocesses) under narrow filesystem permissions.
   const result = run([join(root, 'packages/pi-adapter', suite)]);
+  // A4 deliberately poisons credentials/metadata/errors. Never publish those values in test logs,
+  // including assertion diagnostics on failure. This is a test canary, not general log sanitization.
+  if (shellMode || process.argv[2] === '--auth') {
+    assert.equal(/A4_SYNTHETIC_SECRET_/.test((result.stdout ?? '') + (result.stderr ?? '')), false,
+      'Synthetic credential appeared in captured test output; output suppressed');
+  }
   process.stdout.write(result.stdout ?? '');
   process.stderr.write(result.stderr ?? '');
   if (packageMode && result.status !== 0 && existsSync(join(temporary, 'npm-cache/_logs'))) {
