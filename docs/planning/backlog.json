@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "status": "a0_a4_probe_in_progress_not_created_on_github",
+  "status": "b_product_core_in_progress_not_created_on_github",
   "source": "../ssot/reuse-first.md",
   "normalization": "保留原28项ID作为历史锚点；允许新增任务和状态推进。dependencies为开发前置，acceptanceDependencies为额外集成验收前置；sourceDependencyText仅历史记录。角色未分配，完成须逐条证据，离线校验不证明GitHub Issue存在。",
   "items": [
@@ -8,7 +8,7 @@
       "id": "BOOT-01",
       "priority": "P0",
       "ownerRole": "Tech Lead",
-      "state": "proposed",
+      "state": "in_progress",
       "githubIssueNumber": null,
       "dependencies": [],
       "sourceDependencyText": "无",
@@ -16,7 +16,7 @@
       "reuseRefs": [
         "product-coordination"
       ],
-      "implementationStatus": "not_implemented",
+      "implementationStatus": "in_progress",
       "githubIssueUrl": null,
       "issueVerificationStatus": "not_checked",
       "issueEvidence": [],
@@ -32,9 +32,12 @@
             "ssot-evolution",
             "review-decisions"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-B-REVIEW-20260922"
+          ]
         }
-      ]
+      ],
+      "statusReason": "B最小产品契约和SQLite采用决定已落地并自查；Worker/IPC、完整资源/权限绑定与社区UI准入仍待后续收敛，未做完整验收。"
     },
     {
       "id": "BOOT-02",
@@ -113,7 +116,8 @@
             "EV-A2-INPUTS-20260922",
             "EV-A2-MAC-SHELL-20260922",
             "EV-A3-INPUTS-20260922",
-            "EV-A4-INPUTS-20260922"
+            "EV-A4-INPUTS-20260922",
+            "EV-B-INPUTS-20260922"
           ]
         },
         {
@@ -133,11 +137,13 @@
             "EV-A3-PACKAGES-20260922",
             "EV-A3-REGRESSION-20260922",
             "EV-A4-AUTH-20260922",
-            "EV-A4-REGRESSION-20260922"
+            "EV-A4-REGRESSION-20260922",
+            "EV-B-SDK-20260922",
+            "EV-B-REGRESSION-20260922"
           ]
         }
       ],
-      "statusReason": "A0–A4限定零模型探针通过；声明补丁和公开边界保留。BOOT-01、打包Worker、系统凭据存储及完整产品接缝尚未验收，不能标done。"
+      "statusReason": "A0–A4及B模块级产品/SDK接入测试通过；实际Worker/IPC、平台打包与完整产品接缝未验收，不能标done。"
     },
     {
       "id": "BOOT-04",
@@ -213,7 +219,7 @@
       "id": "CORE-01",
       "priority": "P0",
       "ownerRole": "Backend",
-      "state": "proposed",
+      "state": "in_progress",
       "githubIssueNumber": null,
       "dependencies": [
         "BOOT-01"
@@ -224,7 +230,7 @@
         "native-history",
         "product-coordination"
       ],
-      "implementationStatus": "not_implemented",
+      "implementationStatus": "in_progress",
       "githubIssueUrl": null,
       "issueVerificationStatus": "not_checked",
       "issueEvidence": [],
@@ -242,9 +248,13 @@
           "plannedChecks": [
             "native-history-ownership"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-B-CORE-20260922",
+            "EV-B-SDK-20260922"
+          ]
         }
-      ]
+      ],
+      "statusReason": "产品SQLite和原生Session引用/重开接入已测试，不复制原生消息；完整索引重建、Worker进程连接和验收前置未完成。"
     },
     {
       "id": "CORE-02",
@@ -281,7 +291,9 @@
           "evidenceRefs": [
             "EV-A1-SDK-20260922",
             "EV-A1-CLOSEOUT-SDK-20260922",
-            "EV-A2-SDK-20260922"
+            "EV-A2-SDK-20260922",
+            "EV-B-CORE-20260922",
+            "EV-B-SDK-20260922"
           ]
         },
         {
@@ -303,7 +315,7 @@
       "id": "CORE-03",
       "priority": "P0",
       "ownerRole": "Backend",
-      "state": "proposed",
+      "state": "in_progress",
       "githubIssueNumber": null,
       "dependencies": [
         "CORE-01"
@@ -314,7 +326,7 @@
         "in-run-queue",
         "product-coordination"
       ],
-      "implementationStatus": "not_implemented",
+      "implementationStatus": "in_progress",
       "githubIssueUrl": null,
       "issueVerificationStatus": "not_checked",
       "issueEvidence": [],
@@ -333,7 +345,10 @@
             "queue-ownership",
             "cancel-cleanup"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-B-CORE-20260922",
+            "EV-B-SDK-20260922"
+          ]
         },
         {
           "id": "CORE-03-A02",
@@ -341,7 +356,10 @@
           "plannedChecks": [
             "workspace-write-admission"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-B-CORE-20260922",
+            "EV-B-SDK-20260922"
+          ]
         },
         {
           "id": "CORE-03-A03",
@@ -350,9 +368,13 @@
             "binding-late-operation",
             "snapshot-handoff"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-B-CORE-20260922",
+            "EV-B-SDK-20260922"
+          ]
         }
-      ]
+      ],
+      "statusReason": "模块级幂等、全局单写、批准/操作/取消/unknown、持久事件交接已通过真实SQLite+合成宿主测试；真实Worker/IPC/退出清理与产品失败恢复仍待实现。"
     },
     {
       "id": "CORE-04",
@@ -682,7 +704,7 @@
       "id": "ART-01",
       "priority": "P0",
       "ownerRole": "Backend",
-      "state": "proposed",
+      "state": "in_progress",
       "githubIssueNumber": null,
       "dependencies": [
         "CORE-01"
@@ -692,7 +714,7 @@
       "reuseRefs": [
         "artifact"
       ],
-      "implementationStatus": "not_implemented",
+      "implementationStatus": "in_progress",
       "githubIssueUrl": null,
       "issueVerificationStatus": "not_checked",
       "issueEvidence": [],
@@ -707,9 +729,13 @@
           "plannedChecks": [
             "artifact-file-validation"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-B-CORE-20260922",
+            "EV-B-SDK-20260922"
+          ]
         }
-      ]
+      ],
+      "statusReason": "真实Markdown文件/hash/目标与原操作归属、版本和纯文本预览通过；另存为、完整预览/权限UI与文件竞争原子性尚未完成。"
     },
     {
       "id": "SKL-01",

@@ -1,6 +1,6 @@
 # 模块接入契约：只保留必要的解耦
 
-状态：实施契约，尚非运行代码；服从[复用优先架构](reuse-first.md)。符号与源码依据见[证据表](upstream-evidence.md)。
+状态：实施契约；已验证范围由各阶段报告单独登记，不能把整份契约视为已实现。服从[复用优先架构](reuse-first.md)。符号与源码依据见[证据表](upstream-evidence.md)。
 
 ## 1. 依赖与状态所有权
 
@@ -113,6 +113,12 @@ A4 的 [限定实测](../validation/a4-2026-09-22.md) 已验证内存 store 与�
 
 ## 9. 接入验收的实施约束
 
-具名用例见 [修订清单](review-fixes.md)，并落入 Backlog 的 `acceptanceCriteria`，目前全为 planned。它们是待实现的接缝测试，`check-ssot.py` 通过不表示上述运行行为通过。
+具名用例见 [修订清单](review-fixes.md)，并落入 Backlog 的 `acceptanceCriteria`；`plannedChecks` 保留计划标识，实际覆盖以 `evidenceRefs` 的范围为准。`check-ssot.py` 通过不表示上述运行行为通过。
 
 P0 的 CORE-03 必须保证同 Workspace 至多一个活动写 Run；M0 可先用全局单写 Run 的更保守准入。锁/准入由产品宿主负责，包含等待审批和取消清理阶段，只有停止核验或受控恢复后才能释放。Pi 文件级队列不冒充跨 Worker 锁；CORE-05 的 P1 仅扩展并发与 Worktree 管理。
+
+## B 模块级实现边界（2026-09-22）
+
+[最小契约](b-minimal-contract.md) 和 [限定证据](../validation/b-2026-09-22.md) 实现了产品创建/启动/取消/批准命令、宿主事务与全局单写、固定绑定、操作结算、持久 cursor 和真实 Markdown 索引；通过真实 Pi Session/Runtime/write 接入测试。snapshot/订阅/预览目前为宿主内部方法，资源激活和其他命令仍待实现，不表示第 2.1 节全部接口已开放。
+
+测试在同进程组合模块，没有真实 Worker/IPC。取消和 unknown 的清理证据、崩溃输入为合成；产品库重开不会自动重新执行。完整资源锁/权限快照、真实退出确认与替换失败恢复仍按本契约实施。Node SQLite 的文件权限缺口及文件非原子检查见 [B 边界](../validation/b-boundaries.md)，不能从测试隔离推导出生产沙箱。

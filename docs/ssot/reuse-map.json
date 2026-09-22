@@ -71,7 +71,9 @@
           "EV-A1-SDK-20260922",
           "EV-A0-CLOSEOUT-RELEASE-20260922",
           "EV-A0-CLOSEOUT-TYPES-20260922",
-          "EV-A1-CLOSEOUT-SDK-20260922"
+          "EV-A1-CLOSEOUT-SDK-20260922",
+          "EV-B-INPUTS-20260922",
+          "EV-B-SDK-20260922"
         ]
       }
     },
@@ -129,7 +131,9 @@
           "EV-A1-SDK-20260922",
           "EV-A0-CLOSEOUT-RELEASE-20260922",
           "EV-A0-CLOSEOUT-TYPES-20260922",
-          "EV-A1-CLOSEOUT-SDK-20260922"
+          "EV-A1-CLOSEOUT-SDK-20260922",
+          "EV-B-INPUTS-20260922",
+          "EV-B-SDK-20260922"
         ]
       }
     },
@@ -847,13 +851,19 @@
       "reuse": "复用Pi原生任务执行，不重写",
       "productDelta": "项目/独立Run/审批/操作意图",
       "acceptanceGate": "幂等/绑定/取消/unknown；P0同Workspace写Run串行并覆盖等待审批与清理阶段",
-      "implementationState": "not_implemented",
+      "implementationState": "in_progress",
       "adoption": {
         "status": "not_applicable",
         "imports": [],
         "selectedSourceCommit": null,
-        "verificationStatus": "source_reviewed",
-        "testEvidence": []
+        "verificationStatus": "verified",
+        "testEvidence": [
+          "EV-B-REVIEW-20260922",
+          "EV-B-CORE-20260922",
+          "EV-B-SDK-20260922",
+          "EV-B-MAC-20260922",
+          "EV-B-REGRESSION-20260922"
+        ]
       }
     },
     {
@@ -866,13 +876,19 @@
       "reuse": "复用文件库/预览器而非模型文字猜测",
       "productDelta": "真实文件/版本/来源/验证",
       "acceptanceGate": "missing file拒绝与安全预览",
-      "implementationState": "not_implemented",
+      "implementationState": "in_progress",
       "adoption": {
         "status": "not_applicable",
         "imports": [],
         "selectedSourceCommit": null,
-        "verificationStatus": "source_reviewed",
-        "testEvidence": []
+        "verificationStatus": "verified",
+        "testEvidence": [
+          "EV-B-REVIEW-20260922",
+          "EV-B-CORE-20260922",
+          "EV-B-SDK-20260922",
+          "EV-B-MAC-20260922",
+          "EV-B-REGRESSION-20260922"
+        ]
       }
     },
     {
@@ -1172,6 +1188,78 @@
         "darwin"
       ],
       "locator": "docs/validation/a4-2026-09-22.md"
+    },
+    {
+      "id": "EV-B-REVIEW-20260922",
+      "kind": "review",
+      "result": "passed",
+      "scope": "B最小契约和采用边界自查：产品库/DTO无Pi依赖，adapter仅观察端口；复用Session/工具/认证，Node SQLite 1.2候选限开发宿主；Worker/IPC/完整恢复及UI未完成。无社区代码移植、无上游fork；不是独立安全签收。",
+      "commit": "61ad838ea601ef22f114a44ea533d3aff91517f0",
+      "recordedAt": "2026-09-22T15:37:54.703115+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/ssot/b-minimal-contract.md"
+    },
+    {
+      "id": "EV-B-INPUTS-20260922",
+      "kind": "release",
+      "result": "passed",
+      "scope": "沿用Node24.21.0/npm11.19.0/Pi0.87.0和原锁；2个缓存官方Pi tarball SRI复核，15个文件/19份安装副本字节一致；Node SQLite3.53.4实际导入，精确版官方SQLite文档摘要及稳定性1.2记录。无新依赖/运行时补丁，发行签名未验证。",
+      "commit": "61ad838ea601ef22f114a44ea533d3aff91517f0",
+      "recordedAt": "2026-09-22T15:37:54.703115+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/b-inputs.json"
+    },
+    {
+      "id": "EV-B-CORE-20260922",
+      "kind": "mock",
+      "result": "passed",
+      "scope": "真实ProductCore/SQLite由合成宿主驱动17项：严格产品命令、跨重开幂等、事务失败回滚、数据库约束/多连接全局单写、批准/领取/取消/unknown和对账、绑定失效、迟到操作归属、快照/跨批事件与监听异常、真实Markdown路径/hash/版本/预览。清理和崩溃输入是合成，不代表真实Worker监督或OS崩溃恢复。",
+      "commit": "61ad838ea601ef22f114a44ea533d3aff91517f0",
+      "recordedAt": "2026-09-22T15:37:54.703115+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/b-2026-09-22.md"
+    },
+    {
+      "id": "EV-B-SDK-20260922",
+      "kind": "sdk",
+      "result": "passed",
+      "scope": "真实Pi Session文件保存/关闭/重开与产品原生引用、真实公开write经持久审批产生文件和hash、同Session跨Run旧观察拒绝、公开Runtime替换重新绑定，共4项；另1项明确合成未知事件投影测试。SQLite仅由宿主模块写入，原生消息不复制。零模型，未接入真实Worker/IPC。",
+      "commit": "61ad838ea601ef22f114a44ea533d3aff91517f0",
+      "recordedAt": "2026-09-22T15:37:54.703115+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/b-2026-09-22.md"
+    },
+    {
+      "id": "EV-B-MAC-20260922",
+      "kind": "platform",
+      "result": "passed",
+      "scope": "macOS27.0 arm64实际SQLite/Markdown文件；发现Node SQLite文件访问绕过Node文件权限，B测试以OS文件规则验证合法合成DB读取及新DB写入均拒绝，网络/进程/worker/addon自检通过。A2真实Bash回归通过；不是生产沙箱/Keychain或Windows/Linux证据。",
+      "commit": "61ad838ea601ef22f114a44ea533d3aff91517f0",
+      "recordedAt": "2026-09-22T15:37:54.703115+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/b-2026-09-22.md"
+    },
+    {
+      "id": "EV-B-REGRESSION-20260922",
+      "kind": "static",
+      "result": "passed",
+      "scope": "干净代码SHA上：严格类型、类型10、A1 10/A2 19+4/A3 9+8/A4 16/B 17+5及SSOT60/脚本15/历史16与协议检查通过；文档/应用初始化各2次。git archive新副本使用校验缓存Node归档及A3输入缓存，独立npm ci，外部cwd全部SDK/B套件与类型连续2轮通过。锁及startup27摘要不变。",
+      "commit": "61ad838ea601ef22f114a44ea533d3aff91517f0",
+      "recordedAt": "2026-09-22T15:37:54.703115+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/b-2026-09-22.md"
     }
   ]
 }

@@ -4,7 +4,7 @@
 
 基于 Pi 的跨平台桌面 Agent 工作台，面向代码任务与通用知识工作。
 
-**当前阶段：A0–A4 限定的零模型 Pi Session/工具/资源包/凭据探针通过，严格声明检查经固定类型补丁通过；桌面应用尚未实现。** 当前证据见 [A4 报告](docs/validation/a4-2026-09-22.md)，前序见 [A3](docs/validation/a3-2026-09-22.md)、[A2](docs/validation/a2-2026-09-22.md) 与 [A0/A1 收尾](docs/validation/a0-a1-closeout-2026-09-22.md)。
+**当前阶段：A0–A4 零模型探针及 B 最小产品核心通过限定测试；真实 Worker/IPC 与桌面应用尚未实现。** 当前证据见 [B 报告](docs/validation/b-2026-09-22.md) 与 [最小契约](docs/ssot/b-minimal-contract.md)，前序见 [A4](docs/validation/a4-2026-09-22.md)、[A3](docs/validation/a3-2026-09-22.md)、[A2](docs/validation/a2-2026-09-22.md) 与 [A0/A1 收尾](docs/validation/a0-a1-closeout-2026-09-22.md)。
 
 ## 从这里开始
 
@@ -17,7 +17,7 @@
 | [下一阶段开发](docs/planning/NEXT_STEPS.md) | 从文档进入可运行 MVP 的工作顺序 |
 | [Backlog JSON](docs/planning/backlog.json) | 28 个待办的结构化数据，尚未创建 GitHub Issues |
 
-所有启动资料均放在 `docs/`；`scripts/` 只包含可复用的仓库辅助脚本。文档来自重新上传的 `Pi_Workbench_Startup_Pack_v0.1.zip`，**不是之前 66 文件仓库或另一套 Pi Desktop 文档的完整恢复**。
+启动资料放在 `docs/`；可复用检查和隔离启动器位于 `scripts/`，Pi 适配与产品 DTO 位于 `packages/`，最小产品核心位于 `apps/agent-server/`。文档来自重新上传的 `Pi_Workbench_Startup_Pack_v0.1.zip`，**不是之前 66 文件仓库或另一套 Pi Desktop 文档的完整恢复**。
 
 ## 快速检查
 

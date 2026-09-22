@@ -1,6 +1,6 @@
 # 从文档到可运行产品：复用优先
 
-状态：A0–A4 限定无模型探针、严格类型检查与重复初始化通过；产品阶段仍待实施。决策依据：[SSOT](../ssot/README.md)。工作项见 [backlog.json](backlog.json)；历史原始范围见[原始 Backlog](../startup/docs/08-delivery-and-references.md)。尚未创建 GitHub Issues。
+状态：A0–A4 限定无模型探针通过；B 最小产品核心及同进程 Pi 接入已验证，真实 Worker/IPC 和完整恢复仍待实施。决策依据：[SSOT](../ssot/README.md)。工作项见 [backlog.json](backlog.json)；历史原始范围见[原始 Backlog](../startup/docs/08-delivery-and-references.md)。尚未创建 GitHub Issues。
 
 ## 1. 下一增量不是再造平台
 
@@ -83,3 +83,9 @@ SKL-01、PKG-01 仅进入 in_progress，完整产品启用、签名/撤销、活
 A4 使用真实 Pi 0.87.0 ModelRuntime/内存 CredentialStore 完成 16 项合成认证接缝测试：状态白名单、临时 key、刷新/登录/注销竞争、取消、提交后同步失败和目录发布；完整回归、重复初始化及新副本两轮通过，见 [报告](../validation/a4-2026-09-22.md)。[边界](../validation/a4-boundaries.md) 明确异常可能含密钥、取消不代表底层已结束、系统存储/flush 未实现；没有真实 OAuth 或模型调用。
 
 SEC-03 进入 in_progress；BOOT-03/CORE-02 仍 in_progress，三个 M0 Gate 仍 pending。本轮停止于 A4，下一轮进入 **B：最小产品协调与持久化**，先收敛 BOOT-01 的最小产品契约，复用已验证 Pi 入口承接产品身份、事件和操作结算；不另造 Session 树、认证协议或 Harness，也不自动进入真实模型验收。
+
+## B 最小核心与下一增量（2026-09-22）
+
+[最小契约](../ssot/b-minimal-contract.md) 收敛了产品命令/身份/事务/事件和真实文件成果；采用固定 Node 的公开 SQLite 候选入口，没有新增依赖或重写 Pi 原生历史。17 项核心测试和 5 项 Pi 接入测试、全部前序回归、新副本两轮与重复初始化通过，见 [报告](../validation/b-2026-09-22.md)。BOOT-01、CORE-01、CORE-03、ART-01 进入 in_progress；B 及三个 M0 Gate 均未完成。
+
+下一增量继续 B：连接实际 Worker 生命周期和受限 IPC，使产品绑定、批准/操作结算、资源锁和清理证据跨进程成立；覆盖实际进程中断、替换三类失败与原生引用恢复。Node SQLite 文件访问的权限缺口与候选 API 稳定性须按 [边界记录](../validation/b-boundaries.md) 继续验证。不得把本轮合成 hostClean/崩溃输入当作实际监督，也不自动重发 unknown 操作。完成这些接缝后再进入 C；当前不安装 Electron/React，不使用真实账户或模型。

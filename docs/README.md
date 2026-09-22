@@ -39,3 +39,5 @@ A2 当前记录：[工具接缝与真实 macOS Shell 验证](validation/a2-2026-
 A3 当前记录：[受控资源与包探针](validation/a3-2026-09-22.md) · [公开入口和隔离边界](validation/a3-boundaries.md) · [发行包及测试输入](validation/a3-inputs.json)。SKL-01/PKG-01 进入 in_progress，完整技能库/市场及 M0 Gate 未完成。
 
 A4 当前记录：[凭据与模型探针](validation/a4-2026-09-22.md) · [错误/取消/系统存储边界](validation/a4-boundaries.md) · [发行输入摘要](validation/a4-inputs.json)。16 项合成认证接缝通过，SEC-03 仅进入 in_progress；真实 OAuth、系统密钥库和 M0 Gate 尚未完成。
+
+B 当前记录：[最小产品核心验证](validation/b-2026-09-22.md) · [产品契约与 SQLite 采用决定](ssot/b-minimal-contract.md) · [文件权限/恢复边界](validation/b-boundaries.md) · [输入摘要](validation/b-inputs.json)。17 项核心和 5 项 Pi 接入测试通过；BOOT-01/CORE-01/CORE-03/ART-01 仅进入 in_progress。下一增量仍是 B 的真实 Worker/IPC 和失败恢复，三个 M0 Gate 保持 pending。

@@ -96,3 +96,9 @@ P04/P05/P06/P07/P13 的固定源码链接是复查入口，不声称逐字核验
 代码提交 `ad6a3119d4f3d6c424799ae9de3a3901abdcd32b` 验证同版 ModelRuntime、CredentialSynchronizationError 与内存 CredentialStore/ModelsStore；类型、运行时导出和类方法分别记录在 adoption。Context7 的官方 SDK/pi-ai 文档仅用于定位，实际依据是经 [SRI 与字节复核](../validation/a4-inputs.json) 的发行包内声明、SDK 示例和 [16 项运行结果](../validation/a4-2026-09-22.md)。
 
 锁、依赖与 A0 声明补丁不变，运行时没有本地补丁。认证回调是合成输入，串行锁、刷新、目录与 Session 行为由真实发行包执行；未访问真实 Provider/Keychain。异常携带凭据、提交后同步失败、取消结算及缺少 flush 入口的实际边界见 [A4 记录](../validation/a4-boundaries.md)，没有以 Fork 或伪实现掩盖缺口。
+
+## B 已采用的持久化与产品接入（2026-09-22）
+
+代码提交 `61ad838ea601ef22f114a44ea533d3aff91517f0` 继续复用 Pi 0.87.0 根公开 SessionManager/Runtime、Session 方法及 write 工厂，无新增 Pi 入口或 deep-import。[输入摘要](../validation/b-inputs.json) 重新核对两个缓存官方 tarball 的 SRI、15 个文件/19 份安装副本字节；[报告](../validation/b-2026-09-22.md) 区分 4 项真实 SDK 接入与 1 项合成未知事件投影。
+
+产品 SQLite 使用现有 Node 24.21.0 的公开 node:sqlite，实际 SQLite 3.53.4。通过 Context7 定位文档并取得 [精确版官方文档](https://nodejs.org/download/release/v24.21.0/docs/api/sqlite.html) 的字节摘要；Stability 1.2（Release candidate）与替代方案登记在 [最小契约](b-minimal-contract.md)。已复现 Node 文件权限不拦截 DatabaseSync，B 测试以 macOS OS 文件规则补充并保留读写拒绝断言，见 [边界](../validation/b-boundaries.md)。这不是生产/打包运行时认证或上游安全签收。

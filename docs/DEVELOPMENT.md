@@ -141,7 +141,7 @@ npm run patch:pi-types
 
 初始化器从自身路径定位仓库，可从任意目录执行；已有 Node 和 npm cache 时 `--app --offline` 可重复运行 npm ci。它不修改锁文件、全局 Git/SSH、全局 Node、用户 Pi 配置或文档 `.venv`。Windows 可自行提供精确 Node/npm，自动 Node 解包路径仅实现 macOS/Linux；未声称 Windows 实测。
 
-依赖获取阶段可以联网；SDK 子进程从空环境构造测试所需变量，HOME/agentDir/workspace/sessions 都在自动清理的独立临时目录。公开 ResourceLoader 直接提供空集合，空内存凭据与内存 settings/model store 从创建前注入，不调用默认资源发现。禁止文件访问范围外读取、子进程、worker、native addon；预加载网络 tripwire 拦截 fetch/HTTP/TCP/DNS/UDP 等入口，请求即使被库捕获也让进程失败。macOS 额外使用系统 sandbox-exec 拒绝网络，不回退到开放网络。它用于受信任代码的离线测试，不是恶意插件沙箱。
+依赖获取阶段可以联网；SDK 子进程从空环境构造测试所需变量，HOME/agentDir/workspace/sessions 都在自动清理的独立临时目录。公开 ResourceLoader 直接提供空集合，空内存凭据与内存 settings/model store 从创建前注入，不调用默认资源发现。通过 Node 权限限制文件读取、子进程、worker、native addon（SQLite 的例外与 OS 补充规则见第 13 节）；预加载网络 tripwire 拦截 fetch/HTTP/TCP/DNS/UDP 等入口，请求即使被库捕获也让进程失败。macOS 额外使用系统 sandbox-exec 拒绝网络，不回退到开放网络。它用于受信任代码的离线测试，不是恶意插件沙箱。
 
 ```bash
 # A0：可联网的下载审计，与 SDK 探针分开
@@ -208,3 +208,19 @@ npm run test:pi-shell
 `test:pi-auth` 在既有禁网隔离启动器内运行 16 项测试。显式内存 CredentialStore/modelsStore、无 modelsPath、空资源/settings；只批准测试内合成 Provider，其 login/refresh 回调不执行 OAuth 协议，stream 一旦执行即失败。临时 auth/models 文件是明确标记的负向合成输入，绝不使用用户文件或 Keychain。
 
 SDK 与 Shell launcher 父进程主动放入合成环境 canary，验证白名单子进程没有继承；捕获输出若出现该 canary 就抑制输出并失败。状态投影不透传凭据、上游 source/metadata 或异常；这不是完整产品 Renderer/日志系统。详见 [A4 报告](validation/a4-2026-09-22.md)、[输入摘要](validation/a4-inputs.json) 和 [生命周期边界](validation/a4-boundaries.md)。原始输出在 `.artifacts/a4/`。真实 OAuth、系统存储/flush、Windows/Linux 未验证，三个 M0 Gate 保持 pending。
+
+## 13. B 最小产品核心
+
+沿用第 9 节工具链和锁文件，无新依赖。以下两套测试当前必须在 macOS 运行：
+
+```bash
+npm run typecheck
+npm run test:product-core
+npm run test:product-sdk
+```
+
+`test:product-core` 用真实 SQLite 和文件系统验证产品命令/事务/状态/事件/成果；Worker、清理和崩溃输入明确为合成。`test:product-sdk` 复用真实 Pi 原生保存/重开、Runtime 替换、公开 write 和 A2 批准接缝，不调用模型。Adapter 只传固定身份及有限观察，产品宿主独自写 SQLite；这仍是同进程模块测试，不是已运行的 App Server/Worker 服务。
+
+固定 Node 的 SQLite 入口目前是 Stability 1.2 候选，且已实测其文件访问不受 Node 文件白名单约束。B 启动器因此强制附加 macOS 文件规则，用真实合成 DB 验证禁止目录不可读/不可创建文件；Node 其他权限、网络 tripwire 和空环境隔离仍保留，失败不回退开放环境。当前不支持在其他平台运行 B 测试，详细限制见 [B 边界](validation/b-boundaries.md)。
+
+[脱敏报告](validation/b-2026-09-22.md) 引用真实被测代码 SHA，记录 17+5 项测试、前序回归、重复初始化及独立副本重跑；[输入摘要](validation/b-inputs.json) 可在新克隆定位。原始输出位于忽略的 `.artifacts/b/`。完整 Worker/IPC、失败恢复、资源/权限绑定和三个 M0 Gate 尚未完成。

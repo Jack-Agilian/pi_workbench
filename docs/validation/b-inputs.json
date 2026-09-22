@@ -1,0 +1,125 @@
+{
+  "testedCommit": "61ad838ea601ef22f114a44ea533d3aff91517f0",
+  "recordedAt": "2026-09-22T15:33:52.360199+00:00",
+  "scope": "Recheck cached official Pi tarballs against lock SRI and selected installed source/declaration bytes. No new dependency or runtime patch; A0 declaration patch retained. Node SQLite module used only in fixed development runtime; no signature verification.",
+  "lockSha256": "7cd35e4fc73c7e0b61112b515c6389505baf7d541e638bd7cf0ffe2dbf6e8e44",
+  "runtime": {
+    "node": "24.21.0",
+    "arch": "arm64",
+    "sqlite": "3.53.4"
+  },
+  "nodeExecutableSha256": "e4b5a3af0e05c75de2eae013904145f40fe7fc2a6e6f17510128bf45cca4e79b",
+  "nodeArchiveSha256": "bed7eea5325e1108f32ce5228ddd6a5f0f08a499ee42aa7442aea583702f6057",
+  "nodeDocumentation": {
+    "url": "https://nodejs.org/download/release/v24.21.0/docs/api/sqlite.html",
+    "bytes": 167215,
+    "sha256": "33cb02d9412d3d6b419ceeb717f2f7b551ff73da6d82b81cc90673552915c3da",
+    "stabilityLabels": [
+      "Stability: 1.2"
+    ]
+  },
+  "packages": [
+    {
+      "package": "@earendil-works/pi-coding-agent",
+      "version": "0.87.0",
+      "tarballUrl": "https://registry.npmjs.org/@earendil-works/pi-coding-agent/-/pi-coding-agent-0.87.0.tgz",
+      "integrity": "sha512-S9JJVGHya/h0e0M+zwPTB6RkPe7PmLLqfBUTssFYW5mxAti6oZEILn4jvaUImENRC3U9RwXAB6H4gw8xj2J0GQ==",
+      "bytes": 7227603,
+      "sha256": "9a6733c0e6a31d592b53dc60df43dd0c26fa793ccf2384ed123fc17b0448866a",
+      "installedCopies": [
+        "node_modules/@earendil-works/pi-coding-agent"
+      ],
+      "files": [
+        {
+          "path": "dist/index.js",
+          "bytes": 4742,
+          "sha256": "1e3601da1e18a7be4dfdcc625d7a7fb942cc095a5d737bb1b70211af33b61e05"
+        },
+        {
+          "path": "dist/index.d.ts",
+          "bytes": 10697,
+          "sha256": "1e89f64c284248e8004bc040be1b8d886f20c158091d4e466cb130fa9d13d458"
+        },
+        {
+          "path": "dist/core/sdk.js",
+          "bytes": 14059,
+          "sha256": "b49c2843197166bb84283edcb7702b91346d8fbaed2b0b8c70e5277dd78bcf5f"
+        },
+        {
+          "path": "dist/core/sdk.d.ts",
+          "bytes": 4960,
+          "sha256": "fbb34394c71e113b1f1fb5dd2e3d1da8d559580b339daace88826cd1a666cc4c"
+        },
+        {
+          "path": "dist/core/agent-session.js",
+          "bytes": 146265,
+          "sha256": "5ebfae51db5a900596145159428e7cb57d195af9d54a28f41d4ac8ff1bfd5729"
+        },
+        {
+          "path": "dist/core/agent-session.d.ts",
+          "bytes": 31089,
+          "sha256": "ee0b9c2c2fefeef292c9da884b92c0fa5fce73f04bc834655720253d477f391d"
+        },
+        {
+          "path": "dist/core/session-manager.js",
+          "bytes": 60256,
+          "sha256": "d365ffb5a189915c3af93953daf751bff45fe46222b05c426f8d8b845946bebf"
+        },
+        {
+          "path": "dist/core/session-manager.d.ts",
+          "bytes": 19115,
+          "sha256": "d27e910585a6f41f2d17381516519eefb680f671bd271dcbb09a26de2d4a50f0"
+        },
+        {
+          "path": "dist/core/tools/write.js",
+          "bytes": 2990,
+          "sha256": "0e9daec15a5001cafe651db391aed63a463c346d29b60e6dc91ef09477fd22f5"
+        },
+        {
+          "path": "dist/core/tools/write.d.ts",
+          "bytes": 1330,
+          "sha256": "c38a85e8c740dd43b415517bfdf868f32dd80e77cf5e1e0115753eed9208c852"
+        },
+        {
+          "path": "docs/sdk.md",
+          "bytes": 39211,
+          "sha256": "d3ae431453e8da71d38da833ad43713bca6d537af53e4e0f3ebaef87c14c6732"
+        }
+      ]
+    },
+    {
+      "package": "@earendil-works/pi-ai",
+      "version": "0.87.0",
+      "tarballUrl": "https://registry.npmjs.org/@earendil-works/pi-ai/-/pi-ai-0.87.0.tgz",
+      "integrity": "sha512-lbRm+EMY6Jx3l+HLpbqbm9Yrhkc5u7EffLk2id+zJQEoBuR5I+tijGiZU8zlnuuCclmQOgH0PVjL9PLbeqJ9MQ==",
+      "bytes": 836978,
+      "sha256": "f2adf9de809d035f76f8dadf3d148720ebeef4606a848ab36ee834d895ae812f",
+      "installedCopies": [
+        "node_modules/@earendil-works/pi-ai",
+        "node_modules/@earendil-works/pi-coding-agent/node_modules/@earendil-works/pi-ai"
+      ],
+      "files": [
+        {
+          "path": "dist/index.js",
+          "bytes": 951,
+          "sha256": "4eee4d99e3eaf82e28826808136b2eede4184c3fb697328cbfc32db3360a8540"
+        },
+        {
+          "path": "dist/index.d.ts",
+          "bytes": 2134,
+          "sha256": "dd340daff435715950e104d1983cf013bef83c66e66b4e7b895360c1e8f4ec94"
+        },
+        {
+          "path": "dist/utils/validation.js",
+          "bytes": 10615,
+          "sha256": "25448fb499e38cd216b4a47d747ddf3b7750419d379e4bf4ca1578ada48d04d7"
+        },
+        {
+          "path": "dist/utils/validation.d.ts",
+          "bytes": 834,
+          "sha256": "72d8e9887b0895d5e4d2a06f252859666a5be7cc7d555f8232d128c862bcf9d1"
+        }
+      ]
+    }
+  ]
+}

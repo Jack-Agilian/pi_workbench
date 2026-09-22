@@ -14,9 +14,9 @@
 
 `docs/startup/` 继续保留原始 0.1 快照、原始接口和历史报告，不改摘要。**涉及复用策略、工具接入、技能解析、模型配置、任务队列、传输选型、模块拆分和交付先后的冲突，以本目录为准。**未被本目录覆盖的产品范围、UI 体验及安全要求继续参考原快照。已落地代码和测试是实现事实；与规格冲突时报告偏差，不静默反向改写规格。
 
-原始 `contracts/app-protocol.ts` 与 SQL 只是参考，不能整份复制作为首版必做项。当前没有新增可执行产品协议。A0/A1 已新增锁定的 Pi Session 探针依赖；尚未引入 Electron 或社区 UI。严格声明检查经 [ADR-A0 类型补丁](adr-a0-pi-types.md) 通过，原始发行缺陷及采用边界见 [A0/A1 缺口](../validation/a0-a1-gaps.md)。
+原始 `contracts/app-protocol.ts` 与 SQL 只是参考，不能整份复制作为首版必做项。B 已新增有限的产品 DTO/命令校验与模块级持久核心，范围见 [最小契约](b-minimal-contract.md)；完整 IPC 协议尚未实现。A0/A1 引入的 Pi 精确依赖继续沿用，尚未引入 Electron 或社区 UI。严格声明检查经 [ADR-A0 类型补丁](adr-a0-pi-types.md) 通过，原始发行缺陷及采用边界见 [A0/A1 缺口](../validation/a0-a1-gaps.md)。
 
-维护规则见 [状态、证据与验收](maintenance.md)；本次处理清单见 [R01–R08 修订](review-fixes.md)。修订了维护脚本并明确接缝契约，不代表产品接入测试已经通过。
+维护规则见 [状态、证据与验收](maintenance.md)；本次处理清单见 [R01–R08 修订](review-fixes.md)。该修订只核验维护脚本和接缝契约；后续实际接入证据分别登记如下。
 
 ## 本次明确减少的自研
 
@@ -47,3 +47,7 @@ python scripts/test-tools.py
 ## A4 实际进度
 
 [被测提交与凭据/模型报告](../validation/a4-2026-09-22.md) · [输入摘要](../validation/a4-inputs.json) · [公开错误与生命周期边界](../validation/a4-boundaries.md)。16 项合成认证接缝通过，复用 Pi 的 store 锁、登录/刷新、目录与 Session 选型，只新增状态/结果白名单投影和隔离测试。SEC-03 进入 in_progress，models-auth/pi-settings 追加限定证据；系统凭据存储、真实 OAuth、产品 Renderer/IPC/日志仍未完成，三个 M0 Gate 仍 pending。本轮停止于 A4，下一轮才进入 B。
+
+## B 最小产品核心实际进度
+
+[被测提交与报告](../validation/b-2026-09-22.md) · [最小契约](b-minimal-contract.md) · [输入摘要](../validation/b-inputs.json) · [权限/恢复边界](../validation/b-boundaries.md)。17 项真实 SQLite/合成宿主测试与 5 项 Pi 接入测试通过，复用原生 Session/Runtime/write，只新增产品协调、持久事件和真实 Markdown 成果索引。product-coordination/artifact 与 BOOT-01/CORE-01/CORE-03/ART-01 进入 in_progress，新增证据只支持模块级范围。真实 Worker/IPC、完整资源/权限绑定和失败恢复仍待实施；B 和三个 M0 Gate 未完成，下一增量仍在 B。
