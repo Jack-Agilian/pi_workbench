@@ -1,6 +1,6 @@
 # 从文档到可运行产品：复用优先
 
-状态：A0–A3 限定无模型探针、严格类型检查与重复初始化通过；产品阶段仍待实施。决策依据：[SSOT](../ssot/README.md)。工作项见 [backlog.json](backlog.json)；历史原始范围见[原始 Backlog](../startup/docs/08-delivery-and-references.md)。尚未创建 GitHub Issues。
+状态：A0–A4 限定无模型探针、严格类型检查与重复初始化通过；产品阶段仍待实施。决策依据：[SSOT](../ssot/README.md)。工作项见 [backlog.json](backlog.json)；历史原始范围见[原始 Backlog](../startup/docs/08-delivery-and-references.md)。尚未创建 GitHub Issues。
 
 ## 1. 下一增量不是再造平台
 
@@ -77,3 +77,9 @@ M0-UI、M0-SDK、M0-Pi 保持 pending。A0/A1 原交付停止在其限定范围�
 A3 已在 Pi 0.87.0 验证受控技能快照/原生刷新 9 项，以及真实离线 npm/Git 安装 8 项，见 [报告](../validation/a3-2026-09-22.md)。缺包解析策略、默认加载器隐式安装、祖先发现和原地更新等限制见 [边界](../validation/a3-boundaries.md)。没有复制 Pi 的技能或包来源解析器。新副本独立初始化、外部 cwd 连续两轮通过。
 
 SKL-01、PKG-01 仅进入 in_progress，完整产品启用、签名/撤销、活动引用管理和 CLI 对账仍待实施。BOOT-03 继续 in_progress，三个 Gate 仍 pending。本轮停止于 A3；下一轮按顺序进入 **A4 凭据/模型公开入口的零真实模型探针**，继续空/合成凭据隔离，不自动使用真实账户或调用 Provider。
+
+## A4 后续范围与下一步（2026-09-22）
+
+A4 使用真实 Pi 0.87.0 ModelRuntime/内存 CredentialStore 完成 16 项合成认证接缝测试：状态白名单、临时 key、刷新/登录/注销竞争、取消、提交后同步失败和目录发布；完整回归、重复初始化及新副本两轮通过，见 [报告](../validation/a4-2026-09-22.md)。[边界](../validation/a4-boundaries.md) 明确异常可能含密钥、取消不代表底层已结束、系统存储/flush 未实现；没有真实 OAuth 或模型调用。
+
+SEC-03 进入 in_progress；BOOT-03/CORE-02 仍 in_progress，三个 M0 Gate 仍 pending。本轮停止于 A4，下一轮进入 **B：最小产品协调与持久化**，先收敛 BOOT-01 的最小产品契约，复用已验证 Pi 入口承接产品身份、事件和操作结算；不另造 Session 树、认证协议或 Harness，也不自动进入真实模型验收。

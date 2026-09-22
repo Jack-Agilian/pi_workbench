@@ -90,3 +90,9 @@ P04/P05/P06/P07/P13 的固定源码链接是复查入口，不声称逐字核验
 本轮通过 Context7 阅读官方 [SDK 文档](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/sdk.md) 和 [包文档](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/packages.md) 定位示例；实际行为以 [输入摘要](../validation/a3-inputs.json) 中经 SRI 核对的发行 tarball、16 个安装文件和运行结果为准。没有把 main 或文档旧版 Skill 字段替代已安装类型。
 
 原 U04 的 pinned npm/Git 差异现已在离线真实 npm/Git 探针复现；local 包仍是引用，默认 ResourceLoader no* 标志不阻止隐式安装，具体复现和候选公开改进见 [A3 边界](../validation/a3-boundaries.md)。仅安装测试输入另有精确 registry/SRI 记录，从未作为扩展或业务模块加载；不表示采用新的产品依赖。没有上游 Fork、任意扩展启用或真实模型调用。
+
+## A4 已采用的凭据与模型入口（2026-09-22）
+
+代码提交 `ad6a3119d4f3d6c424799ae9de3a3901abdcd32b` 验证同版 ModelRuntime、CredentialSynchronizationError 与内存 CredentialStore/ModelsStore；类型、运行时导出和类方法分别记录在 adoption。Context7 的官方 SDK/pi-ai 文档仅用于定位，实际依据是经 [SRI 与字节复核](../validation/a4-inputs.json) 的发行包内声明、SDK 示例和 [16 项运行结果](../validation/a4-2026-09-22.md)。
+
+锁、依赖与 A0 声明补丁不变，运行时没有本地补丁。认证回调是合成输入，串行锁、刷新、目录与 Session 行为由真实发行包执行；未访问真实 Provider/Keychain。异常携带凭据、提交后同步失败、取消结算及缺少 flush 入口的实际边界见 [A4 记录](../validation/a4-boundaries.md)，没有以 Fork 或伪实现掩盖缺口。

@@ -158,6 +158,10 @@
               {
                 "name": "ModelRuntime",
                 "kind": "runtime"
+              },
+              {
+                "name": "CredentialSynchronizationError",
+                "kind": "runtime"
               }
             ],
             "selectedVersion": "0.87.0"
@@ -173,6 +177,30 @@
               {
                 "name": "InMemoryModelsStore",
                 "kind": "runtime"
+              },
+              {
+                "name": "CredentialStore",
+                "kind": "type"
+              },
+              {
+                "name": "ModelsStore",
+                "kind": "type"
+              },
+              {
+                "name": "Provider",
+                "kind": "type"
+              },
+              {
+                "name": "Model",
+                "kind": "type"
+              },
+              {
+                "name": "Api",
+                "kind": "type"
+              },
+              {
+                "name": "OAuthCredential",
+                "kind": "type"
               }
             ],
             "selectedVersion": "0.87.0"
@@ -185,7 +213,11 @@
           "EV-A1-SDK-20260922",
           "EV-A0-CLOSEOUT-RELEASE-20260922",
           "EV-A0-CLOSEOUT-TYPES-20260922",
-          "EV-A1-CLOSEOUT-SDK-20260922"
+          "EV-A1-CLOSEOUT-SDK-20260922",
+          "EV-A4-INPUTS-20260922",
+          "EV-A4-AUTH-20260922",
+          "EV-A4-MAC-ISOLATION-20260922",
+          "EV-A4-REGRESSION-20260922"
         ]
       }
     },
@@ -225,7 +257,8 @@
           "EV-A1-SDK-20260922",
           "EV-A0-CLOSEOUT-RELEASE-20260922",
           "EV-A0-CLOSEOUT-TYPES-20260922",
-          "EV-A1-CLOSEOUT-SDK-20260922"
+          "EV-A1-CLOSEOUT-SDK-20260922",
+          "EV-A4-AUTH-20260922"
         ]
       }
     },
@@ -1091,6 +1124,54 @@
         "darwin"
       ],
       "locator": "docs/validation/a3-2026-09-22.md"
+    },
+    {
+      "id": "EV-A4-INPUTS-20260922",
+      "kind": "release",
+      "result": "passed",
+      "scope": "沿用 Pi 0.87.0 / Node 24.21.0；缓存官方两包重新核对 lock/SRI，21 个不同文件、33 份安装副本字节一致，根 exports/声明/SDK 示例已核对；新副本 Node 官方下载校验。未做签名验证，既有声明补丁保留。",
+      "commit": "ad6a3119d4f3d6c424799ae9de3a3901abdcd32b",
+      "recordedAt": "2026-09-22T14:15:28.455885+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/a4-inputs.json"
+    },
+    {
+      "id": "EV-A4-AUTH-20260922",
+      "kind": "sdk",
+      "result": "passed",
+      "scope": "实际 Pi ModelRuntime/CredentialStore 的 16 项零模型探针：仅批准合成 Provider，API key 覆盖/注销、OAuth 单次串行刷新/登录/注销竞争/活跃取消、四类已提交同步失败、存储结果 unknown、脱敏状态白名单、离线目录缓存和旧发布拒绝、空资源 Session 选型。不是真实 OAuth/Provider、Renderer、系统存储或 flush 验收。",
+      "commit": "ad6a3119d4f3d6c424799ae9de3a3901abdcd32b",
+      "recordedAt": "2026-09-22T14:15:28.455885+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/a4-2026-09-22.md"
+    },
+    {
+      "id": "EV-A4-MAC-ISOLATION-20260922",
+      "kind": "platform",
+      "result": "passed",
+      "scope": "macOS 27.0 arm64：A4 独立 HOME/显式存储/禁网与进程拒绝；父 launcher 合成凭据 canary 未进入 SDK 或真实 Pi Bash；Bash 4 项回归通过。测试 stdout/stderr canary 检查通过。没有访问 Keychain、真实 auth.json；不代表产品日志系统、完整沙箱或 Windows。",
+      "commit": "ad6a3119d4f3d6c424799ae9de3a3901abdcd32b",
+      "recordedAt": "2026-09-22T14:15:28.455885+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/a4-2026-09-22.md"
+    },
+    {
+      "id": "EV-A4-REGRESSION-20260922",
+      "kind": "static",
+      "result": "passed",
+      "scope": "在实际代码 SHA 的干净树完成严格类型、类型10/A1 10/A2 19+4/A3 9+8/A4 16、SSOT60/脚本15/历史16及协议类型、结构检查；文档/应用初始化各两次。独立 git archive 副本官方 Node 下载并重复初始化，从外部 cwd 两轮类型/A1/A2/A3资源/A4通过（未在新副本重跑A3包安装）。锁与startup27摘要不变。",
+      "commit": "ad6a3119d4f3d6c424799ae9de3a3901abdcd32b",
+      "recordedAt": "2026-09-22T14:15:28.455885+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/a4-2026-09-22.md"
     }
   ]
 }

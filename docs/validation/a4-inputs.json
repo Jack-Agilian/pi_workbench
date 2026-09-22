@@ -1,0 +1,202 @@
+{
+  "testedCommit": "ad6a3119d4f3d6c424799ae9de3a3901abdcd32b",
+  "recordedAt": "2026-09-22T14:11:04.663092+00:00",
+  "scope": "A4 re-verification of previously downloaded official tarballs against the application lock SRI; selected installed runtime/declaration/example files match bytes. No new release selection or signature verification. A0 declaration patch remains independently checked.",
+  "lockSha256": "7cd35e4fc73c7e0b61112b515c6389505baf7d541e638bd7cf0ffe2dbf6e8e44",
+  "packages": [
+    {
+      "package": "@earendil-works/pi-coding-agent",
+      "version": "0.87.0",
+      "tarballUrl": "https://registry.npmjs.org/@earendil-works/pi-coding-agent/-/pi-coding-agent-0.87.0.tgz",
+      "integrity": "sha512-S9JJVGHya/h0e0M+zwPTB6RkPe7PmLLqfBUTssFYW5mxAti6oZEILn4jvaUImENRC3U9RwXAB6H4gw8xj2J0GQ==",
+      "bytes": 7227603,
+      "sha256": "9a6733c0e6a31d592b53dc60df43dd0c26fa793ccf2384ed123fc17b0448866a",
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "import": "./dist/index.js"
+        },
+        "./rpc-entry": {
+          "import": "./dist/bundle/rpc-entry.js"
+        },
+        "./client": {
+          "source": "./src/client/index.ts"
+        },
+        "./experimental/plugin": {
+          "source": "./src/experimental/plugin.ts"
+        }
+      },
+      "engines": {
+        "node": ">=22.19.0"
+      },
+      "installedCopies": [
+        "node_modules/@earendil-works/pi-coding-agent"
+      ],
+      "files": [
+        {
+          "path": "dist/index.js",
+          "bytes": 4742,
+          "sha256": "1e3601da1e18a7be4dfdcc625d7a7fb942cc095a5d737bb1b70211af33b61e05"
+        },
+        {
+          "path": "dist/index.d.ts",
+          "bytes": 10697,
+          "sha256": "1e89f64c284248e8004bc040be1b8d886f20c158091d4e466cb130fa9d13d458"
+        },
+        {
+          "path": "dist/core/model-runtime.js",
+          "bytes": 27451,
+          "sha256": "bae3c3feb7928c7702c3d98a3454660bee1647064dd449472fc6308c354fbc25"
+        },
+        {
+          "path": "dist/core/model-runtime.d.ts",
+          "bytes": 6410,
+          "sha256": "1eab731760756334e38beb22bea56a4ca96db380e2e5b91a633365b5449fe328"
+        },
+        {
+          "path": "dist/core/runtime-credentials.js",
+          "bytes": 1421,
+          "sha256": "2bf389ca2b04bd4dcee56433ca845cd8d9d96d0ccf84d2d0e9ad2a5e3957bda1"
+        },
+        {
+          "path": "dist/core/runtime-credentials.d.ts",
+          "bytes": 997,
+          "sha256": "322071908dadf1340fa1a86e1849b4aa4b29ce2996110cf3dfab43ba988eb140"
+        },
+        {
+          "path": "dist/core/model-config.js",
+          "bytes": 13150,
+          "sha256": "68c447ff2ef729331713e044dae41b7416dbafbf96c83773308e2eb9c3f86107"
+        },
+        {
+          "path": "docs/sdk.md",
+          "bytes": 39211,
+          "sha256": "d3ae431453e8da71d38da833ad43713bca6d537af53e4e0f3ebaef87c14c6732"
+        },
+        {
+          "path": "examples/sdk/09-api-keys-and-oauth.ts",
+          "bytes": 1092,
+          "sha256": "d1d2b1bd4e57a3b2ab6f910068e8382759d12a94fbecf1332e96a9ebe4683eb4"
+        }
+      ]
+    },
+    {
+      "package": "@earendil-works/pi-ai",
+      "version": "0.87.0",
+      "tarballUrl": "https://registry.npmjs.org/@earendil-works/pi-ai/-/pi-ai-0.87.0.tgz",
+      "integrity": "sha512-lbRm+EMY6Jx3l+HLpbqbm9Yrhkc5u7EffLk2id+zJQEoBuR5I+tijGiZU8zlnuuCclmQOgH0PVjL9PLbeqJ9MQ==",
+      "bytes": 836978,
+      "sha256": "f2adf9de809d035f76f8dadf3d148720ebeef4606a848ab36ee834d895ae812f",
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "import": "./dist/index.js"
+        },
+        "./compat": {
+          "types": "./dist/compat.d.ts",
+          "import": "./dist/compat.js"
+        },
+        "./providers/*": {
+          "types": "./dist/providers/*.d.ts",
+          "import": "./dist/providers/*.js"
+        },
+        "./api/*": {
+          "types": "./dist/api/*.d.ts",
+          "import": "./dist/api/*.js"
+        },
+        "./utils/*": {
+          "types": "./dist/utils/*.d.ts",
+          "import": "./dist/utils/*.js"
+        },
+        "./oauth": {
+          "types": "./dist/oauth.d.ts",
+          "import": "./dist/oauth.js"
+        },
+        "./bedrock-provider": {
+          "types": "./dist/bedrock-provider.d.ts",
+          "import": "./dist/bedrock-provider.js"
+        },
+        "./bun-oauth": {
+          "types": "./dist/bun-oauth.d.ts",
+          "import": "./dist/bun-oauth.js"
+        }
+      },
+      "engines": {
+        "node": ">=22.19.0"
+      },
+      "installedCopies": [
+        "node_modules/@earendil-works/pi-ai",
+        "node_modules/@earendil-works/pi-coding-agent/node_modules/@earendil-works/pi-ai"
+      ],
+      "files": [
+        {
+          "path": "dist/index.js",
+          "bytes": 951,
+          "sha256": "4eee4d99e3eaf82e28826808136b2eede4184c3fb697328cbfc32db3360a8540"
+        },
+        {
+          "path": "dist/index.d.ts",
+          "bytes": 2134,
+          "sha256": "dd340daff435715950e104d1983cf013bef83c66e66b4e7b895360c1e8f4ec94"
+        },
+        {
+          "path": "dist/models.js",
+          "bytes": 25419,
+          "sha256": "75fa33149fb608bc4a7b7a0586c8ca8f0024465d580091b0c426c0baf3fbc80a"
+        },
+        {
+          "path": "dist/models.d.ts",
+          "bytes": 11793,
+          "sha256": "920a510c7a525d8188fb9abe4835713e19281a6c6948bbb6ab8814f076ac2cf1"
+        },
+        {
+          "path": "dist/models-store.js",
+          "bytes": 587,
+          "sha256": "bbce61b3123d849c711a64051b37166a2180ba379bc6c8e20b360f08787d2b5d"
+        },
+        {
+          "path": "dist/models-store.d.ts",
+          "bytes": 1390,
+          "sha256": "775c2f2d3f6d4a39d947818b593e034d7f5e90bc1f3524730bf41aed89a8fa60"
+        },
+        {
+          "path": "dist/auth/types.d.ts",
+          "bytes": 8694,
+          "sha256": "6358ddc2437eb24a0662b7e59b1b9205896689821eb0966821fb2131a0ebc2bd"
+        },
+        {
+          "path": "dist/auth/credential-store.js",
+          "bytes": 2045,
+          "sha256": "7e47b1a35815d04d9798ba7d8b9870409eeb522c36752c97a4c67416caaf2358"
+        },
+        {
+          "path": "dist/auth/credential-store.d.ts",
+          "bytes": 1031,
+          "sha256": "b30029a6b8d93d65dd5b164fa563346009bcf47f674b28367ac08c0f111fcfb1"
+        },
+        {
+          "path": "dist/auth/resolve.js",
+          "bytes": 6048,
+          "sha256": "82ee45ecec319f59536759312a4de25313a8bb8cb7ce43db43d18edc10fef305"
+        },
+        {
+          "path": "dist/auth/resolve.d.ts",
+          "bytes": 1217,
+          "sha256": "0a05e282ce6066bfee601a478e4ae22602f5c8615f282eba941fa4ed4b84f557"
+        },
+        {
+          "path": "dist/utils/abort.js",
+          "bytes": 1551,
+          "sha256": "17326034a23e443ca216f0b6ecb73db1dfd36a06698643ef77dc3ba9401f0636"
+        }
+      ]
+    }
+  ],
+  "freshNodeArchive": {
+    "url": "https://nodejs.org/dist/v24.21.0/node-v24.21.0-darwin-arm64.tar.gz",
+    "sha256": "bed7eea5325e1108f32ce5228ddd6a5f0f08a499ee42aa7442aea583702f6057",
+    "bytes": 52909993,
+    "checksumSource": "https://nodejs.org/dist/v24.21.0/SHASUMS256.txt",
+    "scope": "HTTPS archive bytes against official SHA-256; signature not independently verified"
+  }
+}

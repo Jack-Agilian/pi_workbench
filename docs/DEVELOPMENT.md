@@ -194,3 +194,17 @@ npm run test:pi-packages
 `test:pi-packages` 目前要求 macOS 和本机已有 Git；系统 profile 对 npm/Git 子进程限制文件与网络，失败不回退。npm 需要的祖先 metadata 权限、只读快照限制和默认资源加载器的隐式安装复现见 [A3 边界](validation/a3-boundaries.md)。测试未授权真实模型、未知扩展或用户包脚本。
 
 结果见 [A3 报告](validation/a3-2026-09-22.md) 和 [完整性摘要](validation/a3-inputs.json)。原始输出位于忽略的 `.artifacts/a3/`；本轮停止于 A3，A4 与三个 M0 Gate 尚未完成。
+
+## 12. A4 凭据与模型探针
+
+继续使用第 9 节的工具链，无新依赖或下载 fixture：
+
+```bash
+npm run typecheck
+npm run test:pi-auth
+npm run test:pi-shell
+```
+
+`test:pi-auth` 在既有禁网隔离启动器内运行 16 项测试。显式内存 CredentialStore/modelsStore、无 modelsPath、空资源/settings；只批准测试内合成 Provider，其 login/refresh 回调不执行 OAuth 协议，stream 一旦执行即失败。临时 auth/models 文件是明确标记的负向合成输入，绝不使用用户文件或 Keychain。
+
+SDK 与 Shell launcher 父进程主动放入合成环境 canary，验证白名单子进程没有继承；捕获输出若出现该 canary 就抑制输出并失败。状态投影不透传凭据、上游 source/metadata 或异常；这不是完整产品 Renderer/日志系统。详见 [A4 报告](validation/a4-2026-09-22.md)、[输入摘要](validation/a4-inputs.json) 和 [生命周期边界](validation/a4-boundaries.md)。原始输出在 `.artifacts/a4/`。真实 OAuth、系统存储/flush、Windows/Linux 未验证，三个 M0 Gate 保持 pending。

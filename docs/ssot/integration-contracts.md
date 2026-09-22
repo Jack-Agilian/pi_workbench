@@ -93,6 +93,8 @@ A3 的 [限定证据](../validation/a3-2026-09-22.md) 已用实际 Pi reload 验
 
 CredentialStore 桥接成功也不代表 Pi Worker 永远接触不到凭据。需要向模型 Provider 发请求的进程可能使用凭据；受信任/隔离范围必须说明。Shell 子进程不继承所有账户环境变量。Keychain/DPAPI 适配、并发登录/刷新、退出前 flush 与错误脱敏需实测，不把 Pi 的文件存储直接称作系统密钥库。
 
+A4 的 [限定实测](../validation/a4-2026-09-22.md) 已验证内存 store 与合成 Provider 的并发/取消、状态投影和环境隔离。所选版本的 CredentialSynchronizationError 表示变更已提交但本地同步失败，并可能携带原始 credential/cause；普通错误也不能证明未写入。宿主不得直接发送错误或盲目重试，应保留 committed_needs_sync/unknown 并对账。checkAuth 表示配置存在，不验证 token 有效；取消返回也不证明底层刷新已结算。系统存储/flush 及真实产品进程边界仍按 [A4 边界](../validation/a4-boundaries.md) 留待实施。
+
 ## 7. 扩展 UI 与插件生态边界
 
 可绑定 Pi 现有 `ExtensionUIContext` 的 confirm/select/input/notify 等交互；危险操作审批仍由宿主 Policy 决定，而不是把所有插件弹窗都当授权。TUI `custom()`/renderer 不能直接复用为 React；不提供通用任意 JS 注入。先支持内置/选编工具和数据型技能。[P05]

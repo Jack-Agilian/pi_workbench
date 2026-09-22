@@ -37,3 +37,5 @@ A0/A1 当前记录：[严格类型修复与收尾验证](validation/a0-a1-closeo
 A2 当前记录：[工具接缝与真实 macOS Shell 验证](validation/a2-2026-09-22.md) · [采用边界](validation/a2-boundaries.md) · [输入摘要](validation/a2-inputs.json)。CORE-04/SEC-02 仅推进探针范围，完整产品验收和三个 M0 Gate 仍待完成。
 
 A3 当前记录：[受控资源与包探针](validation/a3-2026-09-22.md) · [公开入口和隔离边界](validation/a3-boundaries.md) · [发行包及测试输入](validation/a3-inputs.json)。SKL-01/PKG-01 进入 in_progress，完整技能库/市场及 M0 Gate 未完成。
+
+A4 当前记录：[凭据与模型探针](validation/a4-2026-09-22.md) · [错误/取消/系统存储边界](validation/a4-boundaries.md) · [发行输入摘要](validation/a4-inputs.json)。16 项合成认证接缝通过，SEC-03 仅进入 in_progress；真实 OAuth、系统密钥库和 M0 Gate 尚未完成。

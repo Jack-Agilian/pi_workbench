@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "status": "a0_a3_probe_in_progress_not_created_on_github",
+  "status": "a0_a4_probe_in_progress_not_created_on_github",
   "source": "../ssot/reuse-first.md",
   "normalization": "保留原28项ID作为历史锚点；允许新增任务和状态推进。dependencies为开发前置，acceptanceDependencies为额外集成验收前置；sourceDependencyText仅历史记录。角色未分配，完成须逐条证据，离线校验不证明GitHub Issue存在。",
   "items": [
@@ -112,7 +112,8 @@
             "EV-A0-CLOSEOUT-BOOTSTRAP-20260922",
             "EV-A2-INPUTS-20260922",
             "EV-A2-MAC-SHELL-20260922",
-            "EV-A3-INPUTS-20260922"
+            "EV-A3-INPUTS-20260922",
+            "EV-A4-INPUTS-20260922"
           ]
         },
         {
@@ -130,11 +131,13 @@
             "EV-A2-REGRESSION-20260922",
             "EV-A3-RESOURCES-20260922",
             "EV-A3-PACKAGES-20260922",
-            "EV-A3-REGRESSION-20260922"
+            "EV-A3-REGRESSION-20260922",
+            "EV-A4-AUTH-20260922",
+            "EV-A4-REGRESSION-20260922"
           ]
         }
       ],
-      "statusReason": "A0–A3限定探针通过；A0声明补丁与A2/A3公开边界均保留。A4、BOOT-01及打包Worker/完整产品接缝未验收，不能标done。"
+      "statusReason": "A0–A4限定零模型探针通过；声明补丁和公开边界保留。BOOT-01、打包Worker、系统凭据存储及完整产品接缝尚未验收，不能标done。"
     },
     {
       "id": "BOOT-04",
@@ -518,7 +521,7 @@
       "id": "SEC-03",
       "priority": "P0",
       "ownerRole": "Desktop",
-      "state": "proposed",
+      "state": "in_progress",
       "githubIssueNumber": null,
       "dependencies": [
         "SEC-01"
@@ -529,7 +532,7 @@
         "models-auth",
         "pi-settings"
       ],
-      "implementationStatus": "not_implemented",
+      "implementationStatus": "in_progress",
       "githubIssueUrl": null,
       "issueVerificationStatus": "not_checked",
       "issueEvidence": [],
@@ -548,7 +551,10 @@
           "plannedChecks": [
             "credential-public-seam"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-A4-INPUTS-20260922",
+            "EV-A4-AUTH-20260922"
+          ]
         },
         {
           "id": "SEC-03-A02",
@@ -557,9 +563,13 @@
             "credential-lifecycle",
             "credential-leakage"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-A4-AUTH-20260922",
+            "EV-A4-MAC-ISOLATION-20260922"
+          ]
         }
-      ]
+      ],
+      "statusReason": "A4仅验证公开ModelRuntime/内存CredentialStore及合成认证并发、脱敏投影和隔离环境；系统Keychain/DPAPI、退出flush、真实OAuth、Renderer/IPC和产品日志未实现，前置与完整验收未完成。"
     },
     {
       "id": "UI-01",

@@ -73,3 +73,5 @@ python scripts/test-tools.py
 A2 的 [工具与 macOS Shell 记录](../validation/a2-2026-09-22.md) 同样只支持其明确范围；Operations、固定测试命令和部分路径负向测试不能推导出完整平台沙箱或产品审批系统。
 
 A3 的 [资源/包记录](../validation/a3-2026-09-22.md) 区分应用锁与仅安装测试输入；合成 Git/准入故障、实际 npm/Git 子进程和公开缺口复现分别说明。探针通过不把 PKG-02、签名/撤销、产品激活或 M0 Gate 晋级；网络准备与禁网 SDK 执行分开记录。
+
+A4 的 [凭据/模型记录](../validation/a4-2026-09-22.md) 区分实际 SDK 编排与合成 Provider 回调；内存 store、状态投影和测试输出/环境 canary 不等于系统 Keychain、真实 OAuth、产品日志或退出 flush。SEC-03 只推进 in_progress，所有证据引用真实被测代码 SHA，M0 Gate 不晋级。
