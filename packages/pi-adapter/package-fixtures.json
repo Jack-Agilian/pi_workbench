@@ -1,0 +1,32 @@
+{
+  "scope": "Offline installation-only inputs; never imported or loaded as extensions. Not application dependencies.",
+  "packages": [
+    {
+      "name": "is-number",
+      "version": "6.0.0",
+      "metadataUrl": "https://registry.npmjs.org/is-number/6.0.0",
+      "tarballUrl": "https://registry.npmjs.org/is-number/-/is-number-6.0.0.tgz",
+      "integrity": "sha512-Wu1VHeILBK8KAWJUAiSZQX94GmOE45Rg6/538fKwiloUu21KncEkYGPqob2oSZ5mUT73vLGrHQjKw3KMPwfDzg==",
+      "bytes": 3474,
+      "sha256": "62589f25115042c4d34863bc8e6ab4790a8920b811949c30e0ebc5733aca66cb"
+    },
+    {
+      "name": "is-number",
+      "version": "7.0.0",
+      "metadataUrl": "https://registry.npmjs.org/is-number/7.0.0",
+      "tarballUrl": "https://registry.npmjs.org/is-number/-/is-number-7.0.0.tgz",
+      "integrity": "sha512-41Cifkg6e8TylSpdtTpeLVMqvSBEVzTttHvERD741+pnZ8ANv0004MRL43QKPDlK9cGvNp6NZWZUBlbGXYxxng==",
+      "bytes": 3730,
+      "sha256": "7b75c1057198cf97696909a9bee176c9c5e9bcb5b03bf3ecef2f484defadd51e"
+    },
+    {
+      "name": "is-odd",
+      "version": "3.0.1",
+      "metadataUrl": "https://registry.npmjs.org/is-odd/3.0.1",
+      "tarballUrl": "https://registry.npmjs.org/is-odd/-/is-odd-3.0.1.tgz",
+      "integrity": "sha512-CQpnWPrDwmP1+SMHXZhtLtJv90yiyVfluGsX5iNCVkrhQtU3TQHsUWPG9wkdk9Lgd5yNpAg9jQEo90CBaXgWMA==",
+      "bytes": 2774,
+      "sha256": "13c23b3f1f3a5c146b8906e23c8e674f8e4a6ff44b77720e1d4bddb7b2caf312"
+    }
+  ]
+}
