@@ -1,18 +1,18 @@
 # A0/A1 发行包缺口与采用边界
 
-选择输入：Node 24.21.0 LTS、npm 11.19.0、Pi 0.87.0、TypeScript 7.0.2；精确依赖见根 package.json，唯一项目锁文件为 package-lock.json。探针只导入两个 Pi 包的公开根入口。被测提交、下载摘要及运行结果见 [验证报告](a0-a1-2026-09-22.md)；不把源码候选 0.86.1 当作发行锁。
+选择输入：Node 24.21.0 LTS、npm 11.19.0、Pi 0.87.0、TypeScript 7.0.2；精确依赖见根 package.json，唯一项目锁文件为 package-lock.json。探针只导入两个 Pi 包的公开根入口。首次失败见 [历史验证](a0-a1-2026-09-22.md)，当前结果见 [收尾验证](a0-a1-closeout-2026-09-22.md)；不把源码候选 0.86.1 当作发行锁。
 
-## G01：严格 NodeNext 声明检查失败（阻塞）
+## G01：原始发行声明失败（项目阻塞已解除，上游缺陷仍在）
 
-复现：完成显式应用初始化后运行 `npm run typecheck`。当前 tsconfig 保留 strict、NodeNext 和完整声明检查，没有 skipLibCheck、any 兼容层、ts-ignore 或 paths 重定向。
+原始复现：在 `90bf84889b391eccc5f6eac88c7f881ea69e865c` 完成应用初始化后运行 `npm run typecheck`。当前 tsconfig 仍保留 strict、NodeNext 和完整声明检查，没有 skipLibCheck、any 兼容层、ts-ignore 或 paths 重定向。
 
 - 发行包嵌套的 `@earendil-works/pi-ai/dist/providers/*.models.d.ts` 包含普通 JSON import，缺少 `with { type: "json" }` 或 type-only 标记。TypeScript 报 TS1543；实测 41 个此类诊断。
 - 锁定的 `@google/genai@2.21.0` 声明引用未安装的 `@modelcontextprotocol/sdk/client/index.js`，报 TS2307。该可选类型引用也不能凭 SDK 运行成功视为通过。
-- 当前 adapter 与测试文件没有独立编译诊断，但**整个 npm run typecheck 失败**。实际 ESM import 与零模型 SDK 探针的通过不替代类型检查。
+- 当时 adapter 与测试文件没有独立编译诊断，但**整个 npm run typecheck 失败**。实际 ESM import 与零模型 SDK 探针的通过不替代类型检查。
 
-候选：优先等待/采用修复声明的官方发行包，重新锁定并运行同一组验证；上游可修正生成的 JSON 类型导入，并解决可选 MCP 类型依赖的声明发布方式。单独补装 MCP 只能涉及后一项，不能解决前一项，本轮不为此扩展依赖面。根入口没有可替代的稳定 `./sdk` 子路径；不通过内部路径规避。
+用户继续指令下按 [ADR-A0](../ssot/adr-a0-pi-types.md) 采用最小声明补丁，并精确补齐 MCP SDK 1.30.0 开发依赖。补丁只将两个 pi-ai 副本各 41 个 JSON 声明导入改成 type-only；运行时字节保持原发行。`npm ci --ignore-scripts` 后由显式入口校验摘要并使用 Git apply；无生命周期钩子。真实被测提交 `ad6a71b6faefdeece0ef5699fbc21eafdaf6c8fe` 上严格类型检查、10 项类型/补丁测试和 10 项 Session 探针均通过。
 
-没有修改 node_modules、添加声明补丁、Fork 上游或切换成不反映 Node ESM 的解析模式。将来若批准最小补丁，应另写 ADR、固定补丁、回归这两个诊断，并在官方版本修复后退出补丁。本轮不构成此类批准。
+TypeScript 5.9.3/6.0.3/7.0.2 对照均复现原始 42 条诊断，降版本不能解决。单独补装 MCP 只消除 TS2307。根入口没有稳定 `./sdk` 子路径，未通过内部路径规避。未来优先采用修复的官方发行包并删除本地补丁；版本改变时当前补丁必须失败，重新审计后才能升级。不 Fork 上游、不放宽声明检查。
 
 ## G02：新会话首次持久化有原生门槛（已验证边界）
 

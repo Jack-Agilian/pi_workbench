@@ -71,6 +71,8 @@ P04/P05/P06/P07/P13 的固定源码链接是复查入口，不声称逐字核验
 
 已采用 Pi **0.87.0** / Node **24.21.0** LTS / npm **11.19.0**。实际输入及字节校验见 [发行包记录](../validation/a0-a1-release.json)，被测提交 `7fad5e9d3af4ef70d72f71c58782f577e4aa0aca` 的命令、平台和结果见 [A0/A1 报告](../validation/a0-a1-2026-09-22.md)。0.86.1 与 466db0f 源码索引仍保留为历史资料，未冒充当前发行锁。
 
-实际根 ESM import 与 10 项零模型 Session 探针通过；严格传递声明检查失败，缺口包括 JSON 类型导入和缺失的可选 MCP 类型模块，详见 [G01–G03](../validation/a0-a1-gaps.md)。已区分运行时导出、类型声明、类方法和 source-only/experimental 子入口。未读取 source 条件执行源码、未 deep-import、未修改上游。
+首次实际根 ESM import 与 10 项零模型 Session 探针通过；严格传递声明检查失败，缺口包括 JSON 类型导入和缺失的可选 MCP 类型模块，详见 [G01–G03](../validation/a0-a1-gaps.md)。已区分运行时导出、类型声明、类方法和 source-only/experimental 子入口。
+
+后续 [收尾报告](../validation/a0-a1-closeout-2026-09-22.md) 记录代码提交 `ad6a71b6faefdeece0ef5699fbc21eafdaf6c8fe` 的严格类型、SDK、下载审计及重复初始化通过；[发行完整性记录](../validation/a0-a1-closeout-release.json) 明确区分原始 tarball 与两个 pi-ai 副本的本地声明补丁。[ADR-A0](adr-a0-pi-types.md) 固定只改 JSON 类型导入，补齐 MCP SDK 1.30.0 类型 peer；运行时字节未改。未读取 source 条件执行源码、未 deep-import、未 Fork。原失败证据保留，不能将补丁后的通过描述为官方原包无缺陷。
 
 本轮只有内存配置/凭据和空资源注入，不验证 Provider/OAuth 或完整技能资源策略。reuse-map 中 verificationStatus=verified 仅指其 evidenceRecords.scope 明确限定的探针接缝；implementationState 仍为 in_progress，不能据此宣布完整模型/资源/配置能力可用。没有真实模型事件 fixture 或 A2 工具测试。

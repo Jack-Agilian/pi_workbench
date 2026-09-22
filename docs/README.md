@@ -32,4 +32,4 @@
 
 当前修订记录：[R01–R08 修订与验收边界](ssot/review-fixes.md)。每次测试的即时输出位于 `.artifacts/`；历史报告不代表当前提交、Pi 接入或目标平台验证。
 
-A0/A1 后续记录：[真实发行包与零模型 Session 探针](validation/a0-a1-2026-09-22.md)。包含被测提交、字节完整性、macOS 证据与严格类型检查阻塞，不代表完整 M0-SDK 或模型验收。
+A0/A1 当前记录：[严格类型修复与收尾验证](validation/a0-a1-closeout-2026-09-22.md)；[首次发行包与 Session 探针](validation/a0-a1-2026-09-22.md) 保留历史失败。包含被测提交、字节完整性、声明补丁与 macOS 证据，不代表完整 M0-SDK 或模型验收。

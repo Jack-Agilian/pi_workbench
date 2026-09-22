@@ -1,6 +1,6 @@
 # 从文档到可运行产品：复用优先
 
-状态：A0/A1 探针已实现，发行声明检查阻塞；产品阶段仍待实施。决策依据：[SSOT](../ssot/README.md)。工作项见 [backlog.json](backlog.json)；历史原始范围见[原始 Backlog](../startup/docs/08-delivery-and-references.md)。尚未创建 GitHub Issues。
+状态：A0/A1 探针、严格类型检查与重复初始化通过；产品阶段仍待实施。决策依据：[SSOT](../ssot/README.md)。工作项见 [backlog.json](backlog.json)；历史原始范围见[原始 Backlog](../startup/docs/08-delivery-and-references.md)。尚未创建 GitHub Issues。
 
 ## 1. 下一增量不是再造平台
 
@@ -62,6 +62,6 @@ CORE-04 的工具接缝验收增加 BOOT-03/CORE-02/SEC-02；SEC-03 的凭据验
 
 ## A0/A1 本轮范围（2026-09-22）
 
-已固定 Node 24.21.0 / npm 11.19.0 / Pi 0.87.0；新增最小 `packages/pi-adapter`、显式应用初始化、离线探针和下载审计。BOOT-03 为 blocked：严格 NodeNext 类型检查遇到发行声明缺口，见 [复现与候选方案](../validation/a0-a1-gaps.md)。CORE-02 仅推进 Session 绑定、替换和三类失败探针，状态 in_progress；未完成产品 Run 归属。A0/A1 可运行部分的被测提交、通过和失败证据见 [验证报告](../validation/a0-a1-2026-09-22.md)。
+已固定 Node 24.21.0 / npm 11.19.0 / Pi 0.87.0；新增最小 `packages/pi-adapter`、显式应用初始化、离线探针和下载审计。严格 NodeNext 类型检查通过 [ADR-A0](../ssot/adr-a0-pi-types.md) 固定声明补丁与精确 MCP 类型 peer 解除阻塞，BOOT-03 改为 in_progress。CORE-02 仅推进 Session 绑定、替换和三类失败探针，仍为 in_progress；未完成产品 Run 归属。当前被测提交与证据见 [收尾报告](../validation/a0-a1-closeout-2026-09-22.md)，原始发行缺口和历史失败保留。
 
-M0-UI、M0-SDK、M0-Pi 保持 pending。A2 未开始；本轮交付可验证部分与上游缺口后停止，不绕过类型门槛推进工具接缝。
+M0-UI、M0-SDK、M0-Pi 保持 pending。本轮 A0/A1 收尾后停止；下一轮才开始 A2 基础工具接缝，优先复用 Pi 同名工厂与 Operations，不扩大本轮范围。

@@ -14,7 +14,7 @@
 
 `docs/startup/` 继续保留原始 0.1 快照、原始接口和历史报告，不改摘要。**涉及复用策略、工具接入、技能解析、模型配置、任务队列、传输选型、模块拆分和交付先后的冲突，以本目录为准。**未被本目录覆盖的产品范围、UI 体验及安全要求继续参考原快照。已落地代码和测试是实现事实；与规格冲突时报告偏差，不静默反向改写规格。
 
-原始 `contracts/app-protocol.ts` 与 SQL 只是参考，不能整份复制作为首版必做项。当前没有新增可执行产品协议。A0/A1 已新增锁定的 Pi Session 探针依赖；尚未引入 Electron 或社区 UI，严格声明检查的阻塞见 [A0/A1 缺口](../validation/a0-a1-gaps.md)。
+原始 `contracts/app-protocol.ts` 与 SQL 只是参考，不能整份复制作为首版必做项。当前没有新增可执行产品协议。A0/A1 已新增锁定的 Pi Session 探针依赖；尚未引入 Electron 或社区 UI。严格声明检查经 [ADR-A0 类型补丁](adr-a0-pi-types.md) 通过，原始发行缺陷及采用边界见 [A0/A1 缺口](../validation/a0-a1-gaps.md)。
 
 维护规则见 [状态、证据与验收](maintenance.md)；本次处理清单见 [R01–R08 修订](review-fixes.md)。修订了维护脚本并明确接缝契约，不代表产品接入测试已经通过。
 
@@ -34,4 +34,4 @@ python scripts/test-tools.py
 
 ## A0/A1 实际进度
 
-[被测提交与脱敏报告](../validation/a0-a1-2026-09-22.md) · [发行包完整性](../validation/a0-a1-release.json) · [公开入口缺口](../validation/a0-a1-gaps.md)。Pi 0.87.0 / Node 24.21.0 的零模型 Session 探针通过；严格应用类型检查仍失败。BOOT-03 blocked、CORE-02 in_progress，M0 三个 Gate pending，本轮未进入 A2。
+[当前被测提交与脱敏报告](../validation/a0-a1-closeout-2026-09-22.md) · [本轮发行包完整性](../validation/a0-a1-closeout-release.json) · [公开入口缺口](../validation/a0-a1-gaps.md)。Pi 0.87.0 / Node 24.21.0 的零模型 Session 探针、严格应用类型检查和重复初始化通过。采用固定声明补丁及精确 MCP 类型 peer，官方原始声明缺陷仍在；历史 failed 证据保留。BOOT-03 与 CORE-02 均 in_progress，M0 三个 Gate pending，本轮未进入 A2。

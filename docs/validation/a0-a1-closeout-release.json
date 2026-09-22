@@ -1,0 +1,257 @@
+{
+  "testedCommit": "ad6a71b6faefdeece0ef5699fbc21eafdaf6c8fe",
+  "recordedAt": "2026-09-22T10:22:02.716666+00:00",
+  "lockfile": "package-lock.json",
+  "lockSha256": "7cd35e4fc73c7e0b61112b515c6389505baf7d541e638bd7cf0ffe2dbf6e8e44",
+  "node": {
+    "url": "https://nodejs.org/dist/v24.21.0/node-v24.21.0-darwin-arm64.tar.gz",
+    "sha256": "bed7eea5325e1108f32ce5228ddd6a5f0f08a499ee42aa7442aea583702f6057",
+    "bytes": 52909993,
+    "checksumSource": "https://nodejs.org/dist/v24.21.0/SHASUMS256.txt",
+    "scope": "HTTPS archive bytes against official SHA-256; signature not independently verified"
+  },
+  "packages": [
+    {
+      "package": "@earendil-works/pi-ai",
+      "version": "0.87.0",
+      "metadataUrl": "https://registry.npmjs.org/%40earendil-works%2Fpi-ai/0.87.0",
+      "tarballUrl": "https://registry.npmjs.org/@earendil-works/pi-ai/-/pi-ai-0.87.0.tgz",
+      "integrity": "sha512-lbRm+EMY6Jx3l+HLpbqbm9Yrhkc5u7EffLk2id+zJQEoBuR5I+tijGiZU8zlnuuCclmQOgH0PVjL9PLbeqJ9MQ==",
+      "bytes": 836978,
+      "sha256": "f2adf9de809d035f76f8dadf3d148720ebeef4606a848ab36ee834d895ae812f",
+      "installedCopies": [
+        {
+          "path": "node_modules/@earendil-works/pi-ai",
+          "filesChecked": 772,
+          "declarationsPatched": 41
+        },
+        {
+          "path": "node_modules/@earendil-works/pi-coding-agent/node_modules/@earendil-works/pi-ai",
+          "filesChecked": 772,
+          "declarationsPatched": 41
+        }
+      ],
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "import": "./dist/index.js"
+        },
+        "./api/*": {
+          "types": "./dist/api/*.d.ts",
+          "import": "./dist/api/*.js"
+        },
+        "./oauth": {
+          "types": "./dist/oauth.d.ts",
+          "import": "./dist/oauth.js"
+        },
+        "./compat": {
+          "types": "./dist/compat.d.ts",
+          "import": "./dist/compat.js"
+        },
+        "./utils/*": {
+          "types": "./dist/utils/*.d.ts",
+          "import": "./dist/utils/*.js"
+        },
+        "./bun-oauth": {
+          "types": "./dist/bun-oauth.d.ts",
+          "import": "./dist/bun-oauth.js"
+        },
+        "./providers/*": {
+          "types": "./dist/providers/*.d.ts",
+          "import": "./dist/providers/*.js"
+        },
+        "./bedrock-provider": {
+          "types": "./dist/bedrock-provider.d.ts",
+          "import": "./dist/bedrock-provider.js"
+        }
+      },
+      "engines": {
+        "node": ">=22.19.0"
+      },
+      "scope": "HTTPS registry/lock/download SRI and installed package files; registry signatures not independently verified",
+      "localDeclarationPatch": {
+        "manifest": "patches/pi-ai-0.87.0-json-types.json",
+        "patchSha256": "57c11da43fd28c77389c4561b08cadca3706d8181cdd5c11e3eaf6d1bccf266e",
+        "scope": "41 declaration-only type imports per copy; runtime JS and model JSON match registry bytes"
+      }
+    },
+    {
+      "package": "@earendil-works/pi-coding-agent",
+      "version": "0.87.0",
+      "metadataUrl": "https://registry.npmjs.org/%40earendil-works%2Fpi-coding-agent/0.87.0",
+      "tarballUrl": "https://registry.npmjs.org/@earendil-works/pi-coding-agent/-/pi-coding-agent-0.87.0.tgz",
+      "integrity": "sha512-S9JJVGHya/h0e0M+zwPTB6RkPe7PmLLqfBUTssFYW5mxAti6oZEILn4jvaUImENRC3U9RwXAB6H4gw8xj2J0GQ==",
+      "bytes": 7227603,
+      "sha256": "9a6733c0e6a31d592b53dc60df43dd0c26fa793ccf2384ed123fc17b0448866a",
+      "installedCopies": [
+        {
+          "path": "node_modules/@earendil-works/pi-coding-agent",
+          "filesChecked": 1100,
+          "declarationsPatched": 0
+        }
+      ],
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "import": "./dist/index.js"
+        },
+        "./client": {
+          "source": "./src/client/index.ts"
+        },
+        "./rpc-entry": {
+          "import": "./dist/bundle/rpc-entry.js"
+        },
+        "./experimental/plugin": {
+          "source": "./src/experimental/plugin.ts"
+        }
+      },
+      "engines": {
+        "node": ">=22.19.0"
+      },
+      "scope": "HTTPS registry/lock/download SRI and installed package files; registry signatures not independently verified"
+    },
+    {
+      "package": "@modelcontextprotocol/sdk",
+      "version": "1.30.0",
+      "metadataUrl": "https://registry.npmjs.org/%40modelcontextprotocol%2Fsdk/1.30.0",
+      "tarballUrl": "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.30.0.tgz",
+      "integrity": "sha512-xKd8OIzlqNzcqcNumGAa6g+PW2kjD5vrpcKOnfldAUPP3j7lnqMPwlTXQm8gF+UwH72z0lqaRbjr9hqGz0eITA==",
+      "bytes": 582844,
+      "sha256": "2cac3f3e38fec2815ed9efafa2947faf8c6957310684f99703f3d180f3e9af1a",
+      "installedCopies": [
+        {
+          "path": "node_modules/@modelcontextprotocol/sdk",
+          "filesChecked": 693,
+          "declarationsPatched": 0
+        }
+      ],
+      "exports": {
+        ".": {
+          "types": "./dist/esm/index.d.ts",
+          "import": "./dist/esm/index.js",
+          "require": "./dist/cjs/index.js"
+        },
+        "./*": {
+          "types": "./dist/esm/*.d.ts",
+          "import": "./dist/esm/*",
+          "require": "./dist/cjs/*"
+        },
+        "./client": {
+          "types": "./dist/esm/client/index.d.ts",
+          "import": "./dist/esm/client/index.js",
+          "require": "./dist/cjs/client/index.js"
+        },
+        "./server": {
+          "types": "./dist/esm/server/index.d.ts",
+          "import": "./dist/esm/server/index.js",
+          "require": "./dist/cjs/server/index.js"
+        },
+        "./validation": {
+          "types": "./dist/esm/validation/index.d.ts",
+          "import": "./dist/esm/validation/index.js",
+          "require": "./dist/cjs/validation/index.js"
+        },
+        "./experimental": {
+          "types": "./dist/esm/experimental/index.d.ts",
+          "import": "./dist/esm/experimental/index.js",
+          "require": "./dist/cjs/experimental/index.js"
+        },
+        "./validation/ajv": {
+          "types": "./dist/esm/validation/ajv-provider.d.ts",
+          "import": "./dist/esm/validation/ajv-provider.js",
+          "require": "./dist/cjs/validation/ajv-provider.js"
+        },
+        "./experimental/tasks": {
+          "types": "./dist/esm/experimental/tasks/index.d.ts",
+          "import": "./dist/esm/experimental/tasks/index.js",
+          "require": "./dist/cjs/experimental/tasks/index.js"
+        },
+        "./validation/cfworker": {
+          "types": "./dist/esm/validation/cfworker-provider.d.ts",
+          "import": "./dist/esm/validation/cfworker-provider.js",
+          "require": "./dist/cjs/validation/cfworker-provider.js"
+        }
+      },
+      "engines": {
+        "node": ">=18"
+      },
+      "scope": "HTTPS registry/lock/download SRI and installed package files; registry signatures not independently verified"
+    },
+    {
+      "package": "@types/node",
+      "version": "24.13.6",
+      "metadataUrl": "https://registry.npmjs.org/%40types%2Fnode/24.13.6",
+      "tarballUrl": "https://registry.npmjs.org/@types/node/-/node-24.13.6.tgz",
+      "integrity": "sha512-SGrw/h3KPFshy3OE6ZL53LMBG5vGQQ8/gIpiqz/kRZhPJ7HgwCEs8LBuNtWLa8dvGZVpSF7+Bf+c11HUrCb/yg==",
+      "bytes": 461826,
+      "sha256": "755b5147491e323c24541830f8eba438c1d1ef8931de725fc613b5439708464a",
+      "installedCopies": [
+        {
+          "path": "node_modules/@types/node",
+          "filesChecked": 75,
+          "declarationsPatched": 0
+        }
+      ],
+      "exports": null,
+      "engines": null,
+      "scope": "HTTPS registry/lock/download SRI and installed package files; registry signatures not independently verified"
+    },
+    {
+      "package": "typescript",
+      "version": "7.0.2",
+      "metadataUrl": "https://registry.npmjs.org/typescript/7.0.2",
+      "tarballUrl": "https://registry.npmjs.org/typescript/-/typescript-7.0.2.tgz",
+      "integrity": "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA==",
+      "bytes": 365612,
+      "sha256": "da2513f4b95176d6dde8b51aab7afe8a927656c9d277369793f77f7e59371c08",
+      "installedCopies": [
+        {
+          "path": "node_modules/typescript",
+          "filesChecked": 416,
+          "declarationsPatched": 0
+        }
+      ],
+      "exports": {
+        ".": "./lib/version.cjs",
+        "./unstable/fs": "./dist/api/fs.js",
+        "./package.json": "./package.json",
+        "./unstable/ast": "./dist/ast/index.js",
+        "./unstable/sync": "./dist/api/sync/api.js",
+        "./unstable/async": "./dist/api/async/api.js",
+        "./unstable/proto": "./dist/api/proto.js",
+        "./unstable/ast/is": "./dist/ast/is.js",
+        "./unstable/ast/clone": "./dist/ast/clone.js",
+        "./unstable/ast/utils": "./dist/ast/utils.js",
+        "./unstable/ast/factory": "./dist/ast/factory.generated.js",
+        "./unstable/ast/scanner": "./dist/ast/scanner.js",
+        "./unstable/ast/visitor": "./dist/ast/visitor.js"
+      },
+      "engines": {
+        "node": ">=16.20.0"
+      },
+      "scope": "HTTPS registry/lock/download SRI and installed package files; registry signatures not independently verified"
+    }
+  ],
+  "compilerComparison": [
+    {
+      "version": "5.9.3",
+      "integrity": "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==",
+      "bytes": 4377468,
+      "tarballUrl": "https://registry.npmjs.org/typescript/-/typescript-5.9.3.tgz",
+      "exit": 2,
+      "TS1543": 41,
+      "TS2307": 1,
+      "diagnostics": 42
+    },
+    {
+      "version": "6.0.3",
+      "integrity": "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==",
+      "bytes": 4515854,
+      "tarballUrl": "https://registry.npmjs.org/typescript/-/typescript-6.0.3.tgz",
+      "exit": 2,
+      "TS1543": 41,
+      "TS2307": 1,
+      "diagnostics": 42
+    }
+  ]
+}

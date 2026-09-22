@@ -25,7 +25,7 @@ done 必须逐条附 passed 证据，并满足任务 requiredEvidenceKinds；额
 
 ## 3. 统一证据记录
 
-可复用的记录放入 `reuse-map.json.evidenceRecords`，任务、能力和里程碑仅引用 ID。A0/A1 已登记限定范围的发行/零模型 SDK 证据及失败的声明检查，见 [本轮记录](../validation/a0-a1-2026-09-22.md)；不填伪造占位值。字段如下：
+可复用的记录放入 `reuse-map.json.evidenceRecords`，任务、能力和里程碑仅引用 ID。A0/A1 已登记限定范围的发行/零模型 SDK 证据，保留首次失败声明检查，并新增 [收尾通过记录](../validation/a0-a1-closeout-2026-09-22.md)；不覆盖旧失败、不填伪造占位值。字段如下：
 
 | 字段 | 要求 |
 |---|---|

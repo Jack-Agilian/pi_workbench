@@ -18,7 +18,8 @@
       "nodeVersion": "24.21.0",
       "lockfilePath": "package-lock.json",
       "evidenceRefs": [
-        "EV-A0-RELEASE-20260922"
+        "EV-A0-RELEASE-20260922",
+        "EV-A0-CLOSEOUT-RELEASE-20260922"
       ]
     }
   },
@@ -67,7 +68,10 @@
         "verificationStatus": "verified",
         "testEvidence": [
           "EV-A0-RELEASE-20260922",
-          "EV-A1-SDK-20260922"
+          "EV-A1-SDK-20260922",
+          "EV-A0-CLOSEOUT-RELEASE-20260922",
+          "EV-A0-CLOSEOUT-TYPES-20260922",
+          "EV-A1-CLOSEOUT-SDK-20260922"
         ]
       }
     },
@@ -122,7 +126,10 @@
         "verificationStatus": "verified",
         "testEvidence": [
           "EV-A0-RELEASE-20260922",
-          "EV-A1-SDK-20260922"
+          "EV-A1-SDK-20260922",
+          "EV-A0-CLOSEOUT-RELEASE-20260922",
+          "EV-A0-CLOSEOUT-TYPES-20260922",
+          "EV-A1-CLOSEOUT-SDK-20260922"
         ]
       }
     },
@@ -175,7 +182,10 @@
         "verificationStatus": "verified",
         "testEvidence": [
           "EV-A0-RELEASE-20260922",
-          "EV-A1-SDK-20260922"
+          "EV-A1-SDK-20260922",
+          "EV-A0-CLOSEOUT-RELEASE-20260922",
+          "EV-A0-CLOSEOUT-TYPES-20260922",
+          "EV-A1-CLOSEOUT-SDK-20260922"
         ]
       }
     },
@@ -212,7 +222,10 @@
         "verificationStatus": "verified",
         "testEvidence": [
           "EV-A0-RELEASE-20260922",
-          "EV-A1-SDK-20260922"
+          "EV-A1-SDK-20260922",
+          "EV-A0-CLOSEOUT-RELEASE-20260922",
+          "EV-A0-CLOSEOUT-TYPES-20260922",
+          "EV-A1-CLOSEOUT-SDK-20260922"
         ]
       }
     },
@@ -299,7 +312,10 @@
         "verificationStatus": "verified",
         "testEvidence": [
           "EV-A0-RELEASE-20260922",
-          "EV-A1-SDK-20260922"
+          "EV-A1-SDK-20260922",
+          "EV-A0-CLOSEOUT-RELEASE-20260922",
+          "EV-A0-CLOSEOUT-TYPES-20260922",
+          "EV-A1-CLOSEOUT-SDK-20260922"
         ]
       }
     },
@@ -877,6 +893,66 @@
         "darwin"
       ],
       "locator": "docs/validation/a0-a1-2026-09-22.md"
+    },
+    {
+      "id": "EV-A0-CLOSEOUT-RELEASE-20260922",
+      "kind": "release",
+      "result": "passed",
+      "scope": "五个精确直接依赖的registry/lock/实际tarball/SRI及安装文件通过；pi-ai两个副本各41个声明按ADR校验修改前后hash，其余文件保持发行字节（package.json核对语义身份）；Node归档SHA256一致。不代表未修改声明、发行签名或Electron/Worker ABI。",
+      "commit": "ad6a71b6faefdeece0ef5699fbc21eafdaf6c8fe",
+      "recordedAt": "2026-09-22T10:22:02.716666+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/a0-a1-closeout-2026-09-22.md"
+    },
+    {
+      "id": "EV-A0-CLOSEOUT-TYPES-20260922",
+      "kind": "static",
+      "result": "passed",
+      "scope": "严格NodeNext和完整声明检查通过；补齐MCP 1.30.0可选类型peer并采用固定声明补丁，无skipLibCheck/any/ts-ignore。10项类型/补丁测试含错误SDK入参拒绝、重复应用、漂移/部分补丁/符号链接拒绝。官方未修补0.87.0仍有原始缺陷。",
+      "commit": "ad6a71b6faefdeece0ef5699fbc21eafdaf6c8fe",
+      "recordedAt": "2026-09-22T10:22:02.716666+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/a0-a1-closeout-2026-09-22.md"
+    },
+    {
+      "id": "EV-A1-CLOSEOUT-SDK-20260922",
+      "kind": "sdk",
+      "result": "passed",
+      "scope": "真实Pi 0.87.0零模型Session探针10/10及5项网络负向与文件/进程隔离自检通过；空资源/凭据、合成记录、内存和磁盘重开、Runtime替换、三类故障及旧回调身份隔离。无Provider调用；不验证运行中取消、跨Run归属或A2。",
+      "commit": "ad6a71b6faefdeece0ef5699fbc21eafdaf6c8fe",
+      "recordedAt": "2026-09-22T10:22:02.716666+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/a0-a1-closeout-2026-09-22.md"
+    },
+    {
+      "id": "EV-A0-CLOSEOUT-REPO-20260922",
+      "kind": "static",
+      "result": "passed",
+      "scope": "干净代码提交上SSOT 60、工具15、结构检查、历史示例16及协议类型检查通过；startup 27项摘要不变。不构成产品E2E。",
+      "commit": "ad6a71b6faefdeece0ef5699fbc21eafdaf6c8fe",
+      "recordedAt": "2026-09-22T10:22:02.716666+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/a0-a1-closeout-2026-09-22.md"
+    },
+    {
+      "id": "EV-A0-CLOSEOUT-BOOTSTRAP-20260922",
+      "kind": "platform",
+      "result": "passed",
+      "scope": "macOS 27.0 arm64：工作树文档和app初始化各两遍；被测提交无.git全新archive副本在线下载Node/app初始化、offline再初始化，锁文件不变；仓库外cwd类型检查和类型测试通过、SDK探针两遍10/10。未测试其他OS、无缓存离线安装或产品沙箱。",
+      "commit": "ad6a71b6faefdeece0ef5699fbc21eafdaf6c8fe",
+      "recordedAt": "2026-09-22T10:22:02.716666+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/a0-a1-closeout-2026-09-22.md"
     }
   ]
 }

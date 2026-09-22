@@ -75,7 +75,7 @@
       "id": "BOOT-03",
       "priority": "P0",
       "ownerRole": "Runtime",
-      "state": "blocked",
+      "state": "in_progress",
       "githubIssueNumber": null,
       "dependencies": [
         "BOOT-01"
@@ -106,7 +106,10 @@
           "evidenceRefs": [
             "EV-A0-RELEASE-20260922",
             "EV-A0-BOOTSTRAP-20260922",
-            "EV-A0-DECLARATIONS-20260922"
+            "EV-A0-DECLARATIONS-20260922",
+            "EV-A0-CLOSEOUT-RELEASE-20260922",
+            "EV-A0-CLOSEOUT-TYPES-20260922",
+            "EV-A0-CLOSEOUT-BOOTSTRAP-20260922"
           ]
         },
         {
@@ -117,11 +120,13 @@
           ],
           "evidenceRefs": [
             "EV-A1-SDK-20260922",
-            "EV-A0-REPO-20260922"
+            "EV-A0-REPO-20260922",
+            "EV-A1-CLOSEOUT-SDK-20260922",
+            "EV-A0-CLOSEOUT-REPO-20260922"
           ]
         }
       ],
-      "statusReason": "A0/A1零模型探针已建立；严格NodeNext声明检查被Pi 0.87.0传递声明的TS1543及TS2307阻塞，详见docs/validation/a0-a1-gaps.md；不放宽类型检查。"
+      "statusReason": "A0/A1限定范围通过，G01经ADR固定声明补丁与精确MCP类型peer解除；原始发行缺陷保留历史证据。A2–A4、BOOT-01前置及实际打包Worker运行时仍未验收，不能标done。"
     },
     {
       "id": "BOOT-04",
@@ -263,7 +268,8 @@
             "binding-session-replacement"
           ],
           "evidenceRefs": [
-            "EV-A1-SDK-20260922"
+            "EV-A1-SDK-20260922",
+            "EV-A1-CLOSEOUT-SDK-20260922"
           ]
         },
         {
@@ -275,7 +281,8 @@
             "replacement-rebind-failure"
           ],
           "evidenceRefs": [
-            "EV-A1-SDK-20260922"
+            "EV-A1-SDK-20260922",
+            "EV-A1-CLOSEOUT-SDK-20260922"
           ]
         }
       ]
