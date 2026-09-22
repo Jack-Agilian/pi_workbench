@@ -1,6 +1,6 @@
 # 当前实施 SSOT
 
-更新：2026-09-22。范围：Pi 桌面工作台的复用策略、模块责任、接入边界和下一步交付。
+更新：2026-09-23。范围：Pi 桌面工作台的复用策略、模块责任、接入边界和下一步交付。
 
 **决策：复用优先，Pi SDK 是默认实现；薄适配只承接产品差异，不重写上游已有能力。** 用户已明确要求尽量不重复造轮子。本目录是这一要求的实施基线，不代表实现、兼容测试或团队验收已经完成。
 
@@ -32,6 +32,8 @@ python scripts/test-tools.py
 
 完整原始设计示例检查仍可用 `python scripts/check-docs.py --typecheck`，其通过不能代替真实 Pi 与 macOS/Windows 测试。检查结果生成到 `.artifacts/`，不覆盖快照里的旧报告。
 
+以下 A0–A4/B 小节保留各阶段交付范围；当前工作顺序以 [NEXT_STEPS 顶部](../planning/NEXT_STEPS.md) 为准。最新复审修正在末节单列。
+
 ## A0/A1 实际进度
 
 [当前被测提交与脱敏报告](../validation/a0-a1-closeout-2026-09-22.md) · [本轮发行包完整性](../validation/a0-a1-closeout-release.json) · [公开入口缺口](../validation/a0-a1-gaps.md)。Pi 0.87.0 / Node 24.21.0 的零模型 Session 探针、严格应用类型检查和重复初始化通过。采用固定声明补丁及精确 MCP 类型 peer，官方原始声明缺陷仍在；历史 failed 证据保留。BOOT-03 与 CORE-02 均 in_progress，M0 三个 Gate pending。
@@ -51,3 +53,7 @@ python scripts/test-tools.py
 ## B 最小产品核心实际进度
 
 [被测提交与报告](../validation/b-2026-09-22.md) · [最小契约](b-minimal-contract.md) · [输入摘要](../validation/b-inputs.json) · [权限/恢复边界](../validation/b-boundaries.md)。17 项真实 SQLite/合成宿主测试与 5 项 Pi 接入测试通过，复用原生 Session/Runtime/write，只新增产品协调、持久事件和真实 Markdown 成果索引。product-coordination/artifact 与 BOOT-01/CORE-01/CORE-03/ART-01 进入 in_progress，新增证据只支持模块级范围。真实 Worker/IPC、完整资源/权限绑定和失败恢复仍待实施；B 和三个 M0 Gate 未完成，下一增量仍在 B。
+
+## 最新复审修正（2026-09-23）
+
+[A4 审核复核](../validation/review-a4-2026-09-23.md)：F01 关闭/替换竞态、F02 跨盘范围已修正，F03 固定 M0 同 provider 单账户约束。Session 15 项、资源 12 项、认证 18 项及 B/前序回归通过；CORE-02/SKL-01/SEC-03 保持 in_progress，三个 M0 Gate pending。唯一当前开发项仍见 NEXT_STEPS 顶部的 B 进程接缝与失败恢复。

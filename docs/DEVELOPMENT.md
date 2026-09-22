@@ -224,3 +224,7 @@ npm run test:product-sdk
 固定 Node 的 SQLite 入口目前是 Stability 1.2 候选，且已实测其文件访问不受 Node 文件白名单约束。B 启动器因此强制附加 macOS 文件规则，用真实合成 DB 验证禁止目录不可读/不可创建文件；Node 其他权限、网络 tripwire 和空环境隔离仍保留，失败不回退开放环境。当前不支持在其他平台运行 B 测试，详细限制见 [B 边界](validation/b-boundaries.md)。
 
 [脱敏报告](validation/b-2026-09-22.md) 引用真实被测代码 SHA，记录 17+5 项测试、前序回归、重复初始化及独立副本重跑；[输入摘要](validation/b-inputs.json) 可在新克隆定位。原始输出位于忽略的 `.artifacts/b/`。完整 Worker/IPC、失败恢复、资源/权限绑定和三个 M0 Gate 尚未完成。
+
+## 14. A4 审核后的回归
+
+运行 `npm run test:pi-probe`、`npm run test:pi-resources`、`npm run test:pi-auth` 分别包含 F01/F02/F03 回归，当前为 15、12、18 项；仍沿用既有隔离启动器，未新增依赖。路径测试使用 Node path.win32/posix，不能据此报告 Windows 实机通过。认证状态先用 createAuthViewReader 登记完整账户白名单，同 Runtime 只绑定一次、同 provider 单账户。实际被测提交、命令与完整回归见 [复审报告](validation/review-a4-2026-09-23.md)。

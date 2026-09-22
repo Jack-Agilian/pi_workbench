@@ -33,7 +33,8 @@
             "review-decisions"
           ],
           "evidenceRefs": [
-            "EV-B-REVIEW-20260922"
+            "EV-B-REVIEW-20260922",
+            "EV-REVIEW-A4-DECISIONS-20260923"
           ]
         }
       ],
@@ -139,7 +140,8 @@
             "EV-A4-AUTH-20260922",
             "EV-A4-REGRESSION-20260922",
             "EV-B-SDK-20260922",
-            "EV-B-REGRESSION-20260922"
+            "EV-B-REGRESSION-20260922",
+            "EV-REVIEW-A4-REGRESSION-20260923"
           ]
         }
       ],
@@ -318,9 +320,12 @@
             "concurrent-close",
             "close-from-subscription-hook"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-REVIEW-A4-LIFECYCLE-20260923"
+          ]
         }
-      ]
+      ],
+      "statusReason": "Session探针及F01关闭/替换并发修正通过15项；B只接入成功替换，真实Worker退出监督和完整产品失败恢复尚未完成。"
     },
     {
       "id": "CORE-03",
@@ -609,10 +614,12 @@
             "auth-selection-immutable",
             "auth-view-generation"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-REVIEW-A4-ACCOUNT-20260923"
+          ]
         }
       ],
-      "statusReason": "A4仅验证公开ModelRuntime/内存CredentialStore及合成认证并发、脱敏投影和隔离环境；系统Keychain/DPAPI、退出flush、真实OAuth、Renderer/IPC和产品日志未实现，前置与完整验收未完成。"
+      "statusReason": "A4原16项及F03单Runtime固定账户白名单2项通过；M0同provider单账户，不支持多账户命名空间。系统存储/flush、真实OAuth、产品设置/IPC和UI generation未实现。"
     },
     {
       "id": "UI-01",
@@ -813,11 +820,12 @@
             "resource-containment-path-flavors"
           ],
           "evidenceRefs": [
-            "EV-A3-RESOURCES-20260922"
+            "EV-A3-RESOURCES-20260922",
+            "EV-REVIEW-A4-PATHS-20260923"
           ]
         }
       ],
-      "statusReason": "A3真实SDK资源9项及包缺失策略探针通过；仅合成准入和持久化回调，完整产品Run、作用域/审批集成及CORE-02尚未完成。"
+      "statusReason": "A3原9项资源及F02的3组标准库路径回归通过；Windows仅验证词法语义，未实测文件/进程；完整产品Run、作用域/审批及CORE-02仍未完成。"
     },
     {
       "id": "QA-01",

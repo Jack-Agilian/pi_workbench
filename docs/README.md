@@ -41,3 +41,5 @@ A3 当前记录：[受控资源与包探针](validation/a3-2026-09-22.md) · [�
 A4 当前记录：[凭据与模型探针](validation/a4-2026-09-22.md) · [错误/取消/系统存储边界](validation/a4-boundaries.md) · [发行输入摘要](validation/a4-inputs.json)。16 项合成认证接缝通过，SEC-03 仅进入 in_progress；真实 OAuth、系统密钥库和 M0 Gate 尚未完成。
 
 B 当前记录：[最小产品核心验证](validation/b-2026-09-22.md) · [产品契约与 SQLite 采用决定](ssot/b-minimal-contract.md) · [文件权限/恢复边界](validation/b-boundaries.md) · [输入摘要](validation/b-inputs.json)。17 项核心和 5 项 Pi 接入测试通过；BOOT-01/CORE-01/CORE-03/ART-01 仅进入 in_progress。下一增量仍是 B 的真实 Worker/IPC 和失败恢复，三个 M0 Gate 保持 pending。
+
+最新复审：[A4 审核 F01–F03 修正及回归](validation/review-a4-2026-09-23.md)。关闭/替换等待、跨盘词法检查和单账户配置约束已补齐；这没有完成真实 Worker、Windows 文件行为或多账户隔离。

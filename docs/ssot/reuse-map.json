@@ -73,7 +73,8 @@
           "EV-A0-CLOSEOUT-TYPES-20260922",
           "EV-A1-CLOSEOUT-SDK-20260922",
           "EV-B-INPUTS-20260922",
-          "EV-B-SDK-20260922"
+          "EV-B-SDK-20260922",
+          "EV-REVIEW-A4-LIFECYCLE-20260923"
         ]
       }
     },
@@ -133,7 +134,8 @@
           "EV-A0-CLOSEOUT-TYPES-20260922",
           "EV-A1-CLOSEOUT-SDK-20260922",
           "EV-B-INPUTS-20260922",
-          "EV-B-SDK-20260922"
+          "EV-B-SDK-20260922",
+          "EV-REVIEW-A4-LIFECYCLE-20260923"
         ]
       }
     },
@@ -221,7 +223,8 @@
           "EV-A4-INPUTS-20260922",
           "EV-A4-AUTH-20260922",
           "EV-A4-MAC-ISOLATION-20260922",
-          "EV-A4-REGRESSION-20260922"
+          "EV-A4-REGRESSION-20260922",
+          "EV-REVIEW-A4-ACCOUNT-20260923"
         ]
       }
     },
@@ -309,7 +312,8 @@
         "verificationStatus": "verified",
         "testEvidence": [
           "EV-A3-INPUTS-20260922",
-          "EV-A3-RESOURCES-20260922"
+          "EV-A3-RESOURCES-20260922",
+          "EV-REVIEW-A4-PATHS-20260923"
         ]
       }
     },
@@ -361,7 +365,8 @@
           "EV-A0-CLOSEOUT-TYPES-20260922",
           "EV-A1-CLOSEOUT-SDK-20260922",
           "EV-A3-INPUTS-20260922",
-          "EV-A3-RESOURCES-20260922"
+          "EV-A3-RESOURCES-20260922",
+          "EV-REVIEW-A4-PATHS-20260923"
         ]
       }
     },
@@ -1260,6 +1265,66 @@
         "darwin"
       ],
       "locator": "docs/validation/b-2026-09-22.md"
+    },
+    {
+      "id": "EV-REVIEW-A4-LIFECYCLE-20260923",
+      "kind": "sdk",
+      "result": "passed",
+      "scope": "真实Pi0.87.0 Session/Runtime在合成factory/rebind门控和cleanup故障下回归：关闭等待替换、迟到实例释放/不发布、重复关闭共享成功或失败结果、同步hook关闭；原10项及新增5项通过。不是模型取消、真实Worker退出或完整产品恢复。",
+      "commit": "9b19f8ec2b2a6222c1baf58d2a991108bd7d3cba",
+      "recordedAt": "2026-09-22T16:24:02.622086+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/review-a4-2026-09-23.md"
+    },
+    {
+      "id": "EV-REVIEW-A4-PATHS-20260923",
+      "kind": "mock",
+      "result": "passed",
+      "scope": "macOS上运行同一资源范围函数，注入Node path.posix/win32；3组20个合成POSIX/跨盘/UNC路径断言通过，旧谓词跨盘和UNC转盘符已复现失败；不是Windows文件/进程/沙箱证据。",
+      "commit": "9b19f8ec2b2a6222c1baf58d2a991108bd7d3cba",
+      "recordedAt": "2026-09-22T16:24:02.622086+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/review-a4-2026-09-23.md"
+    },
+    {
+      "id": "EV-REVIEW-A4-ACCOUNT-20260923",
+      "kind": "sdk",
+      "result": "passed",
+      "scope": "真实ModelRuntime/内存store+批准合成Provider，固定单Runtime账户白名单拒绝同provider多账户、重复账户、二次绑定和未知账户，复制配置防止后改；Pi登录/注销仍作用固定provider。新增2项与原16项通过；多账户命名空间、产品设置/IPC和UI generation未实现。",
+      "commit": "9b19f8ec2b2a6222c1baf58d2a991108bd7d3cba",
+      "recordedAt": "2026-09-22T16:24:02.622086+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/review-a4-2026-09-23.md"
+    },
+    {
+      "id": "EV-REVIEW-A4-REGRESSION-20260923",
+      "kind": "static",
+      "result": "passed",
+      "scope": "干净被测代码SHA上文档/应用初始化各2次、typecheck、类型10/A1 15/A2 19+4/A3 12+8/A4 18/B 17+5、SSOT60/脚本15/历史16及协议检查通过；锁和startup27摘要不变。沿用禁脚本和禁网隔离，未进行新克隆/独立CI或Windows实机。",
+      "commit": "9b19f8ec2b2a6222c1baf58d2a991108bd7d3cba",
+      "recordedAt": "2026-09-22T16:24:02.622086+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/review-a4-2026-09-23.md"
+    },
+    {
+      "id": "EV-REVIEW-A4-DECISIONS-20260923",
+      "kind": "review",
+      "result": "passed",
+      "scope": "复核旧审核F01/F02在含B当前基线仍成立并修正；F03明确M0同provider单账户且不宣称凭据隔离。计划顶部唯一当前B任务，历轮标为阶段记录；保留声明补丁边界、CI与实际Worker未完成。这是自复审，不是独立安全签收。",
+      "commit": "9b19f8ec2b2a6222c1baf58d2a991108bd7d3cba",
+      "recordedAt": "2026-09-22T16:24:02.622086+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/review-a4-2026-09-23.md"
     }
   ]
 }
