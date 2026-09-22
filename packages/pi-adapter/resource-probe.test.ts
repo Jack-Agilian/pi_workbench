@@ -70,7 +70,7 @@ test('resource-preload-allowlist: global/project modules never import; unapprove
   const trap = `import {writeFileSync} from 'node:fs'; writeFileSync(${JSON.stringify(marker)}, 'SYNTHETIC'); export default () => {};`;
   // Synthetic user/global and workspace discovery traps; none is a real extension.
   for (const base of [p.agentDir, join(p.cwd, '.pi'), join(process.env.HOME!, '.pi', 'agent')]) {
-    write(join(base, 'extensions', 'trap.mjs'), trap);
+    write(join(base, 'extensions', 'trap.js'), trap);
     write(join(base, 'skills', 'trap', 'SKILL.md'), '---\nname: trap\ndescription: SYNTHETIC unapproved skill\n---\ntrap');
     write(join(base, 'APPEND_SYSTEM.md'), 'SYNTHETIC UNAPPROVED APPEND');
   }
@@ -79,7 +79,14 @@ test('resource-preload-allowlist: global/project modules never import; unapprove
   let rejected = 0;
   const candidates = [{ approved: false, factory: () => { rejected++; } },
     { approved: true, factory: () => { approved++; } }];
-  const loader = new pi.DefaultResourceLoader({ ...p, settingsManager: pi.SettingsManager.inMemory(),
+  const settingsManager = pi.SettingsManager.inMemory();
+  settingsManager.setProjectTrusted(true);
+  const discovery = await new pi.DefaultPackageManager({ ...p, settingsManager }).resolve(async () => 'error');
+  for (const path of [join(p.agentDir, 'extensions/trap.js'), join(p.cwd, '.pi/extensions/trap.js')]) {
+    assert.ok(discovery.extensions.some(item => item.path === path && item.enabled), 'Trap must be discoverable for the denial test to be meaningful');
+  }
+  assert.equal(existsSync(marker), false, 'Resolution must not import the discoverable module');
+  const loader = new pi.DefaultResourceLoader({ ...p, settingsManager,
     noExtensions: true, noSkills: true, noPromptTemplates: true, noThemes: true, noContextFiles: true,
     systemPrompt: 'SYNTHETIC explicit system prompt', appendSystemPrompt: [],
     extensionFactories: candidates.filter(item => item.approved).map(item => item.factory) });
