@@ -34,4 +34,8 @@ python scripts/test-tools.py
 
 ## A0/A1 实际进度
 
-[当前被测提交与脱敏报告](../validation/a0-a1-closeout-2026-09-22.md) · [本轮发行包完整性](../validation/a0-a1-closeout-release.json) · [公开入口缺口](../validation/a0-a1-gaps.md)。Pi 0.87.0 / Node 24.21.0 的零模型 Session 探针、严格应用类型检查和重复初始化通过。采用固定声明补丁及精确 MCP 类型 peer，官方原始声明缺陷仍在；历史 failed 证据保留。BOOT-03 与 CORE-02 均 in_progress，M0 三个 Gate pending，本轮未进入 A2。
+[当前被测提交与脱敏报告](../validation/a0-a1-closeout-2026-09-22.md) · [本轮发行包完整性](../validation/a0-a1-closeout-release.json) · [公开入口缺口](../validation/a0-a1-gaps.md)。Pi 0.87.0 / Node 24.21.0 的零模型 Session 探针、严格应用类型检查和重复初始化通过。采用固定声明补丁及精确 MCP 类型 peer，官方原始声明缺陷仍在；历史 failed 证据保留。BOOT-03 与 CORE-02 均 in_progress，M0 三个 Gate pending。
+
+## A2 实际进度
+
+[被测提交与工具报告](../validation/a2-2026-09-22.md) · [输入摘要](../validation/a2-inputs.json) · [辅助 I/O 与平台边界](../validation/a2-boundaries.md)。19 项工具接缝与 4 项真实 macOS Bash 测试通过，A1 回归仍通过；没有新增依赖或改动 Pi 运行时代码。read/edit/write/bash 仅采用公开工厂与 Operations。CORE-04、SEC-02 及三项相关能力进入 in_progress；不把探针称为完整权限/平台系统。三个 M0 Gate 仍 pending，本轮未进入 A3/A4。

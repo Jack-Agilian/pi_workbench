@@ -76,3 +76,9 @@ P04/P05/P06/P07/P13 的固定源码链接是复查入口，不声称逐字核验
 后续 [收尾报告](../validation/a0-a1-closeout-2026-09-22.md) 记录代码提交 `ad6a71b6faefdeece0ef5699fbc21eafdaf6c8fe` 的严格类型、SDK、下载审计及重复初始化通过；[发行完整性记录](../validation/a0-a1-closeout-release.json) 明确区分原始 tarball 与两个 pi-ai 副本的本地声明补丁。[ADR-A0](adr-a0-pi-types.md) 固定只改 JSON 类型导入，补齐 MCP SDK 1.30.0 类型 peer；运行时字节未改。未读取 source 条件执行源码、未 deep-import、未 Fork。原失败证据保留，不能将补丁后的通过描述为官方原包无缺陷。
 
 本轮只有内存配置/凭据和空资源注入，不验证 Provider/OAuth 或完整技能资源策略。reuse-map 中 verificationStatus=verified 仅指其 evidenceRecords.scope 明确限定的探针接缝；implementationState 仍为 in_progress，不能据此宣布完整模型/资源/配置能力可用。没有真实模型事件 fixture 或 A2 工具测试。
+
+## A2 已采用的工具入口（2026-09-22）
+
+代码提交 `23ba1bdc54188ee3dbbd0a744800ffea84f855ec` 实测同一 Pi 0.87.0 发行包的四个公开 ToolDefinition 工厂、defineTool、公开参数校验、MIME helper 和本地 Bash Operations。工具/Session 入口继续通过包根 ESM 导入，Pi 类型留在 adapter 和测试内部；详见 [A2 报告](../validation/a2-2026-09-22.md)。
+
+[A2 输入审计](../validation/a2-inputs.json) 重新核对缓存官方 tarball SRI 和 12 个安装文件的原始字节，无新依赖或运行时补丁。read 的路径辅助探测、bash 的临时日志及实际宿主入口边界见 [可复现记录](../validation/a2-boundaries.md)。这不把源文件中存在但未采用的 grep/find/ls/PowerShell 标为已验证。

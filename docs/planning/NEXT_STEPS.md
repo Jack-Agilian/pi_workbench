@@ -1,6 +1,6 @@
 # 从文档到可运行产品：复用优先
 
-状态：A0/A1 探针、严格类型检查与重复初始化通过；产品阶段仍待实施。决策依据：[SSOT](../ssot/README.md)。工作项见 [backlog.json](backlog.json)；历史原始范围见[原始 Backlog](../startup/docs/08-delivery-and-references.md)。尚未创建 GitHub Issues。
+状态：A0/A1 及 A2 最小工具探针、严格类型检查与重复初始化通过；产品阶段仍待实施。决策依据：[SSOT](../ssot/README.md)。工作项见 [backlog.json](backlog.json)；历史原始范围见[原始 Backlog](../startup/docs/08-delivery-and-references.md)。尚未创建 GitHub Issues。
 
 ## 1. 下一增量不是再造平台
 
@@ -60,8 +60,14 @@ CORE-04 的工具接缝验收增加 BOOT-03/CORE-02/SEC-02；SEC-03 的凭据验
 
 本轮修订范围及 planned 用例见 [R01–R08](../ssot/review-fixes.md)；可持续状态与证据规范见 [SSOT 维护](../ssot/maintenance.md)。
 
-## A0/A1 本轮范围（2026-09-22）
+## A0/A1 已验证范围（2026-09-22）
 
 已固定 Node 24.21.0 / npm 11.19.0 / Pi 0.87.0；新增最小 `packages/pi-adapter`、显式应用初始化、离线探针和下载审计。严格 NodeNext 类型检查通过 [ADR-A0](../ssot/adr-a0-pi-types.md) 固定声明补丁与精确 MCP 类型 peer 解除阻塞，BOOT-03 改为 in_progress。CORE-02 仅推进 Session 绑定、替换和三类失败探针，仍为 in_progress；未完成产品 Run 归属。当前被测提交与证据见 [收尾报告](../validation/a0-a1-closeout-2026-09-22.md)，原始发行缺口和历史失败保留。
 
-M0-UI、M0-SDK、M0-Pi 保持 pending。本轮 A0/A1 收尾后停止；下一轮才开始 A2 基础工具接缝，优先复用 Pi 同名工厂与 Operations，不扩大本轮范围。
+M0-UI、M0-SDK、M0-Pi 保持 pending。A0/A1 原交付停止在其限定范围；后续 A2 记录如下。
+
+## A2 本轮范围与下一步（2026-09-22）
+
+继续采用 Pi 0.87.0 的公开 read/edit/write/bash 工厂与 Operations，新增每次调用的固定身份/批准快照、写入前置条件与隔离测试。19 项工具测试、4 项真实 macOS Bash 测试、A1 回归及新副本重跑通过，见 [实际证据](../validation/a2-2026-09-22.md)。CORE-04、SEC-02 从 proposed 推进到 in_progress，BOOT-03/CORE-02 仍 in_progress；前置任务和完整产品验收未被跳过。
+
+辅助 I/O、非原子文件检查、宿主 executeBash 与未覆盖平台的限制见 [A2 边界](../validation/a2-boundaries.md)。本轮在 A2 停止。下一轮进入 A3 受控资源/包探针，仍先复用公开 Skill/ResourceLoader/PackageManager；不提前开启未知扩展、模型调用或整个市场实现。三个 M0 Gate 继续 pending。

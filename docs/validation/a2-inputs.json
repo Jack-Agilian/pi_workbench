@@ -1,0 +1,86 @@
+{
+  "scope": "A2 selected installed runtime/declaration files compared with previously downloaded official tarballs; cached tarball SRI rechecked against unchanged lock; no new registry fetch",
+  "lockSha256": "7cd35e4fc73c7e0b61112b515c6389505baf7d541e638bd7cf0ffe2dbf6e8e44",
+  "packages": [
+    {
+      "package": "@earendil-works/pi-coding-agent",
+      "version": "0.87.0",
+      "tarballUrl": "https://registry.npmjs.org/@earendil-works/pi-coding-agent/-/pi-coding-agent-0.87.0.tgz",
+      "integrity": "sha512-S9JJVGHya/h0e0M+zwPTB6RkPe7PmLLqfBUTssFYW5mxAti6oZEILn4jvaUImENRC3U9RwXAB6H4gw8xj2J0GQ==",
+      "tarballBytes": 7227603,
+      "files": [
+        {
+          "path": "dist/index.js",
+          "sha256": "1e3601da1e18a7be4dfdcc625d7a7fb942cc095a5d737bb1b70211af33b61e05",
+          "bytes": 4742
+        },
+        {
+          "path": "dist/index.d.ts",
+          "sha256": "1e89f64c284248e8004bc040be1b8d886f20c158091d4e466cb130fa9d13d458",
+          "bytes": 10697
+        },
+        {
+          "path": "dist/core/tools/read.js",
+          "sha256": "6be7949968968f42a17ccbe341008db3f061cc1d757b42ff1d269bb0d4cc66f1",
+          "bytes": 10247
+        },
+        {
+          "path": "dist/core/tools/edit.js",
+          "sha256": "e2e7081b28b170eb11bdd8d4fc295c491d581364cd57ae0670f24031b4057265",
+          "bytes": 7723
+        },
+        {
+          "path": "dist/core/tools/write.js",
+          "sha256": "0e9daec15a5001cafe651db391aed63a463c346d29b60e6dc91ef09477fd22f5",
+          "bytes": 2990
+        },
+        {
+          "path": "dist/core/tools/bash.js",
+          "sha256": "8acde89e7e1ad7ab013ccbf4b2cbfe847422de46f9451ca796f889ab37fee307",
+          "bytes": 14017
+        },
+        {
+          "path": "dist/core/tools/path-utils.js",
+          "sha256": "76acb2622a7f4f54c871a553501340829580f0f9caad627e7dafb8aee8b449af",
+          "bytes": 3720
+        },
+        {
+          "path": "dist/core/tools/output-accumulator.js",
+          "sha256": "4fe5f89ce61446ec50da5ea26e9f66e34ed7d628df8563eda403b804a67af50a",
+          "bytes": 6278
+        },
+        {
+          "path": "dist/utils/shell.js",
+          "sha256": "9874bbe8f6e26dd05029c3487d7789b160e92470696b2168424394f5dd00a34a",
+          "bytes": 8176
+        },
+        {
+          "path": "dist/utils/mime.js",
+          "sha256": "36bdb72fc40d809ab5f69e80ecd54651d4131661e92cf7dcec7b719f139badcf",
+          "bytes": 3981
+        }
+      ]
+    },
+    {
+      "package": "@earendil-works/pi-ai",
+      "version": "0.87.0",
+      "tarballUrl": "https://registry.npmjs.org/@earendil-works/pi-ai/-/pi-ai-0.87.0.tgz",
+      "integrity": "sha512-lbRm+EMY6Jx3l+HLpbqbm9Yrhkc5u7EffLk2id+zJQEoBuR5I+tijGiZU8zlnuuCclmQOgH0PVjL9PLbeqJ9MQ==",
+      "tarballBytes": 836978,
+      "files": [
+        {
+          "path": "dist/index.js",
+          "sha256": "4eee4d99e3eaf82e28826808136b2eede4184c3fb697328cbfc32db3360a8540",
+          "bytes": 951
+        },
+        {
+          "path": "dist/utils/validation.js",
+          "sha256": "25448fb499e38cd216b4a47d747ddf3b7750419d379e4bf4ca1578ada48d04d7",
+          "bytes": 10615
+        }
+      ]
+    }
+  ],
+  "testedCommit": "23ba1bdc54188ee3dbbd0a744800ffea84f855ec",
+  "recordedAt": "2026-09-22T11:29:11.877583+00:00"
+}

@@ -378,9 +378,9 @@
       "reuse": "保留名称schema结果与裁剪",
       "productDelta": "Operations和许可",
       "acceptanceGate": "保留完整 ToolDefinition、准备/校验一次；路径/辅助I/O/拒绝零执行",
-      "implementationState": "not_implemented",
+      "implementationState": "in_progress",
       "adoption": {
-        "status": "candidate",
+        "status": "selected",
         "imports": [
           {
             "package": "@earendil-works/pi-coding-agent",
@@ -391,24 +391,23 @@
                 "kind": "runtime"
               },
               {
-                "name": "createGrepToolDefinition",
+                "name": "detectSupportedImageMimeTypeFromFile",
                 "kind": "runtime"
               },
               {
-                "name": "createFindToolDefinition",
-                "kind": "runtime"
-              },
-              {
-                "name": "createLsToolDefinition",
-                "kind": "runtime"
+                "name": "ToolDefinition",
+                "kind": "type"
               }
             ],
-            "selectedVersion": null
+            "selectedVersion": "0.87.0"
           }
         ],
         "selectedSourceCommit": null,
-        "verificationStatus": "source_reviewed",
-        "testEvidence": []
+        "verificationStatus": "verified",
+        "testEvidence": [
+          "EV-A2-INPUTS-20260922",
+          "EV-A2-SDK-20260922"
+        ]
       }
     },
     {
@@ -429,9 +428,9 @@
       "reuse": "保留匹配/patch/文件级队列",
       "productDelta": "操作context/许可/跨Worker锁",
       "acceptanceGate": "最终校验参数绑定审批；edits兼容/元数据不丢；并行context不串；读版本冲突提示而非原子CAS",
-      "implementationState": "not_implemented",
+      "implementationState": "in_progress",
       "adoption": {
-        "status": "candidate",
+        "status": "selected",
         "imports": [
           {
             "package": "@earendil-works/pi-coding-agent",
@@ -446,16 +445,34 @@
                 "kind": "runtime"
               },
               {
-                "name": "withFileMutationQueue",
+                "name": "defineTool",
+                "kind": "runtime"
+              },
+              {
+                "name": "ToolDefinition",
+                "kind": "type"
+              }
+            ],
+            "selectedVersion": "0.87.0"
+          },
+          {
+            "package": "@earendil-works/pi-ai",
+            "importFrom": "@earendil-works/pi-ai",
+            "exports": [
+              {
+                "name": "validateToolArguments",
                 "kind": "runtime"
               }
             ],
-            "selectedVersion": null
+            "selectedVersion": "0.87.0"
           }
         ],
         "selectedSourceCommit": null,
-        "verificationStatus": "source_reviewed",
-        "testEvidence": []
+        "verificationStatus": "verified",
+        "testEvidence": [
+          "EV-A2-INPUTS-20260922",
+          "EV-A2-SDK-20260922"
+        ]
       }
     },
     {
@@ -476,9 +493,9 @@
       "reuse": "保留Shell语义和工具结果",
       "productDelta": "受管进程与OS策略",
       "acceptanceGate": "保留定义/增量/取消；绑定操作、中文路径和受管理进程停止核验；残留可见",
-      "implementationState": "not_implemented",
+      "implementationState": "in_progress",
       "adoption": {
-        "status": "candidate",
+        "status": "selected",
         "imports": [
           {
             "package": "@earendil-works/pi-coding-agent",
@@ -489,24 +506,24 @@
                 "kind": "runtime"
               },
               {
-                "name": "createPowerShellToolDefinition",
+                "name": "createLocalBashOperations",
                 "kind": "runtime"
               },
               {
                 "name": "BashOperations",
                 "kind": "type"
-              },
-              {
-                "name": "PowerShellOperations",
-                "kind": "type"
               }
             ],
-            "selectedVersion": null
+            "selectedVersion": "0.87.0"
           }
         ],
         "selectedSourceCommit": null,
-        "verificationStatus": "source_reviewed",
-        "testEvidence": []
+        "verificationStatus": "verified",
+        "testEvidence": [
+          "EV-A2-INPUTS-20260922",
+          "EV-A2-SDK-20260922",
+          "EV-A2-MAC-SHELL-20260922"
+        ]
       }
     },
     {
@@ -953,6 +970,54 @@
         "darwin"
       ],
       "locator": "docs/validation/a0-a1-closeout-2026-09-22.md"
+    },
+    {
+      "id": "EV-A2-INPUTS-20260922",
+      "kind": "release",
+      "result": "passed",
+      "scope": "保持Pi 0.87.0/Node 24.21.0及原锁；重新核对缓存官方Pi tarball的SRI，12个采用入口/辅助I/O相关安装文件与原包逐字节一致；实际公开导出由工具测试调用。没有新依赖或registry重新下载；A0声明补丁保留，非签名验证。",
+      "commit": "23ba1bdc54188ee3dbbd0a744800ffea84f855ec",
+      "recordedAt": "2026-09-22T11:29:11.877583+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/a2-2026-09-22.md"
+    },
+    {
+      "id": "EV-A2-SDK-20260922",
+      "kind": "sdk",
+      "result": "passed",
+      "scope": "真实Pi工具接缝19/19：完整定义/一次公开准备校验、normal/legacy/string/object edits、原生diff/patch/文本图片/裁剪、同名注册拒绝零Operations、路径/符号链接/辅助I/O边界、审批快照/重放/过期/撤销、写冲突、独立并发operation和迟到事实。BashOperations部分为明确合成后端；无模型/Agent Loop E2E、无原子CAS或产品权限系统。",
+      "commit": "23ba1bdc54188ee3dbbd0a744800ffea84f855ec",
+      "recordedAt": "2026-09-22T11:29:11.877583+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/a2-2026-09-22.md"
+    },
+    {
+      "id": "EV-A2-MAC-SHELL-20260922",
+      "kind": "platform",
+      "result": "passed",
+      "scope": "仅macOS 27.0 arm64真实Pi createLocalBashOperations 4/4：中文cwd输出/空Provider环境、运行中的Shell和sleep子进程取消及超时后独立确认均退出、子进程内核网络及canary文件读写拒绝。不覆盖脱离进程组后代、Windows/PowerShell或产品沙箱。",
+      "commit": "23ba1bdc54188ee3dbbd0a744800ffea84f855ec",
+      "recordedAt": "2026-09-22T11:29:11.877583+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/a2-2026-09-22.md"
+    },
+    {
+      "id": "EV-A2-REGRESSION-20260922",
+      "kind": "static",
+      "result": "passed",
+      "scope": "代码提交上严格类型检查、类型/补丁10、A1 Session 10、SSOT 60、工具15、历史示例16及协议类型通过，startup 27摘要不变。无.git新副本在线/离线初始化锁不变，在仓库外cwd连续两轮typecheck、A2工具19、Mac Shell4、A1 Session10通过。",
+      "commit": "23ba1bdc54188ee3dbbd0a744800ffea84f855ec",
+      "recordedAt": "2026-09-22T11:29:11.877583+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/a2-2026-09-22.md"
     }
   ]
 }

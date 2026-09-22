@@ -170,3 +170,5 @@ npm run test:pi-probe
 `test:pi-tools` 使用真实 Pi 文件工具、独立合成文件及明确标记的合成 BashOperations，禁止子进程。`test:pi-shell` 在 macOS 使用 Pi 官方本地 Bash 后端，执行固定测试命令，验证已运行的进程取消和超时；该模式额外启用子进程并套用 OS 网络/文件边界。其他平台明确失败，不退回开放环境。两种模式均从空环境白名单创建子进程，不读取用户 Pi 设置/凭据，不调用模型。
 
 审批回调、不可复用操作身份、Operations 和观察只用于探针；测试保留 Pi 的参数准备、schema、元数据、diff、裁剪与结果形状。完整采用边界、辅助 I/O 与竞争窗口见 [A2 边界记录](validation/a2-boundaries.md)。原始运行日志位于忽略的 `.artifacts/a2/`。
+
+A2 的实际被测 SHA、命令和新副本结果见 [脱敏验证报告](validation/a2-2026-09-22.md)，采用文件摘要见 [输入记录](validation/a2-inputs.json)。
