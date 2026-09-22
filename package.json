@@ -16,6 +16,8 @@
     "test:pi-shell": "node scripts/run-pi-probe.mjs --shell",
     "test:pi-resources": "node scripts/run-pi-probe.mjs --resources",
     "test:pi-auth": "node scripts/run-pi-probe.mjs --auth",
+    "test:product-core": "node scripts/run-pi-probe.mjs --product",
+    "test:product-sdk": "node scripts/run-pi-probe.mjs --product-sdk",
     "prepare:pi-packages": "node scripts/prepare-pi-package-fixtures.mjs",
     "test:pi-packages": "node scripts/run-pi-probe.mjs --packages",
     "patch:pi-types": "node scripts/check-environment.mjs --versions-only && node scripts/pi-type-patch.mjs",

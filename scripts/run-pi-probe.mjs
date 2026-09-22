@@ -7,25 +7,37 @@ import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-assert.ok(process.argv.length === 2 || (process.argv.length === 3 && ['--tools', '--shell', '--resources', '--packages', '--auth'].includes(process.argv[2])), 'Unknown probe mode');
+assert.ok(process.argv.length === 2 || (process.argv.length === 3 && ['--tools', '--shell', '--resources', '--packages', '--auth', '--product', '--product-sdk'].includes(process.argv[2])), 'Unknown probe mode');
 const shellMode = process.argv[2] === '--shell';
 const packageMode = process.argv[2] === '--packages';
+const productMode = ['--product', '--product-sdk'].includes(process.argv[2]);
 const childMode = shellMode || packageMode;
+const fileMode = childMode || productMode;
 if (shellMode || process.argv[2] === '--auth') {
   // Positive canaries in this launcher process only. Children must receive none of them.
   for (const name of ['OPENAI_API_KEY', 'ANTHROPIC_API_KEY', 'GOOGLE_API_KEY', 'AWS_ACCESS_KEY_ID',
     'GOOGLE_APPLICATION_CREDENTIALS', 'BASH_ENV']) process.env[name] = 'A4_SYNTHETIC_SECRET_PARENT_ENV';
 }
 if (childMode) assert.equal(process.platform, 'darwin', 'Child-process probes currently require the verified macOS sandbox profile');
+if (productMode) assert.equal(process.platform, 'darwin', 'SQLite probes require the verified macOS filesystem sandbox profile');
 const gitPath = packageMode ? (process.env.PATH ?? '').split(delimiter).map(path => join(path, 'git')).find(existsSync) : undefined;
 if (packageMode) assert.ok(gitPath, 'An existing Git executable is required');
 if (packageMode) assert.ok(existsSync(join(root, '.artifacts/a3/package-inputs/cache')), 'Run npm run prepare:pi-packages separately before the offline SDK test');
 const suite = shellMode ? 'shell-probe.test.ts' : process.argv[2] === '--tools' ? 'tool-probe.test.ts'
   : process.argv[2] === '--resources' ? 'resource-probe.test.ts' : packageMode ? 'package-probe.test.ts'
-  : process.argv[2] === '--auth' ? 'auth-probe.test.ts' : 'probe.test.ts';
+  : process.argv[2] === '--auth' ? 'auth-probe.test.ts' : process.argv[2] === '--product-sdk' ? 'product-probe.test.ts' : 'probe.test.ts';
 const temporary = realpathSync(mkdtempSync(join(tmpdir(), 'pi-sdk-probe-')));
-const denied = childMode ? realpathSync(mkdtempSync(join(tmpdir(), 'pi-child-denied-'))) : undefined;
+const denied = fileMode ? realpathSync(mkdtempSync(join(tmpdir(), 'pi-child-denied-'))) : undefined;
 if (denied) writeFileSync(join(denied, 'synthetic-canary.txt'), 'SYNTHETIC filesystem boundary canary');
+if (productMode) {
+  const { DatabaseSync } = await import('node:sqlite');
+  const database = new DatabaseSync(join(denied, 'synthetic.sqlite'));
+  database.exec("CREATE TABLE synthetic_canary(value TEXT); INSERT INTO synthetic_canary VALUES ('SYNTHETIC');");
+  assert.equal(database.prepare('SELECT value FROM synthetic_canary').get().value, 'SYNTHETIC');
+  database.close();
+  writeFileSync(join(temporary, 'product-symlink-target.md'), 'SYNTHETIC symlink target');
+  symlinkSync(join(temporary, 'product-symlink-target.md'), join(temporary, 'product-symlink.md'));
+}
 const agentDir = join(temporary, 'home', '.pi', 'agent');
 for (const dir of [agentDir, join(temporary, 'workspace'), join(temporary, 'tmp')]) mkdirSync(dir, { recursive: true });
 if (process.argv[2] === '--tools') {
@@ -66,12 +78,13 @@ const flags = [
   ...[join(root, 'node_modules'), join(root, 'packages/pi-adapter'), join(root, 'package.json'),
     join(root, 'scripts/probe-no-network.mjs'), temporary].map(path => `--allow-fs-read=${path}`),
   `--allow-fs-write=${temporary}`,
+  ...(productMode ? [join(root, 'apps/agent-server'), join(root, 'packages/app-contracts')].map(path => `--allow-fs-read=${path}`) : []),
   '--import', join(root, 'scripts/probe-no-network.mjs'),
   ...(childMode ? ['--allow-child-process', '--allow-fs-read=/bin/bash'] : []),
   ...(packageMode ? [`--allow-fs-read=${resolve(dirname(process.execPath), '..')}`] : []),
 ];
 const profile = ['(version 1)', '(allow default)', '(deny network*)'];
-if (childMode) {
+if (fileMode) {
   // Shell binaries cannot enforce Node permissions (Node children inherit flags
   // via NODE_OPTIONS). OS file rules cover this fixed-command test only.
   profile.push('(deny file-write*)', `(allow file-write* (subpath ${JSON.stringify(realpathSync(temporary))}))`,
@@ -82,7 +95,7 @@ if (childMode) {
   for (let ancestor = dirname(realpathSync(root)); ancestor !== dirname(ancestor); ancestor = dirname(ancestor)) {
     profile.push(`(allow file-read-metadata (literal ${JSON.stringify(ancestor)}))`);
   }
-  if (packageMode) {
+  if (packageMode || productMode) {
     // npm's ancestor lstat needs --allow-fs-read=*: enforce its reads in the inherited OS profile.
     // Metadata is needed to canonicalize ancestors; data access remains limited to approved roots.
     profile.push('(deny file-read*)', '(allow file-read-metadata)',
@@ -128,6 +141,18 @@ try {
     assert.equal(process.permission.has('addons'), false);
   `]);
   assert.equal(boundary.status, 0, boundary.stderr);
+  if (productMode) {
+    const sqliteBoundary = run(['-e', `
+      const assert = require('node:assert/strict');
+      const {DatabaseSync} = require('node:sqlite');
+      const path = require('node:path').join(require('node:path').dirname(process.env.PI_PROBE_DENIED_PATH), 'synthetic.sqlite');
+      assert.throws(() => new DatabaseSync(path, {readOnly:true}), /unable to open database file/);
+      assert.throws(() => new DatabaseSync(path + '.new'), /unable to open database file/);
+    `]);
+    assert.equal(sqliteBoundary.status, 0, sqliteBoundary.stderr);
+    assert.equal(existsSync(join(denied, 'synthetic.sqlite.new')), false);
+    console.log('SQLite OS read/write boundary passed against a valid synthetic database.');
+  }
   if (packageMode) {
     const npmBoundary = run(['--allow-fs-read=*', '-e', `
       const assert = require('node:assert/strict');
@@ -150,7 +175,7 @@ try {
     : 'Isolation self-checks passed: 5 network tripwires + file/process/worker/addon denial.');
   // node:test also runs from an explicit entrypoint; avoid the CLI's directory
   // glob discovery (and test subprocesses) under narrow filesystem permissions.
-  const result = run([join(root, 'packages/pi-adapter', suite)]);
+  const result = run([process.argv[2] === '--product' ? join(root, 'apps/agent-server/core.test.ts') : join(root, 'packages/pi-adapter', suite)]);
   // A4 deliberately poisons credentials/metadata/errors. Never publish those values in test logs,
   // including assertion diagnostics on failure. This is a test canary, not general log sanitization.
   if (shellMode || process.argv[2] === '--auth') {
