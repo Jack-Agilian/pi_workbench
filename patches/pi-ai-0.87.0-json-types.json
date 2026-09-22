@@ -1,0 +1,219 @@
+{
+  "schemaVersion": 1,
+  "package": "@earendil-works/pi-ai",
+  "version": "0.87.0",
+  "integrity": "sha512-lbRm+EMY6Jx3l+HLpbqbm9Yrhkc5u7EffLk2id+zJQEoBuR5I+tijGiZU8zlnuuCclmQOgH0PVjL9PLbeqJ9MQ==",
+  "patchFile": "patches/pi-ai-0.87.0-json-types.patch",
+  "patchSha256": "57c11da43fd28c77389c4561b08cadca3706d8181cdd5c11e3eaf6d1bccf266e",
+  "packageRoots": [
+    "node_modules/@earendil-works/pi-ai",
+    "node_modules/@earendil-works/pi-coding-agent/node_modules/@earendil-works/pi-ai"
+  ],
+  "files": [
+    {
+      "path": "dist/providers/amazon-bedrock.models.d.ts",
+      "beforeSha256": "462079557299af52f98012327e8dfec2ce74cdbd5a0076aa04cd94d4fea8bfcc",
+      "afterSha256": "8a3d580bb3a6551d045d49047e952278ec008c3e9f4cf010bdadcee2ae6e15a2"
+    },
+    {
+      "path": "dist/providers/ant-ling.models.d.ts",
+      "beforeSha256": "b4ba5aa79423d9abcc181c0763420387cf7b284b710e335c287cdc31a070e5ea",
+      "afterSha256": "b71ccfd5414a5f87023fa3c334098de78dd55d1f4538dc3835ff2833583c3f72"
+    },
+    {
+      "path": "dist/providers/anthropic.models.d.ts",
+      "beforeSha256": "482123c38cf2581d08a253064f896712e42a573dce26eb3e78d2036a982579b1",
+      "afterSha256": "7a6269a83c34542eac5b2c059fb52b53f149a79ac17f767f5c364ced40c6f4a4"
+    },
+    {
+      "path": "dist/providers/azure-openai-responses.models.d.ts",
+      "beforeSha256": "b8e007fcb9aaec9645382ced0bc1ae057294fe25c4494ef2ff13a273b0f12fe9",
+      "afterSha256": "24e3c6ed04b2d8ead80fa4167992f8c026444656e41407d00a28f0eaa896bd6d"
+    },
+    {
+      "path": "dist/providers/baseten.models.d.ts",
+      "beforeSha256": "480347195fb00612ed3c6110a68dd2399ecf4d306f6f5d6988ddde14ca41d86c",
+      "afterSha256": "3af357fcd26ba55625a08b778662da75b81acf2a0db5b6912654fd9a941aab78"
+    },
+    {
+      "path": "dist/providers/cerebras.models.d.ts",
+      "beforeSha256": "b32e3483d3460f103ecd552c653353bc69ddda265154d6d0ad42fb6a673f3170",
+      "afterSha256": "89d9b3605d49b45f93210f320f10dfdae98e345024fba026384c1213e6367c9e"
+    },
+    {
+      "path": "dist/providers/cloudflare-ai-gateway.models.d.ts",
+      "beforeSha256": "928907fe1e9c7a982097069bbd308d75117ab0354563bcaa41bb87a171331be4",
+      "afterSha256": "89704f55100094e2193972500b92bc0d19333f71ca60fcd3d4ef4394cc1b57c7"
+    },
+    {
+      "path": "dist/providers/cloudflare-workers-ai.models.d.ts",
+      "beforeSha256": "92b1ca9ea2e1158054785ca32d7d466877ce5c77940b28545202652730464f6c",
+      "afterSha256": "9fa351b1a0916c804e92f70589f9b6e9856742779a99f095803eeaaa5557f472"
+    },
+    {
+      "path": "dist/providers/deepseek.models.d.ts",
+      "beforeSha256": "539e055bd90a4ae953ed2349ef43a469de64b2a3183d809e952a4c514176b9c0",
+      "afterSha256": "01e607e58ab9a98206c70dba0de8946becd6ae35f39c7d11c1a67dd8ef766f2e"
+    },
+    {
+      "path": "dist/providers/fireworks.models.d.ts",
+      "beforeSha256": "a31fe13c60700eb1d400c250b97cb6ee97541c8a40aee036d5d1bc311a86188c",
+      "afterSha256": "622932db7c802036f39d708aef66bc4f3fb0bd382fdbb4acf832200569eeee4b"
+    },
+    {
+      "path": "dist/providers/github-copilot.models.d.ts",
+      "beforeSha256": "1fe4f31047b3ec74adf5457031999643977f4c1e0e11c137d82bc5d8211cd4e3",
+      "afterSha256": "c3668cb78e08f01136909429319c9b31ce7e2888903f448001cf42dbe12567d8"
+    },
+    {
+      "path": "dist/providers/google-vertex.models.d.ts",
+      "beforeSha256": "12a0f7e8bbffb7b82e120470dbd892627e1602e659a4d8c8783e45788d5be84a",
+      "afterSha256": "7d3c51ff1985e38bfe8c854be64576ff6c1061e06424eb82b83f5e2d54825562"
+    },
+    {
+      "path": "dist/providers/google.models.d.ts",
+      "beforeSha256": "e79112b5973bf81d6a15cd3bf63da23b36d75c7299a6a5bc1fb11279737b71cf",
+      "afterSha256": "5e007793f2d1e2aca1b593f91edb0134d1ceadd00088cc4a57f21cd8ae5d2dc3"
+    },
+    {
+      "path": "dist/providers/groq.models.d.ts",
+      "beforeSha256": "79797fe84695cc351ed0d0668556d6427f1153dd8e747836fde3aeedce6272ea",
+      "afterSha256": "f5b611a2d8e2969301359c0e38ec9e42953a4fa2dba148e7fe95d307478335b0"
+    },
+    {
+      "path": "dist/providers/huggingface.models.d.ts",
+      "beforeSha256": "9d1f8e059ea2475bfb60e4c563b0d2c1d178d7c9d3ed729cc8b68d43bb750413",
+      "afterSha256": "06f2cdca2807efcb606c51ee882fa66c402abafae15b7ec225c6a1930a94f17e"
+    },
+    {
+      "path": "dist/providers/kimi-coding.models.d.ts",
+      "beforeSha256": "ef1e0e50110365354f3369403637ba80eb29d83910e3c31e0737ae738988e0c1",
+      "afterSha256": "b8874370768baac1f2001687af2236b8c040df5ba690dcf548b23fa9c5156a49"
+    },
+    {
+      "path": "dist/providers/meta.models.d.ts",
+      "beforeSha256": "85cff08605e4871e97f418858bec844a400b467a1c3b10c51d2969e38e252409",
+      "afterSha256": "95be3d8e3bfece7de71999496bbf2b2e532443987106a7bd9cfa32ada00813d1"
+    },
+    {
+      "path": "dist/providers/minimax-cn.models.d.ts",
+      "beforeSha256": "367f8df221f320301a8ca956463f6813c464ecd802f0a3f0f9a13957f0554d3c",
+      "afterSha256": "891a23183926d458163e85c2b5a13369c020ec5c83292a8b0531201f0938b6d2"
+    },
+    {
+      "path": "dist/providers/minimax.models.d.ts",
+      "beforeSha256": "50c55696f11dcf080c8ae012cac9b7a9c66267ed70e662abb50f1a9275624dd7",
+      "afterSha256": "90f2ff7bb0d74117f60f51d32b15b638f517feb4b1746152dda188d5c86459a3"
+    },
+    {
+      "path": "dist/providers/mistral.models.d.ts",
+      "beforeSha256": "a853f6aec6660eb946a11aaf5944cad9244655f3864f2d09b11fd4c700cc694e",
+      "afterSha256": "6b8cbe3ed4e7edf1719816413e91e67b417cc0f2991f5f8db4bccf1ab0eede73"
+    },
+    {
+      "path": "dist/providers/moonshotai-cn.models.d.ts",
+      "beforeSha256": "7cff28d59734f9e1d70443b7f345429d7961dcdabd6ef1a9c0bd2f35eb4c2322",
+      "afterSha256": "a688883c5558b3db6a5b73e37cf52decfbf635f75c21d3c8725024211dda1ca2"
+    },
+    {
+      "path": "dist/providers/moonshotai.models.d.ts",
+      "beforeSha256": "6c5f0054a3ad9437fa62255e2cee7bbb4e5929e4aeddea25f0772a99a919bd39",
+      "afterSha256": "3725d1756f04d78eb6de0b632dc70a829033031efb653cb0eff615622aecb19b"
+    },
+    {
+      "path": "dist/providers/nvidia.models.d.ts",
+      "beforeSha256": "1ded8b351ff03073c52031e616268a8506259b079eb2960cb6b475cb7affc03c",
+      "afterSha256": "73e2dd7336430f625b968e4a359cbc77afd943bbc09094ce402b02b779eb932f"
+    },
+    {
+      "path": "dist/providers/openai-codex.models.d.ts",
+      "beforeSha256": "2c086e4f574b200ae46138508df73a9cdff6b39f2d9ab88aa27010e707211678",
+      "afterSha256": "9f5317b9ab53ce7338c7a7881e5e5b89ddb4e2c9e9233ba996f794fce88a9e41"
+    },
+    {
+      "path": "dist/providers/openai.models.d.ts",
+      "beforeSha256": "4cc8d9708118920e7f5368f9e38b6ec71f96f7fe47622d54fd33e1cb40055a72",
+      "afterSha256": "20ce3a0a0de6a2ebf7770ccb7f65b9de6911bc2887bb9134dd27146cd51105de"
+    },
+    {
+      "path": "dist/providers/opencode-go.models.d.ts",
+      "beforeSha256": "5df1745da96a01a148978e0eb3bcc3f16a3385a00ade7cc0b215215b37cd7273",
+      "afterSha256": "822331e94f4a5494b71fce32a1684d6dd37a6f629fae466087712e9e986c0d3f"
+    },
+    {
+      "path": "dist/providers/opencode.models.d.ts",
+      "beforeSha256": "b672cd23a3425b72732e15507379971a8020c4f1ae4357cdc59d885a5515db17",
+      "afterSha256": "deb9b229caac967f97b761f90e7631f3f82cb36c1b175cd79349d91e38e022fb"
+    },
+    {
+      "path": "dist/providers/openrouter.models.d.ts",
+      "beforeSha256": "7137429f0bcac4599fa53ae07fe2df63dfd596e4ccca2b0ecf867f0251dd6cdb",
+      "afterSha256": "930bd2ffce3781ef384d6828d06b36adce127f7877aba2e19fb24e29eaa25350"
+    },
+    {
+      "path": "dist/providers/qwen-token-plan-cn.models.d.ts",
+      "beforeSha256": "f68135ff03699bcdc7254206fb31b8b2ceba12cd2b292ba1cc111b2fcb3b4305",
+      "afterSha256": "6b37b896575e470a224abd109a945b9023933249c8a780bd0aa0b5482ce0c3fc"
+    },
+    {
+      "path": "dist/providers/qwen-token-plan-individual.models.d.ts",
+      "beforeSha256": "f7e5f7bd229c705d0e22fc9d696dfb4fe687f017dd9c30f76709fc9a5fa07731",
+      "afterSha256": "c46554119e775959eff1328cd53b0d13b7a85b250311a61c7d0493a2049738e2"
+    },
+    {
+      "path": "dist/providers/qwen-token-plan.models.d.ts",
+      "beforeSha256": "107cf3e9da194a981dd908bf6f4923a8023f27de1f28beb74933aa91b9e91a08",
+      "afterSha256": "0fc52912fa2c4383485661c275b0009e599e1d74ce58285cbaf9c3994431d768"
+    },
+    {
+      "path": "dist/providers/radius.models.d.ts",
+      "beforeSha256": "774b8440ec62d98cf515643905f8f6461212bc2cffc27e8b81ffbd00410216b1",
+      "afterSha256": "ba545b8a6c0a63ce15133e7178032bba1055dc2197437e862897ddc64f84cf8e"
+    },
+    {
+      "path": "dist/providers/together.models.d.ts",
+      "beforeSha256": "b3df45f09d3492d96e1b0fbda7e9b4743c3d7dc8345ce6bf5eb24cd243e39725",
+      "afterSha256": "9106d7ecb60ff28a5d8614cd1c01466ea02123c5219d34cbd5656e20e5329011"
+    },
+    {
+      "path": "dist/providers/vercel-ai-gateway.models.d.ts",
+      "beforeSha256": "3add193770007001b9c6e8a5760c0b4c987ebab28478d7b33d3a5d5af0688676",
+      "afterSha256": "f138a8624b41acd20c09f0601abe38009503b8df97145ae14820418968ea3c54"
+    },
+    {
+      "path": "dist/providers/xai.models.d.ts",
+      "beforeSha256": "9f3adb466d600044dc2222d49f079f655b19313f213243bd09ebaceb345492d5",
+      "afterSha256": "0a7eb90462a1ff3aa822bc915218b2297a33e7f517c473eef6da6a6bb5032923"
+    },
+    {
+      "path": "dist/providers/xiaomi-token-plan-ams.models.d.ts",
+      "beforeSha256": "46a556dc6f32770bdd45d034a1f9d945cd286a0a34ee98301ae08e73dc6a4046",
+      "afterSha256": "98158bc4a0af20d56bebb7e0c9a6393fd878b57fc2a8401783099ec5ec9e081a"
+    },
+    {
+      "path": "dist/providers/xiaomi-token-plan-cn.models.d.ts",
+      "beforeSha256": "a13b7480d987b187f3d1b95a32c2ecc21d49b645dbaafbe6ed41ddae5db62b15",
+      "afterSha256": "986b6579dfd202619a09590995ef09f405a82577d998f2419ac26eadc2fb7ac8"
+    },
+    {
+      "path": "dist/providers/xiaomi-token-plan-sgp.models.d.ts",
+      "beforeSha256": "983fa1b258b7318cf85ae8e9861a67630e5808add28026a9656b2e714f0865ab",
+      "afterSha256": "d45432c3946bd0c88d989ba8e80cf5fc9c2c4dfb7c986a143a3b38f12ceffd9f"
+    },
+    {
+      "path": "dist/providers/xiaomi.models.d.ts",
+      "beforeSha256": "ecb5d6301e32feea7221afed736a9790b2c27134d3290056b685a93b8c2e389d",
+      "afterSha256": "f784ceb15b9a0a4e542b18d2dcba341923707b247910e15d70d8a22b3a75aa3c"
+    },
+    {
+      "path": "dist/providers/zai-coding-cn.models.d.ts",
+      "beforeSha256": "d21b2072deea7d8bb3117efa6d52ba5ef593a9babe271eff6cb50699a510c0da",
+      "afterSha256": "c2d249ec99c89c2e8d20503bdf1a6beb3fa044796edd0f41f5ec603ddcf16b86"
+    },
+    {
+      "path": "dist/providers/zai.models.d.ts",
+      "beforeSha256": "1461850e10a2cfb6e01e45c192c90bf3778ec9928dde2509b29d725e7c6b1228",
+      "afterSha256": "2fc3b3b358cdc4d59a90bbd9a1db558d5a833ef6bf60b6f3d3457ae678ea0621"
+    }
+  ]
+}

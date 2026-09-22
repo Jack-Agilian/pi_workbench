@@ -1,0 +1,369 @@
+--- a/dist/providers/amazon-bedrock.models.d.ts
++++ b/dist/providers/amazon-bedrock.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/amazon-bedrock.json";
++import type values from "./data/amazon-bedrock.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const AMAZON_BEDROCK_MODELS: ModelCatalog<typeof values, "amazon-bedrock">;
+ //# sourceMappingURL=amazon-bedrock.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/ant-ling.models.d.ts
++++ b/dist/providers/ant-ling.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/ant-ling.json";
++import type values from "./data/ant-ling.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const ANT_LING_MODELS: ModelCatalog<typeof values, "ant-ling">;
+ //# sourceMappingURL=ant-ling.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/anthropic.models.d.ts
++++ b/dist/providers/anthropic.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/anthropic.json";
++import type values from "./data/anthropic.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const ANTHROPIC_MODELS: ModelCatalog<typeof values, "anthropic">;
+ //# sourceMappingURL=anthropic.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/azure-openai-responses.models.d.ts
++++ b/dist/providers/azure-openai-responses.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/azure-openai-responses.json";
++import type values from "./data/azure-openai-responses.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const AZURE_OPENAI_RESPONSES_MODELS: ModelCatalog<typeof values, "azure-openai-responses">;
+ //# sourceMappingURL=azure-openai-responses.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/baseten.models.d.ts
++++ b/dist/providers/baseten.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/baseten.json";
++import type values from "./data/baseten.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const BASETEN_MODELS: ModelCatalog<typeof values, "baseten">;
+ //# sourceMappingURL=baseten.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/cerebras.models.d.ts
++++ b/dist/providers/cerebras.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/cerebras.json";
++import type values from "./data/cerebras.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const CEREBRAS_MODELS: ModelCatalog<typeof values, "cerebras">;
+ //# sourceMappingURL=cerebras.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/cloudflare-ai-gateway.models.d.ts
++++ b/dist/providers/cloudflare-ai-gateway.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/cloudflare-ai-gateway.json";
++import type values from "./data/cloudflare-ai-gateway.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const CLOUDFLARE_AI_GATEWAY_MODELS: ModelCatalog<typeof values, "cloudflare-ai-gateway">;
+ //# sourceMappingURL=cloudflare-ai-gateway.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/cloudflare-workers-ai.models.d.ts
++++ b/dist/providers/cloudflare-workers-ai.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/cloudflare-workers-ai.json";
++import type values from "./data/cloudflare-workers-ai.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const CLOUDFLARE_WORKERS_AI_MODELS: ModelCatalog<typeof values, "cloudflare-workers-ai">;
+ //# sourceMappingURL=cloudflare-workers-ai.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/deepseek.models.d.ts
++++ b/dist/providers/deepseek.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/deepseek.json";
++import type values from "./data/deepseek.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const DEEPSEEK_MODELS: ModelCatalog<typeof values, "deepseek">;
+ //# sourceMappingURL=deepseek.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/fireworks.models.d.ts
++++ b/dist/providers/fireworks.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/fireworks.json";
++import type values from "./data/fireworks.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const FIREWORKS_MODELS: ModelCatalog<typeof values, "fireworks">;
+ //# sourceMappingURL=fireworks.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/github-copilot.models.d.ts
++++ b/dist/providers/github-copilot.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/github-copilot.json";
++import type values from "./data/github-copilot.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const GITHUB_COPILOT_MODELS: ModelCatalog<typeof values, "github-copilot">;
+ //# sourceMappingURL=github-copilot.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/google-vertex.models.d.ts
++++ b/dist/providers/google-vertex.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/google-vertex.json";
++import type values from "./data/google-vertex.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const GOOGLE_VERTEX_MODELS: ModelCatalog<typeof values, "google-vertex">;
+ //# sourceMappingURL=google-vertex.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/google.models.d.ts
++++ b/dist/providers/google.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/google.json";
++import type values from "./data/google.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const GOOGLE_MODELS: ModelCatalog<typeof values, "google">;
+ //# sourceMappingURL=google.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/groq.models.d.ts
++++ b/dist/providers/groq.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/groq.json";
++import type values from "./data/groq.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const GROQ_MODELS: ModelCatalog<typeof values, "groq">;
+ //# sourceMappingURL=groq.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/huggingface.models.d.ts
++++ b/dist/providers/huggingface.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/huggingface.json";
++import type values from "./data/huggingface.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const HUGGINGFACE_MODELS: ModelCatalog<typeof values, "huggingface">;
+ //# sourceMappingURL=huggingface.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/kimi-coding.models.d.ts
++++ b/dist/providers/kimi-coding.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/kimi-coding.json";
++import type values from "./data/kimi-coding.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const KIMI_CODING_MODELS: ModelCatalog<typeof values, "kimi-coding">;
+ //# sourceMappingURL=kimi-coding.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/meta.models.d.ts
++++ b/dist/providers/meta.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/meta.json";
++import type values from "./data/meta.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const META_MODELS: ModelCatalog<typeof values, "meta">;
+ //# sourceMappingURL=meta.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/minimax-cn.models.d.ts
++++ b/dist/providers/minimax-cn.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/minimax-cn.json";
++import type values from "./data/minimax-cn.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const MINIMAX_CN_MODELS: ModelCatalog<typeof values, "minimax-cn">;
+ //# sourceMappingURL=minimax-cn.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/minimax.models.d.ts
++++ b/dist/providers/minimax.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/minimax.json";
++import type values from "./data/minimax.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const MINIMAX_MODELS: ModelCatalog<typeof values, "minimax">;
+ //# sourceMappingURL=minimax.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/mistral.models.d.ts
++++ b/dist/providers/mistral.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/mistral.json";
++import type values from "./data/mistral.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const MISTRAL_MODELS: ModelCatalog<typeof values, "mistral">;
+ //# sourceMappingURL=mistral.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/moonshotai-cn.models.d.ts
++++ b/dist/providers/moonshotai-cn.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/moonshotai-cn.json";
++import type values from "./data/moonshotai-cn.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const MOONSHOTAI_CN_MODELS: ModelCatalog<typeof values, "moonshotai-cn">;
+ //# sourceMappingURL=moonshotai-cn.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/moonshotai.models.d.ts
++++ b/dist/providers/moonshotai.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/moonshotai.json";
++import type values from "./data/moonshotai.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const MOONSHOTAI_MODELS: ModelCatalog<typeof values, "moonshotai">;
+ //# sourceMappingURL=moonshotai.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/nvidia.models.d.ts
++++ b/dist/providers/nvidia.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/nvidia.json";
++import type values from "./data/nvidia.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const NVIDIA_MODELS: ModelCatalog<typeof values, "nvidia">;
+ //# sourceMappingURL=nvidia.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/openai-codex.models.d.ts
++++ b/dist/providers/openai-codex.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/openai-codex.json";
++import type values from "./data/openai-codex.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const OPENAI_CODEX_MODELS: ModelCatalog<typeof values, "openai-codex">;
+ //# sourceMappingURL=openai-codex.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/openai.models.d.ts
++++ b/dist/providers/openai.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/openai.json";
++import type values from "./data/openai.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const OPENAI_MODELS: ModelCatalog<typeof values, "openai">;
+ //# sourceMappingURL=openai.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/opencode-go.models.d.ts
++++ b/dist/providers/opencode-go.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/opencode-go.json";
++import type values from "./data/opencode-go.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const OPENCODE_GO_MODELS: ModelCatalog<typeof values, "opencode-go">;
+ //# sourceMappingURL=opencode-go.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/opencode.models.d.ts
++++ b/dist/providers/opencode.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/opencode.json";
++import type values from "./data/opencode.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const OPENCODE_MODELS: ModelCatalog<typeof values, "opencode">;
+ //# sourceMappingURL=opencode.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/openrouter.models.d.ts
++++ b/dist/providers/openrouter.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/openrouter.json";
++import type values from "./data/openrouter.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const OPENROUTER_MODELS: ModelCatalog<typeof values, "openrouter">;
+ //# sourceMappingURL=openrouter.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/qwen-token-plan-cn.models.d.ts
++++ b/dist/providers/qwen-token-plan-cn.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/qwen-token-plan-cn.json";
++import type values from "./data/qwen-token-plan-cn.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const QWEN_TOKEN_PLAN_CN_MODELS: ModelCatalog<typeof values, "qwen-token-plan-cn">;
+ //# sourceMappingURL=qwen-token-plan-cn.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/qwen-token-plan-individual.models.d.ts
++++ b/dist/providers/qwen-token-plan-individual.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/qwen-token-plan-individual.json";
++import type values from "./data/qwen-token-plan-individual.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const QWEN_TOKEN_PLAN_INDIVIDUAL_MODELS: ModelCatalog<typeof values, "qwen-token-plan-individual">;
+ //# sourceMappingURL=qwen-token-plan-individual.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/qwen-token-plan.models.d.ts
++++ b/dist/providers/qwen-token-plan.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/qwen-token-plan.json";
++import type values from "./data/qwen-token-plan.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const QWEN_TOKEN_PLAN_MODELS: ModelCatalog<typeof values, "qwen-token-plan">;
+ //# sourceMappingURL=qwen-token-plan.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/radius.models.d.ts
++++ b/dist/providers/radius.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/radius.json";
++import type values from "./data/radius.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const RADIUS_MODELS: ModelCatalog<typeof values, "radius">;
+ //# sourceMappingURL=radius.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/together.models.d.ts
++++ b/dist/providers/together.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/together.json";
++import type values from "./data/together.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const TOGETHER_MODELS: ModelCatalog<typeof values, "together">;
+ //# sourceMappingURL=together.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/vercel-ai-gateway.models.d.ts
++++ b/dist/providers/vercel-ai-gateway.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/vercel-ai-gateway.json";
++import type values from "./data/vercel-ai-gateway.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const VERCEL_AI_GATEWAY_MODELS: ModelCatalog<typeof values, "vercel-ai-gateway">;
+ //# sourceMappingURL=vercel-ai-gateway.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/xai.models.d.ts
++++ b/dist/providers/xai.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/xai.json";
++import type values from "./data/xai.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const XAI_MODELS: ModelCatalog<typeof values, "xai">;
+ //# sourceMappingURL=xai.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/xiaomi-token-plan-ams.models.d.ts
++++ b/dist/providers/xiaomi-token-plan-ams.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/xiaomi-token-plan-ams.json";
++import type values from "./data/xiaomi-token-plan-ams.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const XIAOMI_TOKEN_PLAN_AMS_MODELS: ModelCatalog<typeof values, "xiaomi-token-plan-ams">;
+ //# sourceMappingURL=xiaomi-token-plan-ams.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/xiaomi-token-plan-cn.models.d.ts
++++ b/dist/providers/xiaomi-token-plan-cn.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/xiaomi-token-plan-cn.json";
++import type values from "./data/xiaomi-token-plan-cn.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const XIAOMI_TOKEN_PLAN_CN_MODELS: ModelCatalog<typeof values, "xiaomi-token-plan-cn">;
+ //# sourceMappingURL=xiaomi-token-plan-cn.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/xiaomi-token-plan-sgp.models.d.ts
++++ b/dist/providers/xiaomi-token-plan-sgp.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/xiaomi-token-plan-sgp.json";
++import type values from "./data/xiaomi-token-plan-sgp.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const XIAOMI_TOKEN_PLAN_SGP_MODELS: ModelCatalog<typeof values, "xiaomi-token-plan-sgp">;
+ //# sourceMappingURL=xiaomi-token-plan-sgp.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/xiaomi.models.d.ts
++++ b/dist/providers/xiaomi.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/xiaomi.json";
++import type values from "./data/xiaomi.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const XIAOMI_MODELS: ModelCatalog<typeof values, "xiaomi">;
+ //# sourceMappingURL=xiaomi.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/zai-coding-cn.models.d.ts
++++ b/dist/providers/zai-coding-cn.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/zai-coding-cn.json";
++import type values from "./data/zai-coding-cn.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const ZAI_CODING_CN_MODELS: ModelCatalog<typeof values, "zai-coding-cn">;
+ //# sourceMappingURL=zai-coding-cn.models.d.ts.map
+\ No newline at end of file
+--- a/dist/providers/zai.models.d.ts
++++ b/dist/providers/zai.models.d.ts
+@@ -1,4 +1,4 @@
+-import values from "./data/zai.json";
++import type values from "./data/zai.json";
+ import { type ModelCatalog } from "../model-catalog.ts";
+ export declare const ZAI_MODELS: ModelCatalog<typeof values, "zai">;
+ //# sourceMappingURL=zai.models.d.ts.map
+\ No newline at end of file

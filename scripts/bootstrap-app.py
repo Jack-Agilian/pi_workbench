@@ -82,8 +82,10 @@ def main() -> int:
     if args.offline:
         command.append('--offline')
     subprocess.run(command, cwd=ROOT, env=env, check=True, timeout=600)
+    # Explicit, reviewed declaration-only patch; third-party lifecycle scripts remain disabled.
+    subprocess.run([node, str(ROOT / 'scripts/pi-type-patch.mjs')], cwd=ROOT, env=env, check=True, timeout=60)
     subprocess.run([node, str(ROOT / 'scripts/check-environment.mjs')], cwd=ROOT, env=env, check=True)
-    print('Application probe dependencies ready; lifecycle scripts disabled. No SDK/model test was run.')
+    print('Application probe dependencies ready; reviewed type patch applied, lifecycle scripts disabled. No SDK/model test was run.')
     return 0
 
 

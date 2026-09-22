@@ -107,13 +107,13 @@ M0-UI、M0-SDK、M0-Pi 分别在 `backlog.json.milestones` 记录；未取得相
 
 ## 9. A0/A1 应用探针（显式模式）
 
-精确运行时：Node **24.21.0** LTS，随官方二进制附带 npm **11.19.0**。两个 Pi 直接依赖均为 **0.87.0**；TypeScript **7.0.2**、Node 类型 **24.13.6**。根 `.node-version`、package.json 与唯一 package-lock.json 约束版本；不依赖全局 Pi，不使用 latest 标签安装。项目 `.npmrc` 始终禁用 lifecycle scripts，显式 npm run 仍执行指定脚本。
+精确运行时：Node **24.21.0** LTS，随官方二进制附带 npm **11.19.0**。两个 Pi 直接依赖均为 **0.87.0**；TypeScript **7.0.2**、Node 类型 **24.13.6**、用于满足可选类型引用的 MCP SDK **1.30.0**。根 `.node-version`、package.json 与唯一 package-lock.json 约束版本；不依赖全局 Pi，不使用 latest 标签安装。项目 `.npmrc` 始终禁用 lifecycle scripts，显式 npm run 仍执行指定脚本。
 
 ```bash
 # 默认文档环境不变
 bash scripts/bootstrap.sh --offline
 
-# 有准确版本的 Node/npm 时，只安装锁定依赖
+# 有准确版本的 Node/npm 时，安装锁定依赖并显式应用已审核的声明补丁
 .venv/bin/python scripts/bootstrap.py --app
 
 # macOS/Linux：显式下载官方精确 Node 到被忽略的 .artifacts/toolchains
@@ -124,10 +124,20 @@ bash scripts/bootstrap.sh --offline
 export PATH="$PWD/.artifacts/toolchains/node-v24.21.0-darwin-arm64/bin:$PATH"
 npm run check:environment
 npm run typecheck
+npm run test:pi-types
 npm run test:pi-probe
 ```
 
-严格 `npm run typecheck` 当前会因发行包声明问题失败，详见 [可复现缺口](validation/a0-a1-gaps.md)。不应删除该门槛或开启 skipLibCheck 来宣称通过。Session 运行探针独立执行，不隐含类型通过。
+Pi 0.87.0 原始声明的严格检查失败复现及候选见 [ADR-A0](ssot/adr-a0-pi-types.md)。应用初始化在禁用 lifecycle scripts 的 npm ci 后，显式用 Git apply 应用固定的 41 文件声明补丁（两个副本）。补丁只改 JSON 类型导入；strict、NodeNext 和完整声明检查保留。`npm run typecheck` 只核验补丁，不修改依赖；`npm run test:pi-types` 验证重复应用、异常拒绝，以及正确/错误 SDK 入参的编译结果。
+
+若手动运行安装命令，须显式补一步；不用 postinstall 自动执行：
+
+```bash
+npm ci --ignore-scripts --no-audit --no-fund
+npm run patch:pi-types
+```
+
+补丁版本、SRI、文件摘要不匹配时立即失败，按 ADR 重新审核。不要删除门槛或开启 skipLibCheck。Session 运行探针独立执行，不隐含类型通过。
 
 初始化器从自身路径定位仓库，可从任意目录执行；已有 Node 和 npm cache 时 `--app --offline` 可重复运行 npm ci。它不修改锁文件、全局 Git/SSH、全局 Node、用户 Pi 配置或文档 `.venv`。Windows 可自行提供精确 Node/npm，自动 Node 解包路径仅实现 macOS/Linux；未声称 Windows 实测。
 
@@ -142,6 +152,6 @@ export PATH="$PWD/node_modules/.bin:$PATH"
 .venv/bin/python scripts/check-docs.py --typecheck
 ```
 
-下载审计对四个直接依赖比较 registry/lock/SRI/实际 tarball 字节，以及安装文件；输出仅在 `.artifacts/a0-a1/`。SDK tests 仅写入明确的合成记录，不调用 prompt/Provider；没有真实模型 fixture。订阅重放与注入故障也明确是合成测试。A0/A1 的阶段结果不代表 CORE-02、M0-SDK、M0-Pi 完成；本轮不进入 A2。
+下载审计对五个直接依赖比较 registry/lock/SRI/实际 tarball 字节，以及安装文件；两个 pi-ai 副本的声明分别验证修改前后摘要，其余文件验证原始字节（package.json 核对语义身份）。默认输出在 `.artifacts/a0-a1/`，可用 `--output-dir .artifacts/<目录>` 保存新一轮结果。SDK tests 仅写入明确的合成记录，不调用 prompt/Provider；没有真实模型 fixture。订阅重放与注入故障也明确是合成测试。A0/A1 的阶段结果不代表 CORE-02、M0-SDK、M0-Pi 完成；本轮不进入 A2。
 
 本轮可定位结果：[A0/A1 验证报告](validation/a0-a1-2026-09-22.md)、[下载完整性记录](validation/a0-a1-release.json)。报告引用先提交后实测的代码 SHA；文档提交不冒充被测代码提交。
