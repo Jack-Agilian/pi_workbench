@@ -28,7 +28,9 @@ UI 发送输入、Thread、附件引用和选择；App Server 核验并生成 Ru
 
 默认采用 SDK Worker，不同时实现独立 CLI RPC 后端。只需要 `open/restore`、`start`、`steer`、`cancel`、`snapshot/ref`、`close` 与订阅。适配器直接调用 `AgentSession` / `SessionManager` / `AgentSessionRuntime`。[P01][P02]
 
-`start` 返回已接受，`cancel` 返回已请求；都不代表完成。Worker 只上报 observations；App Server 添加 runId/epoch/序号并结算产品状态。Session 切换与 Fork 经过 Pi runtime；替换后的 session 重新订阅、重新绑定 extension UI，不把旧实例事件串入当前 Thread。[P02]
+`start` 返回已接受，`cancel` 返回已请求；都不代表完成。Worker 只上报 observations。App Server 在派发 Run 或替换 Session 时创建不可复用的 `runtimeBindingId`，绑定 Thread、Run、Worker generation 和 Session generation；wrapper/订阅闭包捕获该身份并随观察返回，等价的独立绑定通道也可。宿主验证通道与绑定后分配产品 seq，不以接收瞬间的 `currentRun` 补身份；Worker epoch 单独不足以区分同进程 Session 替换。Pi 原生事件不改造，绑定属于产品边界信封。旧观察不能进入新 Run；确已发生的迟到副作用应归原 operation 审计，不直接丢失事实。Session 切换与 Fork 经过 Pi runtime；替换后的 session 重新订阅、重新绑定 extension UI，不把旧实例事件串入当前 Thread。[P02]
+
+Session 替换不是自动回滚事务：所核查的 Pi Runtime 先 teardown 旧实例，再创建新实例。[U01] 宿主在替换前保留最后可恢复的 nativeSessionRef，用公开失效/重新绑定回调管理有效性。失效前失败可保留仍有效旧实例；失效后 factory 失败进入 `session_unavailable`，禁止向旧 disposed 对象发送。新实例创建成功但 UI/订阅 rebind 失败时也先阻断新运行，清理不完整绑定后重试绑定或按原生引用恢复，不能制造双实例/双订阅。恢复仍走 Pi SessionManager/Runtime，不自行编辑原生历史。覆盖三种失败点：前置检查、旧实例失效后的创建、创建后的 rebind。
 
 `AgentSessionEvent` 和工具详情可在 adapter 内直接使用；传往 UI 只暴露已脱敏、大小受限、可序列化的必要字段。保留 `source.type` 和未知事件的 diagnostic fallback，不以重写 Pi 的整个 event union 作为接入前置条件。
 
@@ -37,6 +39,10 @@ UI 发送输入、Thread、附件引用和选择；App Server 核验并生成 Ru
 OperationContext 至少关联 `runId / toolCallId / operationId / runtimeEpoch / workspaceRef / parametersDigest / deadline`。该上下文由宿主生成或验证，不相信模型填入的许可。
 
 同名工具 wrapper 捕获本次调用上下文，绑定公共工厂的 Operations；禁止用共享可变 `currentRunId` 或最后一个审批对象串联异步调用。公共 Operations 类型未必带齐业务字段，在 wrapper 闭包/明确的调用上下文中补，不更改上游工具 schema。
+
+工具定义以公开 `create*ToolDefinition` 为优先入口，保留 `prepareArguments/constrainedSampling/executionMode` 与其余公开行为字段，只包装执行；内部工具包装源码仅为证据，不 deep-import。[U02][U03] 上游参数准备和校验只发生一次；摘要基于实际 execute 收到的最终结构，批准后若目标/参数改变须重新授权。wrapper 不自行实现 edits 的旧格式兼容，也不再重复 prepareArguments。
+
+工具意图摘要与 Operations 派生的文件内容摘要分别存放。Operations 继承已绑定 operation，并检查其准许目标、截止时间、取消状态及读取版本/写入前置条件；不错误地要求写入内容 hash 等于工具输入 hash。前置 hash 只是冲突检测，不是跨外部编辑器的原子 CAS。
 
 工具预先授权后每次执行仍核验许可有效性、取消状态、目标和参数摘要。文件写入需冲突前置检查；读/写/命令适配本身仍需负向路径测试。保留上游工具的返回形状、prompt metadata、裁剪与 diff 行为。[P05][P07]
 
@@ -53,7 +59,7 @@ M0 默认只开放独立任务队列；steer 可以随后开放，followUp 在�
 
 ## 4. 事件与恢复
 
-App Server 对产品事件分配 run 内单调 seq；Worker generation/epoch 拒绝旧进程观察。快照包含已提交游标，实时订阅从该游标之后继续，处理快照和订阅之间的竞态。重放只恢复展示，不执行工具。
+App Server 对产品事件分配 run 内单调 seq；按第 2.2 节的绑定拒绝错投/旧 Session 观察，不能只检查进程 epoch。快照包含已提交游标，实时订阅从该游标之后继续，处理快照和订阅之间的竞态。重放只恢复展示，不执行工具。
 
 批次保存文本增量；最终消息与审批/状态要有持久边界。Pi 原生事件中 delta 与累计工具结果不同，adapter 按锁定版本保留语义。上游文档的 settled 语义需源码/真实探针确认，不能只检测字符串 `agent_end` 就宣布产品任务完成。[P13]
 
@@ -63,9 +69,21 @@ App Server 对产品事件分配 run 内单调 seq；Worker generation/epoch 拒
 
 Package facade：列已配置/安装包、resolve、显式 install/remove/update、进度；尽量映射 Pi PackageManager 而非维护第二套包来源数据库。[P03] 产品额外存安装意图、批准/签名证据、不可变版本及作用域启用，不替代上游内部目录解析。
 
+产品受管模式的审核/启用/目标版本由宿主权威维护，投影给 Pi Settings/PackageManager；后者复用来源解析和安装机制，不另作一套双向可写的产品激活状态。外部 CLI 修改只经显式导入或对账，冲突先显示，不能 last-write-wins。
+
+固定 npm 版本的产品升级必须显式指定目标版：源码 `updateConfiguredSources` 会跳过 pinned npm，而 Git ref 的处理不同。[U04] 将检查新版、准备指定版本、校验、激活分开；上游显式 install 在受控新根执行，能力由 A3 先验证。准备/校验失败保留旧激活；有活动引用时保留旧目录；不在活动资源根原地 update。测试 pinned npm、Git ref、同包多版本/共享依赖、只配置未安装、离线缺包和失败回滚。
+
 Skill facade：以 Pi Skill/diagnostic 为输入建立产品列表，只加 ID、来源、scope、启用、摘要。解析/formatSkillsForPrompt 留给 Pi；不在产品层再次拼所有 SKILL.md 正文进入 system prompt。[P04]
 
 加载顺序必须是预先筛选源 → 固定资源副本 → Pi 解析/加载已批准项。不能先执行 DefaultResourceLoader.reload() 再移除不允许的扩展。独立 agentDir 也不能单独证明所有全局发现均被禁用，需要恶意全局/项目 fixture 验证。
+
+### 5.1 相邻 Run 的资源切换
+
+下一个 Run 进入 starting 后，先解析期望 ResourceLock，并与 Session 的实际 `loadedResourceLockId` 比较。一致才复用；不同则在 Pi settled、无宿主操作/审批时，使用所选 Pi 版本已验证的公开刷新或重建路径。确认实际加载成功后，在产品持久边界记录锁与绑定，再允许 start/prompt；数据库更新失败也不得启动。失败时显示期望/实际版本与阻断原因，保持不可运行状态，不能将新锁记成已生效或静默回退。任务启动前再核验绑定、取消和权限版本。
+
+物化范围至少包含本次允许的包内资料、模板、脚本及运行依赖闭包；首版内容包可拒绝包外动态依赖，不必创造通用依赖运行时。禁止仅复制 SKILL.md 却继续读取源目录里的可变脚本。禁用技能应让后续 Run 的活动资源清单不再含它，但不自动擦除历史 transcript，工具授权仍独立执行。
+
+验收：连续 A/B Run，A 始终使用旧快照，B 成功切换新版；禁用后 B 不加载；刷新/重建失败阻断；共享模板更改不污染 A。刷新若导致 Session 失效，适用第 2.2 节恢复契约。
 
 ## 6. 模型与凭据接口
 
@@ -88,3 +106,9 @@ CredentialStore 桥接成功也不代表 Pi Worker 永远接触不到凭据。�
 - 未批准全局/项目扩展从未执行；resolve 不隐式安装；更改原技能文件不改变活动快照。
 - Package 安装脚本/路径/依赖/失败事务行为被验证；产品更新不改变活动 Run。
 - 凭据不进入 Renderer/日志/Shell 环境；Linux 单测不能代替两平台实测。
+
+## 9. 接入验收的实施约束
+
+具名用例见 [修订清单](review-fixes.md)，并落入 Backlog 的 `acceptanceCriteria`，目前全为 planned。它们是待实现的接缝测试，`check-ssot.py` 通过不表示上述运行行为通过。
+
+P0 的 CORE-03 必须保证同 Workspace 至多一个活动写 Run；M0 可先用全局单写 Run 的更保守准入。锁/准入由产品宿主负责，包含等待审批和取消清理阶段，只有停止核验或受控恢复后才能释放。Pi 文件级队列不冒充跨 Worker 锁；CORE-05 的 P1 仅扩展并发与 Worktree 管理。

@@ -11,6 +11,7 @@
 ```bash
 bash scripts/bootstrap.sh --offline
 .venv/bin/python scripts/check-docs.py --structural-only
+.venv/bin/python scripts/check-ssot.py
 ```
 
 ### Windows
@@ -18,6 +19,7 @@ bash scripts/bootstrap.sh --offline
 ```powershell
 py -3 scripts/bootstrap.py --offline
 .\.venv\Scripts\python.exe scripts\check-docs.py --structural-only
+.\.venv\Scripts\python.exe scripts\check-ssot.py
 ```
 
 也提供 `scripts/bootstrap.ps1` 入口；不改变系统执行策略。默认创建/复用 `.venv`，不修改全局 Git、SSH 或系统权限。默认没有网络依赖安装。
@@ -34,6 +36,7 @@ macOS/Linux：
 
 ```bash
 .venv/bin/python scripts/check-docs.py
+.venv/bin/python scripts/check-ssot.py
 .venv/bin/python scripts/test-tools.py
 ```
 
@@ -93,3 +96,11 @@ python scripts/publish.py \
 ## 7. 当前平台验证范围
 
 脚本在本次 Linux 容器执行；macOS/Windows 的入口和路径分支是实现草案，尚未经两种目标操作系统实测。PowerShell、ConPTY、Job Object、Keychain 和安装签名未被测试。不能把本文的跨平台入口存在理解为应用已支持双平台。
+
+## 8. SSOT 的推进与 A0 运行时记录
+
+字段和证据规则见 [SSOT 维护规则](ssot/maintenance.md)。`check-ssot.py` 校验动态任务/能力、两类依赖的联合无环性、合法状态和证据引用；它不联网核实 Issue、CI、包签名或测试真实性。测试中的合成证据只存在于内存，不写入正式清单。`docs/startup/` 摘要继续严格保持不变。
+
+A0 实施完成后，分别记录开发 Node、打包后的 Worker 可执行文件/Node 版本、Electron 版本及 ABI、OS/CPU、Pi 精确发行包及完整性、锁文件、安装脚本白名单和原生模块构建证据。不要以开发机 Node 版本推断 Electron 内部或独立 Worker 的运行时兼容性。当前文档初始化器仍不安装应用工具链。
+
+M0-UI、M0-SDK、M0-Pi 分别在 `backlog.json.milestones` 记录；未取得相应证据保持 pending。新增测试报告应记录被测提交及工作区差异、命令、平台和范围；忽略的 `.artifacts/` 仅作即时输出，要供后续完成声明引用时，提交脱敏摘要或使用可访问的 CI 结果地址。

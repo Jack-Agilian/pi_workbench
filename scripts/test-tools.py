@@ -70,16 +70,12 @@ class RepositoryToolsTests(unittest.TestCase):
     def test_backlog_dependencies_are_valid_acyclic(self):
         data=json.loads((ROOT/'docs/planning/backlog.json').read_text(encoding='utf-8'))
         items={i['id']:i for i in data['items']}
-        self.assertEqual(len(items),28)
-        visited, active=set(),set()
-        def visit(id):
-            self.assertIn(id,items)
-            self.assertNotIn(id,active,'Cyclic backlog dependency')
-            if id in visited:return
-            active.add(id)
-            for dep in items[id]['dependencies']: visit(dep)
-            active.remove(id);visited.add(id)
-        for id in items:visit(id)
+        self.assertTrue(items)
+        self.assertEqual(len(items),len(data['items']))
+        spec=importlib.util.spec_from_file_location('ssot_checks',ROOT/'scripts/check-ssot.py')
+        assert spec and spec.loader
+        ssot=importlib.util.module_from_spec(spec);spec.loader.exec_module(ssot)
+        ssot.validate_dependency_graph(data['items'])
     def test_original_import_has_27_matching_digests(self):
         self.assertEqual(checks.verify_manifest(ROOT/'docs/startup'),27)
 

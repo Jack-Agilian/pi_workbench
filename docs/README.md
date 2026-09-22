@@ -26,6 +26,8 @@
 
 ## 本次新增的工程准备
 
-[开发与初始化](DEVELOPMENT.md) · [导入记录](IMPORT.md) · [本次验证结果](VALIDATION.md) · [下一步开发路线](planning/NEXT_STEPS.md) · [结构化 Backlog](planning/backlog.json)
+[开发与初始化](DEVELOPMENT.md) · [导入记录](IMPORT.md) · [初始导入验证记录（历史）](VALIDATION.md) · [下一步开发路线](planning/NEXT_STEPS.md) · [结构化 Backlog](planning/backlog.json)
 
 原包发布日期、依赖候选版本和原始测试报告均按历史资料处理。2026-09-21 的新核验与实施决策见 `ssot/`；没有恢复后一套未上传的 Pi Desktop 专题资料。
+
+当前修订记录：[R01–R08 修订与验收边界](ssot/review-fixes.md)。每次测试的即时输出位于 `.artifacts/`；历史报告不代表当前提交、Pi 接入或目标平台验证。

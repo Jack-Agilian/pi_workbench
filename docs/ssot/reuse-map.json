@@ -1,15 +1,16 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "decision": "reuse-first",
-  "reviewedOn": "2026-09-21",
-  "projectBaseCommit": "43e50c80a7938ea60fcf49813cc0809e872d31fa",
+  "reviewedOn": "2026-09-22",
+  "projectBaseCommit": "be9e1f0858e9188131c959d2438dede73c0e2215",
   "upstream": {
     "repository": "earendil-works/pi",
     "sourceCommit": "466db0fecdc20996a553116984d18c0d362b035a",
     "manifestVersion": "0.86.1",
     "nodeRequirement": ">=22.19.0",
     "releaseTarballVerified": false,
-    "npmVersionPinned": null
+    "npmVersionPinned": null,
+    "releaseArtifact": null
   },
   "evidenceDocument": "upstream-evidence.md",
   "implementationStatus": "documentation_only",
@@ -27,15 +28,39 @@
       ],
       "reuse": "工具循环、原生重试/压缩保持上游",
       "productDelta": "Worker 监督和产品 Run 结算",
-      "acceptanceGate": "session 与事件探针",
-      "implementationState": "not_implemented"
+      "acceptanceGate": "原生 SDK 探针；运行绑定在派发时固定；同 Worker 迟到观察不归入新 Run",
+      "implementationState": "not_implemented",
+      "adoption": {
+        "status": "candidate",
+        "imports": [
+          {
+            "package": "@earendil-works/pi-coding-agent",
+            "importFrom": "@earendil-works/pi-coding-agent",
+            "exports": [
+              {
+                "name": "createAgentSession",
+                "kind": "runtime"
+              },
+              {
+                "name": "AgentSession",
+                "kind": "runtime"
+              }
+            ],
+            "selectedVersion": null
+          }
+        ],
+        "selectedSourceCommit": null,
+        "verificationStatus": "source_reviewed",
+        "testEvidence": []
+      }
     },
     {
       "id": "native-history",
       "mode": "direct",
       "evidence": [
         "P01",
-        "P02"
+        "P02",
+        "U01"
       ],
       "upstreamSymbolsOrPaths": [
         "SessionManager",
@@ -43,8 +68,31 @@
       ],
       "reuse": "JSONL、分支、恢复保持 Pi",
       "productDelta": "Thread 绑定和可重建索引",
-      "acceptanceGate": "保存/恢复/Fork后不双写且订阅更新",
-      "implementationState": "not_implemented"
+      "acceptanceGate": "保存/恢复/Fork不双写；替换前三类失败点和重绑定；失效旧对象不可继续使用",
+      "implementationState": "not_implemented",
+      "adoption": {
+        "status": "candidate",
+        "imports": [
+          {
+            "package": "@earendil-works/pi-coding-agent",
+            "importFrom": "@earendil-works/pi-coding-agent",
+            "exports": [
+              {
+                "name": "SessionManager",
+                "kind": "runtime"
+              },
+              {
+                "name": "AgentSessionRuntime",
+                "kind": "runtime"
+              }
+            ],
+            "selectedVersion": null
+          }
+        ],
+        "selectedSourceCommit": null,
+        "verificationStatus": "source_reviewed",
+        "testEvidence": []
+      }
     },
     {
       "id": "models-auth",
@@ -60,7 +108,37 @@
       "reuse": "Provider、目录、登录/刷新复用",
       "productDelta": "系统凭据与桌面交互",
       "acceptanceGate": "secret 不进Renderer/日志/子进程env",
-      "implementationState": "not_implemented"
+      "implementationState": "not_implemented",
+      "adoption": {
+        "status": "candidate",
+        "imports": [
+          {
+            "package": "@earendil-works/pi-coding-agent",
+            "importFrom": "@earendil-works/pi-coding-agent",
+            "exports": [
+              {
+                "name": "ModelRuntime",
+                "kind": "runtime"
+              }
+            ],
+            "selectedVersion": null
+          },
+          {
+            "package": "@earendil-works/pi-ai",
+            "importFrom": "@earendil-works/pi-ai",
+            "exports": [
+              {
+                "name": "CredentialStore",
+                "kind": "type"
+              }
+            ],
+            "selectedVersion": null
+          }
+        ],
+        "selectedSourceCommit": null,
+        "verificationStatus": "source_reviewed",
+        "testEvidence": []
+      }
     },
     {
       "id": "pi-settings",
@@ -75,7 +153,26 @@
       "reuse": "复用 Pi 设置解析/持久",
       "productDelta": "隔离配置路径与产品偏好",
       "acceptanceGate": "无全局未知设置泄入；flush错误处理",
-      "implementationState": "not_implemented"
+      "implementationState": "not_implemented",
+      "adoption": {
+        "status": "candidate",
+        "imports": [
+          {
+            "package": "@earendil-works/pi-coding-agent",
+            "importFrom": "@earendil-works/pi-coding-agent",
+            "exports": [
+              {
+                "name": "SettingsManager",
+                "kind": "runtime"
+              }
+            ],
+            "selectedVersion": null
+          }
+        ],
+        "selectedSourceCommit": null,
+        "verificationStatus": "source_reviewed",
+        "testEvidence": []
+      }
     },
     {
       "id": "skills",
@@ -91,8 +188,35 @@
       ],
       "reuse": "复用格式/诊断/按需装配",
       "productDelta": "作用域、内容副本、版本锁",
-      "acceptanceGate": "坏技能诊断/更新不改变当前Run",
-      "implementationState": "not_implemented"
+      "acceptanceGate": "A/B连续Run资源快照与模板闭包；新版加载失败阻断；禁用不误称删除原生历史",
+      "implementationState": "not_implemented",
+      "adoption": {
+        "status": "candidate",
+        "imports": [
+          {
+            "package": "@earendil-works/pi-coding-agent",
+            "importFrom": "@earendil-works/pi-coding-agent",
+            "exports": [
+              {
+                "name": "loadSkillsFromDir",
+                "kind": "runtime"
+              },
+              {
+                "name": "loadSkills",
+                "kind": "runtime"
+              },
+              {
+                "name": "formatSkillsForPrompt",
+                "kind": "runtime"
+              }
+            ],
+            "selectedVersion": null
+          }
+        ],
+        "selectedSourceCommit": null,
+        "verificationStatus": "source_reviewed",
+        "testEvidence": []
+      }
     },
     {
       "id": "resources",
@@ -108,8 +232,31 @@
       ],
       "reuse": "复用资源模型与受支持加载入口",
       "productDelta": "预先批准目录，不自动发现/执行未知扩展",
-      "acceptanceGate": "恶意global/project factory从未执行",
-      "implementationState": "not_implemented"
+      "acceptanceGate": "预批准factory/实际loadedResourceLockId；刷新或重建在settled边界确认后start",
+      "implementationState": "not_implemented",
+      "adoption": {
+        "status": "candidate",
+        "imports": [
+          {
+            "package": "@earendil-works/pi-coding-agent",
+            "importFrom": "@earendil-works/pi-coding-agent",
+            "exports": [
+              {
+                "name": "ResourceLoader",
+                "kind": "type"
+              },
+              {
+                "name": "DefaultResourceLoader",
+                "kind": "runtime"
+              }
+            ],
+            "selectedVersion": null
+          }
+        ],
+        "selectedSourceCommit": null,
+        "verificationStatus": "source_reviewed",
+        "testEvidence": []
+      }
     },
     {
       "id": "package-manager",
@@ -117,7 +264,8 @@
       "evidence": [
         "P01",
         "P03",
-        "P06"
+        "P06",
+        "U04"
       ],
       "upstreamSymbolsOrPaths": [
         "DefaultPackageManager",
@@ -125,8 +273,31 @@
       ],
       "reuse": "复用npm/git/local解析与可用安装能力",
       "productDelta": "审核/签名/事务/快照/撤销",
-      "acceptanceGate": "所有安装分支副作用和离线resolve测试",
-      "implementationState": "not_implemented"
+      "acceptanceGate": "固定npm显式目标升级/Git ref/受控新根/离线缺包/共享依赖；失败保留旧激活",
+      "implementationState": "not_implemented",
+      "adoption": {
+        "status": "candidate",
+        "imports": [
+          {
+            "package": "@earendil-works/pi-coding-agent",
+            "importFrom": "@earendil-works/pi-coding-agent",
+            "exports": [
+              {
+                "name": "DefaultPackageManager",
+                "kind": "runtime"
+              },
+              {
+                "name": "PackageManager",
+                "kind": "type"
+              }
+            ],
+            "selectedVersion": null
+          }
+        ],
+        "selectedSourceCommit": null,
+        "verificationStatus": "source_reviewed",
+        "testEvidence": []
+      }
     },
     {
       "id": "read-search",
@@ -134,18 +305,50 @@
       "evidence": [
         "P01",
         "P05",
-        "P07"
+        "P07",
+        "U03"
       ],
       "upstreamSymbolsOrPaths": [
-        "createReadTool",
-        "createGrepTool",
-        "createFindTool",
-        "createLsTool"
+        "createReadToolDefinition",
+        "createGrepToolDefinition",
+        "createFindToolDefinition",
+        "createLsToolDefinition"
       ],
       "reuse": "保留名称schema结果与裁剪",
       "productDelta": "Operations和许可",
-      "acceptanceGate": "路径/工具输出/辅助I/O覆盖",
-      "implementationState": "not_implemented"
+      "acceptanceGate": "保留完整 ToolDefinition、准备/校验一次；路径/辅助I/O/拒绝零执行",
+      "implementationState": "not_implemented",
+      "adoption": {
+        "status": "candidate",
+        "imports": [
+          {
+            "package": "@earendil-works/pi-coding-agent",
+            "importFrom": "@earendil-works/pi-coding-agent",
+            "exports": [
+              {
+                "name": "createReadToolDefinition",
+                "kind": "runtime"
+              },
+              {
+                "name": "createGrepToolDefinition",
+                "kind": "runtime"
+              },
+              {
+                "name": "createFindToolDefinition",
+                "kind": "runtime"
+              },
+              {
+                "name": "createLsToolDefinition",
+                "kind": "runtime"
+              }
+            ],
+            "selectedVersion": null
+          }
+        ],
+        "selectedSourceCommit": null,
+        "verificationStatus": "source_reviewed",
+        "testEvidence": []
+      }
     },
     {
       "id": "edit-write",
@@ -153,17 +356,46 @@
       "evidence": [
         "P01",
         "P05",
-        "P07"
+        "P07",
+        "U02",
+        "U03"
       ],
       "upstreamSymbolsOrPaths": [
-        "createEditTool",
-        "createWriteTool",
+        "createEditToolDefinition",
+        "createWriteToolDefinition",
         "withFileMutationQueue"
       ],
       "reuse": "保留匹配/patch/文件级队列",
       "productDelta": "操作context/许可/跨Worker锁",
-      "acceptanceGate": "拒绝零写入/并发context不串/冲突可见",
-      "implementationState": "not_implemented"
+      "acceptanceGate": "最终校验参数绑定审批；edits兼容/元数据不丢；并行context不串；读版本冲突提示而非原子CAS",
+      "implementationState": "not_implemented",
+      "adoption": {
+        "status": "candidate",
+        "imports": [
+          {
+            "package": "@earendil-works/pi-coding-agent",
+            "importFrom": "@earendil-works/pi-coding-agent",
+            "exports": [
+              {
+                "name": "createEditToolDefinition",
+                "kind": "runtime"
+              },
+              {
+                "name": "createWriteToolDefinition",
+                "kind": "runtime"
+              },
+              {
+                "name": "withFileMutationQueue",
+                "kind": "runtime"
+              }
+            ],
+            "selectedVersion": null
+          }
+        ],
+        "selectedSourceCommit": null,
+        "verificationStatus": "source_reviewed",
+        "testEvidence": []
+      }
     },
     {
       "id": "shell",
@@ -171,18 +403,50 @@
       "evidence": [
         "P01",
         "P05",
-        "P07"
+        "P07",
+        "U03"
       ],
       "upstreamSymbolsOrPaths": [
-        "createBashTool",
-        "createPowerShellTool",
+        "createBashToolDefinition",
+        "createPowerShellToolDefinition",
         "BashOperations",
         "PowerShellOperations"
       ],
       "reuse": "保留Shell语义和工具结果",
       "productDelta": "受管进程与OS策略",
-      "acceptanceGate": "取消和超时/中文路径/残留可见",
-      "implementationState": "not_implemented"
+      "acceptanceGate": "保留定义/增量/取消；绑定操作、中文路径和受管理进程停止核验；残留可见",
+      "implementationState": "not_implemented",
+      "adoption": {
+        "status": "candidate",
+        "imports": [
+          {
+            "package": "@earendil-works/pi-coding-agent",
+            "importFrom": "@earendil-works/pi-coding-agent",
+            "exports": [
+              {
+                "name": "createBashToolDefinition",
+                "kind": "runtime"
+              },
+              {
+                "name": "createPowerShellToolDefinition",
+                "kind": "runtime"
+              },
+              {
+                "name": "BashOperations",
+                "kind": "type"
+              },
+              {
+                "name": "PowerShellOperations",
+                "kind": "type"
+              }
+            ],
+            "selectedVersion": null
+          }
+        ],
+        "selectedSourceCommit": null,
+        "verificationStatus": "source_reviewed",
+        "testEvidence": []
+      }
     },
     {
       "id": "output-diff",
@@ -199,7 +463,34 @@
       "reuse": "复用截断/单次修改patch",
       "productDelta": "真实Git diff视图和大日志Blob",
       "acceptanceGate": "累计输出不重复；Git状态独立验证",
-      "implementationState": "not_implemented"
+      "implementationState": "not_implemented",
+      "adoption": {
+        "status": "candidate",
+        "imports": [
+          {
+            "package": "@earendil-works/pi-coding-agent",
+            "importFrom": "@earendil-works/pi-coding-agent",
+            "exports": [
+              {
+                "name": "truncateHead",
+                "kind": "runtime"
+              },
+              {
+                "name": "truncateTail",
+                "kind": "runtime"
+              },
+              {
+                "name": "generateUnifiedPatch",
+                "kind": "runtime"
+              }
+            ],
+            "selectedVersion": null
+          }
+        ],
+        "selectedSourceCommit": null,
+        "verificationStatus": "source_reviewed",
+        "testEvidence": []
+      }
     },
     {
       "id": "in-run-queue",
@@ -215,7 +506,26 @@
       "reuse": "复用运行内队列",
       "productDelta": "独立任务由产品排队",
       "acceptanceGate": "输入唯一归属不双投递",
-      "implementationState": "not_implemented"
+      "implementationState": "not_implemented",
+      "adoption": {
+        "status": "candidate",
+        "imports": [
+          {
+            "package": "@earendil-works/pi-coding-agent",
+            "importFrom": "@earendil-works/pi-coding-agent",
+            "exports": [
+              {
+                "name": "AgentSession",
+                "kind": "runtime"
+              }
+            ],
+            "selectedVersion": null
+          }
+        ],
+        "selectedSourceCommit": null,
+        "verificationStatus": "source_reviewed",
+        "testEvidence": []
+      }
     },
     {
       "id": "extension-ui",
@@ -230,7 +540,26 @@
       "reuse": "复用声明性交互seam",
       "productDelta": "桌面select/input/notify和授权区分",
       "acceptanceGate": "TUI custom不注入Renderer",
-      "implementationState": "not_implemented"
+      "implementationState": "not_implemented",
+      "adoption": {
+        "status": "candidate",
+        "imports": [
+          {
+            "package": "@earendil-works/pi-coding-agent",
+            "importFrom": "@earendil-works/pi-coding-agent",
+            "exports": [
+              {
+                "name": "ExtensionUIContext",
+                "kind": "type"
+              }
+            ],
+            "selectedVersion": null
+          }
+        ],
+        "selectedSourceCommit": null,
+        "verificationStatus": "source_reviewed",
+        "testEvidence": []
+      }
     },
     {
       "id": "tui-components",
@@ -245,7 +574,30 @@
       "reuse": "仅行为参考，不当React组件导入",
       "productDelta": "桌面视图",
       "acceptanceGate": "组件框架/运行环境匹配",
-      "implementationState": "not_implemented"
+      "implementationState": "not_implemented",
+      "adoption": {
+        "status": "candidate",
+        "imports": [
+          {
+            "package": "@earendil-works/pi-coding-agent",
+            "importFrom": "@earendil-works/pi-coding-agent",
+            "exports": [
+              {
+                "name": "AssistantMessageComponent",
+                "kind": "runtime"
+              },
+              {
+                "name": "ToolExecutionComponent",
+                "kind": "runtime"
+              }
+            ],
+            "selectedVersion": null
+          }
+        ],
+        "selectedSourceCommit": null,
+        "verificationStatus": "source_reviewed",
+        "testEvidence": []
+      }
     },
     {
       "id": "community-ui",
@@ -262,7 +614,14 @@
       "reuse": "定向选社区模块，不整仓拼装",
       "productDelta": "品牌/产品协议/安全边界",
       "acceptanceGate": "固定commit/许可证/最小组件验证",
-      "implementationState": "not_implemented"
+      "implementationState": "not_implemented",
+      "adoption": {
+        "status": "candidate",
+        "imports": [],
+        "selectedSourceCommit": null,
+        "verificationStatus": "source_reviewed",
+        "testEvidence": []
+      }
     },
     {
       "id": "terminal",
@@ -278,7 +637,14 @@
       "reuse": "终端显示与PTY库复用",
       "productDelta": "生命周期、权限、平台测试",
       "acceptanceGate": "Electron ABI/resize/cleanup双平台",
-      "implementationState": "not_implemented"
+      "implementationState": "not_implemented",
+      "adoption": {
+        "status": "candidate",
+        "imports": [],
+        "selectedSourceCommit": null,
+        "verificationStatus": "source_reviewed",
+        "testEvidence": []
+      }
     },
     {
       "id": "experimental-service",
@@ -295,7 +661,14 @@
       "reuse": "先评估路由/订阅/transport",
       "productDelta": "应用认证和Session管理",
       "acceptanceGate": "发布导出/跨平台/受控工具和资源",
-      "implementationState": "not_implemented"
+      "implementationState": "not_implemented",
+      "adoption": {
+        "status": "candidate",
+        "imports": [],
+        "selectedSourceCommit": null,
+        "verificationStatus": "source_reviewed",
+        "testEvidence": []
+      }
     },
     {
       "id": "composition",
@@ -309,7 +682,14 @@
       "reuse": "不造平行plugin/replica框架",
       "productDelta": "无需要时仅模块调用",
       "acceptanceGate": "真实需求和接缝收益证据",
-      "implementationState": "not_implemented"
+      "implementationState": "not_implemented",
+      "adoption": {
+        "status": "candidate",
+        "imports": [],
+        "selectedSourceCommit": null,
+        "verificationStatus": "source_reviewed",
+        "testEvidence": []
+      }
     },
     {
       "id": "durable",
@@ -323,7 +703,14 @@
       "reuse": "不可假定已完成磁盘持久化",
       "productDelta": "产品磁盘恢复和索引",
       "acceptanceGate": "公开持久后端/迁移/恢复实测后晋级",
-      "implementationState": "not_implemented"
+      "implementationState": "not_implemented",
+      "adoption": {
+        "status": "candidate",
+        "imports": [],
+        "selectedSourceCommit": null,
+        "verificationStatus": "source_reviewed",
+        "testEvidence": []
+      }
     },
     {
       "id": "product-coordination",
@@ -335,8 +722,15 @@
       "upstreamSymbolsOrPaths": [],
       "reuse": "复用Pi原生任务执行，不重写",
       "productDelta": "项目/独立Run/审批/操作意图",
-      "acceptanceGate": "幂等/取消/外部结果未知处理",
-      "implementationState": "not_implemented"
+      "acceptanceGate": "幂等/绑定/取消/unknown；P0同Workspace写Run串行并覆盖等待审批与清理阶段",
+      "implementationState": "not_implemented",
+      "adoption": {
+        "status": "not_applicable",
+        "imports": [],
+        "selectedSourceCommit": null,
+        "verificationStatus": "source_reviewed",
+        "testEvidence": []
+      }
     },
     {
       "id": "artifact",
@@ -348,7 +742,14 @@
       "reuse": "复用文件库/预览器而非模型文字猜测",
       "productDelta": "真实文件/版本/来源/验证",
       "acceptanceGate": "missing file拒绝与安全预览",
-      "implementationState": "not_implemented"
+      "implementationState": "not_implemented",
+      "adoption": {
+        "status": "not_applicable",
+        "imports": [],
+        "selectedSourceCommit": null,
+        "verificationStatus": "source_reviewed",
+        "testEvidence": []
+      }
     },
     {
       "id": "market-governance",
@@ -360,8 +761,16 @@
       "upstreamSymbolsOrPaths": [],
       "reuse": "依附Pi包格式与管理器",
       "productDelta": "catalog/作用域/审核/撤销/事务",
-      "acceptanceGate": "更新和撤销不默改活动Run",
-      "implementationState": "not_implemented"
+      "acceptanceGate": "宿主激活为权威、Pi配置投影；外部CLI导入对账；旧快照有引用时保留",
+      "implementationState": "not_implemented",
+      "adoption": {
+        "status": "not_applicable",
+        "imports": [],
+        "selectedSourceCommit": null,
+        "verificationStatus": "source_reviewed",
+        "testEvidence": []
+      }
     }
-  ]
+  ],
+  "evidenceRecords": []
 }

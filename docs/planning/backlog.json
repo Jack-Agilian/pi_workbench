@@ -1,8 +1,8 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "status": "reuse_first_planned_not_created_on_github",
   "source": "../ssot/reuse-first.md",
-  "normalization": "保持原28项ID和依赖；当前验收按复用优先SSOT更新。Roles不是已分配的人；没有创建GitHub Issues。",
+  "normalization": "保留原28项ID作为历史锚点；允许新增任务和状态推进。dependencies为开发前置，acceptanceDependencies为额外集成验收前置；sourceDependencyText仅历史记录。角色未分配，完成须逐条证据，离线校验不证明GitHub Issue存在。",
   "items": [
     {
       "id": "BOOT-01",
@@ -16,7 +16,25 @@
       "reuseRefs": [
         "product-coordination"
       ],
-      "implementationStatus": "not_implemented"
+      "implementationStatus": "not_implemented",
+      "githubIssueUrl": null,
+      "issueVerificationStatus": "not_checked",
+      "issueEvidence": [],
+      "acceptanceDependencies": [],
+      "requiredEvidenceKinds": [
+        "review"
+      ],
+      "acceptanceCriteria": [
+        {
+          "id": "BOOT-01-A01",
+          "requirement": "规则与权威范围收敛，例外走有证据ADR，不重建Harness",
+          "plannedChecks": [
+            "ssot-evolution",
+            "review-decisions"
+          ],
+          "evidenceRefs": []
+        }
+      ]
     },
     {
       "id": "BOOT-02",
@@ -33,7 +51,25 @@
         "community-ui",
         "terminal"
       ],
-      "implementationStatus": "not_implemented"
+      "implementationStatus": "not_implemented",
+      "githubIssueUrl": null,
+      "issueVerificationStatus": "not_checked",
+      "issueEvidence": [],
+      "acceptanceDependencies": [],
+      "requiredEvidenceKinds": [
+        "platform"
+      ],
+      "acceptanceCriteria": [
+        {
+          "id": "BOOT-02-A01",
+          "requirement": "桌面空壳和工具链可安装/启动，记录运行时、ABI和目标平台",
+          "plannedChecks": [
+            "desktop-startup",
+            "runtime-matrix"
+          ],
+          "evidenceRefs": []
+        }
+      ]
     },
     {
       "id": "BOOT-03",
@@ -50,7 +86,34 @@
         "agent-session",
         "native-history"
       ],
-      "implementationStatus": "not_implemented"
+      "implementationStatus": "not_implemented",
+      "githubIssueUrl": null,
+      "issueVerificationStatus": "not_checked",
+      "issueEvidence": [],
+      "acceptanceDependencies": [],
+      "requiredEvidenceKinds": [
+        "release",
+        "sdk"
+      ],
+      "acceptanceCriteria": [
+        {
+          "id": "BOOT-03-A01",
+          "requirement": "发行包名称/精确版/exports/完整性/lock及实际Worker运行时记录",
+          "plannedChecks": [
+            "release-imports",
+            "runtime-matrix"
+          ],
+          "evidenceRefs": []
+        },
+        {
+          "id": "BOOT-03-A02",
+          "requirement": "源码候选与发行包验证区分；无模型探针不能标为模型测试",
+          "plannedChecks": [
+            "evidence-levels"
+          ],
+          "evidenceRefs": []
+        }
+      ]
     },
     {
       "id": "BOOT-04",
@@ -67,7 +130,24 @@
         "product-coordination",
         "agent-session"
       ],
-      "implementationStatus": "not_implemented"
+      "implementationStatus": "not_implemented",
+      "githubIssueUrl": null,
+      "issueVerificationStatus": "not_checked",
+      "issueEvidence": [],
+      "acceptanceDependencies": [],
+      "requiredEvidenceKinds": [
+        "mock"
+      ],
+      "acceptanceCriteria": [
+        {
+          "id": "BOOT-04-A01",
+          "requirement": "Mock与真实fixture分离，覆盖迟到事件/取消/重放且不产生真实外部副作用",
+          "plannedChecks": [
+            "mock-boundaries"
+          ],
+          "evidenceRefs": []
+        }
+      ]
     },
     {
       "id": "BOOT-05",
@@ -84,7 +164,26 @@
         "shell",
         "terminal"
       ],
-      "implementationStatus": "not_implemented"
+      "implementationStatus": "not_implemented",
+      "githubIssueUrl": null,
+      "issueVerificationStatus": "not_checked",
+      "issueEvidence": [],
+      "acceptanceDependencies": [
+        "BOOT-03"
+      ],
+      "requiredEvidenceKinds": [
+        "platform"
+      ],
+      "acceptanceCriteria": [
+        {
+          "id": "BOOT-05-A01",
+          "requirement": "Windows中文/空格路径、Shell、PTY resize、进程树清理实测并记录",
+          "plannedChecks": [
+            "windows-execution"
+          ],
+          "evidenceRefs": []
+        }
+      ]
     },
     {
       "id": "CORE-01",
@@ -101,7 +200,27 @@
         "native-history",
         "product-coordination"
       ],
-      "implementationStatus": "not_implemented"
+      "implementationStatus": "not_implemented",
+      "githubIssueUrl": null,
+      "issueVerificationStatus": "not_checked",
+      "issueEvidence": [],
+      "acceptanceDependencies": [
+        "BOOT-03",
+        "CORE-02"
+      ],
+      "requiredEvidenceKinds": [
+        "sdk"
+      ],
+      "acceptanceCriteria": [
+        {
+          "id": "CORE-01-A01",
+          "requirement": "产品库不写原生历史；Session绑定和恢复索引可重建",
+          "plannedChecks": [
+            "native-history-ownership"
+          ],
+          "evidenceRefs": []
+        }
+      ]
     },
     {
       "id": "CORE-02",
@@ -113,13 +232,41 @@
         "BOOT-03"
       ],
       "sourceDependencyText": "03",
-      "workAndAcceptance": "薄适配公开Pi SDK与SessionRuntime，不复制会话/Provider；验证替换后订阅和取消",
+      "workAndAcceptance": "派发时绑定runtimeBindingId；同Worker迟到和同进程Session替换观察不能串流；替换前失败/失效后创建失败/rebind失败分别处理；旧对象失效后不可用",
       "reuseRefs": [
         "agent-session",
         "native-history",
         "models-auth"
       ],
-      "implementationStatus": "not_implemented"
+      "implementationStatus": "not_implemented",
+      "githubIssueUrl": null,
+      "issueVerificationStatus": "not_checked",
+      "issueEvidence": [],
+      "acceptanceDependencies": [],
+      "requiredEvidenceKinds": [
+        "sdk"
+      ],
+      "acceptanceCriteria": [
+        {
+          "id": "CORE-02-A01",
+          "requirement": "派发时绑定runtimeBindingId；同Worker迟到和同进程Session替换观察不能串流",
+          "plannedChecks": [
+            "binding-late-run",
+            "binding-session-replacement"
+          ],
+          "evidenceRefs": []
+        },
+        {
+          "id": "CORE-02-A02",
+          "requirement": "替换前失败/失效后创建失败/rebind失败分别处理；旧对象失效后不可用",
+          "plannedChecks": [
+            "replacement-precheck-failure",
+            "replacement-factory-failure",
+            "replacement-rebind-failure"
+          ],
+          "evidenceRefs": []
+        }
+      ]
     },
     {
       "id": "CORE-03",
@@ -131,12 +278,50 @@
         "CORE-01"
       ],
       "sourceDependencyText": "CORE-01",
-      "workAndAcceptance": "产品独立任务队列与Pi steer/followUp单一归属；原生重试留Pi；幂等取消/结算",
+      "workAndAcceptance": "输入单一队列归属，重复start去重，取消只在清理核验后终结；P0同Workspace活动写Run串行，包含等待审批和取消清理；可全局单写起步；snapshot/subscribe不漏关键事件，迟到操作仍归原operation审计，重放不执行",
       "reuseRefs": [
         "in-run-queue",
         "product-coordination"
       ],
-      "implementationStatus": "not_implemented"
+      "implementationStatus": "not_implemented",
+      "githubIssueUrl": null,
+      "issueVerificationStatus": "not_checked",
+      "issueEvidence": [],
+      "acceptanceDependencies": [
+        "CORE-02"
+      ],
+      "requiredEvidenceKinds": [
+        "mock"
+      ],
+      "acceptanceCriteria": [
+        {
+          "id": "CORE-03-A01",
+          "requirement": "输入单一队列归属，重复start去重，取消只在清理核验后终结",
+          "plannedChecks": [
+            "run-idempotency",
+            "queue-ownership",
+            "cancel-cleanup"
+          ],
+          "evidenceRefs": []
+        },
+        {
+          "id": "CORE-03-A02",
+          "requirement": "P0同Workspace活动写Run串行，包含等待审批和取消清理；可全局单写起步",
+          "plannedChecks": [
+            "workspace-write-admission"
+          ],
+          "evidenceRefs": []
+        },
+        {
+          "id": "CORE-03-A03",
+          "requirement": "snapshot/subscribe不漏关键事件，迟到操作仍归原operation审计，重放不执行",
+          "plannedChecks": [
+            "binding-late-operation",
+            "snapshot-handoff"
+          ],
+          "evidenceRefs": []
+        }
+      ]
     },
     {
       "id": "CORE-04",
@@ -148,13 +333,54 @@
         "BOOT-05"
       ],
       "sourceDependencyText": "05",
-      "workAndAcceptance": "包装Pi同名工具/Operations；保留schema/results/patch/cancel，审批拒绝零副作用",
+      "workAndAcceptance": "公开ToolDefinition完整保留prepareArguments/constrainedSampling/executionMode及prompt元数据；仅包装execute/Operations；准备/校验一次；正常/旧格式/字符串edits，结果/patch/增量/取消语义一致；拒绝零执行、并行context不串、路径与辅助I/O覆盖；证据含实际SDK/授权/平台",
       "reuseRefs": [
         "read-search",
         "edit-write",
         "shell"
       ],
-      "implementationStatus": "not_implemented"
+      "implementationStatus": "not_implemented",
+      "githubIssueUrl": null,
+      "issueVerificationStatus": "not_checked",
+      "issueEvidence": [],
+      "acceptanceDependencies": [
+        "BOOT-03",
+        "CORE-02",
+        "SEC-02"
+      ],
+      "requiredEvidenceKinds": [
+        "sdk",
+        "platform"
+      ],
+      "acceptanceCriteria": [
+        {
+          "id": "CORE-04-A01",
+          "requirement": "公开ToolDefinition完整保留prepareArguments/constrainedSampling/executionMode及prompt元数据；仅包装execute/Operations",
+          "plannedChecks": [
+            "tool-definition-parity"
+          ],
+          "evidenceRefs": []
+        },
+        {
+          "id": "CORE-04-A02",
+          "requirement": "准备/校验一次；正常/旧格式/字符串edits，结果/patch/增量/取消语义一致",
+          "plannedChecks": [
+            "tool-argument-normalization",
+            "tool-output-parity"
+          ],
+          "evidenceRefs": []
+        },
+        {
+          "id": "CORE-04-A03",
+          "requirement": "拒绝零执行、并行context不串、路径与辅助I/O覆盖；证据含实际SDK/授权/平台",
+          "plannedChecks": [
+            "tool-denial",
+            "tool-context-concurrency",
+            "tool-io-coverage"
+          ],
+          "evidenceRefs": []
+        }
+      ]
     },
     {
       "id": "SEC-01",
@@ -171,7 +397,24 @@
         "community-ui",
         "product-coordination"
       ],
-      "implementationStatus": "not_implemented"
+      "implementationStatus": "not_implemented",
+      "githubIssueUrl": null,
+      "issueVerificationStatus": "not_checked",
+      "issueEvidence": [],
+      "acceptanceDependencies": [],
+      "requiredEvidenceKinds": [
+        "static"
+      ],
+      "acceptanceCriteria": [
+        {
+          "id": "SEC-01-A01",
+          "requirement": "IPC来源/Schema/CSP校验；Renderer无任意FS/Shell/密钥入口",
+          "plannedChecks": [
+            "renderer-boundary"
+          ],
+          "evidenceRefs": []
+        }
+      ]
     },
     {
       "id": "SEC-02",
@@ -183,13 +426,49 @@
         "CORE-02"
       ],
       "sourceDependencyText": "CORE-02",
-      "workAndAcceptance": "Pi同名工具wrapper与Operations接入宿主批准；绑定参数/epoch/截止时间，过期或取消零执行",
+      "workAndAcceptance": "摘要绑定实际execute参数，prepare不重复；许可过期/取消/参数变更不复用；派生写入内容hash不与工具输入hash直接比较；验证目标和读取版本，非原子CAS宣传；拒绝及并发调用的隔离接缝由锁定SDK的wrapper实测",
       "reuseRefs": [
         "read-search",
         "edit-write",
         "shell"
       ],
-      "implementationStatus": "not_implemented"
+      "implementationStatus": "not_implemented",
+      "githubIssueUrl": null,
+      "issueVerificationStatus": "not_checked",
+      "issueEvidence": [],
+      "acceptanceDependencies": [],
+      "requiredEvidenceKinds": [
+        "sdk"
+      ],
+      "acceptanceCriteria": [
+        {
+          "id": "SEC-02-A01",
+          "requirement": "摘要绑定实际execute参数，prepare不重复；许可过期/取消/参数变更不复用",
+          "plannedChecks": [
+            "approval-normalized-input",
+            "approval-expiry"
+          ],
+          "evidenceRefs": []
+        },
+        {
+          "id": "SEC-02-A02",
+          "requirement": "派生写入内容hash不与工具输入hash直接比较；验证目标和读取版本，非原子CAS宣传",
+          "plannedChecks": [
+            "operation-derived-content",
+            "write-conflict"
+          ],
+          "evidenceRefs": []
+        },
+        {
+          "id": "SEC-02-A03",
+          "requirement": "拒绝及并发调用的隔离接缝由锁定SDK的wrapper实测",
+          "plannedChecks": [
+            "tool-denial",
+            "tool-context-concurrency"
+          ],
+          "evidenceRefs": []
+        }
+      ]
     },
     {
       "id": "SEC-03",
@@ -206,7 +485,37 @@
         "models-auth",
         "pi-settings"
       ],
-      "implementationStatus": "not_implemented"
+      "implementationStatus": "not_implemented",
+      "githubIssueUrl": null,
+      "issueVerificationStatus": "not_checked",
+      "issueEvidence": [],
+      "acceptanceDependencies": [
+        "BOOT-03",
+        "CORE-02"
+      ],
+      "requiredEvidenceKinds": [
+        "sdk",
+        "platform"
+      ],
+      "acceptanceCriteria": [
+        {
+          "id": "SEC-03-A01",
+          "requirement": "公开ModelRuntime/CredentialStore接入，所选发行包及导出先验证",
+          "plannedChecks": [
+            "credential-public-seam"
+          ],
+          "evidenceRefs": []
+        },
+        {
+          "id": "SEC-03-A02",
+          "requirement": "系统存储刷新/flush/脱敏实测；Renderer/日志/子进程env不泄漏凭据",
+          "plannedChecks": [
+            "credential-lifecycle",
+            "credential-leakage"
+          ],
+          "evidenceRefs": []
+        }
+      ]
     },
     {
       "id": "UI-01",
@@ -224,7 +533,25 @@
         "community-ui",
         "product-coordination"
       ],
-      "implementationStatus": "not_implemented"
+      "implementationStatus": "not_implemented",
+      "githubIssueUrl": null,
+      "issueVerificationStatus": "not_checked",
+      "issueEvidence": [],
+      "acceptanceDependencies": [],
+      "requiredEvidenceKinds": [
+        "mock"
+      ],
+      "acceptanceCriteria": [
+        {
+          "id": "UI-01-A01",
+          "requirement": "社区组件固定来源与许可；任务/消息按Thread隔离，状态完整",
+          "plannedChecks": [
+            "ui-source-review",
+            "thread-switch"
+          ],
+          "evidenceRefs": []
+        }
+      ]
     },
     {
       "id": "UI-02",
@@ -243,7 +570,25 @@
         "extension-ui",
         "output-diff"
       ],
-      "implementationStatus": "not_implemented"
+      "implementationStatus": "not_implemented",
+      "githubIssueUrl": null,
+      "issueVerificationStatus": "not_checked",
+      "issueEvidence": [],
+      "acceptanceDependencies": [],
+      "requiredEvidenceKinds": [
+        "mock"
+      ],
+      "acceptanceCriteria": [
+        {
+          "id": "UI-02-A01",
+          "requirement": "Composer/工具卡映射delta与累计结果，审批不是TUI任意JS；取消状态不谎报",
+          "plannedChecks": [
+            "ui-tool-events",
+            "ui-approval-cancel"
+          ],
+          "evidenceRefs": []
+        }
+      ]
     },
     {
       "id": "GIT-01",
@@ -260,7 +605,24 @@
         "output-diff",
         "community-ui"
       ],
-      "implementationStatus": "not_implemented"
+      "implementationStatus": "not_implemented",
+      "githubIssueUrl": null,
+      "issueVerificationStatus": "not_checked",
+      "issueEvidence": [],
+      "acceptanceDependencies": [],
+      "requiredEvidenceKinds": [
+        "platform"
+      ],
+      "acceptanceCriteria": [
+        {
+          "id": "GIT-01-A01",
+          "requirement": "工作区diff取Git真实状态，单工具patch只作单次变更；非Git可用",
+          "plannedChecks": [
+            "git-diff-truth"
+          ],
+          "evidenceRefs": []
+        }
+      ]
     },
     {
       "id": "ART-01",
@@ -276,7 +638,24 @@
       "reuseRefs": [
         "artifact"
       ],
-      "implementationStatus": "not_implemented"
+      "implementationStatus": "not_implemented",
+      "githubIssueUrl": null,
+      "issueVerificationStatus": "not_checked",
+      "issueEvidence": [],
+      "acceptanceDependencies": [],
+      "requiredEvidenceKinds": [
+        "static"
+      ],
+      "acceptanceCriteria": [
+        {
+          "id": "ART-01-A01",
+          "requirement": "真实文件/hash/来源/版本/安全预览，缺失拒绝和外部修改可见",
+          "plannedChecks": [
+            "artifact-file-validation"
+          ],
+          "evidenceRefs": []
+        }
+      ]
     },
     {
       "id": "SKL-01",
@@ -288,12 +667,47 @@
         "CORE-02"
       ],
       "sourceDependencyText": "CORE-02",
-      "workAndAcceptance": "复用Pi技能加载和ResourceLoader；安全筛选在执行factory前；无全局/项目未知扩展",
+      "workAndAcceptance": "执行factory前预批准，缺包resolve不隐式安装；全局/项目恶意fixture不执行；连续A/B锁对比、settled刷新/重建、确认loaded锁后start；失败阻断不静默回退；快照含模板/脚本/批准资料闭包；禁用不擦除transcript，也不替代授权",
       "reuseRefs": [
         "skills",
         "resources"
       ],
-      "implementationStatus": "not_implemented"
+      "implementationStatus": "not_implemented",
+      "githubIssueUrl": null,
+      "issueVerificationStatus": "not_checked",
+      "issueEvidence": [],
+      "acceptanceDependencies": [],
+      "requiredEvidenceKinds": [
+        "sdk"
+      ],
+      "acceptanceCriteria": [
+        {
+          "id": "SKL-01-A01",
+          "requirement": "执行factory前预批准，缺包resolve不隐式安装；全局/项目恶意fixture不执行",
+          "plannedChecks": [
+            "resource-preload-allowlist"
+          ],
+          "evidenceRefs": []
+        },
+        {
+          "id": "SKL-01-A02",
+          "requirement": "连续A/B锁对比、settled刷新/重建、确认loaded锁后start；失败阻断不静默回退",
+          "plannedChecks": [
+            "resource-next-run",
+            "resource-load-failure"
+          ],
+          "evidenceRefs": []
+        },
+        {
+          "id": "SKL-01-A03",
+          "requirement": "快照含模板/脚本/批准资料闭包；禁用不擦除transcript，也不替代授权",
+          "plannedChecks": [
+            "resource-snapshot-closure",
+            "resource-disable"
+          ],
+          "evidenceRefs": []
+        }
+      ]
     },
     {
       "id": "QA-01",
@@ -321,7 +735,7 @@
         "SKL-01"
       ],
       "sourceDependencyText": "上述 P0",
-      "workAndAcceptance": "两条端到端验收、崩溃/取消/跨线程安全回归；优先按SSOT复用已验证上游/社区实现，仅实现本项产品增量，测试与未测边界明确",
+      "workAndAcceptance": "M0-UI/M0-SDK/M0-Pi分别记录，只凭Mock不得关闭真实Pi验收；Mac闭环与Windows验证分别留证，崩溃/取消/跨Thread回归，未测项明确",
       "reuseRefs": [
         "agent-session",
         "native-history",
@@ -329,7 +743,39 @@
         "package-manager",
         "terminal"
       ],
-      "implementationStatus": "not_implemented"
+      "implementationStatus": "not_implemented",
+      "githubIssueUrl": null,
+      "issueVerificationStatus": "not_checked",
+      "issueEvidence": [],
+      "acceptanceDependencies": [],
+      "requiredEvidenceKinds": [
+        "model",
+        "platform"
+      ],
+      "acceptanceCriteria": [
+        {
+          "id": "QA-01-A01",
+          "requirement": "M0-UI/M0-SDK/M0-Pi分别记录，只凭Mock不得关闭真实Pi验收",
+          "plannedChecks": [
+            "milestone-evidence-levels"
+          ],
+          "evidenceRefs": []
+        },
+        {
+          "id": "QA-01-A02",
+          "requirement": "Mac闭环与Windows验证分别留证，崩溃/取消/跨Thread回归，未测项明确",
+          "plannedChecks": [
+            "mac-pi-e2e",
+            "windows-execution"
+          ],
+          "evidenceRefs": []
+        }
+      ],
+      "milestoneDependencies": [
+        "M0-UI",
+        "M0-SDK",
+        "M0-Pi"
+      ]
     },
     {
       "id": "PKG-01",
@@ -342,12 +788,38 @@
         "SEC-02"
       ],
       "sourceDependencyText": "SKL-01,SEC-02",
-      "workAndAcceptance": "优先Pi包来源/资源入口/PackageManager；受控安装事务，不复制npm/git解析",
+      "workAndAcceptance": "Pi解析/安装优先复用；明确目标精确版，在受控新根准备，证明目录/副作用可控；固定npm升级不等同update；Git ref/多版本/共享依赖/只配置未安装/离线缺包覆盖",
       "reuseRefs": [
         "package-manager",
         "market-governance"
       ],
-      "implementationStatus": "not_implemented"
+      "implementationStatus": "not_implemented",
+      "githubIssueUrl": null,
+      "issueVerificationStatus": "not_checked",
+      "issueEvidence": [],
+      "acceptanceDependencies": [],
+      "requiredEvidenceKinds": [
+        "sdk"
+      ],
+      "acceptanceCriteria": [
+        {
+          "id": "PKG-01-A01",
+          "requirement": "Pi解析/安装优先复用；明确目标精确版，在受控新根准备，证明目录/副作用可控",
+          "plannedChecks": [
+            "package-staging"
+          ],
+          "evidenceRefs": []
+        },
+        {
+          "id": "PKG-01-A02",
+          "requirement": "固定npm升级不等同update；Git ref/多版本/共享依赖/只配置未安装/离线缺包覆盖",
+          "plannedChecks": [
+            "package-pinned-upgrade",
+            "package-resolution-cases"
+          ],
+          "evidenceRefs": []
+        }
+      ]
     },
     {
       "id": "PKG-02",
@@ -359,12 +831,38 @@
         "PKG-01"
       ],
       "sourceDependencyText": "PKG-01",
-      "workAndAcceptance": "补签名/撤销/回滚与权限差异；验证各安装分支脚本/依赖/离线resolve，不自动放行",
+      "workAndAcceptance": "校验后切换激活、失败保留旧版、活动引用不删除；签名/撤销/权限差异可见；外部CLI改动显式导入/对账；宿主激活权威，不做双向last-write-wins",
       "reuseRefs": [
         "package-manager",
         "market-governance"
       ],
-      "implementationStatus": "not_implemented"
+      "implementationStatus": "not_implemented",
+      "githubIssueUrl": null,
+      "issueVerificationStatus": "not_checked",
+      "issueEvidence": [],
+      "acceptanceDependencies": [],
+      "requiredEvidenceKinds": [
+        "sdk"
+      ],
+      "acceptanceCriteria": [
+        {
+          "id": "PKG-02-A01",
+          "requirement": "校验后切换激活、失败保留旧版、活动引用不删除；签名/撤销/权限差异可见",
+          "plannedChecks": [
+            "package-activation-rollback",
+            "package-active-reference"
+          ],
+          "evidenceRefs": []
+        },
+        {
+          "id": "PKG-02-A02",
+          "requirement": "外部CLI改动显式导入/对账；宿主激活权威，不做双向last-write-wins",
+          "plannedChecks": [
+            "package-owner-reconcile"
+          ],
+          "evidenceRefs": []
+        }
+      ]
     },
     {
       "id": "SKL-02",
@@ -381,7 +879,25 @@
         "skills",
         "market-governance"
       ],
-      "implementationStatus": "not_implemented"
+      "implementationStatus": "not_implemented",
+      "githubIssueUrl": null,
+      "issueVerificationStatus": "not_checked",
+      "issueEvidence": [],
+      "acceptanceDependencies": [],
+      "requiredEvidenceKinds": [
+        "sdk"
+      ],
+      "acceptanceCriteria": [
+        {
+          "id": "SKL-02-A01",
+          "requirement": "复用解析，个人副本/scope/相邻Run快照切换，活动任务不受源变化影响",
+          "plannedChecks": [
+            "skill-personal-copy",
+            "resource-next-run"
+          ],
+          "evidenceRefs": []
+        }
+      ]
     },
     {
       "id": "UI-03",
@@ -400,7 +916,24 @@
         "skills",
         "package-manager"
       ],
-      "implementationStatus": "not_implemented"
+      "implementationStatus": "not_implemented",
+      "githubIssueUrl": null,
+      "issueVerificationStatus": "not_checked",
+      "issueEvidence": [],
+      "acceptanceDependencies": [],
+      "requiredEvidenceKinds": [
+        "mock"
+      ],
+      "acceptanceCriteria": [
+        {
+          "id": "UI-03-A01",
+          "requirement": "市场/库明确安装/启用/授权/实际Run版本及更新失败状态",
+          "plannedChecks": [
+            "resource-management-ui"
+          ],
+          "evidenceRefs": []
+        }
+      ]
     },
     {
       "id": "CORE-05",
@@ -412,13 +945,30 @@
         "QA-01"
       ],
       "sourceDependencyText": "QA-01",
-      "workAndAcceptance": "Pi Session负责会话；产品补Workspace并发/Worktree跨Worker锁，原生工具锁不冒充跨进程锁",
+      "workAndAcceptance": "在CORE-03 P0写入串行基础上扩展并发/Worktree管理；Pi保留Session和文件工具，不把原生锁视为跨Worker锁",
       "reuseRefs": [
         "native-history",
         "product-coordination",
         "edit-write"
       ],
-      "implementationStatus": "not_implemented"
+      "implementationStatus": "not_implemented",
+      "githubIssueUrl": null,
+      "issueVerificationStatus": "not_checked",
+      "issueEvidence": [],
+      "acceptanceDependencies": [],
+      "requiredEvidenceKinds": [
+        "platform"
+      ],
+      "acceptanceCriteria": [
+        {
+          "id": "CORE-05-A01",
+          "requirement": "仅在P0串行和QA后扩展Workspace并发/Worktree跨Worker锁；不重写Session",
+          "plannedChecks": [
+            "workspace-parallelism"
+          ],
+          "evidenceRefs": []
+        }
+      ]
     },
     {
       "id": "CON-01",
@@ -435,7 +985,24 @@
         "extension-ui",
         "product-coordination"
       ],
-      "implementationStatus": "not_implemented"
+      "implementationStatus": "not_implemented",
+      "githubIssueUrl": null,
+      "issueVerificationStatus": "not_checked",
+      "issueEvidence": [],
+      "acceptanceDependencies": [],
+      "requiredEvidenceKinds": [
+        "sdk"
+      ],
+      "acceptanceCriteria": [
+        {
+          "id": "CON-01-A01",
+          "requirement": "一个只读服务官方SDK/MCP，账户绑定及审计，与模型凭据分离",
+          "plannedChecks": [
+            "connector-read-only"
+          ],
+          "evidenceRefs": []
+        }
+      ]
     },
     {
       "id": "ART-02",
@@ -451,7 +1018,24 @@
       "reuseRefs": [
         "artifact"
       ],
-      "implementationStatus": "not_implemented"
+      "implementationStatus": "not_implemented",
+      "githubIssueUrl": null,
+      "issueVerificationStatus": "not_checked",
+      "issueEvidence": [],
+      "acceptanceDependencies": [],
+      "requiredEvidenceKinds": [
+        "platform"
+      ],
+      "acceptanceCriteria": [
+        {
+          "id": "ART-02-A01",
+          "requirement": "一个Office格式生成/核实/预览全链路，记录真实工具及未支持项",
+          "plannedChecks": [
+            "office-artifact"
+          ],
+          "evidenceRefs": []
+        }
+      ]
     },
     {
       "id": "PRE-01",
@@ -470,7 +1054,24 @@
         "resources",
         "market-governance"
       ],
-      "implementationStatus": "not_implemented"
+      "implementationStatus": "not_implemented",
+      "githubIssueUrl": null,
+      "issueVerificationStatus": "not_checked",
+      "issueEvidence": [],
+      "acceptanceDependencies": [],
+      "requiredEvidenceKinds": [
+        "static"
+      ],
+      "acceptanceCriteria": [
+        {
+          "id": "PRE-01-A01",
+          "requirement": "3个预设/案例引用现有资源；创建前显示版本和权限，不自行扩大授权",
+          "plannedChecks": [
+            "preset-resource-policy"
+          ],
+          "evidenceRefs": []
+        }
+      ]
     },
     {
       "id": "ISO-01",
@@ -489,7 +1090,24 @@
         "terminal",
         "product-coordination"
       ],
-      "implementationStatus": "not_implemented"
+      "implementationStatus": "not_implemented",
+      "githubIssueUrl": null,
+      "issueVerificationStatus": "not_checked",
+      "issueEvidence": [],
+      "acceptanceDependencies": [],
+      "requiredEvidenceKinds": [
+        "platform"
+      ],
+      "acceptanceCriteria": [
+        {
+          "id": "ISO-01-A01",
+          "requirement": "现有隔离后端整Worker验证，按OS证据显示能力，禁止静默降级",
+          "plannedChecks": [
+            "isolation-backend"
+          ],
+          "evidenceRefs": []
+        }
+      ]
     },
     {
       "id": "AUTO-01",
@@ -507,10 +1125,71 @@
         "product-coordination",
         "in-run-queue"
       ],
-      "implementationStatus": "not_implemented"
+      "implementationStatus": "not_implemented",
+      "githubIssueUrl": null,
+      "issueVerificationStatus": "not_checked",
+      "issueEvidence": [],
+      "acceptanceDependencies": [],
+      "requiredEvidenceKinds": [
+        "mock"
+      ],
+      "acceptanceCriteria": [
+        {
+          "id": "AUTO-01-A01",
+          "requirement": "调度时区/漏跑/去重/审批/外部unknown恢复；不盲目重发副作用",
+          "plannedChecks": [
+            "automation-idempotency"
+          ],
+          "evidenceRefs": []
+        }
+      ]
     }
   ],
   "decisionSource": "../ssot/README.md",
   "historicalSource": "../startup/docs/08-delivery-and-references.md",
-  "updatedOn": "2026-09-21"
+  "updatedOn": "2026-09-22",
+  "milestones": [
+    {
+      "id": "M0-UI",
+      "state": "pending",
+      "requiredEvidenceKinds": [
+        "mock"
+      ],
+      "requiredPlatforms": [
+        "darwin"
+      ],
+      "prerequisites": [],
+      "evidenceRefs": [],
+      "acceptance": "Mac Mock桌面任务、审批/取消/恢复及真实Markdown文件；不冒充Pi或模型"
+    },
+    {
+      "id": "M0-SDK",
+      "state": "pending",
+      "requiredEvidenceKinds": [
+        "release",
+        "sdk"
+      ],
+      "requiredPlatforms": [],
+      "prerequisites": [],
+      "evidenceRefs": [],
+      "acceptance": "真实发行包、Session、本地工具、受控资源与宿主接缝；可无模型"
+    },
+    {
+      "id": "M0-Pi",
+      "state": "pending",
+      "requiredEvidenceKinds": [
+        "model",
+        "platform"
+      ],
+      "requiredPlatforms": [
+        "darwin"
+      ],
+      "prerequisites": [
+        "M0-UI",
+        "M0-SDK"
+      ],
+      "evidenceRefs": [],
+      "acceptance": "授权真实模型任务及审批/取消/恢复Mac证据；不推导未测平台/沙箱"
+    }
+  ]
 }

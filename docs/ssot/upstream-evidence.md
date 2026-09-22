@@ -51,3 +51,16 @@ P04/P05/P06/P07/P13 的固定源码链接是复查入口，不声称逐字核验
 4. 新能力缺口：先记录公开 API 是否可满足，再决定补丁/上游贡献/隔离适配；禁止默认 fork 整个 Harness。
 
 本次交付是文档和待办调整。文档结构、摘要、链接和 JSON 检查不构成源代码安全审计、法律意见、真实模型行为验证或 macOS/Windows 发行认证。
+
+## R01–R08 修订沿用的补充源码证据（2026-09-22）
+
+以下 U01–U04 来自上一轮对固定 SHA 的实际读取，本轮将已审阅行为落入契约；没有因此重新运行 SDK、审计全部文件或验证发行包。内部文件仅作为行为证据，实施仍只用公开入口。
+
+| ID | 资料 | 已核查行为与限制 |
+|---|---|---|
+| U01 | [Session Runtime 1–220 行](https://github.com/earendil-works/pi/blob/466db0fecdc20996a553116984d18c0d362b035a/packages/coding-agent/src/core/agent-session-runtime.ts#L1-L220) | teardown 旧实例后创建新实例，失效与 rebind 回调；失败不是自动回滚。 |
+| U02 | [edit 工具](https://github.com/earendil-works/pi/blob/466db0fecdc20996a553116984d18c0d362b035a/packages/coding-agent/src/core/tools/edit.ts) | prepareArguments 兼容输入、完整定义字段、Operations、取消和 patch；未实测。 |
+| U03 | [工具包装实现](https://github.com/earendil-works/pi/blob/466db0fecdc20996a553116984d18c0d362b035a/packages/coding-agent/src/core/tools/tool-definition-wrapper.ts) | 保留 prepareArguments/constrainedSampling/executionMode 等；仅说明行为，不建议内部导入。 |
+| U04 | [包管理 1010–1250 行](https://github.com/earendil-works/pi/blob/466db0fecdc20996a553116984d18c0d362b035a/packages/coding-agent/src/core/package-manager.ts#L1010-L1250) | 固定 npm 版本跳过一般更新、Git ref 不同策略、显式 install/remove；未审计全部安装分支。 |
+
+当前修订基于产品提交 `be9e1f0858e9188131c959d2438dede73c0e2215`；上文的项目基线及环境为先前核验的历史记录。新的实际发行版本和运行证据填写到 reuse-map 的 adoption/evidenceRecords，不能将本文源码版本当发行锁。
