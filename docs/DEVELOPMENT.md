@@ -155,3 +155,18 @@ export PATH="$PWD/node_modules/.bin:$PATH"
 下载审计对五个直接依赖比较 registry/lock/SRI/实际 tarball 字节，以及安装文件；两个 pi-ai 副本的声明分别验证修改前后摘要，其余文件验证原始字节（package.json 核对语义身份）。默认输出在 `.artifacts/a0-a1/`，可用 `--output-dir .artifacts/<目录>` 保存新一轮结果。SDK tests 仅写入明确的合成记录，不调用 prompt/Provider；没有真实模型 fixture。订阅重放与注入故障也明确是合成测试。A0/A1 的阶段结果不代表 CORE-02、M0-SDK、M0-Pi 完成；本轮不进入 A2。
 
 本轮可定位结果：[A0/A1 收尾报告](validation/a0-a1-closeout-2026-09-22.md)、[含声明补丁的完整性记录](validation/a0-a1-closeout-release.json)；[首次验证](validation/a0-a1-2026-09-22.md) 保留历史失败。报告引用先提交后实测的代码 SHA；文档提交不冒充被测代码提交。
+
+## 10. A2 工具探针
+
+沿用第 9 节初始化和精确依赖，无额外安装。使用同一项目 Node/npm：
+
+```bash
+npm run typecheck
+npm run test:pi-tools
+npm run test:pi-shell
+npm run test:pi-probe
+```
+
+`test:pi-tools` 使用真实 Pi 文件工具、独立合成文件及明确标记的合成 BashOperations，禁止子进程。`test:pi-shell` 在 macOS 使用 Pi 官方本地 Bash 后端，执行固定测试命令，验证已运行的进程取消和超时；该模式额外启用子进程并套用 OS 网络/文件边界。其他平台明确失败，不退回开放环境。两种模式均从空环境白名单创建子进程，不读取用户 Pi 设置/凭据，不调用模型。
+
+审批回调、不可复用操作身份、Operations 和观察只用于探针；测试保留 Pi 的参数准备、schema、元数据、diff、裁剪与结果形状。完整采用边界、辅助 I/O 与竞争窗口见 [A2 边界记录](validation/a2-boundaries.md)。原始运行日志位于忽略的 `.artifacts/a2/`。

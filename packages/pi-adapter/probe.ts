@@ -34,7 +34,7 @@ export function emptyResources(): ResourceLoader {
   };
 }
 
-export const createProbeRuntime: CreateAgentSessionRuntimeFactory = async (options) => {
+export async function createProbeServices(options: { cwd: string; agentDir: string }): Promise<AgentSessionServices> {
   const credentials = new InMemoryCredentialStore();
   const services: AgentSessionServices = {
     cwd: options.cwd,
@@ -50,6 +50,11 @@ export const createProbeRuntime: CreateAgentSessionRuntimeFactory = async (optio
     }),
     diagnostics: [],
   };
+  return services;
+}
+
+export const createProbeRuntime: CreateAgentSessionRuntimeFactory = async (options) => {
+  const services = await createProbeServices(options);
   return {
     ...await createAgentSession({
       ...services,

@@ -12,6 +12,8 @@
     "check:environment": "node scripts/check-environment.mjs",
     "typecheck": "node scripts/check-environment.mjs --versions-only && node scripts/pi-type-patch.mjs --check && tsc --noEmit",
     "test:pi-probe": "node scripts/run-pi-probe.mjs",
+    "test:pi-tools": "node scripts/run-pi-probe.mjs --tools",
+    "test:pi-shell": "node scripts/run-pi-probe.mjs --shell",
     "patch:pi-types": "node scripts/check-environment.mjs --versions-only && node scripts/pi-type-patch.mjs",
     "test:pi-types": "node scripts/check-environment.mjs --versions-only && node --test scripts/pi-type-patch.test.mjs packages/pi-adapter/types.test.mjs"
   },
