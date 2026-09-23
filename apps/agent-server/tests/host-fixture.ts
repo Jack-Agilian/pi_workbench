@@ -9,6 +9,10 @@ if (process.argv[3] !== 'before-ready') {
   f.entry.extraRead!.push(join(import.meta.dirname, 'descendant-fixture.mjs'));
 }
 const pending = f.start(); void pending.catch(() => {});
+if (process.argv[3] === 'dispatched') {
+  writeFileSync(manifest, JSON.stringify({ root: f.root, database: f.database, cwd: f.cwd, thread: f.thread, run: f.run, resources: f.resources, workerPid: null, guardianPid: f.supervisor.guardianPid }));
+  process.kill(process.pid, 'SIGKILL');
+}
 await until(() => !!f.supervisor.workerPid, 'worker pid');
 if (process.argv[3] !== 'before-ready') { await f.approval(); await until(() => f.stage('descendants'), 'descendants'); }
 else await until(() => f.stage('before-ready'), 'before-ready');

@@ -3,7 +3,7 @@ import { spawn, type ChildProcess } from 'node:child_process';
 import { mkdirSync, realpathSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { inside } from '../../packages/pi-adapter/approved-resources.ts';
+import { inside } from '../../packages/pi-adapter/path-scope.ts';
 import type { WorkerInit } from '../../packages/app-contracts/worker-ipc.ts';
 export const repository = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 export interface LaunchSpec {
@@ -41,7 +41,10 @@ export function launchSpec(config: WorkerInit, identity: { instanceId: string; n
 }
 export function spawnGuardian(spec: LaunchSpec, lease: string): ChildProcess {
   const path = join(lease, 'launch.json'); writeFileSync(path, JSON.stringify(spec), { mode: 0o600, flag: 'wx' });
-  return spawn(process.execPath, [join(repository, 'apps/agent-server/worker-guardian.ts'), path], {
+  const guardian = spawn(process.execPath, [join(repository, 'apps/agent-server/worker-guardian.ts'), path], {
     cwd: lease, env: sterileEnvironment(join(lease, 'home')), stdio: ['ignore','ignore','ignore','ipc'], serialization: 'json',
   });
+  guardian.on('error', () => {}); // Spawn failure can arrive after the surrounding SQLite transaction rolls back.
+  if (!guardian.pid) throw new Error('guardian_spawn_failed');
+  return guardian;
 }

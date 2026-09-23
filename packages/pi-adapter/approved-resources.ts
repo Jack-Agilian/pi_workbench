@@ -1,11 +1,13 @@
 // A3: approved content snapshots and one admission seam, not a skill parser or Run coordinator.
 import { createHash } from 'node:crypto';
 import { chmodSync, lstatSync, mkdirSync, readFileSync, readdirSync, realpathSync, writeFileSync } from 'node:fs';
-import pathApi, { dirname, join, relative, resolve } from 'node:path';
+import { dirname, join, relative, resolve } from 'node:path';
 import {
   DefaultPackageManager, SettingsManager, loadSkills,
   type ResourceLoader,
 } from '@earendil-works/pi-coding-agent';
+import { inside } from './path-scope.ts';
+export { inside } from './path-scope.ts';
 import { explicitEmptyResources } from './session-services.ts';
 
 type FileEntry = Readonly<{ path: string; sha256: string }>;
@@ -16,12 +18,6 @@ export interface ContentSnapshot {
   readonly expectedSkillNames: readonly string[];
 }
 const digest = (value: string | Buffer): string => createHash('sha256').update(value).digest('hex');
-/** Lexical containment only; explicit path flavor also permits cross-platform regression tests. */
-export function inside(root: string, path: string, flavor: Pick<typeof pathApi, 'relative' | 'resolve' | 'isAbsolute' | 'sep'> = pathApi): boolean {
-  const rel = flavor.relative(root, flavor.resolve(path));
-  return rel === '' || (!rel.startsWith(`..${flavor.sep}`) && rel !== '..' && !flavor.isAbsolute(rel));
-}
-
 /** Whole approved content tree: templates/scripts are copied as bytes, never executed.
  * Closure is reviewed by the caller; arbitrary Markdown references are not statically proved safe.
  * Links and special files are rejected; this is not protection against a hostile concurrent writer.

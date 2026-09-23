@@ -20,7 +20,16 @@ const syntheticNative = (runtime: AgentSessionRuntime) => {
     usage: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, totalTokens: 0, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 } } };
   manager.appendMessage(assistant);
 };
+let creations = 0; let bindings = 0;
 serveWorker({
+  testOnly: {
+    afterSessionCreated: async () => { creations++;
+      if (spec.mode === 'session-create' || (spec.mode === 'replace-create' && creations === 2)) { stage(spec.mode); await pause(); }
+    },
+    beforeBind: async close => { bindings++;
+      if (spec.mode === 'close-rebind' && bindings === 2) { const pending = close(); assert.equal(close(), pending); stage('close-rebind'); }
+    },
+  },
   beforeReady: async (runtime, close) => {
     assert.equal(process.env.OPENAI_API_KEY, undefined); assert.equal(process.env.NODE_OPTIONS, undefined);
     assert.equal(process.permission.has('addons'), false); assert.equal(process.permission.has('worker'), false);
@@ -31,6 +40,7 @@ serveWorker({
     stage('database-denied');
     if (spec.persistNative) syntheticNative(runtime);
     if (spec.mode === 'before-ready') { stage('before-ready'); await pause(); }
+    if (spec.mode === 'replace-create' || spec.mode === 'close-rebind') await runtime.newSession();
     if (spec.mode === 'replace') {
       runtime.setRebindSession(async () => { stage('rebind'); await pause(); });
       await runtime.newSession();

@@ -10,7 +10,9 @@ import { bindProductSession } from './product-binding.ts';
 import { IpcSender } from './ipc-channel.ts';
 
 /** Trusted composition seam only; never serialized on product commands or IPC. */
-export interface WorkerDriver {
+interface WorkerDriver {
+  // Lifecycle checkpoints belong only to the trusted no-model test driver; no wire fields enable them.
+  testOnly?: { afterSessionCreated?: (close: () => Promise<void>) => Promise<void>; beforeBind?: (close: () => Promise<void>) => Promise<void> };
   beforeReady?(runtime: AgentSessionRuntime, close: () => Promise<void>): Promise<void>;
   afterGrant?(signal: AbortSignal): Promise<void>;
   execute(runtime: AgentSessionRuntime, signal: AbortSignal): Promise<void>;
@@ -63,6 +65,7 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
       const services = await createIsolatedServices(options); services.resourceLoader = resources.loader;
       const result = await createAgentSession({ ...services, sessionManager: options.sessionManager, sessionStartEvent: options.sessionStartEvent,
         tools: ['write','edit'], customTools: definitions, noTools: 'builtin', thinkingLevel: 'off' });
+      try { await driver?.testOnly?.afterSessionCreated?.(close); } catch (error) { result.session.dispose(); throw error; }
       if (closed) { result.session.dispose(); throw new Error('worker_closed'); }
       return { ...result, services, diagnostics: services.diagnostics };
     };
@@ -73,6 +76,7 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
       if (closed) throw new Error('worker_closed');
       const generation = ++subscriptionGeneration; const session = runtime!.session;
       await session.bindExtensions({});
+      await driver?.testOnly?.beforeBind?.(close);
       if (closed || generation !== subscriptionGeneration) throw new Error('worker_closed');
       unbind = bindProductSession(session, c.binding, (_binding, event) => {
         if (!closed && generation === subscriptionGeneration) void send({ type: 'observation', ...event }).catch(fail);

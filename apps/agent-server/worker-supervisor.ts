@@ -15,7 +15,7 @@ export interface ExecutionPlan { tool: 'write' | 'edit'; target: string; paramet
 interface Journal { binding: Dispatch; config: WorkerInit; plan: ExecutionPlan; spec: LaunchSpec; lease: string }
 interface Active {
   journal: Journal; child: ChildProcess; sender: IpcSender; done: Promise<void>; resolve: () => void; reject: (error: unknown) => void;
-  pid?: number; hello: boolean; ready: boolean; closed: boolean; result?: boolean; closing?: Promise<void>;
+  pid?: number; armed: boolean; hello: boolean; ready: boolean; closed: boolean; result?: boolean;
   requests: Map<string, string>; replies: Map<string, WireBody>; pending: Map<string, string>; startedAt: number;
 }
 export interface SupervisorOptions { stateDirectory: string; databaseDirectory: string; resources: ResourceSelection; readyTimeoutMs?: number }
@@ -45,34 +45,31 @@ export class WorkerSupervisor {
     if (this.active) return this.active.done;
     sha256(plan.parametersDigest); sha256(plan.expectedContentDigest); if (plan.fileVersion !== null) sha256(plan.fileVersion);
     if (!['write','edit'].includes(plan.tool) || plan.deadline <= Date.now() || plan.deadline > Date.now() + 120_000) throw new Error('invalid_execution_plan');
-    let journal: Journal | undefined;
-    const binding = this.core.dispatchNext(dispatch => {
+    let journal: Journal | undefined; let child: ChildProcess | undefined;
+    let binding: Dispatch | undefined;
+    try { binding = this.core.dispatchNext(dispatch => {
       const workspace = this.core.workspacePath(dispatch.workspaceId); artifactPath(workspace, plan.target);
       const lease = join(this.options.stateDirectory, 'leases', randomUUID());
       const agentDir = join(this.options.stateDirectory, 'workers', randomUUID());
       const sessions = join(this.options.stateDirectory, 'sessions', dispatch.threadId);
       for (const dir of [lease, agentDir, sessions]) mkdirSync(dir, { recursive: true, mode: 0o700 });
-      const config: WorkerInit = { binding: dispatch, workspace, agentDir, sessions, resources: this.options.resources, deadline: plan.deadline };
+      const config: WorkerInit = { binding: dispatch, workspace, agentDir, sessions, resources: structuredClone(this.options.resources), deadline: plan.deadline };
       const spec = launchSpec(config, { instanceId: randomUUID(), nonce: randomUUID() }, { lease, databaseDirectory: this.options.databaseDirectory }, entry);
-      journal = { binding: dispatch, config, plan: Object.freeze({ ...plan }), spec, lease }; return JSON.stringify(journal);
-    });
-    if (!binding || !journal) return;
-    let child: ChildProcess;
-    try { child = spawnGuardian(journal.spec, journal.lease); }
-    catch (error) {
-      // Synchronous spawn rejection means no child handle was created. Preserve journal and cleanup proof.
-      writeFileSync(journal.spec.receipt, JSON.stringify({ instanceId: journal.spec.instanceId, runtimeBindingId: binding.runtimeBindingId, nonce: journal.spec.nonce, workerPid: null, exited: true, groupGone: true }), { mode: 0o600, flag: 'wx' });
-      this.recover(); throw error;
-    }
+      journal = { binding: dispatch, config, plan: Object.freeze({ ...plan }), spec, lease };
+      // Guardian exists before commit, but may not launch any Worker until the committed host arms it.
+      child = spawnGuardian(spec, lease); return JSON.stringify(journal);
+    }); } catch (error) { if (child?.connected) child.disconnect(); throw error; }
+    if (!binding || !journal || !child) return;
+    const guardian = child;
     let resolve!: () => void; let reject!: (error: unknown) => void; const done = new Promise<void>((r, e) => { resolve = r; reject = e; });
     this.closeResult = done;
-    const sender = new IpcSender((message, callback) => child.send(message, callback));
-    const active: Active = { journal, child, sender, done, resolve, reject, hello: false, ready: false, closed: false, requests: new Map(), replies: new Map(), pending: new Map(), startedAt: Date.now() };
+    const sender = new IpcSender((message, callback) => guardian.send(message, callback));
+    const active: Active = { journal, child: guardian, sender, done, resolve, reject, armed: false, hello: false, ready: false, closed: false, requests: new Map(), replies: new Map(), pending: new Map(), startedAt: Date.now() };
     this.active = active;
-    child.on('message', raw => { try { this.receive(active, raw); } catch { this.stop(active); } });
-    child.on('error', () => this.stop(active));
-    child.once('exit', () => { void this.finish(active); });
-    child.once('close', () => { if (!child.pid) void this.finish(active); });
+    guardian.on('message', raw => { try { this.receive(active, raw); } catch { this.stop(active); } });
+    guardian.on('error', () => this.stop(active));
+    guardian.once('exit', () => { void this.finish(active); });
+    guardian.once('close', () => { if (!guardian.pid) void this.finish(active); });
     const timer = setInterval(() => {
       if ((!active.ready && Date.now() - active.startedAt > (this.options.readyTimeoutMs ?? 5000)) || Date.now() >= plan.deadline) this.stop(active);
     }, 50); void done.then(() => clearInterval(timer), () => clearInterval(timer));
@@ -85,6 +82,10 @@ export class WorkerSupervisor {
   private receive(active: Active, raw: unknown) {
     if (this.active !== active) return; // closure bound to actual child handle, never routable by message strings
     const outer = exact(raw, Object.hasOwn(Object(raw), 'message') ? ['kind','message'] : Object.hasOwn(Object(raw), 'pid') ? ['kind','pid'] : ['kind']);
+    if (outer.kind === 'guardian-ready') {
+      if (active.armed) throw new Error('duplicate_guardian_ready'); active.armed = true;
+      void active.sender.send({ kind: 'arm' }).catch(() => this.stop(active)); return;
+    }
     if (outer.kind === 'spawned') { if (active.pid || typeof outer.pid !== 'number' || !Number.isSafeInteger(outer.pid)) throw new Error('invalid_spawn'); active.pid = outer.pid; return; }
     if (outer.kind === 'cleanup') return;
     if (outer.kind !== 'worker') throw new Error('unknown_guardian_message');
@@ -163,7 +164,13 @@ export class WorkerSupervisor {
   private async finish(active: Active): Promise<void> {
     active.sender.close();
     try {
-      const { binding } = active.journal; const clean = this.clean(active.journal);
+      const { binding, spec } = active.journal;
+      if (!active.armed && !existsSync(spec.receipt)) {
+        // Owned guardian has exited and was never armed: protocol forbids it from spawning a Worker.
+        writeFileSync(spec.receipt, JSON.stringify({ instanceId: spec.instanceId, runtimeBindingId: binding.runtimeBindingId,
+          nonce: spec.nonce, workerPid: null, exited: true, groupGone: true }), { flag: 'wx', mode: 0o600 });
+      }
+      const clean = this.clean(active.journal);
       if (clean) {
         const snap = this.core.snapshot(binding.threadId); const run = snap.runs.find(r => r.id === binding.runId)!;
         const outstanding = snap.operations.some(o => o.runId === run.id && ['pending','approved','executing','unknown'].includes(o.state));
@@ -174,7 +181,8 @@ export class WorkerSupervisor {
           if (run.state === 'starting' && !outstanding) this.core.reconcileRun(run.id, 'failed', { piIdle: true, hostClean: true });
         }
       }
-      // Missing proof keeps starting/unknown and the durable journal. Recovery can be retried later.
+      // Missing proof keeps admission blocked, and close callers share the failure.
+      if (!clean) throw new Error('cleanup_evidence_missing');
       active.resolve();
     } catch (error) { active.reject(error); }
     finally { if (this.active === active) this.active = undefined; }

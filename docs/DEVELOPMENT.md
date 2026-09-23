@@ -228,3 +228,20 @@ npm run test:product-sdk
 ## 14. A4 审核后的回归
 
 运行 `npm run test:pi-probe`、`npm run test:pi-resources`、`npm run test:pi-auth` 分别包含 F01/F02/F03 回归，当前为 15、12、18 项；仍沿用既有隔离启动器，未新增依赖。路径测试使用 Node path.win32/posix，不能据此报告 Windows 实机通过。认证状态先用 createAuthViewReader 登记完整账户白名单，同 Runtime 只绑定一次、同 provider 单账户。实际被测提交、命令与完整回归见 [复审报告](validation/review-a4-2026-09-23.md)。
+
+## B-IPC：真实子进程与四场景驱动
+
+沿用第 9 节的项目 Node/npm 和初始化，macOS 上执行：
+
+```bash
+npm run typecheck
+npm run test:product-worker
+npm run demo:product-worker -- allow
+npm run demo:product-worker -- deny
+npm run demo:product-worker -- cancel
+npm run demo:product-worker -- crash
+```
+
+驱动复用 ProductCore 命令、真实 SQLite、同一 IPC/Worker 和已注册 Pi write/edit。输出明确标记 SYNTHETIC；没有模型调用。每次使用独立临时 workspace/agentDir/Session/产品库，结束删除测试临时文件；演示打印生成的 Markdown 和结果摘要。`crash` 在实际文件写入后杀死 Worker，重开产品库仅核验原文件，Run 由 unknown 对账为 failed，已核实的成果仍归原 Operation。
+
+[进程契约](ssot/b-worker-contract.md) 说明权限、监护器与恢复范围。受限 Worker 仅支持当前验证的 macOS/Node 组合，其他平台报错。正常 entry 没有合成开关或模型驱动；测试 entry 的可信组合不能由 Renderer 命令选择。C 将补安全正文/工具摘要展示，当前类型标签投影不是聊天时间线。
