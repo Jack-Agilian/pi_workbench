@@ -8,6 +8,7 @@ import { contentLoader, inside, verifyContent } from './approved-resources.ts';
 import { createControlledTools, type ToolApproval } from './controlled-tools.ts';
 import { bindProductSession } from './product-binding.ts';
 import { IpcSender } from './ipc-channel.ts';
+import { projectMessages } from './presentation.ts';
 
 /** Trusted composition seam only; never serialized on product commands or IPC. */
 interface WorkerDriver {
@@ -30,7 +31,9 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
   const seen = new Set<string>();
   const references = new Map<string, { resolve(): void; reject(error: Error): void }>();
   let reservedReference: string | null = null;
-  const send = (body: WireBody, requestId = `worker-${++sequence}`) => sender.send({ version: 2, instanceId, runtimeBindingId, requestId, body } satisfies Envelope);
+  let priorEntries = new Set<string>();
+  const send = (body: WireBody, requestId = `worker-${++sequence}`) => sender.send({ version: 3, instanceId, runtimeBindingId, requestId, body } satisfies Envelope);
+  const publish = () => runtime && started && !closed ? send({ type: 'presentation', projection: projectMessages(runtime.session.sessionManager.getBranch().filter(entry => !priorEntries.has(entry.id))) }) : Promise.resolve();
   function close(): Promise<void> {
     if (closing) return closing;
     closed = true; subscriptionGeneration++; unbind(); abort.abort(new Error('worker_closed')); tools?.revoke();
@@ -55,6 +58,7 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
       authorize: async operation => {
         if (closed || !operation.target || !['write','edit'].includes(operation.tool)) throw new Error('tool_not_admitted');
         verifyContent(c.resources);
+        await publish();
         const requestId = `operation-${++sequence}`;
         const promise = new Promise<ToolApproval | undefined>(resolve => { grants.set(requestId, { resolve, localId: operation.operationId }); });
         await send({ type: 'operation', toolCallId: operation.toolCallId, tool: operation.tool as 'write' | 'edit', parametersDigest: operation.parametersDigest,
@@ -125,9 +129,11 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
       if (started) return;
       if (!runtime || !config || !driver) throw new Error('worker_driver_not_configured'); started = true;
       executing = (async () => {
+        priorEntries = new Set(runtime!.session.sessionManager.getBranch().map(entry => entry.id));
         let ok = false;
         try { abort.signal.throwIfAborted(); verifyContent(config!.resources); await driver.execute(runtime!, abort.signal); ok = !abort.signal.aborted; }
         catch { ok = false; }
+        await publish();
         for (const operationId of claimed) await send({ type: 'result', operationId, ok });
         await send({ type: 'done', ok });
       })(); void executing.catch(fail); return;

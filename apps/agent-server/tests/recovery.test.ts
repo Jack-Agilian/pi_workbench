@@ -147,7 +147,7 @@ test('cold recovery with known native history missing remains unknown despite va
 test('schema v2 migration preserves existing native reference as known persisted', async t => {
   const f = createScenario('normal', true); t.after(f.dispose); const first = f.start(); await f.approval(); await first;
   const native = f.core.nativeSessionReference(f.thread); f.core.close();
-  const db = new DatabaseSync(f.database); db.exec('ALTER TABLE threads DROP COLUMN native_persisted; PRAGMA user_version=2;'); db.close();
+  const db = new DatabaseSync(f.database); db.exec('DROP TABLE run_display; ALTER TABLE threads DROP COLUMN native_persisted; PRAGMA user_version=2;'); db.close();
   f.reopen(); assert.deepEqual(f.core.nativeSessionReference(f.thread), native);
-  const read = new DatabaseSync(f.database, { readOnly: true }); assert.equal(read.prepare('PRAGMA user_version').get()?.user_version, 3); read.close();
+  const read = new DatabaseSync(f.database, { readOnly: true }); assert.equal(read.prepare('PRAGMA user_version').get()?.user_version, 4); read.close();
 });

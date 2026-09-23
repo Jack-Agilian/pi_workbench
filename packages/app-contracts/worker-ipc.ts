@@ -1,6 +1,7 @@
 // Workbench protocol, not Pi SDK API. No product database or SDK types on this channel.
 import { identifier, sha256, type Dispatch } from './index.ts';
-export const IPC_VERSION = 2;
+import { parsePresentation, type Presentation } from './presentation.ts';
+export const IPC_VERSION = 3;
 export const MAX_MESSAGE_BYTES = 65_536;
 export interface ResourceSelection { root: string; id: string; files: readonly { path: string; sha256: string }[]; expectedSkillNames: readonly string[] }
 export interface WorkerInit { binding: Dispatch; workspace: string; agentDir: string; sessions: string; resources: ResourceSelection; deadline: number }
@@ -16,10 +17,11 @@ export type WireBody =
   | { type: 'deny' }
   | { type: 'result'; operationId: string; ok: boolean }
   | { type: 'observation'; kind: 'activity' | 'idle' | 'diagnostic'; eventType: string; sourceType: string | null }
+  | { type: 'presentation'; projection: Presentation }
   | { type: 'done'; ok: boolean }
   | { type: 'closed'; nativeRef: string | null }
   | { type: 'fault'; code: 'initialization_failed' | 'execution_failed' | 'protocol_failed' };
-export interface Envelope { version: 2; instanceId: string; runtimeBindingId: string; requestId: string; body: WireBody }
+export interface Envelope { version: 3; instanceId: string; runtimeBindingId: string; requestId: string; body: WireBody }
 export function record(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value) || ![Object.prototype, null].includes(Object.getPrototypeOf(value))) throw new Error('invalid_record');
   const fields = Object.getOwnPropertyDescriptors(value);
@@ -62,6 +64,7 @@ export function parseEnvelope(value: unknown): Envelope {
     case 'grant': check('operationId','parametersDigest','expiresAt','fileVersion'); identifier(b.operationId); sha256(b.parametersDigest); number(b.expiresAt); if (b.fileVersion !== null) sha256(b.fileVersion); break;
     case 'result': check('operationId','ok'); identifier(b.operationId); boolean(b.ok); break;
     case 'done': check('ok'); boolean(b.ok); break;
+    case 'presentation': check('projection'); b.projection = parsePresentation(b.projection); obj.body = b; break;
     case 'closed': check('nativeRef'); nullablePath(b.nativeRef); break;
     case 'observation': check('kind','eventType','sourceType'); if (typeof b.kind !== 'string' || !['activity','idle','diagnostic'].includes(b.kind)) throw new Error('invalid_kind'); identifier(b.eventType); if (b.sourceType !== null) identifier(b.sourceType); break;
     case 'fault': check('code'); if (typeof b.code !== 'string' || !['initialization_failed','execution_failed','protocol_failed'].includes(b.code)) throw new Error('invalid_fault'); break;

@@ -8,9 +8,17 @@
     "allowImportingTsExtensions": true,
     "erasableSyntaxOnly": true,
     "verbatimModuleSyntax": true,
-    "types": ["node"],
+    "types": [
+      "node"
+    ],
     "noUnusedLocals": true,
-    "noUnusedParameters": true
+    "noUnusedParameters": true,
+    "jsx": "react-jsx"
   },
-  "include": ["packages/**/*.ts", "apps/agent-server/**/*.ts"]
+  "include": [
+    "packages/**/*.ts",
+    "apps/agent-server/**/*.ts",
+    "apps/desktop/**/*.ts",
+    "apps/desktop/**/*.tsx"
+  ]
 }

@@ -1,10 +1,11 @@
-// Minimal product host. SQLite contains product intents/indexes, never Pi messages or a Session tree.
+// Product intents/indexes and disposable display projections; Pi owns authoritative messages and the Session tree.
 import { randomUUID } from 'node:crypto';
 import { chmodSync, realpathSync } from 'node:fs';
 import { DatabaseSync, type SQLInputValue } from 'node:sqlite';
 import { identifier, parseCommand, sha256, type Ack, type ArtifactView, type Binding, type Dispatch,
   type OperationView, type ProductEvent, type RuntimeObservation, type RunView, type Snapshot, type ThreadView } from '../../packages/app-contracts/index.ts';
 import { artifactPath, inspectMarkdown } from './artifact.ts';
+import { parsePresentation, type Presentation } from '../../packages/app-contracts/presentation.ts';
 
 type Run = RunView & { input: string; runtimeBindingId: string | null; workerEpoch: string | null; sessionGeneration: string | null };
 type Operation = OperationView & { runtimeBindingId: string; contentDigest: string | null };
@@ -28,7 +29,7 @@ export class ProductCore {
       if (path !== ':memory:') chmodSync(path, 0o600);
       this.db.exec('PRAGMA busy_timeout=1000; PRAGMA synchronous=FULL;');
       const version = this.one<{ user_version: number }>('PRAGMA user_version').user_version;
-      if (![0, 1, 2, 3].includes(version)) throw new Error('unsupported_database_version');
+      if (![0, 1, 2, 3, 4].includes(version)) throw new Error('unsupported_database_version');
       if (version === 0) {
         this.db.exec(`BEGIN IMMEDIATE;
           CREATE TABLE workspaces(id TEXT PRIMARY KEY, path TEXT NOT NULL UNIQUE) STRICT;
@@ -57,6 +58,9 @@ export class ProductCore {
       if (version < 3) this.db.exec(`BEGIN IMMEDIATE;
         ALTER TABLE threads ADD COLUMN native_persisted INTEGER NOT NULL DEFAULT 1 CHECK(native_persisted IN (0,1));
         PRAGMA user_version=3; COMMIT;`);
+      if (version < 4) this.db.exec(`BEGIN IMMEDIATE;
+        CREATE TABLE run_display(run_id TEXT PRIMARY KEY REFERENCES runs(id), projection TEXT NOT NULL) STRICT;
+        PRAGMA user_version=4; COMMIT;`);
       this.transaction(() => {
         for (const workspace of workspaces) {
           identifier(workspace.id); const canonical = realpathSync(workspace.path);
@@ -168,6 +172,22 @@ export class ProductCore {
     return this.all('SELECT run_id AS runId,record,cancel_requested AS cancelRequested FROM worker_launches');
   }
   workspacePath(id: string): string { return this.one<{path:string}>('SELECT path FROM workspaces WHERE id=?', id).path; }
+  listThreads(): ThreadView[] { return this.all('SELECT id,workspace_id AS workspaceId,title FROM threads ORDER BY rowid DESC'); }
+  /** Trusted host scheduling only. Renderer cannot select an executable or plan. */
+  nextQueuedIntent(): { id: string; input: string } | undefined { return this.get("SELECT id,input FROM runs WHERE state='queued' ORDER BY rowid LIMIT 1"); }
+  runInputs(threadId: string): { id: string; input: string }[] { return this.all('SELECT id,input FROM runs WHERE thread_id=? ORDER BY rowid', threadId); }
+  projectSession(binding: Binding, raw: unknown): void {
+    const projection = parsePresentation(raw);
+    this.mutate(() => {
+      const run = this.bound(binding);
+      this.db.prepare('INSERT INTO run_display VALUES (?,?) ON CONFLICT(run_id) DO UPDATE SET projection=excluded.projection').run(run.id, JSON.stringify(projection));
+      this.event(run.threadId, run.id, 'display.replaced', run.id);
+    });
+  }
+  presentation(runId: string): Presentation {
+    const row = this.get<{ projection: string }>('SELECT projection FROM run_display WHERE run_id=?', runId);
+    return row ? parsePresentation(JSON.parse(row.projection)) : { messages: [], omitted: false };
+  }
   markRunning(binding: Binding): void {
     this.mutate(() => { const run = this.bound(binding); if (run.state !== 'starting') throw new Error('not_starting'); this.setRun(run, 'running'); });
   }

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { parseEnvelope, MAX_MESSAGE_BYTES } from '../../../packages/app-contracts/worker-ipc.ts';
 import { IpcSender } from '../../../packages/pi-adapter/ipc-channel.ts';
-const envelope = { version: 2, instanceId: 'worker', runtimeBindingId: 'binding', requestId: 'request', body: { type: 'hello', pid: 12 } };
+const envelope = { version: 3, instanceId: 'worker', runtimeBindingId: 'binding', requestId: 'request', body: { type: 'hello', pid: 12 } };
 test('IPC enums require original JSON strings, never coercible arrays or objects', () => {
   for (const [field, body, values] of [
     ['tool', { type: 'operation', toolCallId: 'call', parametersDigest: 'a'.repeat(64), target: 'report.md', resourceLock: 'b'.repeat(64) }, ['write','edit']],

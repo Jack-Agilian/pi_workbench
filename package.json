@@ -23,15 +23,26 @@
     "patch:pi-types": "node scripts/check-environment.mjs --versions-only && node scripts/pi-type-patch.mjs",
     "test:pi-types": "node scripts/check-environment.mjs --versions-only && node --test scripts/pi-type-patch.test.mjs packages/pi-adapter/types.test.mjs",
     "test:product-worker": "node scripts/run-product-worker.mjs",
-    "demo:product-worker": "node scripts/run-product-worker.mjs --demo"
+    "demo:product-worker": "node scripts/run-product-worker.mjs --demo",
+    "prepare:desktop": "node scripts/prepare-desktop.mjs",
+    "build:desktop": "node scripts/build-desktop.mjs",
+    "desktop": "node scripts/launch-desktop.mjs --demo",
+    "test:desktop": "node scripts/test-desktop.mjs",
+    "test:desktop-ui": "node scripts/launch-desktop.mjs --demo --smoke-test"
   },
   "dependencies": {
     "@earendil-works/pi-ai": "0.87.0",
-    "@earendil-works/pi-coding-agent": "0.87.0"
+    "@earendil-works/pi-coding-agent": "0.87.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
   },
   "devDependencies": {
     "@modelcontextprotocol/sdk": "1.30.0",
     "@types/node": "24.13.6",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "electron": "44.4.5",
+    "esbuild": "0.28.2",
     "typescript": "7.0.2"
   }
 }

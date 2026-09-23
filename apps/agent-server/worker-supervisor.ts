@@ -77,7 +77,7 @@ export class WorkerSupervisor {
   }
   private send(active: Active, body: WireBody, requestId = `host-${++this.sequence}`): Promise<void> {
     const { spec } = active.journal;
-    return active.sender.send({ version: 2, instanceId: spec.instanceId, runtimeBindingId: spec.runtimeBindingId, requestId, body } satisfies Envelope);
+    return active.sender.send({ version: 3, instanceId: spec.instanceId, runtimeBindingId: spec.runtimeBindingId, requestId, body } satisfies Envelope);
   }
   private receive(active: Active, raw: unknown) {
     if (this.active !== active) return; // closure bound to actual child handle, never routable by message strings
@@ -129,6 +129,7 @@ export class WorkerSupervisor {
         else this.core.finishOperation(binding, operation.id, 'unknown'); break;
       }
       case 'observation': if (active.ready && !active.closed) this.core.observe(binding, body); break;
+      case 'presentation': if (!active.ready || active.closed) throw new Error('unexpected_presentation'); this.core.projectSession(binding, body.projection); break;
       case 'done': if (!active.ready || active.result !== undefined) throw new Error('unexpected_done'); active.result = body.ok; void this.send(active, { type: 'close' }).catch(() => this.stop(active)); break;
       case 'closed': active.closed = true; this.nativeReference(active, body.nativeRef); break;
       case 'fault': this.stop(active); break;

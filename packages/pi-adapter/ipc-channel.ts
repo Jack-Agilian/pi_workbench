@@ -7,10 +7,14 @@ export class IpcSender {
   private tail: Promise<void> = Promise.resolve();
   private closed = false;
   private readonly sendRaw: Send;
-  constructor(send: Send) { this.sendRaw = send; }
+  private readonly limit: number;
+  constructor(send: Send, limit = MAX_MESSAGE_BYTES) {
+    if (!Number.isSafeInteger(limit) || limit < 1 || limit > 1_250_000) throw new Error('invalid_ipc_limit');
+    this.sendRaw = send; this.limit = limit;
+  }
   send(message: object): Promise<void> {
     const size = Buffer.byteLength(JSON.stringify(message));
-    if (this.closed || size > MAX_MESSAGE_BYTES || this.pending >= 16 || this.bytes + size > MAX_MESSAGE_BYTES * 2) return Promise.reject(new Error('ipc_backpressure_or_closed'));
+    if (this.closed || size > this.limit || this.pending >= 16 || this.bytes + size > this.limit * 2) return Promise.reject(new Error('ipc_backpressure_or_closed'));
     this.pending++; this.bytes += size;
     const next = this.tail.then(() => new Promise<void>((resolve, reject) => {
       if (this.closed) { reject(new Error('ipc_closed')); return; }

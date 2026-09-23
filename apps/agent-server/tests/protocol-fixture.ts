@@ -1,7 +1,7 @@
 // SYNTHETIC hostile/duplicate wire producer, never represented as an actual Pi event fixture.
 import { parseEnvelope, type WireBody, type WorkerInit } from '../../../packages/app-contracts/worker-ipc.ts';
 const instanceId = process.argv[2]!; const runtimeBindingId = process.argv[3]!; const mode = process.argv[4]!;
-const envelope = (body: WireBody, requestId: string) => ({ version: 2, instanceId, runtimeBindingId, requestId, body });
+const envelope = (body: WireBody, requestId: string) => ({ version: 3, instanceId, runtimeBindingId, requestId, body });
 const send = (body: WireBody, requestId: string) => process.send!(envelope(body, requestId));
 let config: WorkerInit;
 process.on('message', raw => {
