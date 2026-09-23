@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { existsSync, lstatSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 import type { ChildProcess } from 'node:child_process';
 import { parseCommand, sha256, type Dispatch } from '../../packages/app-contracts/index.ts';
 import { exact, parseEnvelope, type Envelope, type ResourceSelection, type WireBody, type WorkerInit } from '../../packages/app-contracts/worker-ipc.ts';
@@ -15,7 +15,7 @@ export interface ExecutionPlan { tool: 'write' | 'edit'; target: string; paramet
 interface Journal { binding: Dispatch; config: WorkerInit; plan: ExecutionPlan; spec: LaunchSpec; lease: string }
 interface Active {
   journal: Journal; child: ChildProcess; sender: IpcSender; done: Promise<void>; resolve: () => void; reject: (error: unknown) => void;
-  pid?: number; armed: boolean; hello: boolean; ready: boolean; closed: boolean; result?: boolean;
+  pid?: number; armed: boolean; hello: boolean; ready: boolean; closed: boolean; result?: boolean; nativeRef?: string;
   requests: Map<string, string>; replies: Map<string, WireBody>; pending: Map<string, string>; startedAt: number;
 }
 export interface SupervisorOptions { stateDirectory: string; databaseDirectory: string; resources: ResourceSelection; readyTimeoutMs?: number }
@@ -77,7 +77,7 @@ export class WorkerSupervisor {
   }
   private send(active: Active, body: WireBody, requestId = `host-${++this.sequence}`): Promise<void> {
     const { spec } = active.journal;
-    return active.sender.send({ version: 1, instanceId: spec.instanceId, runtimeBindingId: spec.runtimeBindingId, requestId, body } satisfies Envelope);
+    return active.sender.send({ version: 2, instanceId: spec.instanceId, runtimeBindingId: spec.runtimeBindingId, requestId, body } satisfies Envelope);
   }
   private receive(active: Active, raw: unknown) {
     if (this.active !== active) return; // closure bound to actual child handle, never routable by message strings
@@ -101,6 +101,12 @@ export class WorkerSupervisor {
       case 'hello':
         if (active.hello || body.pid !== active.pid) throw new Error('unexpected_worker'); active.hello = true;
         void this.send(active, { type: 'init', config }).catch(() => this.stop(active)); break;
+      case 'session-reference': {
+        if (!active.hello || active.closed) throw new Error('unexpected_native_reference');
+        this.nativeReference(active, body.nativeRef, true);
+        const reply: WireBody = { type: 'session-reference-accepted' }; active.replies.set(requestId, reply);
+        void this.send(active, reply, requestId).catch(() => this.stop(active)); break;
+      }
       case 'ready':
         if (!active.hello || active.ready || body.resourceLock !== config.resources.id) throw new Error('resource_lock_mismatch');
         verifyContent(config.resources); this.nativeReference(active, body.nativeRef);
@@ -129,10 +135,21 @@ export class WorkerSupervisor {
       default: throw new Error('unexpected_worker_message');
     }
   }
-  private nativeReference(active: Active, reference: string | null) {
+  private nativeFile(journal: Journal, reference: string): boolean {
+    if (!inside(journal.config.sessions, reference) || dirname(reference) !== realpathSync(journal.config.sessions) || !reference.endsWith('.jsonl')) throw new Error('invalid_native_reference');
+    try {
+      const stat = lstatSync(reference);
+      if (!stat.isFile() || stat.isSymbolicLink() || realpathSync(reference) !== reference) throw new Error('invalid_native_reference');
+      return true;
+    } catch (error) { if (error instanceof Error && 'code' in error && error.code === 'ENOENT') return false; throw error; }
+  }
+  private nativeReference(active: Active, reference: string | null, reserve = false) {
     if (reference === null) return;
-    if (!inside(active.journal.config.sessions, reference) || !existsSync(reference) || realpathSync(reference) !== reference) throw new Error('invalid_native_reference');
-    this.core.bindNativeSession(active.journal.binding, reference);
+    if (!reserve && reference !== active.nativeRef) throw new Error('unreserved_native_reference');
+    const persisted = this.nativeFile(active.journal, reference);
+    const prior = this.core.nativeSessionReference(active.journal.binding.threadId);
+    if (reference === prior.reference && prior.persisted && !persisted) throw new Error('native_session_missing');
+    this.core.bindNativeSession(active.journal.binding, reference, persisted); active.nativeRef = reference;
   }
   private fileVersion(journal: Journal): string | null {
     const path = join(journal.config.workspace, artifactPath(journal.config.workspace, journal.plan.target));
@@ -190,12 +207,19 @@ export class WorkerSupervisor {
   /** Explicit reconciliation after actual guardian cleanup. Reads files; NEVER replays tools. */
   recover(): void {
     if (this.active) throw new Error('worker_still_owned');
+    // Cold takeover revokes old logical authority even when physical cleanup cannot be proven.
+    this.core.fencePreviousHost();
     const journals = this.core.workerLaunches().map(row => ({ ...row, journal: JSON.parse(row.record) as Journal }));
     const pending = journals.filter(({ journal }) => this.core.snapshot(journal.binding.threadId).runs.some(r => r.id === journal.binding.runId && ['starting','running','cancelling','unknown'].includes(r.state)));
     if (pending.some(({ journal }) => !this.clean(journal))) throw new Error('cleanup_evidence_missing');
     this.core.recoverAfterCrash();
     for (const { journal, cancelRequested } of pending) {
       const { binding, plan } = journal;
+      const native = this.core.nativeSessionReference(binding.threadId);
+      if (native.reference) {
+        if (this.nativeFile(journal, native.reference)) this.core.reconcileNativeSession(binding.runId, native.reference);
+        else if (native.persisted) throw new Error('native_session_missing');
+      }
       for (const op of this.core.snapshot(binding.threadId).operations.filter(o => o.runId === binding.runId)) {
         if (op.state === 'unknown') {
           const version = this.fileVersion(journal);
@@ -204,7 +228,7 @@ export class WorkerSupervisor {
           else throw new Error('side_effect_unresolved');
         }
         const current = this.core.snapshot(binding.threadId).operations.find(o => o.id === op.id)!;
-        if (current.state === 'succeeded') this.core.recordArtifact(binding, op.id, plan.target);
+        if (current.state === 'succeeded') this.core.reconcileArtifact(binding, op.id, plan.target);
       }
       this.core.reconcileRun(binding.runId, cancelRequested ? 'cancelled' : 'failed', { piIdle: true, hostClean: true });
     }

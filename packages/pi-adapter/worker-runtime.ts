@@ -28,16 +28,18 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
   const grants = new Map<string, { resolve: (value: ToolApproval | undefined) => void; localId: string }>();
   const claimed = new Set<string>();
   const seen = new Set<string>();
-  const send = (body: WireBody, requestId = `worker-${++sequence}`) => sender.send({ version: 1, instanceId, runtimeBindingId, requestId, body } satisfies Envelope);
-  const nativeRef = () => { const path = runtime?.session.sessionManager.getSessionFile(); return path && existsSync(path) ? path : null; };
+  const references = new Map<string, { resolve(): void; reject(error: Error): void }>();
+  let reservedReference: string | null = null;
+  const send = (body: WireBody, requestId = `worker-${++sequence}`) => sender.send({ version: 2, instanceId, runtimeBindingId, requestId, body } satisfies Envelope);
   function close(): Promise<void> {
     if (closing) return closing;
     closed = true; subscriptionGeneration++; unbind(); abort.abort(new Error('worker_closed')); tools?.revoke();
     for (const grant of grants.values()) grant.resolve(undefined); grants.clear();
+    for (const reference of references.values()) reference.reject(new Error('worker_closed')); references.clear();
     closing = Promise.resolve().then(async () => {
       await creating?.catch(() => {}); await executing?.catch(() => {});
       unbind(); if (runtime) await runtime.dispose();
-      await send({ type: 'closed', nativeRef: nativeRef() });
+      await send({ type: 'closed', nativeRef: reservedReference });
       sender.close(); if (process.connected) process.disconnect();
     });
     return closing;
@@ -62,6 +64,14 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
     const definitions = [defineTool(tools.write), defineTool(tools.edit)];
     const factory: CreateAgentSessionRuntimeFactory = async options => {
       if (closed) throw new Error('worker_closed');
+      const reference = options.sessionManager.getSessionFile();
+      if (!reference || !inside(c.sessions, reference)) throw new Error('invalid_native_reference');
+      const requestId = `native-${++sequence}`;
+      const accepted = new Promise<void>((resolve, reject) => { references.set(requestId, { resolve, reject }); });
+      // Persist Pi's preallocated path in the host before Session creation or synthetic/real input.
+      void send({ type: 'session-reference', nativeRef: reference }, requestId).catch(() => references.get(requestId)?.reject(new Error('native_reference_failed')));
+      try { await accepted; } finally { references.delete(requestId); }
+      if (closed) throw new Error('worker_closed'); reservedReference = reference;
       const services = await createIsolatedServices(options); services.resourceLoader = resources.loader;
       const result = await createAgentSession({ ...services, sessionManager: options.sessionManager, sessionStartEvent: options.sessionStartEvent,
         tools: ['write','edit'], customTools: definitions, noTools: 'builtin', thinkingLevel: 'off' });
@@ -70,6 +80,7 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
       return { ...result, services, diagnostics: services.diagnostics };
     };
     if (c.binding.nativeSessionRef && !inside(c.sessions, c.binding.nativeSessionRef)) throw new Error('native_reference_outside_session_root');
+    if (c.binding.nativeSessionRef && c.binding.nativeSessionPersisted && !existsSync(c.binding.nativeSessionRef)) throw new Error('native_session_missing');
     const manager = c.binding.nativeSessionRef ? SessionManager.open(c.binding.nativeSessionRef, c.sessions) : SessionManager.create(c.workspace, c.sessions);
     runtime = await createAgentSessionRuntime(factory, { cwd: c.workspace, agentDir: c.agentDir, sessionManager: manager });
     const bind = async () => {
@@ -86,7 +97,7 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
     runtime.setRebindSession(bind); await bind();
     await driver?.beforeReady?.(runtime, close);
     if (closed) return;
-    await send({ type: 'ready', resourceLock: resources.loaded.id, nativeRef: nativeRef() });
+    await send({ type: 'ready', resourceLock: resources.loaded.id, nativeRef: reservedReference });
   }
   async function receive(raw: unknown) {
     const message = parseEnvelope(raw);
@@ -97,6 +108,7 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
     if (body.type === 'cancel') { abort.abort(new Error('cancel_requested')); tools?.revoke(); for (const g of grants.values()) g.resolve(undefined); return; }
     if (body.type === 'close') { fail(); return; }
     if (closed) return;
+    if (body.type === 'session-reference-accepted') { references.get(requestId)?.resolve(); return; }
     if (body.type === 'init') {
       if (creating) throw new Error('already_initialized');
       creating = Promise.resolve().then(() => initialize(body.config));

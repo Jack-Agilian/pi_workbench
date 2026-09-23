@@ -220,6 +220,31 @@ test('native reference stays host-only; product database contains no transcript 
   assert.deepEqual(db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE '%message%'").all(), []);
   assert.equal(db.prepare('SELECT count(*) AS n FROM threads').get()?.n, 1);
 });
+test('cold fencing leaves current epoch intact; previous epoch approval is revoked on takeover', t => {
+  const f = fixture(t); const binding = f.running(); const op = approve(f.core, binding);
+  const before = f.core.snapshot(f.thread); f.core.fencePreviousHost(); assert.deepEqual(f.core.snapshot(f.thread), before);
+  f.core.close(); const reopened = new ProductCore(f.path, f.workspaces); t.after(() => reopened.close());
+  reopened.fencePreviousHost(); assert.equal(reopened.snapshot(f.thread).runs[0]!.state, 'unknown');
+  assert.equal(reopened.snapshot(f.thread).operations[0]!.state, 'denied'); assert.throws(() => reopened.claimOperation(binding, op.id, hash), /stale_binding/);
+});
+test('native reference reservation cannot redirect pending operations or downgrade observed persistence', t => {
+  const f = fixture(t); const binding = f.running(); const reference = join(f.dir, 'reserved.jsonl');
+  f.core.bindNativeSession(binding, reference, false); assert.equal(f.core.nativeSessionReference(f.thread).persisted, false);
+  f.core.bindNativeSession(binding, reference, true); f.core.bindNativeSession(binding, reference, false);
+  assert.equal(f.core.nativeSessionReference(f.thread).persisted, true);
+  approve(f.core, binding); assert.throws(() => f.core.bindNativeSession(binding, join(f.dir, 'other.jsonl'), false), /native_binding_busy/);
+  assert.equal(f.core.nativeSessionReference(f.thread).reference, reference);
+});
+test('historical artifact recovery checks original operation identity and target before reusing committed metadata', t => {
+  const f = fixture(t); const binding = f.running(); const op = approve(f.core, binding); const path = join(f.workspace, 'report.md');
+  writeFileSync(path, '# SYNTHETIC report\n'); f.core.claimOperation(binding, op.id, hash); f.core.finishOperation(binding, op.id, 'succeeded', contentHash(path));
+  const artifact = f.core.recordArtifact(binding, op.id, 'report.md'); f.core.recoverAfterCrash(); rmSync(path);
+  assert.equal(f.core.reconcileArtifact(binding, op.id, 'report.md').id, artifact.id);
+  assert.throws(() => f.core.reconcileArtifact({ ...binding, runtimeBindingId: 'unrelated' }, op.id, 'report.md'), /artifact_origin_mismatch/);
+  assert.throws(() => f.core.reconcileArtifact({ ...binding, threadId: 'unrelated' }, op.id, 'report.md'), /artifact_origin_mismatch/);
+  assert.throws(() => f.core.reconcileArtifact(binding, op.id, 'other.md'), /artifact_target_mismatch/);
+  assert.throws(() => f.core.recordArtifact(binding, op.id, 'report.md'), /ENOENT/);
+});
 
 test('artifacts require actual bounded files and successful origin; versions detect changes and missing files', t => {
   const f = fixture(t); const binding = f.running(); const op = approve(f.core, binding); const path = join(f.workspace, 'report.md');

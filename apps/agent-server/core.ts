@@ -28,7 +28,7 @@ export class ProductCore {
       if (path !== ':memory:') chmodSync(path, 0o600);
       this.db.exec('PRAGMA busy_timeout=1000; PRAGMA synchronous=FULL;');
       const version = this.one<{ user_version: number }>('PRAGMA user_version').user_version;
-      if (version !== 0 && version !== 1 && version !== 2) throw new Error('unsupported_database_version');
+      if (![0, 1, 2, 3].includes(version)) throw new Error('unsupported_database_version');
       if (version === 0) {
         this.db.exec(`BEGIN IMMEDIATE;
           CREATE TABLE workspaces(id TEXT PRIMARY KEY, path TEXT NOT NULL UNIQUE) STRICT;
@@ -54,6 +54,9 @@ export class ProductCore {
       if (version < 2) this.db.exec(`BEGIN IMMEDIATE;
         CREATE TABLE worker_launches(run_id TEXT PRIMARY KEY REFERENCES runs(id), record TEXT NOT NULL, cancel_requested INTEGER NOT NULL DEFAULT 0) STRICT;
         PRAGMA user_version=2; COMMIT;`);
+      if (version < 3) this.db.exec(`BEGIN IMMEDIATE;
+        ALTER TABLE threads ADD COLUMN native_persisted INTEGER NOT NULL DEFAULT 1 CHECK(native_persisted IN (0,1));
+        PRAGMA user_version=3; COMMIT;`);
       this.transaction(() => {
         for (const workspace of workspaces) {
           identifier(workspace.id); const canonical = realpathSync(workspace.path);
@@ -155,7 +158,7 @@ export class ProductCore {
       const binding: Binding = { runId: run.id, threadId: run.threadId, runtimeBindingId: randomUUID(), workerEpoch: this.epoch, sessionGeneration: randomUUID() };
       this.db.prepare("UPDATE runs SET state='starting',binding_id=?,worker_epoch=?,session_generation=? WHERE id=?").run(binding.runtimeBindingId, binding.workerEpoch, binding.sessionGeneration, run.id);
       this.event(run.threadId, run.id, 'run.starting', run.id);
-      const dispatch = { ...binding, ...thread, input: run.input };
+      const dispatch = { ...binding, ...thread, nativeSessionPersisted: this.nativeSessionReference(run.threadId).persisted, input: run.input };
       if (prepare) this.db.prepare('INSERT INTO worker_launches(run_id,record) VALUES (?,?)').run(run.id, prepare(dispatch));
       return dispatch;
     });
@@ -168,11 +171,30 @@ export class ProductCore {
   markRunning(binding: Binding): void {
     this.mutate(() => { const run = this.bound(binding); if (run.state !== 'starting') throw new Error('not_starting'); this.setRun(run, 'running'); });
   }
-  bindNativeSession(binding: Binding, reference: string): void {
+  /** Host-only reference metadata, never a message/tree or a Renderer path. */
+  nativeSessionReference(threadId: string): { reference: string | null; persisted: boolean } {
+    const row = this.one<{ reference: string | null; persisted: number }>('SELECT native_ref AS reference,native_persisted AS persisted FROM threads WHERE id=?', threadId);
+    return { reference: row.reference, persisted: row.reference !== null && row.persisted === 1 };
+  }
+  bindNativeSession(binding: Binding, reference: string, persisted = true): void {
     if (!reference || reference.length > 4096 || reference.includes('\0')) throw new Error('invalid_native_reference');
     this.mutate(() => { const run = this.bound(binding);
-      this.db.prepare('UPDATE threads SET native_ref=? WHERE id=?').run(reference, run.threadId);
+      const prior = this.nativeSessionReference(run.threadId);
+      const observed = persisted || (prior.reference === reference && prior.persisted);
+      if (prior.reference === reference && prior.persisted === observed) return;
+      if (prior.reference !== reference && (!['starting','running'].includes(run.state) || this.get(`SELECT id FROM operations WHERE run_id=? AND state IN ${outstanding}`, run.id))) throw new Error('native_binding_busy');
+      this.db.prepare('UPDATE threads SET native_ref=?,native_persisted=? WHERE id=?').run(reference, Number(observed), run.threadId);
       this.event(run.threadId, run.id, 'session.bound', run.id);
+    });
+  }
+  /** Cleanup has completed; host inspected the exact reserved path. Never selects a file by recency. */
+  reconcileNativeSession(runId: string, reference: string): void {
+    this.mutate(() => {
+      const run = this.run(runId); const prior = this.nativeSessionReference(run.threadId);
+      if (run.state !== 'unknown' || prior.reference !== reference) throw new Error('native_reconciliation_mismatch');
+      if (prior.persisted) return;
+      this.db.prepare('UPDATE threads SET native_persisted=1 WHERE id=?').run(run.threadId);
+      this.event(run.threadId, run.id, 'session.persisted', run.id);
     });
   }
   replaceBinding(binding: Binding, evidence: { piIdle: boolean; hostClean: boolean }): Binding {
@@ -267,6 +289,12 @@ export class ProductCore {
       this.fenceRun(run);
     });
   }
+  /** Exclusive new host takes logical ownership. No assertion about old processes or side effects. */
+  fencePreviousHost(): void {
+    this.mutate(() => {
+      for (const run of this.all<Run>(`SELECT ${runColumns} FROM runs WHERE state IN ('starting','running','cancelling') AND worker_epoch != ?`, this.epoch)) this.fenceRun(run);
+    });
+  }
   /** Explicit recovery only after the host has stopped/fenced the old Worker. Keeps global admission blocked. */
   recoverAfterCrash(): void {
     this.mutate(() => {
@@ -306,6 +334,16 @@ export class ProductCore {
       this.event(run.threadId, run.id, 'artifact.recorded', id);
       return this.one<ArtifactView>(`SELECT ${artifactColumns} FROM artifacts WHERE id=?`, id);
     });
+  }
+  /** Recovery reuses a committed historical fact; unregistered results still require actual bytes. */
+  reconcileArtifact(binding: Binding, operationId: string, path: string): ArtifactView {
+    const run = this.run(binding.runId); const op = this.operation(operationId);
+    if (run.state !== 'unknown' || run.threadId !== binding.threadId || op.runId !== run.id || op.runtimeBindingId !== binding.runtimeBindingId || op.state !== 'succeeded') throw new Error('artifact_origin_mismatch');
+    const workspace = this.one<{ path: string }>('SELECT w.path FROM workspaces w JOIN threads t ON t.workspace_id=w.id WHERE t.id=?', run.threadId);
+    const target = artifactPath(workspace.path, path);
+    if (op.artifactPath !== target) throw new Error('artifact_target_mismatch');
+    const prior = this.get<ArtifactView>(`SELECT ${artifactColumns} FROM artifacts WHERE operation_id=? AND path=? AND digest=?`, operationId, target, op.contentDigest);
+    return prior ?? this.recordArtifact(binding, operationId, target);
   }
   previewArtifact(id: string): { status: 'ready' | 'changed' | 'missing' | 'unavailable'; text?: string } {
     const artifact = this.one<ArtifactView & { workspaceId: string }>(`SELECT ${artifactColumns},workspace_id AS workspaceId FROM artifacts WHERE id=?`, id);

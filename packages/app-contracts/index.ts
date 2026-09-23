@@ -15,7 +15,7 @@ export interface RuntimeObservation { kind: 'activity' | 'idle' | 'diagnostic'; 
 export interface ProductEvent { seq: number; runSeq: number; threadId: string; runId: string; kind: string; entityId: string; eventType: string | null; sourceType: string | null }
 export interface Snapshot { cursor: number; thread: ThreadView; runs: RunView[]; operations: OperationView[]; artifacts: ArtifactView[] }
 export interface Binding { runId: string; threadId: string; runtimeBindingId: string; workerEpoch: string; sessionGeneration: string }
-export interface Dispatch extends Binding { input: string; workspaceId: string; nativeSessionRef: string | null }
+export interface Dispatch extends Binding { input: string; workspaceId: string; nativeSessionRef: string | null; nativeSessionPersisted: boolean }
 
 export function identifier(value: unknown): string {
   if (typeof value !== 'string' || !/^[a-zA-Z0-9._:-]{1,128}$/.test(value)) throw new Error('invalid_identifier');

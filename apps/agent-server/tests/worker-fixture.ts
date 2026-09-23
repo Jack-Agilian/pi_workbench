@@ -47,6 +47,7 @@ serveWorker({
     }
     if (spec.mode === 'close-create') { const first = close(); assert.equal(close(), first); stage('close-create'); }
     if (spec.mode === 'restore') assert.ok(runtime.session.messages.some(m => m.role === 'user'));
+    if (spec.mode === 'restore-empty') assert.equal(runtime.session.messages.length, 0);
   },
   afterGrant: async signal => {
     stage('claimed');
@@ -61,6 +62,13 @@ serveWorker({
     }
   },
   execute: async (runtime, signal) => {
+    if (spec.mode === 'native-late' || spec.mode === 'native-replace-late') {
+      if (spec.mode === 'native-replace-late') await runtime.newSession();
+      assert.equal(existsSync(runtime.session.sessionManager.getSessionFile()!), false);
+      syntheticNative(runtime);
+      writeFileSync(join(process.cwd(), '.native-path'), runtime.session.sessionManager.getSessionFile()!);
+      stage('native-late'); await pause();
+    }
     const tool = runtime.session.agent.state.tools.find(t => t.name === spec.tool); assert.ok(tool);
     const prepared: unknown = tool.prepareArguments?.(spec.args) ?? spec.args;
     assert.ok(prepared && typeof prepared === 'object' && !Array.isArray(prepared));
