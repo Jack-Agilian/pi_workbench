@@ -13,3 +13,11 @@ Node 子进程 IPC 连接为 App Server → 生命周期监护器 → Worker。�
 工具与故障驱动只能通过测试入口的可信组合注入；Renderer 仍只有既有四种产品命令。当前生产 entry 不配置模型驱动，不能调用真实模型。测试驱动标记 SYNTHETIC，在真实 Worker 内调用已注册的真实 Pi 工具。
 
 此文是实现契约。实际执行范围、失败和被测 SHA 由后续 docs/validation 记录；契约和测试数量不能替代 M0 Gate 证据。
+
+## 宿主审批与结算
+
+当前可信宿主组合只批准一个 write/edit Markdown 意图，绑定归一化参数摘要、相对目标、已有 fileVersion、预期结果摘要、资源锁、运行绑定和期限。Operation ID 在宿主 SQLite 内生成；Worker 的工具调用 ID 只作关联。批准命令提交之后，宿主再次核对文件版本、资源内容和期限，事务领取成功后才回授授权；Pi Operations 在实际写前再检查版本/取消/期限。取消不能撤销已发生的写入。
+
+Worker 的 result/done/closed 都只是输入。宿主自行读取文件，用原 Operation 登记成果，等待监护器核验整个固定进程组消失后才能结算。断开或 kill 后未确认操作为 unknown，不自动重发。显式 recover 重开真实产品状态，凭受保护的清理记录及文件摘要将操作对账；崩溃 Run 最终只能 failed 或 cancelled，不能推断为 completed。缺清理证据或文件呈第三种状态时保持阻断，不能靠 PID/退出码或 Worker 的自报释放名额。
+
+正常路径完成后 Worker 与 Session 一起关闭。订阅游标和快照属于产品数据库；重新订阅只读取事实，不调用工具。投影目前仍是事件类型标签，C 必须补正文/工具摘要的安全展示，不能把这些标签或 SDK 对象当作聊天时间线。

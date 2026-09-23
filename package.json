@@ -21,7 +21,8 @@
     "prepare:pi-packages": "node scripts/prepare-pi-package-fixtures.mjs",
     "test:pi-packages": "node scripts/run-pi-probe.mjs --packages",
     "patch:pi-types": "node scripts/check-environment.mjs --versions-only && node scripts/pi-type-patch.mjs",
-    "test:pi-types": "node scripts/check-environment.mjs --versions-only && node --test scripts/pi-type-patch.test.mjs packages/pi-adapter/types.test.mjs"
+    "test:pi-types": "node scripts/check-environment.mjs --versions-only && node --test scripts/pi-type-patch.test.mjs packages/pi-adapter/types.test.mjs",
+    "test:product-worker": "node scripts/run-product-worker.mjs"
   },
   "dependencies": {
     "@earendil-works/pi-ai": "0.87.0",
