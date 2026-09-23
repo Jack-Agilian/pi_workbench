@@ -1,57 +1,17 @@
 // A0/A1 only: no product protocol, Run coordinator, tool execution or model calls.
 import { randomUUID } from 'node:crypto';
-import { InMemoryCredentialStore, InMemoryModelsStore } from '@earendil-works/pi-ai';
 import {
   createAgentSession,
   createAgentSessionRuntime,
-  createExtensionRuntime,
-  ModelRuntime,
-  SettingsManager,
   type AgentSession,
   type AgentSessionEvent,
   type AgentSessionRuntime,
-  type AgentSessionServices,
   type CreateAgentSessionRuntimeFactory,
-  type ResourceLoader,
   type SessionManager,
 } from '@earendil-works/pi-coding-agent';
 
-/** Supply empty resources BEFORE discovery; never instantiate the discovery loader. */
-export function emptyResources(): ResourceLoader {
-  const extensions = { extensions: [], errors: [], runtime: createExtensionRuntime() };
-  return {
-    getExtensions: () => extensions,
-    getSkills: () => ({ skills: [], diagnostics: [] }),
-    getPrompts: () => ({ prompts: [], diagnostics: [] }),
-    getThemes: () => ({ themes: [], diagnostics: [] }),
-    getAgentsFiles: () => ({ agentsFiles: [] }),
-    getSystemPrompt: () => 'Synthetic offline Session probe. No model invocation.',
-    getSystemPromptSource: () => undefined,
-    getAppendSystemPrompt: () => [],
-    getAppendSystemPromptSources: () => [],
-    extendResources: () => { throw new Error('Probe resources are explicitly empty'); },
-    reload: async () => {},
-  };
-}
-
-export async function createProbeServices(options: { cwd: string; agentDir: string }): Promise<AgentSessionServices> {
-  const credentials = new InMemoryCredentialStore();
-  const services: AgentSessionServices = {
-    cwd: options.cwd,
-    agentDir: options.agentDir,
-    settingsManager: SettingsManager.inMemory(),
-    resourceLoader: emptyResources(),
-    modelRuntime: await ModelRuntime.create({
-      credentials,
-      modelsPath: null,
-      modelsStore: new InMemoryModelsStore(),
-      allowModelNetwork: false,
-      refreshOnCreate: false,
-    }),
-    diagnostics: [],
-  };
-  return services;
-}
+export { explicitEmptyResources as emptyResources, createIsolatedServices as createProbeServices } from './session-services.ts';
+import { createIsolatedServices as createProbeServices } from './session-services.ts';
 
 export const createProbeRuntime: CreateAgentSessionRuntimeFactory = async (options) => {
   const services = await createProbeServices(options);

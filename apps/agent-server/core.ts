@@ -28,7 +28,7 @@ export class ProductCore {
       if (path !== ':memory:') chmodSync(path, 0o600);
       this.db.exec('PRAGMA busy_timeout=1000; PRAGMA synchronous=FULL;');
       const version = this.one<{ user_version: number }>('PRAGMA user_version').user_version;
-      if (version !== 0 && version !== 1) throw new Error('unsupported_database_version');
+      if (version !== 0 && version !== 1 && version !== 2) throw new Error('unsupported_database_version');
       if (version === 0) {
         this.db.exec(`BEGIN IMMEDIATE;
           CREATE TABLE workspaces(id TEXT PRIMARY KEY, path TEXT NOT NULL UNIQUE) STRICT;
@@ -51,6 +51,9 @@ export class ProductCore {
           CREATE TABLE requests(id TEXT PRIMARY KEY, command TEXT NOT NULL, response TEXT NOT NULL) STRICT;
           PRAGMA user_version=1; COMMIT;`);
       }
+      if (version < 2) this.db.exec(`BEGIN IMMEDIATE;
+        CREATE TABLE worker_launches(run_id TEXT PRIMARY KEY REFERENCES runs(id), record TEXT NOT NULL, cancel_requested INTEGER NOT NULL DEFAULT 0) STRICT;
+        PRAGMA user_version=2; COMMIT;`);
       this.transaction(() => {
         for (const workspace of workspaces) {
           identifier(workspace.id); const canonical = realpathSync(workspace.path);
@@ -123,6 +126,7 @@ export class ProductCore {
           const run = this.run(command.runId); id = run.id;
           if (terminal.has(run.state) || run.state === 'cancelling') break;
           if (run.state === 'unknown') throw new Error('reconciliation_required');
+          this.db.prepare('UPDATE worker_launches SET cancel_requested=1 WHERE run_id=?').run(run.id);
           this.revokePending(run.id);
           this.setRun(run, run.state === 'queued' ? 'cancelled' : 'cancelling'); break;
         }
@@ -142,7 +146,7 @@ export class ProductCore {
   }
 
   /** Trusted host calls below. Persist dispatch before any Worker side effect. Never replay automatically. */
-  dispatchNext(): Dispatch | undefined {
+  dispatchNext(prepare?: (dispatch: Dispatch) => string): Dispatch | undefined {
     return this.mutate(() => {
       if (this.get(`SELECT id FROM runs WHERE state IN ${active}`)) return undefined;
       const run = this.get<Run>(`SELECT ${runColumns} FROM runs WHERE state='queued' ORDER BY rowid LIMIT 1`);
@@ -151,9 +155,16 @@ export class ProductCore {
       const binding: Binding = { runId: run.id, threadId: run.threadId, runtimeBindingId: randomUUID(), workerEpoch: this.epoch, sessionGeneration: randomUUID() };
       this.db.prepare("UPDATE runs SET state='starting',binding_id=?,worker_epoch=?,session_generation=? WHERE id=?").run(binding.runtimeBindingId, binding.workerEpoch, binding.sessionGeneration, run.id);
       this.event(run.threadId, run.id, 'run.starting', run.id);
-      return { ...binding, ...thread, input: run.input };
+      const dispatch = { ...binding, ...thread, input: run.input };
+      if (prepare) this.db.prepare('INSERT INTO worker_launches(run_id,record) VALUES (?,?)').run(run.id, prepare(dispatch));
+      return dispatch;
     });
   }
+  /** Host-only recovery journal. Kept independently of the Worker writable Session tree. */
+  workerLaunches(): { runId: string; record: string; cancelRequested: number }[] {
+    return this.all('SELECT run_id AS runId,record,cancel_requested AS cancelRequested FROM worker_launches');
+  }
+  workspacePath(id: string): string { return this.one<{path:string}>('SELECT path FROM workspaces WHERE id=?', id).path; }
   markRunning(binding: Binding): void {
     this.mutate(() => { const run = this.bound(binding); if (run.state !== 'starting') throw new Error('not_starting'); this.setRun(run, 'running'); });
   }
