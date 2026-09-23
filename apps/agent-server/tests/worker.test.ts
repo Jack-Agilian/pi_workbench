@@ -123,7 +123,8 @@ test('missing cleanup receipt cannot free slot; repeated close shares rejection 
   const first = f.supervisor.close(); assert.equal(f.supervisor.close(), first); await assert.rejects(first, /cleanup_evidence_missing/);
   await until(() => { try { process.kill(-pid, 0); return false; } catch { return true; } }, 'actual test group stopped');
   f.reopen(); assert.throws(() => f.supervisor.recover(), /cleanup_evidence_missing/);
-  assert.equal(f.core.dispatchNext(), undefined); assert.equal(f.core.snapshot(f.thread).operations[0]!.state, 'executing');
+  assert.equal(f.core.dispatchNext(), undefined); assert.equal(f.core.snapshot(f.thread).operations[0]!.state, 'unknown');
+  assert.equal(f.core.snapshot(f.thread).runs[0]!.state, 'unknown');
 });
 test('native Pi reference survives Worker recycling; product subscription reconnect resumes facts without tool replay', async t => {
   const f = fixture(t, 'normal', true); const received: number[] = []; const sub = f.core.subscribe(f.thread, 0, e => received.push(e.seq));

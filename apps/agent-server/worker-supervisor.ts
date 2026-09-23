@@ -182,7 +182,7 @@ export class WorkerSupervisor {
         }
       }
       // Missing proof keeps admission blocked, and close callers share the failure.
-      if (!clean) throw new Error('cleanup_evidence_missing');
+      if (!clean) { this.core.workerDisconnected(binding); throw new Error('cleanup_evidence_missing'); }
       active.resolve();
     } catch (error) { active.reject(error); }
     finally { if (this.active === active) this.active = undefined; }

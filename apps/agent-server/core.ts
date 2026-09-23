@@ -253,15 +253,24 @@ export class ProductCore {
       this.setRun(run, result);
     });
   }
+  private fenceRun(run: Run): void {
+    this.revokePending(run.id);
+    this.db.prepare("UPDATE operations SET state='unknown' WHERE run_id=? AND state='executing'").run(run.id);
+    this.db.prepare('UPDATE runs SET binding_id=NULL,worker_epoch=NULL,session_generation=NULL WHERE id=?').run(run.id);
+    this.setRun(run, 'unknown');
+  }
+  /** Actual host channel loss fences authority immediately, but makes NO cleanup/termination claim. */
+  workerDisconnected(binding: Binding): void {
+    this.mutate(() => {
+      let run: Run;
+      try { run = this.bound(binding); } catch (error) { if (error instanceof Error && error.message === 'stale_binding') return; throw error; }
+      this.fenceRun(run);
+    });
+  }
   /** Explicit recovery only after the host has stopped/fenced the old Worker. Keeps global admission blocked. */
   recoverAfterCrash(): void {
     this.mutate(() => {
-      for (const run of this.all<Run>(`SELECT ${runColumns} FROM runs WHERE state IN ('starting','running','cancelling')`)) {
-        this.revokePending(run.id);
-        this.db.prepare("UPDATE operations SET state='unknown' WHERE run_id=? AND state='executing'").run(run.id);
-        this.db.prepare('UPDATE runs SET binding_id=NULL,worker_epoch=NULL,session_generation=NULL WHERE id=?').run(run.id);
-        this.setRun(run, 'unknown');
-      }
+      for (const run of this.all<Run>(`SELECT ${runColumns} FROM runs WHERE state IN ('starting','running','cancelling')`)) this.fenceRun(run);
     });
   }
   reconcileOperation(id: string, result: 'succeeded' | 'failed', contentDigest?: string): void {
