@@ -11,11 +11,13 @@ const active = new Set<RunState>(['queued','starting','running','cancelling','un
 const id = () => crypto.randomUUID();
 function App() {
   const [home, setHome] = useState<DesktopHome | null>(null);
-  const [selected, setSelected] = useState(''); const [thread, setThread] = useState<DesktopThread | null>(null);
+  const [selected, setSelected] = useState(''); const [threadState, setThread] = useState<DesktopThread | null>(null);
+  const thread = threadState?.thread.id === selected ? threadState : null;
   const [drafts, setDrafts] = useState<Record<string, string>>({}); const [title, setTitle] = useState('');
   const [problem, setProblem] = useState(''); const [disconnected, setDisconnected] = useState(false);
   const [busy, setBusy] = useState(false); const [tick, setTick] = useState(0);
-  const [preview, setPreview] = useState<{ id: string; value: Preview } | null>(null);
+  const [previewState, setPreview] = useState<{ threadId: string; id: string; value: Preview } | null>(null);
+  const preview = previewState?.threadId === selected ? previewState : null;
   const selectedRef = useRef(selected); selectedRef.current = selected;
   const generation = useRef(0); const commandPending = useRef(false); const previewGeneration = useRef(0);
   const retry = useRef<{ threadId: string; input: string; requestId: string } | null>(null);
@@ -76,7 +78,7 @@ function App() {
   }
   async function showArtifact(artifactId: string) {
     const current = selected; const currentPreview = ++previewGeneration.current;
-    try { const value = await api.preview(artifactId); if (selectedRef.current === current && previewGeneration.current === currentPreview) setPreview({ id: artifactId, value }); }
+    try { const value = await api.preview(artifactId); if (selectedRef.current === current && previewGeneration.current === currentPreview) setPreview({ threadId: current, id: artifactId, value }); }
     catch (error) { if (selectedRef.current === current) failed(error); }
   }
   async function reconnect() {
@@ -111,6 +113,7 @@ function App() {
               <div className="run-label"><span>任务 {String(index + 1).padStart(2, '0')}</span><span className={`state state-${run.state}`}>{labels[run.state]}</span>{active.has(run.state) && !['unknown','cancelling'].includes(run.state) && <button className="stop" disabled={busy || disconnected} onClick={() => void command({ type: 'runs.cancel', requestId: id(), runId: run.id })}>停止</button>}</div>
               <div className="message user"><span className="avatar">你</span><div><small>任务目标</small><p>{thread?.inputs.find(input => input.id === run.id)?.text}</p></div></div>
               {thread?.presentations.find(p => p.runId === run.id)?.value.messages.filter(message => message.role === 'assistant').map(message => <div className="message assistant" key={message.id}><span className="avatar">π</span><div><small>Pi · 合成演示记录</small><p>{message.text}</p>{message.truncated && <small>正文已截断或脱敏</small>}</div></div>)}
+              {thread?.presentations.find(p => p.runId === run.id)?.value.omitted && <p className="run-note">部分消息超出展示上限；此处仅显示有限摘要。</p>}
               {thread?.operations.filter(op => op.runId === run.id).map(op => <div className="tool-card" key={op.id}><span className="file-icon">▤</span><div><strong>写入 Markdown</strong><span>{op.artifactPath}</span></div><span className="tool-status">{operationLabels[op.state] ?? '未知操作'}</span></div>)}
               {run.state === 'unknown' && <p className="run-note">不能确认此次执行的最终结果。核验现有文件后再继续，不会自动重新写入。</p>}
               {run.state === 'cancelled' && <p className="run-note">执行与清理已结束；已经发生的文件改动不会自动回滚。</p>}
@@ -128,7 +131,7 @@ function App() {
           {!pending.length && <div className="approval-empty"><span>✓</span> 暂无待处理审批</div>}
           <h3 className="artifacts-heading">成果文件 <span>{thread?.artifacts.length ?? 0}</span></h3>
           {!thread?.artifacts.length && <div className="artifact-empty"><span>▤</span><p>成果将在这里出现</p><small>只有核验过的真实文件才会登记。</small></div>}
-          {thread?.artifacts.map(artifact => <button className={`artifact ${preview?.id === artifact.id ? 'selected-artifact' : ''}`} key={artifact.id} onClick={() => void showArtifact(artifact.id)}><span className="file-icon">M↓</span><div><strong>{artifact.path}</strong><small>版本 {artifact.version} · {artifact.bytes} B · 查看预览</small></div></button>)}
+          {thread?.artifacts.map(artifact => <button className={`artifact ${preview?.id === artifact.id ? 'selected-artifact' : ''}`} key={artifact.id} onClick={() => void showArtifact(artifact.id)}><span className="file-icon">M↓</span><div><strong title={artifact.path}>{artifact.path}</strong><small>任务 {currentRuns.findIndex(run => run.id === artifact.runId) + 1} · 版本 {artifact.version} · {artifact.bytes} B · 查看预览</small></div></button>)}
           {preview && <section className="preview"><div><h3>纯文本预览</h3><button aria-label="关闭预览" onClick={() => { previewGeneration.current++; setPreview(null); }}>×</button></div>{preview.value.status === 'ready' ? <pre>{preview.value.text}</pre> : <p role="status">{preview.value.status === 'changed' ? '文件已被外部修改，请重新核验。' : preview.value.status === 'missing' ? '文件已不存在，历史成果记录仍保留。' : '当前无法安全读取此文件。'}</p>}<button onClick={() => void showArtifact(preview.id)}>重新核验文件</button></section>}
           <div className="inspector-foot">演示消息均已标记为合成内容。<br />真实工具会在批准后写入本地文件。</div>
         </aside>
