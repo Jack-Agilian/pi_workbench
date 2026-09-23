@@ -1,5 +1,7 @@
 # B 最小核心的可复现边界
 
+阶段范围说明：本文保留 B 模块级交付当时的限制与 schema v1 记录；后续实际 Worker、schema v2 迁移与 macOS 进程监督的新增证据见 [B-IPC](b-ipc-2026-09-23.md)，不由本文旧合成输入推导。
+
 对应代码：`61ad838ea601ef22f114a44ea533d3aff91517f0`。运行 `npm run test:product-core`、`npm run test:product-sdk`；输入/命令见 [报告](b-2026-09-22.md)，当前契约见 [B 最小契约](../ssot/b-minimal-contract.md)。
 
 ## B-G01：Node SQLite 的文件访问不由 Node 白名单阻止

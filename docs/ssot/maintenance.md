@@ -77,3 +77,5 @@ A3 的 [资源/包记录](../validation/a3-2026-09-22.md) 区分应用锁与仅�
 A4 的 [凭据/模型记录](../validation/a4-2026-09-22.md) 区分实际 SDK 编排与合成 Provider 回调；内存 store、状态投影和测试输出/环境 canary 不等于系统 Keychain、真实 OAuth、产品日志或退出 flush。SEC-03 只推进 in_progress，所有证据引用真实被测代码 SHA，M0 Gate 不晋级。
 
 B 的 [最小核心记录](../validation/b-2026-09-22.md) 将真实 SQLite/文件系统与合成宿主/崩溃输入明确区分；5 项 Pi 接入包含 1 项合成未来事件投影。own 能力仍用 adoption.status=not_applicable、无上游 imports，verificationStatus=verified 仅表示引用范围已经验证，implementationState 保持 in_progress。BOOT-01/CORE-01/CORE-03/ART-01 推进为 in_progress；没有完成整个 B、真实 Worker/IPC 或 M0 Gate。代码提交先于证据提交，新增记录均引用实际被测 SHA。
+
+B-IPC 的 [持久报告](../validation/b-ipc-2026-09-23.md) 按 SDK、实际 macOS 进程/SQLite、协议合成输入和静态回归分别登记证据。每项引用已存在的被测代码 SHA，后续文档提交不冒充被测代码；own 能力不伪造上游 imports。实际进程清理也只支持所测固定后代，不推导通用沙箱或 M0 Gate 完成。

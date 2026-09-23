@@ -34,11 +34,12 @@
           ],
           "evidenceRefs": [
             "EV-B-REVIEW-20260922",
-            "EV-REVIEW-A4-DECISIONS-20260923"
+            "EV-REVIEW-A4-DECISIONS-20260923",
+            "EV-B-IPC-REVIEW-20260923"
           ]
         }
       ],
-      "statusReason": "B最小产品契约和SQLite采用决定已落地并自查；Worker/IPC、完整资源/权限绑定与社区UI准入仍待后续收敛，未做完整验收。"
+      "statusReason": "B-IPC所有权、有限通信与恢复契约已收敛并自复审；社区UI准入和完整验收仍未完成。下一步C最小桌面界面。"
     },
     {
       "id": "BOOT-02",
@@ -118,7 +119,9 @@
             "EV-A2-MAC-SHELL-20260922",
             "EV-A3-INPUTS-20260922",
             "EV-A4-INPUTS-20260922",
-            "EV-B-INPUTS-20260922"
+            "EV-B-INPUTS-20260922",
+            "EV-B-IPC-REGRESSION-20260923",
+            "EV-B-IPC-INITIALIZATION-20260923"
           ]
         },
         {
@@ -141,11 +144,13 @@
             "EV-A4-REGRESSION-20260922",
             "EV-B-SDK-20260922",
             "EV-B-REGRESSION-20260922",
-            "EV-REVIEW-A4-REGRESSION-20260923"
+            "EV-REVIEW-A4-REGRESSION-20260923",
+            "EV-B-IPC-REGRESSION-20260923",
+            "EV-B-IPC-INITIALIZATION-20260923"
           ]
         }
       ],
-      "statusReason": "A0–A4及B模块级产品/SDK接入测试通过；实际Worker/IPC、平台打包与完整产品接缝未验收，不能标done。"
+      "statusReason": "A0–A4、B模块与B-IPC实际Worker/IPC及零模型回归通过；平台打包、完整产品接缝和三个M0 Gate仍未验收。"
     },
     {
       "id": "BOOT-04",
@@ -252,11 +257,13 @@
           ],
           "evidenceRefs": [
             "EV-B-CORE-20260922",
-            "EV-B-SDK-20260922"
+            "EV-B-SDK-20260922",
+            "EV-B-IPC-SDK-20260923",
+            "EV-B-IPC-MAC-20260923"
           ]
         }
       ],
-      "statusReason": "产品SQLite和原生Session引用/重开接入已测试，不复制原生消息；完整索引重建、Worker进程连接和验收前置未完成。"
+      "statusReason": "实际Worker以Pi原生引用重开Session，SQLite只存产品意图/索引；schema v1到v2保留请求迁移通过。完整索引重建及验收前置仍未完成。"
     },
     {
       "id": "CORE-02",
@@ -295,7 +302,9 @@
             "EV-A1-CLOSEOUT-SDK-20260922",
             "EV-A2-SDK-20260922",
             "EV-B-CORE-20260922",
-            "EV-B-SDK-20260922"
+            "EV-B-SDK-20260922",
+            "EV-B-IPC-SDK-20260923",
+            "EV-B-IPC-MAC-20260923"
           ]
         },
         {
@@ -308,7 +317,9 @@
           ],
           "evidenceRefs": [
             "EV-A1-SDK-20260922",
-            "EV-A1-CLOSEOUT-SDK-20260922"
+            "EV-A1-CLOSEOUT-SDK-20260922",
+            "EV-B-IPC-SDK-20260923",
+            "EV-B-IPC-MAC-20260923"
           ]
         },
         {
@@ -321,11 +332,26 @@
             "close-from-subscription-hook"
           ],
           "evidenceRefs": [
-            "EV-REVIEW-A4-LIFECYCLE-20260923"
+            "EV-REVIEW-A4-LIFECYCLE-20260923",
+            "EV-B-IPC-SDK-20260923",
+            "EV-B-IPC-MAC-20260923"
+          ]
+        },
+        {
+          "id": "CORE-02-A04",
+          "requirement": "真实Worker/受限IPC的来源、版本、实例绑定与宿主SQLite隔离；故障无清理证据不释放执行名额",
+          "plannedChecks": [
+            "worker-ipc-source-binding",
+            "worker-sqlite-os-denial",
+            "worker-cleanup-proof"
+          ],
+          "evidenceRefs": [
+            "EV-B-IPC-SDK-20260923",
+            "EV-B-IPC-MAC-20260923"
           ]
         }
       ],
-      "statusReason": "Session探针及F01关闭/替换并发修正通过15项；B只接入成功替换，真实Worker退出监督和完整产品失败恢复尚未完成。"
+      "statusReason": "B-IPC实际进程创建/替换/rebind关闭、旧绑定、App Server SIGKILL和清理证据失败路径通过，保留F01/A1回归；不涵盖任意恶意后代、生产打包或真实模型。"
     },
     {
       "id": "CORE-03",
@@ -363,7 +389,9 @@
           ],
           "evidenceRefs": [
             "EV-B-CORE-20260922",
-            "EV-B-SDK-20260922"
+            "EV-B-SDK-20260922",
+            "EV-B-IPC-SDK-20260923",
+            "EV-B-IPC-MAC-20260923"
           ]
         },
         {
@@ -374,7 +402,9 @@
           ],
           "evidenceRefs": [
             "EV-B-CORE-20260922",
-            "EV-B-SDK-20260922"
+            "EV-B-SDK-20260922",
+            "EV-B-IPC-SDK-20260923",
+            "EV-B-IPC-MAC-20260923"
           ]
         },
         {
@@ -386,11 +416,26 @@
           ],
           "evidenceRefs": [
             "EV-B-CORE-20260922",
-            "EV-B-SDK-20260922"
+            "EV-B-SDK-20260922",
+            "EV-B-IPC-SDK-20260923",
+            "EV-B-IPC-MAC-20260923"
+          ]
+        },
+        {
+          "id": "CORE-03-A04",
+          "requirement": "真实App Server/Worker终止后重开产品库，未确认副作用不重发，已写丢结果只核验；订阅重接不执行",
+          "plannedChecks": [
+            "worker-crash-reconcile",
+            "host-sigkill-descendants",
+            "worker-snapshot-reconnect"
+          ],
+          "evidenceRefs": [
+            "EV-B-IPC-MAC-20260923",
+            "EV-B-IPC-SDK-20260923"
           ]
         }
       ],
-      "statusReason": "模块级幂等、全局单写、批准/操作/取消/unknown、持久事件交接已通过真实SQLite+合成宿主测试；真实Worker/IPC/退出清理与产品失败恢复仍待实现。"
+      "statusReason": "B-IPC把幂等、全局单写、审批/一次领取/取消与unknown接上真实Worker；结果丢失重开只核验，订阅游标重接不执行工具。通用队列策略、UI和全部验收前置未完成。"
     },
     {
       "id": "CORE-04",
@@ -429,7 +474,9 @@
             "tool-definition-parity"
           ],
           "evidenceRefs": [
-            "EV-A2-SDK-20260922"
+            "EV-A2-SDK-20260922",
+            "EV-B-IPC-SDK-20260923",
+            "EV-B-IPC-MAC-20260923"
           ]
         },
         {
@@ -441,7 +488,9 @@
           ],
           "evidenceRefs": [
             "EV-A2-SDK-20260922",
-            "EV-A2-MAC-SHELL-20260922"
+            "EV-A2-MAC-SHELL-20260922",
+            "EV-B-IPC-SDK-20260923",
+            "EV-B-IPC-MAC-20260923"
           ]
         },
         {
@@ -454,11 +503,13 @@
           ],
           "evidenceRefs": [
             "EV-A2-SDK-20260922",
-            "EV-A2-MAC-SHELL-20260922"
+            "EV-A2-MAC-SHELL-20260922",
+            "EV-B-IPC-SDK-20260923",
+            "EV-B-IPC-MAC-20260923"
           ]
         }
       ],
-      "statusReason": "A2本地工具/审批接缝探针已验证，仍非完整产品能力；跨进程治理、原子路径/写入约束、实际产品Run及其他平台待后续验收。"
+      "statusReason": "B-IPC实际Worker内复用Pi write/edit与既有Operations，拒绝/版本/期限/取消通过；原子写入约束、完整Shell产品路径与其他平台仍未完成。"
     },
     {
       "id": "SEC-01",
@@ -527,7 +578,9 @@
             "approval-expiry"
           ],
           "evidenceRefs": [
-            "EV-A2-SDK-20260922"
+            "EV-A2-SDK-20260922",
+            "EV-B-IPC-SDK-20260923",
+            "EV-B-IPC-MAC-20260923"
           ]
         },
         {
@@ -538,7 +591,9 @@
             "write-conflict"
           ],
           "evidenceRefs": [
-            "EV-A2-SDK-20260922"
+            "EV-A2-SDK-20260922",
+            "EV-B-IPC-SDK-20260923",
+            "EV-B-IPC-MAC-20260923"
           ]
         },
         {
@@ -549,11 +604,13 @@
             "tool-context-concurrency"
           ],
           "evidenceRefs": [
-            "EV-A2-SDK-20260922"
+            "EV-A2-SDK-20260922",
+            "EV-B-IPC-SDK-20260923",
+            "EV-B-IPC-MAC-20260923"
           ]
         }
       ],
-      "statusReason": "A2本地工具/审批接缝探针已验证，仍非完整产品能力；跨进程治理、原子路径/写入约束、实际产品Run及其他平台待后续验收。"
+      "statusReason": "B-IPC宿主计划绑定摘要/目标/fileVersion/期限/资源锁，领取后同一IPC授权；实际Worker SQLite拒绝与文件冲突通过。非原子CAS，通用策略/其他平台未验收。"
     },
     {
       "id": "SEC-03",
@@ -759,11 +816,13 @@
           ],
           "evidenceRefs": [
             "EV-B-CORE-20260922",
-            "EV-B-SDK-20260922"
+            "EV-B-SDK-20260922",
+            "EV-B-IPC-SDK-20260923",
+            "EV-B-IPC-MAC-20260923"
           ]
         }
       ],
-      "statusReason": "真实Markdown文件/hash/目标与原操作归属、版本和纯文本预览通过；另存为、完整预览/权限UI与文件竞争原子性尚未完成。"
+      "statusReason": "B-IPC宿主核验真实Markdown/hash并登记原Operation成果，丢结果恢复不重复写；另存为、完整展示与原子文件竞争仍未完成。"
     },
     {
       "id": "SKL-01",
@@ -1272,7 +1331,7 @@
   ],
   "decisionSource": "../ssot/README.md",
   "historicalSource": "../startup/docs/08-delivery-and-references.md",
-  "updatedOn": "2026-09-22",
+  "updatedOn": "2026-09-23",
   "milestones": [
     {
       "id": "M0-UI",

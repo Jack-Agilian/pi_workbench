@@ -97,7 +97,7 @@ M0 明确同 provider 只允许一个配置账户。accountId 是产品标识，
 
 CredentialStore 桥接成功也不代表 Pi Worker 永远接触不到凭据。需要向模型 Provider 发请求的进程可能使用凭据；受信任/隔离范围必须说明。Shell 子进程不继承所有账户环境变量。Keychain/DPAPI 适配、并发登录/刷新、退出前 flush 与错误脱敏需实测，不把 Pi 的文件存储直接称作系统密钥库。
 
-A4 的 [限定实测](../validation/a4-2026-09-22.md) 已验证内存 store 与合成 Provider 的并发/取消、状态投影和环境隔离。所选版本的 CredentialSynchronizationError 表示变更已提交但本地同步失败，并可能携带原始 credential/cause；普通错误也不能证明未写入。宿主不得直接发送错误或盲目重试，应保留 committed_needs_sync/unknown 并对账。checkAuth 表示配置存在，不验证 token 有效；取消返回也不证明底层刷新已结算。系统存储/flush 及真实产品进程边界仍按 [A4 边界](../validation/a4-boundaries.md) 留待实施。
+A4 的 [限定实测](../validation/a4-2026-09-22.md) 已验证内存 store 与合成 Provider 的并发/取消、状态投影和环境隔离。所选版本的 CredentialSynchronizationError 表示变更已提交但本地同步失败，并可能携带原始 credential/cause；普通错误也不能证明未写入。宿主不得直接发送错误或盲目重试，应保留 committed_needs_sync/unknown 并对账。checkAuth 表示配置存在，不验证 token 有效；取消返回也不证明底层刷新已结算。系统存储/flush 及使用真实凭据的产品进程边界仍按 [A4 边界](../validation/a4-boundaries.md) 留待实施。
 
 ## 7. 扩展 UI 与插件生态边界
 
@@ -125,4 +125,4 @@ P0 的 CORE-03 必须保证同 Workspace 至多一个活动写 Run；M0 可先�
 
 [最小契约](b-minimal-contract.md) 和 [限定证据](../validation/b-2026-09-22.md) 实现了产品创建/启动/取消/批准命令、宿主事务与全局单写、固定绑定、操作结算、持久 cursor 和真实 Markdown 索引；通过真实 Pi Session/Runtime/write 接入测试。snapshot/订阅/预览目前为宿主内部方法，资源激活和其他命令仍待实现，不表示第 2.1 节全部接口已开放。
 
-测试在同进程组合模块，没有真实 Worker/IPC。取消和 unknown 的清理证据、崩溃输入为合成；产品库重开不会自动重新执行。完整资源锁/权限快照、真实退出确认与替换失败恢复仍按本契约实施。Node SQLite 的文件权限缺口及文件非原子检查见 [B 边界](../validation/b-boundaries.md)，不能从测试隔离推导出生产沙箱。
+该阶段测试在同进程组合模块，取消和 unknown 的清理证据、崩溃输入为合成；产品库重开不会自动重新执行。后续 [B-IPC 契约](b-worker-contract.md) 与 [macOS 实测](../validation/b-ipc-2026-09-23.md) 已补真实子进程、单操作权限/资源绑定、退出确认与故障恢复；通用策略与其他平台不在此范围。Node SQLite 的文件权限缺口及文件非原子检查见 [B 边界](../validation/b-boundaries.md)，不能从测试隔离推导出生产沙箱。

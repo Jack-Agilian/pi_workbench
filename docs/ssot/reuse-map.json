@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "decision": "reuse-first",
-  "reviewedOn": "2026-09-22",
+  "reviewedOn": "2026-09-23",
   "projectBaseCommit": "be9e1f0858e9188131c959d2438dede73c0e2215",
   "upstream": {
     "repository": "earendil-works/pi",
@@ -38,7 +38,7 @@
         "AgentSession"
       ],
       "reuse": "工具循环、原生重试/压缩保持上游",
-      "productDelta": "Worker 监督和产品 Run 结算",
+      "productDelta": "packages/pi-adapter/worker-runtime.ts采用公开SDK；apps/agent-server/worker-supervisor.ts负责进程监督和产品Run结算",
       "acceptanceGate": "原生 SDK 探针；运行绑定在派发时固定；同 Worker 迟到观察不归入新 Run",
       "implementationState": "in_progress",
       "adoption": {
@@ -74,7 +74,9 @@
           "EV-A1-CLOSEOUT-SDK-20260922",
           "EV-B-INPUTS-20260922",
           "EV-B-SDK-20260922",
-          "EV-REVIEW-A4-LIFECYCLE-20260923"
+          "EV-REVIEW-A4-LIFECYCLE-20260923",
+          "EV-B-IPC-SDK-20260923",
+          "EV-B-IPC-MAC-20260923"
         ]
       }
     },
@@ -135,7 +137,9 @@
           "EV-A1-CLOSEOUT-SDK-20260922",
           "EV-B-INPUTS-20260922",
           "EV-B-SDK-20260922",
-          "EV-REVIEW-A4-LIFECYCLE-20260923"
+          "EV-REVIEW-A4-LIFECYCLE-20260923",
+          "EV-B-IPC-SDK-20260923",
+          "EV-B-IPC-MAC-20260923"
         ]
       }
     },
@@ -330,7 +334,7 @@
         "DefaultResourceLoader"
       ],
       "reuse": "复用资源模型与受支持加载入口",
-      "productDelta": "预先批准目录，不自动发现/执行未知扩展",
+      "productDelta": "packages/pi-adapter/approved-resources.ts复用Pi解析；Worker加载前批准、expected/loaded锁核对，不自动执行未知扩展",
       "acceptanceGate": "预批准factory/实际loadedResourceLockId；刷新或重建在settled边界确认后start",
       "implementationState": "in_progress",
       "adoption": {
@@ -366,7 +370,9 @@
           "EV-A1-CLOSEOUT-SDK-20260922",
           "EV-A3-INPUTS-20260922",
           "EV-A3-RESOURCES-20260922",
-          "EV-REVIEW-A4-PATHS-20260923"
+          "EV-REVIEW-A4-PATHS-20260923",
+          "EV-B-IPC-SDK-20260923",
+          "EV-B-IPC-MAC-20260923"
         ]
       }
     },
@@ -526,7 +532,9 @@
         "verificationStatus": "verified",
         "testEvidence": [
           "EV-A2-INPUTS-20260922",
-          "EV-A2-SDK-20260922"
+          "EV-A2-SDK-20260922",
+          "EV-B-IPC-SDK-20260923",
+          "EV-B-IPC-MAC-20260923"
         ]
       }
     },
@@ -854,7 +862,7 @@
       ],
       "upstreamSymbolsOrPaths": [],
       "reuse": "复用Pi原生任务执行，不重写",
-      "productDelta": "项目/独立Run/审批/操作意图",
+      "productDelta": "ProductCore持久Run/Operation/Approval与v2启动日志；WorkerSupervisor/guardian根据实际句柄和清理证据结算，非Pi协议",
       "acceptanceGate": "幂等/绑定/取消/unknown；P0同Workspace写Run串行并覆盖等待审批与清理阶段",
       "implementationState": "in_progress",
       "adoption": {
@@ -867,7 +875,11 @@
           "EV-B-CORE-20260922",
           "EV-B-SDK-20260922",
           "EV-B-MAC-20260922",
-          "EV-B-REGRESSION-20260922"
+          "EV-B-REGRESSION-20260922",
+          "EV-B-IPC-SDK-20260923",
+          "EV-B-IPC-MAC-20260923",
+          "EV-B-IPC-REVIEW-20260923",
+          "EV-B-IPC-REGRESSION-20260923"
         ]
       }
     },
@@ -892,7 +904,9 @@
           "EV-B-CORE-20260922",
           "EV-B-SDK-20260922",
           "EV-B-MAC-20260922",
-          "EV-B-REGRESSION-20260922"
+          "EV-B-REGRESSION-20260922",
+          "EV-B-IPC-SDK-20260923",
+          "EV-B-IPC-MAC-20260923"
         ]
       }
     },
@@ -1325,6 +1339,66 @@
         "darwin"
       ],
       "locator": "docs/validation/review-a4-2026-09-23.md"
+    },
+    {
+      "id": "EV-B-IPC-REVIEW-20260923",
+      "kind": "review",
+      "result": "passed",
+      "scope": "自复审：公开Pi SDK/Operations复用、进程所有权、有限协议、guardian先启动后arm避免派发窗口，测试入口与Renderer命令分离；不代表独立安全签收或通用沙箱。",
+      "commit": "0e9a01af0b91cdda096d30159f18734ca6504ced",
+      "recordedAt": "2026-09-23T08:19:19.370897+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/b-ipc-2026-09-23.md"
+    },
+    {
+      "id": "EV-B-IPC-SDK-20260923",
+      "kind": "sdk",
+      "result": "passed",
+      "scope": "真实Pi 0.87.0在OS Worker内加载批准资源，以明确合成驱动调用注册write/edit；审批/一次领取/版本与期限/活跃取消、原生Session跨Worker引用恢复及关闭/rebind检查。30项混合套件中的恶意wire与发送器背压为合成，不冒充真实Pi事件；真实模型0。",
+      "commit": "0e9a01af0b91cdda096d30159f18734ca6504ced",
+      "recordedAt": "2026-09-23T08:19:19.370897+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/b-ipc-2026-09-23.md"
+    },
+    {
+      "id": "EV-B-IPC-MAC-20260923",
+      "kind": "platform",
+      "result": "passed",
+      "scope": "macOS 27 arm64实际子进程IPC、测试SQLite读/创建拒绝、进程与App Server SIGKILL、固定非detach父子进程组消失/心跳停止/监听端口被OS拒绝；结果丢失重开库只核验不重写；证据缺失保留全局阻断。不涵盖任意恶意后代或其他平台。 收尾修正使缺清理记录的Run与已领取Operation显式unknown，仍不释放名额。",
+      "commit": "0e9a01af0b91cdda096d30159f18734ca6504ced",
+      "recordedAt": "2026-09-23T08:19:19.370897+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/b-ipc-2026-09-23.md"
+    },
+    {
+      "id": "EV-B-IPC-REGRESSION-20260923",
+      "kind": "static",
+      "result": "passed",
+      "scope": "被测代码无未提交差异（仅SSOT/计划/报告待提交）时，typecheck、类型10/A1 15/A2 19+4/A3 12+8/A4 18/B 17+5/B-IPC 30通过；SSOT60/脚本15/完整文档示例检查通过。独立cwd与合成父环境canary再次运行B-IPC30及4驱动通过；锁/startup27不变。初始化单独引用其实际前置SHA证据；无新克隆或独立CI。",
+      "commit": "0e9a01af0b91cdda096d30159f18734ca6504ced",
+      "recordedAt": "2026-09-23T08:19:19.370897+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/b-ipc-2026-09-23.md"
+    },
+    {
+      "id": "EV-B-IPC-INITIALIZATION-20260923",
+      "kind": "static",
+      "result": "passed",
+      "scope": "在干净35fcef1代码上，既有文档初始化--offline与应用初始化--app --offline各连续2次成功；lifecycle scripts禁用、声明补丁受控、锁摘要不变。后续0e9a01a仅修正断连产品状态，不改变初始化/依赖配置。环境核验macOS27 arm64/Node24.21/npm11.19，未新克隆。",
+      "commit": "35fcef147169631f62e65c564cf3fa541c7c3754",
+      "recordedAt": "2026-09-23T08:19:19.370897+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/b-ipc-2026-09-23.md"
     }
   ]
 }

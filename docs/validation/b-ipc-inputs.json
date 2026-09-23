@@ -1,0 +1,258 @@
+{
+  "testedCodeCommit": "0e9a01af0b91cdda096d30159f18734ca6504ced",
+  "baseline": "cd6c82b1995e9c0fc0007b790e2b24a47aaf0fa9",
+  "branch": "codex/b-worker-ipc",
+  "recordedAt": "2026-09-23T08:19:19.370897+00:00",
+  "workingTreeAtCodeTests": "No code differences; only the listed SSOT/planning/validation markdown and JSON documents awaiting the evidence commit.",
+  "environment": {
+    "platform": "darwin",
+    "node": {
+      "version": "24.21.0",
+      "arch": "arm64",
+      "executable": "${REPOSITORY}/.artifacts/toolchains/node-v24.21.0-darwin-arm64/bin/node"
+    },
+    "macOS": {
+      "exit": 0,
+      "output": "27.0"
+    },
+    "machine": {
+      "exit": 0,
+      "output": "arm64"
+    },
+    "rosetta": {
+      "exit": 0,
+      "output": "0"
+    },
+    "git": {
+      "executable": "/opt/homebrew/bin/git",
+      "exit": 0,
+      "output": "git version 2.55.0"
+    },
+    "python3": {
+      "executable": "/opt/homebrew/bin/python3",
+      "exit": 0,
+      "output": "Python 3.14.7"
+    },
+    "projectPython": {
+      "executable": "${REPOSITORY}/.venv/bin/python",
+      "exit": 0,
+      "output": "Python 3.14.7"
+    },
+    "npm": {
+      "executable": "${REPOSITORY}/.artifacts/toolchains/node-v24.21.0-darwin-arm64/bin/npm",
+      "exit": 0,
+      "output": "11.19.0"
+    }
+  },
+  "packageLockSha256": "7cd35e4fc73c7e0b61112b515c6389505baf7d541e638bd7cf0ffe2dbf6e8e44",
+  "selectedPiVersion": "0.87.0",
+  "realModelCalls": 0,
+  "checks": [
+    {
+      "command": "npm run typecheck",
+      "exit": 0,
+      "passed": null,
+      "rawLog": ".artifacts/b-ipc/verified-typecheck.log",
+      "rawLogSha256": "ca27905bae0ff05202f06b1202f21718c69c2a76a72c41f79c5c9dd4c1c13f7b",
+      "testedCodeCommit": "0e9a01af0b91cdda096d30159f18734ca6504ced"
+    },
+    {
+      "command": "npm run test:pi-types",
+      "exit": 0,
+      "passed": 10,
+      "rawLog": ".artifacts/b-ipc/verified-test-pi-types.log",
+      "rawLogSha256": "1868d2c9a56592ca0ac62a21af68d05c00cb5d6469593c8bf7620240fc800fa4",
+      "testedCodeCommit": "0e9a01af0b91cdda096d30159f18734ca6504ced"
+    },
+    {
+      "command": "npm run test:pi-probe",
+      "exit": 0,
+      "passed": 15,
+      "rawLog": ".artifacts/b-ipc/verified-test-pi-probe.log",
+      "rawLogSha256": "fd7988fd816cd2c41a2d3f2820e7ad2f2bda8e82d81107b3b5650c90fc3a082e",
+      "testedCodeCommit": "0e9a01af0b91cdda096d30159f18734ca6504ced"
+    },
+    {
+      "command": "npm run test:pi-tools",
+      "exit": 0,
+      "passed": 19,
+      "rawLog": ".artifacts/b-ipc/verified-test-pi-tools.log",
+      "rawLogSha256": "d71191f9c348e11335639d9d18d7283fba5e5993732c5e218117297eaff43ffc",
+      "testedCodeCommit": "0e9a01af0b91cdda096d30159f18734ca6504ced"
+    },
+    {
+      "command": "npm run test:pi-shell",
+      "exit": 0,
+      "passed": 4,
+      "rawLog": ".artifacts/b-ipc/verified-test-pi-shell.log",
+      "rawLogSha256": "10396a82ebb0d7ef4066f82d25ac5be71104e76456abd00c2901602cf30ab4c2",
+      "testedCodeCommit": "0e9a01af0b91cdda096d30159f18734ca6504ced"
+    },
+    {
+      "command": "npm run test:pi-resources",
+      "exit": 0,
+      "passed": 12,
+      "rawLog": ".artifacts/b-ipc/verified-test-pi-resources.log",
+      "rawLogSha256": "be6888abfa3e4a7b70a986586a0ae22a518b7f3e13f9c67954bfa34b5bcdb415",
+      "testedCodeCommit": "0e9a01af0b91cdda096d30159f18734ca6504ced"
+    },
+    {
+      "command": "npm run test:pi-packages",
+      "exit": 0,
+      "passed": 8,
+      "rawLog": ".artifacts/b-ipc/verified-test-pi-packages.log",
+      "rawLogSha256": "68fb829d0811456617c0226e7c446318f2b591833f6473301807e6f143347bcb",
+      "testedCodeCommit": "0e9a01af0b91cdda096d30159f18734ca6504ced"
+    },
+    {
+      "command": "npm run test:pi-auth",
+      "exit": 0,
+      "passed": 18,
+      "rawLog": ".artifacts/b-ipc/verified-test-pi-auth.log",
+      "rawLogSha256": "91f2d2f021f1f84d019c81fcbbc01ca0e655a52db1b020254ccbb969e2f93eec",
+      "testedCodeCommit": "0e9a01af0b91cdda096d30159f18734ca6504ced"
+    },
+    {
+      "command": "npm run test:product-core",
+      "exit": 0,
+      "passed": 17,
+      "rawLog": ".artifacts/b-ipc/verified-test-product-core.log",
+      "rawLogSha256": "7e39786ab65c7d2b7288969646eb21790ce3dffbc9c58b6fdfb1ff3c79759c10",
+      "testedCodeCommit": "0e9a01af0b91cdda096d30159f18734ca6504ced"
+    },
+    {
+      "command": "npm run test:product-sdk",
+      "exit": 0,
+      "passed": 5,
+      "rawLog": ".artifacts/b-ipc/verified-test-product-sdk.log",
+      "rawLogSha256": "6eb2495ac10a7896712b455025e4c3f0c3f011bc596c8c5a6892af6abc313cc2",
+      "testedCodeCommit": "0e9a01af0b91cdda096d30159f18734ca6504ced"
+    },
+    {
+      "command": "npm run test:product-worker",
+      "exit": 0,
+      "passed": 30,
+      "rawLog": ".artifacts/b-ipc/verified-test-product-worker.log",
+      "rawLogSha256": "a295ef905fc3eebfd554117ed27b1ed39156ffbd6fbf8cac377c0425d966586a",
+      "testedCodeCommit": "0e9a01af0b91cdda096d30159f18734ca6504ced"
+    }
+  ],
+  "initialization": [
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/bootstrap.py",
+        "--offline"
+      ],
+      "iteration": 1,
+      "exit": 0,
+      "log": "final-bootstrap-docs-1.log",
+      "testedCodeCommit": "35fcef147169631f62e65c564cf3fa541c7c3754"
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/bootstrap.py",
+        "--offline"
+      ],
+      "iteration": 2,
+      "exit": 0,
+      "log": "final-bootstrap-docs-2.log",
+      "testedCodeCommit": "35fcef147169631f62e65c564cf3fa541c7c3754"
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/bootstrap.py",
+        "--app",
+        "--offline"
+      ],
+      "iteration": 1,
+      "exit": 0,
+      "log": "final-bootstrap-app-1.log",
+      "testedCodeCommit": "35fcef147169631f62e65c564cf3fa541c7c3754"
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/bootstrap.py",
+        "--app",
+        "--offline"
+      ],
+      "iteration": 2,
+      "exit": 0,
+      "log": "final-bootstrap-app-2.log",
+      "testedCodeCommit": "35fcef147169631f62e65c564cf3fa541c7c3754"
+    }
+  ],
+  "independentCwdRepeat": [
+    {
+      "command": "node scripts/run-product-worker.mjs ",
+      "cwd": "independent managed temporary directory",
+      "synthetic_parent_env_canaries": true,
+      "exit": 0,
+      "log": "verified-worker-repeat.log",
+      "testedCodeCommit": "0e9a01af0b91cdda096d30159f18734ca6504ced"
+    },
+    {
+      "command": "node scripts/run-product-worker.mjs --demo allow",
+      "cwd": "independent managed temporary directory",
+      "synthetic_parent_env_canaries": true,
+      "exit": 0,
+      "log": "verified-demo-allow.log",
+      "testedCodeCommit": "0e9a01af0b91cdda096d30159f18734ca6504ced"
+    },
+    {
+      "command": "node scripts/run-product-worker.mjs --demo deny",
+      "cwd": "independent managed temporary directory",
+      "synthetic_parent_env_canaries": true,
+      "exit": 0,
+      "log": "verified-demo-deny.log",
+      "testedCodeCommit": "0e9a01af0b91cdda096d30159f18734ca6504ced"
+    },
+    {
+      "command": "node scripts/run-product-worker.mjs --demo cancel",
+      "cwd": "independent managed temporary directory",
+      "synthetic_parent_env_canaries": true,
+      "exit": 0,
+      "log": "verified-demo-cancel.log",
+      "testedCodeCommit": "0e9a01af0b91cdda096d30159f18734ca6504ced"
+    },
+    {
+      "command": "node scripts/run-product-worker.mjs --demo crash",
+      "cwd": "independent managed temporary directory",
+      "synthetic_parent_env_canaries": true,
+      "exit": 0,
+      "log": "verified-demo-crash.log",
+      "testedCodeCommit": "0e9a01af0b91cdda096d30159f18734ca6504ced"
+    }
+  ],
+  "limitations": [
+    "macOS fixed non-detaching process group only; not arbitrary malicious descendants",
+    "No Windows/Linux restricted mode support, packaged ABI, CI, fresh clone, real accounts or models",
+    "IPC backpressure callback=false test is synthetic unit input; OS transport/process/SQLite tests are real",
+    "Database schema v2 migration fixture is synthetic v1; no real user database used",
+    "Raw logs ignored locally; this committed summary and markdown are the cross-clone evidence locators"
+  ],
+  "environmentTestCommit": "35fcef147169631f62e65c564cf3fa541c7c3754",
+  "documentationChecks": [
+    {
+      "command": ".venv/bin/python scripts/check-ssot.py",
+      "testedCodeCommit": "0e9a01af0b91cdda096d30159f18734ca6504ced",
+      "exit": 0,
+      "scope": "with only documentation changes pending"
+    },
+    {
+      "command": ".venv/bin/python scripts/test-tools.py",
+      "testedCodeCommit": "0e9a01af0b91cdda096d30159f18734ca6504ced",
+      "exit": 0,
+      "scope": "with only documentation changes pending"
+    },
+    {
+      "command": ".venv/bin/python scripts/check-docs.py --typecheck",
+      "testedCodeCommit": "0e9a01af0b91cdda096d30159f18734ca6504ced",
+      "exit": 0,
+      "scope": "with only documentation changes pending"
+    }
+  ]
+}

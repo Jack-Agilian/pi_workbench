@@ -14,7 +14,7 @@
 
 `docs/startup/` 继续保留原始 0.1 快照、原始接口和历史报告，不改摘要。**涉及复用策略、工具接入、技能解析、模型配置、任务队列、传输选型、模块拆分和交付先后的冲突，以本目录为准。**未被本目录覆盖的产品范围、UI 体验及安全要求继续参考原快照。已落地代码和测试是实现事实；与规格冲突时报告偏差，不静默反向改写规格。
 
-原始 `contracts/app-protocol.ts` 与 SQL 只是参考，不能整份复制作为首版必做项。B 已新增有限的产品 DTO/命令校验与模块级持久核心，范围见 [最小契约](b-minimal-contract.md)；完整 IPC 协议尚未实现。A0/A1 引入的 Pi 精确依赖继续沿用，尚未引入 Electron 或社区 UI。严格声明检查经 [ADR-A0 类型补丁](adr-a0-pi-types.md) 通过，原始发行缺陷及采用边界见 [A0/A1 缺口](../validation/a0-a1-gaps.md)。
+原始 `contracts/app-protocol.ts` 与 SQL 只是参考，不能整份复制作为首版必做项。B 已新增有限的产品 DTO/命令校验与模块级持久核心，范围见 [最小契约](b-minimal-contract.md)；[B-IPC](b-worker-contract.md) 已补有限、可校验的进程协议和宿主监督。A0/A1 引入的 Pi 精确依赖继续沿用，尚未引入 Electron 或社区 UI。严格声明检查经 [ADR-A0 类型补丁](adr-a0-pi-types.md) 通过，原始发行缺陷及采用边界见 [A0/A1 缺口](../validation/a0-a1-gaps.md)。
 
 维护规则见 [状态、证据与验收](maintenance.md)；本次处理清单见 [R01–R08 修订](review-fixes.md)。该修订只核验维护脚本和接缝契约；后续实际接入证据分别登记如下。
 
@@ -52,8 +52,12 @@ python scripts/test-tools.py
 
 ## B 最小产品核心实际进度
 
-[被测提交与报告](../validation/b-2026-09-22.md) · [最小契约](b-minimal-contract.md) · [输入摘要](../validation/b-inputs.json) · [权限/恢复边界](../validation/b-boundaries.md)。17 项真实 SQLite/合成宿主测试与 5 项 Pi 接入测试通过，复用原生 Session/Runtime/write，只新增产品协调、持久事件和真实 Markdown 成果索引。product-coordination/artifact 与 BOOT-01/CORE-01/CORE-03/ART-01 进入 in_progress，新增证据只支持模块级范围。真实 Worker/IPC、完整资源/权限绑定和失败恢复仍待实施；B 和三个 M0 Gate 未完成，下一增量仍在 B。
+[被测提交与报告](../validation/b-2026-09-22.md) · [最小契约](b-minimal-contract.md) · [输入摘要](../validation/b-inputs.json) · [权限/恢复边界](../validation/b-boundaries.md)。17 项真实 SQLite/合成宿主测试与 5 项 Pi 接入测试通过，复用原生 Session/Runtime/write，只新增产品协调、持久事件和真实 Markdown 成果索引。product-coordination/artifact 与 BOOT-01/CORE-01/CORE-03/ART-01 进入 in_progress，新增证据只支持模块级范围。该阶段未包含真实 Worker/IPC；后续 B-IPC 进展见下方，三个 M0 Gate 仍未完成。
 
 ## 最新复审修正（2026-09-23）
 
-[A4 审核复核](../validation/review-a4-2026-09-23.md)：F01 关闭/替换竞态、F02 跨盘范围已修正，F03 固定 M0 同 provider 单账户约束。Session 15 项、资源 12 项、认证 18 项及 B/前序回归通过；CORE-02/SKL-01/SEC-03 保持 in_progress，三个 M0 Gate pending。唯一当前开发项仍见 NEXT_STEPS 顶部的 B 进程接缝与失败恢复。
+[A4 审核复核](../validation/review-a4-2026-09-23.md)：F01 关闭/替换竞态、F02 跨盘范围已修正，F03 固定 M0 同 provider 单账户约束。Session 15 项、资源 12 项、认证 18 项及 B/前序回归通过；CORE-02/SKL-01/SEC-03 保持 in_progress，三个 M0 Gate pending。该次复审没有包含 B-IPC；唯一当前开发项以 NEXT_STEPS 顶部为准。
+
+## B-IPC：2026-09-23
+
+[真实进程验证](../validation/b-ipc-2026-09-23.md) · [进程/审批/恢复契约](b-worker-contract.md) · [被测输入与命令](../validation/b-ipc-inputs.json)。30 项混合检查、四场景驱动及原回归通过；Pi 仍拥有 Session、工具实现与原生历史，App Server 仍唯一写产品库。实际 Worker OS 文件限制、App Server SIGKILL 后固定后代清理和结果丢失只核验不重写均已测试。限定 B-IPC 完成；相关能力保持 in_progress，三个 M0 Gate pending，唯一下一步为 C 最小桌面界面及安全展示投影。
