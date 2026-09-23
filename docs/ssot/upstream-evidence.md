@@ -38,10 +38,11 @@ P04/P05/P06/P07/P13 的固定源码链接是复查入口，不声称逐字核验
 
 | ID | 来源 | 当前决定与限制 |
 |---|---|---|
-| C01 | [pi-gui README](https://github.com/minghinmatthewlam/pi-gui) | 确认 thin pi-sdk-driver、Electron/React、timeline/diff/PTY 方向；仅候选模块级借鉴。本次未固定其 commit、未复制代码、未运行。 |
+| C01 | [pi-gui README](https://github.com/minghinmatthewlam/pi-gui) | 最初仅 README 候选；C 已固定 0b4cd334942ac01bfc6b3cba736a79984925d8cf/MIT，仅局部移植 Composer 键盘保护，未复制完整 SessionDriver/timeline。见 [C 证据](../validation/c-desktop-2026-09-23.md)。 |
 | C02 | [OpenPi README](https://github.com/heyhuynhgiabuu/openpi) | 当前说明为 Electron main 托管 Pi，不是独立 sidecar；参考定制资源页和职责边界。本次未完成模块、依赖与许可审计。 |
 | L01 | [xterm.js](https://xtermjs.org/) | 浏览器终端组件候选；实施时精确锁版本与校验维护状态。 |
 | L02 | [node-pty README](https://github.com/microsoft/node-pty) | PTY 库候选，文档说明 macOS/Linux/Windows 与 ConPTY；未验证 Electron ABI、签名或进程清理。 |
+| L03 | [Electron 44.4.5 官方发行](https://github.com/electron/electron/releases/tag/v44.4.5) / [安全入口](https://www.electronjs.org/docs/latest/tutorial/security) / [React 19.3](https://react.dev/blog/2026/09/09/react-19-3) | C 固定发行与实际 registry/字节、公开 API 及 macOS 桌面测试见 [C 报告](../validation/c-desktop-2026-09-23.md)；其他平台、签名发布未验证。 |
 
 未在本次重新逐项核验的 Picot、Pi Desktop、Zosma、PI WEB 留在历史参考表，不列为已选依赖。特别注意同名仓库；禁止只按“OpenPi”或“Pi Desktop”名称复制代码。
 

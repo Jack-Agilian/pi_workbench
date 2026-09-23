@@ -78,7 +78,10 @@
           "EV-B-IPC-SDK-20260923",
           "EV-B-IPC-MAC-20260923",
           "EV-REVIEW-B-IPC-SDK-20260923",
-          "EV-REVIEW-B-IPC-MAC-20260923"
+          "EV-REVIEW-B-IPC-MAC-20260923",
+          "EV-C-SDK-20260923",
+          "EV-C-MAC-20260923",
+          "EV-C-REGRESSION-20260923"
         ]
       }
     },
@@ -146,7 +149,10 @@
           "EV-B-IPC-SDK-20260923",
           "EV-B-IPC-MAC-20260923",
           "EV-REVIEW-B-IPC-SDK-20260923",
-          "EV-REVIEW-B-IPC-MAC-20260923"
+          "EV-REVIEW-B-IPC-MAC-20260923",
+          "EV-C-SDK-20260923",
+          "EV-C-MAC-20260923",
+          "EV-C-REGRESSION-20260923"
         ]
       }
     },
@@ -760,15 +766,19 @@
         "customizations"
       ],
       "reuse": "定向选社区模块，不整仓拼装",
-      "productDelta": "品牌/产品协议/安全边界",
+      "productDelta": "固定pi-gui许可/来源后仅局部移植Composer键盘保护；React产品视图，不引入上游SessionDriver",
       "acceptanceGate": "固定commit/许可证/最小组件验证",
-      "implementationState": "not_implemented",
+      "implementationState": "in_progress",
       "adoption": {
-        "status": "candidate",
+        "status": "selected",
         "imports": [],
-        "selectedSourceCommit": null,
-        "verificationStatus": "source_reviewed",
-        "testEvidence": []
+        "selectedSourceCommit": "0b4cd334942ac01bfc6b3cba736a79984925d8cf",
+        "verificationStatus": "verified",
+        "testEvidence": [
+          "EV-C-REVIEW-20260923",
+          "EV-C-SYNTHETIC-20260923",
+          "EV-C-MAC-20260923"
+        ]
       }
     },
     {
@@ -869,7 +879,7 @@
       ],
       "upstreamSymbolsOrPaths": [],
       "reuse": "复用Pi原生任务执行，不重写",
-      "productDelta": "ProductCore持久Run/Operation/Approval、v2启动日志及v3原生落盘标记；Supervisor冷恢复先失效旧epoch授权，再按清理证据结算",
+      "productDelta": "ProductCore持久Run/Operation/Approval、v2启动日志及v3原生落盘标记；Supervisor冷恢复先失效旧epoch授权，再按清理证据结算；C沿用同一核心，v4仅增有限展示缓存",
       "acceptanceGate": "幂等/绑定/取消/unknown；P0同Workspace写Run串行并覆盖等待审批与清理阶段",
       "implementationState": "in_progress",
       "adoption": {
@@ -889,7 +899,10 @@
           "EV-B-IPC-REGRESSION-20260923",
           "EV-REVIEW-B-IPC-DECISIONS-20260923",
           "EV-REVIEW-B-IPC-MAC-20260923",
-          "EV-REVIEW-B-IPC-REGRESSION-20260923"
+          "EV-REVIEW-B-IPC-REGRESSION-20260923",
+          "EV-C-SDK-20260923",
+          "EV-C-MAC-20260923",
+          "EV-C-REGRESSION-20260923"
         ]
       }
     },
@@ -919,7 +932,10 @@
           "EV-B-IPC-MAC-20260923",
           "EV-REVIEW-B-IPC-DECISIONS-20260923",
           "EV-REVIEW-B-IPC-MAC-20260923",
-          "EV-REVIEW-B-IPC-REGRESSION-20260923"
+          "EV-REVIEW-B-IPC-REGRESSION-20260923",
+          "EV-C-SDK-20260923",
+          "EV-C-MAC-20260923",
+          "EV-C-REGRESSION-20260923"
         ]
       }
     },
@@ -941,6 +957,122 @@
         "selectedSourceCommit": null,
         "verificationStatus": "source_reviewed",
         "testEvidence": []
+      }
+    },
+    {
+      "id": "desktop-ui",
+      "mode": "adapt",
+      "evidence": [
+        "C01",
+        "L03"
+      ],
+      "upstreamSymbolsOrPaths": [
+        "Electron BrowserWindow/contextBridge/ipcMain/protocol",
+        "React createRoot/useEffect",
+        "esbuild build"
+      ],
+      "reuse": "Electron公开窗口/沙盒/IPC，React渲染和esbuild构建；复用既有产品与Pi Worker链路",
+      "productDelta": "闭合产品桥、Thread/Run视图、审批/取消/成果与有界纯文本投影；显式无模型驱动",
+      "acceptanceGate": "真实桌面进程/来源/CSP、Thread隔离、审批/取消/恢复；平台/模型/Gate分别验收",
+      "implementationState": "in_progress",
+      "adoption": {
+        "status": "selected",
+        "imports": [
+          {
+            "package": "electron",
+            "importFrom": "electron",
+            "exports": [
+              {
+                "name": "app",
+                "kind": "runtime"
+              },
+              {
+                "name": "BrowserWindow",
+                "kind": "runtime"
+              },
+              {
+                "name": "ipcMain",
+                "kind": "runtime"
+              },
+              {
+                "name": "contextBridge",
+                "kind": "runtime"
+              },
+              {
+                "name": "ipcRenderer",
+                "kind": "runtime"
+              },
+              {
+                "name": "protocol",
+                "kind": "runtime"
+              },
+              {
+                "name": "session",
+                "kind": "runtime"
+              },
+              {
+                "name": "dialog",
+                "kind": "runtime"
+              }
+            ],
+            "selectedVersion": "44.4.5"
+          },
+          {
+            "package": "react",
+            "importFrom": "react",
+            "exports": [
+              {
+                "name": "StrictMode",
+                "kind": "runtime"
+              },
+              {
+                "name": "useState",
+                "kind": "runtime"
+              },
+              {
+                "name": "useEffect",
+                "kind": "runtime"
+              },
+              {
+                "name": "useRef",
+                "kind": "runtime"
+              }
+            ],
+            "selectedVersion": "19.3.0"
+          },
+          {
+            "package": "react-dom",
+            "importFrom": "react-dom/client",
+            "exports": [
+              {
+                "name": "createRoot",
+                "kind": "runtime"
+              }
+            ],
+            "selectedVersion": "19.3.0"
+          },
+          {
+            "package": "esbuild",
+            "importFrom": "esbuild",
+            "exports": [
+              {
+                "name": "build",
+                "kind": "runtime"
+              }
+            ],
+            "selectedVersion": "0.28.2"
+          }
+        ],
+        "selectedSourceCommit": null,
+        "verificationStatus": "verified",
+        "testEvidence": [
+          "EV-C-REVIEW-20260923",
+          "EV-C-MAC-20260923",
+          "EV-C-SYNTHETIC-20260923",
+          "EV-C-SDK-20260923",
+          "EV-C-REGRESSION-20260923",
+          "EV-C-RELEASE-20260923"
+        ]
       }
     }
   ],
@@ -1472,6 +1604,78 @@
         "darwin"
       ],
       "locator": "docs/validation/review-b-ipc-2026-09-23.md"
+    },
+    {
+      "id": "EV-C-REVIEW-20260923",
+      "kind": "review",
+      "result": "passed",
+      "scope": "固定pi-gui提交/MIT，只局部移植Enter/Shift/IME guard；公开Pi条目投影、闭合IPC/来源审查；不复用整个社区SessionDriver，不证明任意恶意Renderer隔离。",
+      "commit": "e531a69ba3fd7bc94d25848af162f87673c40fe0",
+      "recordedAt": "2026-09-23T11:45:25.280350+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/c-desktop-2026-09-23.md"
+    },
+    {
+      "id": "EV-C-MAC-20260923",
+      "kind": "platform",
+      "result": "passed",
+      "scope": "macOS27 arm64实际Electron44.4.5、独立Node宿主/Worker：允许/拒绝/活跃取消/宿主SIGKILL后UI重连、纯文本预览/外部变更、Thread切换/草稿、CSP/Node不可达。锁屏，未做人工/真实IME/其他平台验收。 最终SHA新克隆离线初始化/实际窗口同样通过。",
+      "commit": "e531a69ba3fd7bc94d25848af162f87673c40fe0",
+      "recordedAt": "2026-09-23T11:45:25.280350+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/c-desktop-2026-09-23.md"
+    },
+    {
+      "id": "EV-C-SYNTHETIC-20260923",
+      "kind": "mock",
+      "result": "passed",
+      "scope": "12项混合桌面检查与实际Electron四场景；合成Assistant/IME/故障驱动明确标记，复用真实ProductCore/SQLite/Pi工具，无模型；不是第二套Harness。",
+      "commit": "e531a69ba3fd7bc94d25848af162f87673c40fe0",
+      "recordedAt": "2026-09-23T11:45:25.280350+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/c-desktop-2026-09-23.md"
+    },
+    {
+      "id": "EV-C-SDK-20260923",
+      "kind": "sdk",
+      "result": "passed",
+      "scope": "Pi0.87.0原生appendMessage/getBranch安全正文投影、独立Worker真实write、拒绝/取消、旧绑定及schema迁移，前序A1-A4与B通过；无真实模型/流式事件fixture。",
+      "commit": "73ed780ab8892cdd139a5b8a7ecee94d6fa9b234",
+      "recordedAt": "2026-09-23T11:45:25.280350+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/c-desktop-2026-09-23.md"
+    },
+    {
+      "id": "EV-C-REGRESSION-20260923",
+      "kind": "static",
+      "result": "passed",
+      "scope": "完整回归：类型10/A1 15/A2 19+4/A3 12+8/A4 18/Core20/SDK5/Worker48/桌面12；初始化与Electron离线准备各两轮。完整文档7类/SSOT60/脚本15通过，界面小修另按最终SHA验证。",
+      "commit": "73ed780ab8892cdd139a5b8a7ecee94d6fa9b234",
+      "recordedAt": "2026-09-23T11:45:25.280350+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/c-desktop-2026-09-23.md"
+    },
+    {
+      "id": "EV-C-RELEASE-20260923",
+      "kind": "release",
+      "result": "passed",
+      "scope": "官方Electron44.4.5/React19.3资料与真实registry，11直接依赖SRI/tarball/安装文件，Electron arm64归档SHA256/字节；禁lifecycle、未独立验签，其他平台未测。",
+      "commit": "e531a69ba3fd7bc94d25848af162f87673c40fe0",
+      "recordedAt": "2026-09-23T11:45:25.280350+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/c-desktop-2026-09-23.md"
     }
   ]
 }

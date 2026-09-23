@@ -1,14 +1,14 @@
 # 从文档到可运行产品：复用优先
 
-状态：A0–A4 限定无模型探针、B 最小产品核心、B-IPC 真实子进程接缝已验证。决策依据：[SSOT](../ssot/README.md)，进程范围与最新证据见 [B-IPC 审核修正报告](../validation/review-b-ipc-2026-09-23.md)。工作项见 [backlog.json](backlog.json)。尚未创建 GitHub Issues。
+状态：A0–A4 限定无模型探针、B 最小产品核心、B-IPC 真实子进程接缝及 C 最小无模型桌面已限定验证。决策依据：[SSOT](../ssot/README.md)，进程范围与最新证据见 [B-IPC 审核修正报告](../validation/review-b-ipc-2026-09-23.md)。工作项见 [backlog.json](backlog.json)。尚未创建 GitHub Issues。
 
-## 当前唯一开发项：C 的最小桌面界面
+## 当前唯一开发项：D 的平台执行竖切（待启动）
 
-B-IPC 审核的冷恢复 fencing、已登记成果恢复、严格枚举和首次落盘引用四项已修正，48 项 Worker 混合检查及前序回归通过。B-IPC 已连接真实 Worker、受限 Node IPC、宿主审批/一次领取、Pi write/edit、成果核验与 macOS 固定进程组清理。实际 SIGKILL、结果丢失、原生 Session 重开和 SQLite 隔离有独立证据；不存在以 Worker 的 hostClean 自报结算的路径。范围不包含任意恶意后代、跨平台生产沙箱或真实模型。
+B-IPC 及四项审核修正已快进集成 develop（`590c89d`）。C 的最小 Electron/React 桌面已交付到独立功能分支，复用现有 ProductCore、WorkerSupervisor 和受限 Pi 工具链路；详情见 [C 契约](../ssot/c-desktop-contract.md) 与 [真实代码/平台证据](../validation/c-desktop-2026-09-23.md)。安全正文投影、宿主工具卡、审批/取消、真实 Markdown 预览和断连恢复已经有限验证，不再把事件类型标签当聊天正文。
 
-下一轮实施 C 的最小 Electron/React 桌面界面，复用现有 ProductCore 与 WorkerSupervisor，不再新建孤立探针。C 必须补消息正文/工具摘要的安全展示投影：当前 product-binding 只提供事件类型标签，不能直接作为聊天时间线，也不能原样透传整个 SDK 对象。社区组件仍按固定来源与许可审查后局部采用。
+下一轮只推进 D：继续 Mac 执行/应用退出闭环，并准备 Windows 中文/空格路径、Shell/PTY 与受管进程清理的最小竖切。复用 Pi Operations 与成熟平台库；在可用 Windows 环境实测前保持未支持/未验证，不以静态路径测试或 Mac 结果代替。终端/平台新依赖须单独核验公开发行与许可，不自动开启市场或真实模型。
 
-本轮停止在 B-IPC；尚未安装 Electron/React、使用真实账户或模型。M0-UI、M0-SDK、M0-Pi 保持 pending，测试数量不自动完成 Gate。以下 A0–A4/B 小节为历史阶段记录，以本栏为唯一当前顺序。
+本轮停止在限定 C；C 功能分支尚未自动合并 develop。正文流式 delta、全历史分页、真实工作区选择和扩展 UI 等 UI 余项仍留在 backlog；这些不是并列的第二个“当前开发项”。M0-UI、M0-SDK、M0-Pi 保持 pending，待完整范围评审；不存在真实账户/模型、签名安装或双平台验收声明。以下 A0–A4/B/C 小节是历史阶段记录，以本栏为唯一当前顺序。
 
 ## 1. 下一增量不是再造平台
 

@@ -36,17 +36,19 @@
             "EV-B-REVIEW-20260922",
             "EV-REVIEW-A4-DECISIONS-20260923",
             "EV-B-IPC-REVIEW-20260923",
-            "EV-REVIEW-B-IPC-DECISIONS-20260923"
+            "EV-REVIEW-B-IPC-DECISIONS-20260923",
+            "EV-C-SDK-20260923",
+            "EV-C-MAC-20260923"
           ]
         }
       ],
-      "statusReason": "B-IPC四项审核已局部修正并记录失败/成功范围；继续C最小桌面界面，社区UI准入与完整验收未完成。"
+      "statusReason": "B-IPC已集成develop，C限定桌面及社区局部移植已记录来源/证据；下一项D平台执行竖切尚未开始。"
     },
     {
       "id": "BOOT-02",
       "priority": "P0",
       "ownerRole": "Desktop",
-      "state": "proposed",
+      "state": "in_progress",
       "githubIssueNumber": null,
       "dependencies": [
         "BOOT-01"
@@ -55,9 +57,10 @@
       "workAndAcceptance": "复用Electron工具链/社区构建模式；建立两平台空壳和原生模块CI，不声明尚未完成签名",
       "reuseRefs": [
         "community-ui",
-        "terminal"
+        "terminal",
+        "desktop-ui"
       ],
-      "implementationStatus": "not_implemented",
+      "implementationStatus": "in_progress",
       "githubIssueUrl": null,
       "issueVerificationStatus": "not_checked",
       "issueEvidence": [],
@@ -73,9 +76,15 @@
             "desktop-startup",
             "runtime-matrix"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-C-REVIEW-20260923",
+            "EV-C-MAC-20260923",
+            "EV-C-SYNTHETIC-20260923",
+            "EV-C-REGRESSION-20260923"
+          ]
         }
-      ]
+      ],
+      "statusReason": "限定C最小macOS桌面已接真实产品/Worker链路；仅无模型合成驱动。完整UI、流式事件、双平台及M0 Gate未完成。"
     },
     {
       "id": "BOOT-03",
@@ -159,7 +168,7 @@
       "id": "BOOT-04",
       "priority": "P0",
       "ownerRole": "Frontend",
-      "state": "proposed",
+      "state": "in_progress",
       "githubIssueNumber": null,
       "dependencies": [
         "BOOT-01"
@@ -168,9 +177,10 @@
       "workAndAcceptance": "Mock只覆盖产品与边界故障；不实现替代Agent Loop；与SDK探针并行",
       "reuseRefs": [
         "product-coordination",
-        "agent-session"
+        "agent-session",
+        "desktop-ui"
       ],
-      "implementationStatus": "not_implemented",
+      "implementationStatus": "in_progress",
       "githubIssueUrl": null,
       "issueVerificationStatus": "not_checked",
       "issueEvidence": [],
@@ -185,9 +195,15 @@
           "plannedChecks": [
             "mock-boundaries"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-C-REVIEW-20260923",
+            "EV-C-MAC-20260923",
+            "EV-C-SYNTHETIC-20260923",
+            "EV-C-REGRESSION-20260923"
+          ]
         }
-      ]
+      ],
+      "statusReason": "限定C最小macOS桌面已接真实产品/Worker链路；仅无模型合成驱动。完整UI、流式事件、双平台及M0 Gate未完成。"
     },
     {
       "id": "BOOT-05",
@@ -264,7 +280,9 @@
             "EV-B-IPC-SDK-20260923",
             "EV-B-IPC-MAC-20260923",
             "EV-REVIEW-B-IPC-SDK-20260923",
-            "EV-REVIEW-B-IPC-MAC-20260923"
+            "EV-REVIEW-B-IPC-MAC-20260923",
+            "EV-C-SDK-20260923",
+            "EV-C-MAC-20260923"
           ]
         },
         {
@@ -325,7 +343,9 @@
             "EV-B-IPC-SDK-20260923",
             "EV-B-IPC-MAC-20260923",
             "EV-REVIEW-B-IPC-SDK-20260923",
-            "EV-REVIEW-B-IPC-MAC-20260923"
+            "EV-REVIEW-B-IPC-MAC-20260923",
+            "EV-C-SDK-20260923",
+            "EV-C-MAC-20260923"
           ]
         },
         {
@@ -419,7 +439,9 @@
             "EV-B-SDK-20260922",
             "EV-B-IPC-SDK-20260923",
             "EV-B-IPC-MAC-20260923",
-            "EV-REVIEW-B-IPC-MAC-20260923"
+            "EV-REVIEW-B-IPC-MAC-20260923",
+            "EV-C-SDK-20260923",
+            "EV-C-MAC-20260923"
           ]
         },
         {
@@ -558,7 +580,7 @@
       "id": "SEC-01",
       "priority": "P0",
       "ownerRole": "Desktop",
-      "state": "proposed",
+      "state": "in_progress",
       "githubIssueNumber": null,
       "dependencies": [
         "BOOT-02"
@@ -567,9 +589,10 @@
       "workAndAcceptance": "复用Electron安全IPC与社区边界测试模式；CSP/来源/schema验证，Renderer不直接碰FS/Shell/secret",
       "reuseRefs": [
         "community-ui",
-        "product-coordination"
+        "product-coordination",
+        "desktop-ui"
       ],
-      "implementationStatus": "not_implemented",
+      "implementationStatus": "in_progress",
       "githubIssueUrl": null,
       "issueVerificationStatus": "not_checked",
       "issueEvidence": [],
@@ -584,9 +607,15 @@
           "plannedChecks": [
             "renderer-boundary"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-C-REVIEW-20260923",
+            "EV-C-MAC-20260923",
+            "EV-C-SYNTHETIC-20260923",
+            "EV-C-REGRESSION-20260923"
+          ]
         }
-      ]
+      ],
+      "statusReason": "限定C最小macOS桌面已接真实产品/Worker链路；仅无模型合成驱动。完整UI、流式事件、双平台及M0 Gate未完成。"
     },
     {
       "id": "SEC-02",
@@ -725,7 +754,7 @@
       "id": "UI-01",
       "priority": "P0",
       "ownerRole": "Frontend",
-      "state": "proposed",
+      "state": "in_progress",
       "githubIssueNumber": null,
       "dependencies": [
         "BOOT-04",
@@ -735,9 +764,10 @@
       "workAndAcceptance": "定向复用pi-gui工作台/时间线模式；固定来源后局部移植，不依赖Pi内部类型",
       "reuseRefs": [
         "community-ui",
-        "product-coordination"
+        "product-coordination",
+        "desktop-ui"
       ],
-      "implementationStatus": "not_implemented",
+      "implementationStatus": "in_progress",
       "githubIssueUrl": null,
       "issueVerificationStatus": "not_checked",
       "issueEvidence": [],
@@ -753,15 +783,21 @@
             "ui-source-review",
             "thread-switch"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-C-REVIEW-20260923",
+            "EV-C-MAC-20260923",
+            "EV-C-SYNTHETIC-20260923",
+            "EV-C-REGRESSION-20260923"
+          ]
         }
-      ]
+      ],
+      "statusReason": "限定C最小macOS桌面已接真实产品/Worker链路；仅无模型合成驱动。完整UI、流式事件、双平台及M0 Gate未完成。"
     },
     {
       "id": "UI-02",
       "priority": "P0",
       "ownerRole": "Frontend",
-      "state": "proposed",
+      "state": "in_progress",
       "githubIssueNumber": null,
       "dependencies": [
         "UI-01",
@@ -772,9 +808,10 @@
       "reuseRefs": [
         "community-ui",
         "extension-ui",
-        "output-diff"
+        "output-diff",
+        "desktop-ui"
       ],
-      "implementationStatus": "not_implemented",
+      "implementationStatus": "in_progress",
       "githubIssueUrl": null,
       "issueVerificationStatus": "not_checked",
       "issueEvidence": [],
@@ -790,9 +827,15 @@
             "ui-tool-events",
             "ui-approval-cancel"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-C-REVIEW-20260923",
+            "EV-C-MAC-20260923",
+            "EV-C-SYNTHETIC-20260923",
+            "EV-C-REGRESSION-20260923"
+          ]
         }
-      ]
+      ],
+      "statusReason": "限定C最小macOS桌面已接真实产品/Worker链路；仅无模型合成驱动。完整UI、流式事件、双平台及M0 Gate未完成。"
     },
     {
       "id": "GIT-01",
@@ -863,7 +906,9 @@
             "EV-B-IPC-SDK-20260923",
             "EV-B-IPC-MAC-20260923",
             "EV-REVIEW-B-IPC-MAC-20260923",
-            "EV-REVIEW-B-IPC-REGRESSION-20260923"
+            "EV-REVIEW-B-IPC-REGRESSION-20260923",
+            "EV-C-SDK-20260923",
+            "EV-C-MAC-20260923"
           ]
         },
         {
@@ -880,7 +925,7 @@
           ]
         }
       ],
-      "statusReason": "恢复复用匹配原Operation/绑定/目标/摘要的已登记历史成果；当前missing/changed由安全预览表达，未登记和unknown仍严格核验；另存为/UI未完成。"
+      "statusReason": "C增加真实Markdown纯文本预览、外部修改可见和成果来源；历史对账范围保留，另存为/其他格式未完成。"
     },
     {
       "id": "SKL-01",
@@ -1401,7 +1446,10 @@
         "darwin"
       ],
       "prerequisites": [],
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        "EV-C-SYNTHETIC-20260923",
+        "EV-C-MAC-20260923"
+      ],
       "acceptance": "Mac Mock桌面任务、审批/取消/恢复及真实Markdown文件；不冒充Pi或模型"
     },
     {

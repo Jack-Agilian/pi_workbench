@@ -14,7 +14,7 @@
 
 `docs/startup/` 继续保留原始 0.1 快照、原始接口和历史报告，不改摘要。**涉及复用策略、工具接入、技能解析、模型配置、任务队列、传输选型、模块拆分和交付先后的冲突，以本目录为准。**未被本目录覆盖的产品范围、UI 体验及安全要求继续参考原快照。已落地代码和测试是实现事实；与规格冲突时报告偏差，不静默反向改写规格。
 
-原始 `contracts/app-protocol.ts` 与 SQL 只是参考，不能整份复制作为首版必做项。B 已新增有限的产品 DTO/命令校验与模块级持久核心，范围见 [最小契约](b-minimal-contract.md)；[B-IPC](b-worker-contract.md) 已补有限、可校验的进程协议和宿主监督。A0/A1 引入的 Pi 精确依赖继续沿用，尚未引入 Electron 或社区 UI。严格声明检查经 [ADR-A0 类型补丁](adr-a0-pi-types.md) 通过，原始发行缺陷及采用边界见 [A0/A1 缺口](../validation/a0-a1-gaps.md)。
+原始 `contracts/app-protocol.ts` 与 SQL 只是参考，不能整份复制作为首版必做项。B 已新增有限的产品 DTO/命令校验与模块级持久核心，范围见 [最小契约](b-minimal-contract.md)；[B-IPC](b-worker-contract.md) 已补有限、可校验的进程协议和宿主监督。A0/A1 引入的 Pi 精确依赖继续沿用，C 另以 [最小桌面契约](c-desktop-contract.md) 引入精确 Electron/React 与有来源的社区键盘保护片段。严格声明检查经 [ADR-A0 类型补丁](adr-a0-pi-types.md) 通过，原始发行缺陷及采用边界见 [A0/A1 缺口](../validation/a0-a1-gaps.md)。
 
 维护规则见 [状态、证据与验收](maintenance.md)；本次处理清单见 [R01–R08 修订](review-fixes.md)。该修订只核验维护脚本和接缝契约；后续实际接入证据分别登记如下。
 
@@ -65,3 +65,7 @@ python scripts/test-tools.py
 ## B-IPC 审核修正（2026-09-23）
 
 [复核与修正证据](../validation/review-b-ipc-2026-09-23.md) 保留原 0e9a01a 的四项缺陷及实际被测修正 SHA。冷启动先失效旧授权再检查清理证明，已登记成果恢复与当前可用性分开，IPC v2 严格枚举及原生路径持久确认已回归；Worker 48、Core 20、SDK 5 及 A1–A4 通过。前节 30 项属于历史范围；相关能力保持 in_progress，三个 M0 Gate pending，唯一当前项仍为 C。
+
+## C 最小桌面：2026-09-23
+
+[实际代码 SHA 与验证](../validation/c-desktop-2026-09-23.md) · [桌面/展示边界](c-desktop-contract.md) · [发行与命令摘要](../validation/c-desktop-inputs.json)。真实 Electron 连接独立 Node 宿主和 Pi Worker，四个无模型场景、12 项桌面检查及前序回归通过。正文投影与工具/成果视图只用产品 DTO；原生 Session 仍归 Pi。BOOT-02/BOOT-04/UI-01/UI-02/SEC-01 开始限定实施，三个 M0 Gate 保持 pending。前面“下一步 C”为历史记录；唯一当前顺序以 NEXT_STEPS 顶部的 D 待启动为准。

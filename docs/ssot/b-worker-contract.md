@@ -45,3 +45,7 @@ Worker 使用 Pi 0.87.0 公开 SessionManager.create/open/getSessionFile；在 R
 schema v3 在 Thread 的既有原生引用旁增加 native_persisted 标记，表示宿主已观察到该路径的文件。ready/closed 和清理后恢复可更新它；同路径不能从 true 降回 false。已知落盘文件丢失时不静默新建空历史。尚未落盘的预分配路径可以用 Pi.open 恢复为空 Session，产品 Run.input 保留首次 Assistant 前的意图；Pi 负责实际 JSONL 写入和读取。恢复读取确定引用，不扫描最新文件或按 mtime 猜测。v1/v2 库自动前向迁移；不提供回退到旧版本运行时的库降级。
 
 当前新增故障证据覆盖首次创建及 newSession 替换后首次落盘、宿主确认前死亡、已知落盘文件缺失。未扩展为 Fork/import 的全部落盘窗口、消息投影或生产通用恢复器。若文件在宿主首次观察前落盘又被外部删除，布尔标记无法证明这段不可见历史；不宣称跨文件/SQLite 原子持久性。
+
+## C 的后续采用
+
+上述 v2/v3 和类型标签描述保留 B-IPC 阶段语境。C 当前使用 Worker IPC v3 的有界 presentation 替换消息与产品 schema v4 展示缓存；不改变原生 Session、审批或清理所有权。独立 Electron/Node 宿主入口及安全正文/工具视图见 [C 契约](c-desktop-contract.md)，不能把缓存当原生消息树或恢复模型上下文。

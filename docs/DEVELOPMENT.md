@@ -247,3 +247,26 @@ npm run demo:product-worker -- crash
 [进程契约](ssot/b-worker-contract.md) 说明权限、监护器与恢复范围。受限 Worker 仅支持当前验证的 macOS/Node 组合，其他平台报错。正常 entry 没有合成开关或模型驱动；测试 entry 的可信组合不能由 Renderer 命令选择。C 将补安全正文/工具摘要展示，当前类型标签投影不是聊天时间线。
 
 B-IPC [审核修正与回归](validation/review-b-ipc-2026-09-23.md) 仍使用同一测试/演示命令，Worker 套件现为 48 项。IPC v2 增加宿主持久确认的 Pi 原生路径；产品库 schema v3 前向迁移原生落盘标记。升级后的宿主和 Worker 必须使用同一协议；不支持将 v3 库交回旧运行时。冷启动独占宿主先 recover，再开放命令；缺清理凭据时授权失效且继续阻断，不能强行释放 Run。
+
+## C：最小 Electron/React 桌面
+
+在前述固定 Node/npm 和 `bootstrap.py --app` 初始化之后，显式准备 Electron 官方二进制，再启动无模型演示：
+
+```bash
+npm run prepare:desktop
+npm run desktop
+
+# 已有归档时，不出网地恢复 npm ci 删除的二进制
+npm run prepare:desktop -- --offline
+npm run typecheck
+npm run test:desktop
+npm run test:desktop-ui
+```
+
+桌面入口不隐式下载。prepare 只支持本轮实测的 macOS arm64，核验官方归档 SHA-256 后用系统 ditto 解包；npm scripts 仍禁用，不调用第三方 lifecycle。默认文档 bootstrap 不变；`--app --offline` 之后须再次运行 `prepare:desktop -- --offline`。Electron/React/esbuild 版本与实际 ABI 见 [C 报告](validation/c-desktop-2026-09-23.md) 和 [完整性记录](validation/c-desktop-inputs.json)。
+
+`npm run desktop` 固定选择 --demo，所有 Assistant 都标记合成、无模型。演示库/工作区/Session/浏览器状态仅保存在项目 `.artifacts/desktop-demo/`，实际 Pi write 在批准后写 Markdown。关闭等待宿主/Worker 清理；unknown 时先核验，不自动重跑。它不会打开真实用户目录或读取账户。暂不提供自由目录选择、登录或生产启动模式。
+
+`test:desktop` 使用独立临时 workspace/profile 和禁网 SDK；`test:desktop-ui` 启动真正 Electron 窗口，走 UI/受限 IPC/真实 Worker 的允许、拒绝、取消、宿主强杀恢复四场景，并检查文本注入、脱敏、文件变化、线程/草稿隔离。测试截图及日志放 `.artifacts/c-desktop/`，临时 profile 在测试后移除。窗口测试可在锁屏下执行，但不能据此声称人工/原生输入法/读屏验收。
+
+源码工具从自身路径定位仓库；在其他 cwd 可使用 `npm --prefix /path/to/checkout run desktop`。独立宿主仍使用项目 Node，Renderer 只接产品 DTO。详细支持范围和消息投影限制见 [C 契约](ssot/c-desktop-contract.md)。没有安装发布工具、全局包或更改系统安全设置。

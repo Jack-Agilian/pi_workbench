@@ -1,0 +1,1039 @@
+{
+  "scope": "C bounded synthetic desktop with real Pi local tools; zero real model calls; not a full M0 Gate",
+  "baseline": "590c89d1fc1cb905a90cd1277753107296627a31",
+  "developMerge": {
+    "from": "cd6c82b1995e9c0fc0007b790e2b24a47aaf0fa9",
+    "to": "590c89d1fc1cb905a90cd1277753107296627a31",
+    "method": "fast-forward; independent ls-remote readback confirmed"
+  },
+  "fullRegression": {
+    "testedCommit": "73ed780ab8892cdd139a5b8a7ecee94d6fa9b234",
+    "recordedAt": "2026-09-23T11:33:09.942681+00:00",
+    "results": [
+      {
+        "command": [
+          "npm",
+          "run",
+          "check:environment"
+        ],
+        "exitCode": 0,
+        "seconds": 0.244,
+        "outputSha256": "e5bf052638bae533d3e2a8ba27b584b7115930409dcdbe7cebae96a7b862096c"
+      },
+      {
+        "command": [
+          ".venv/bin/python",
+          "scripts/bootstrap.py",
+          "--offline"
+        ],
+        "exitCode": 0,
+        "seconds": 0.27,
+        "outputSha256": "3ea15daae1509efa047013bbd2c19c3450d238f305165ba5e78a1793167cedbc"
+      },
+      {
+        "command": [
+          ".venv/bin/python",
+          "scripts/bootstrap.py",
+          "--offline"
+        ],
+        "exitCode": 0,
+        "seconds": 0.207,
+        "outputSha256": "3ea15daae1509efa047013bbd2c19c3450d238f305165ba5e78a1793167cedbc"
+      },
+      {
+        "command": [
+          ".venv/bin/python",
+          "scripts/bootstrap.py",
+          "--app",
+          "--offline"
+        ],
+        "exitCode": 0,
+        "seconds": 4.796,
+        "outputSha256": "51a37495d8f8b101d3a6cea14271a330d0054d53d9ce69cf98849897479056e6"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "prepare:desktop",
+          "--",
+          "--offline"
+        ],
+        "exitCode": 0,
+        "seconds": 0.736,
+        "outputSha256": "9f56e66db05ca94dc6df8ee58a58c2e4c3b094cd1b055592f25c9f3967c894b1"
+      },
+      {
+        "command": [
+          ".venv/bin/python",
+          "scripts/bootstrap.py",
+          "--app",
+          "--offline"
+        ],
+        "exitCode": 0,
+        "seconds": 4.556,
+        "outputSha256": "51a37495d8f8b101d3a6cea14271a330d0054d53d9ce69cf98849897479056e6"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "prepare:desktop",
+          "--",
+          "--offline"
+        ],
+        "exitCode": 0,
+        "seconds": 0.683,
+        "outputSha256": "9f56e66db05ca94dc6df8ee58a58c2e4c3b094cd1b055592f25c9f3967c894b1"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "typecheck"
+        ],
+        "exitCode": 0,
+        "seconds": 2.235,
+        "outputSha256": "ca27905bae0ff05202f06b1202f21718c69c2a76a72c41f79c5c9dd4c1c13f7b"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:pi-types"
+        ],
+        "exitCode": 0,
+        "seconds": 2.516,
+        "testCount": 10,
+        "outputSha256": "7f20115ecf67d912a57a6889f71f4ceb108d288708d584174b43352cd6d25613"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:pi-probe"
+        ],
+        "exitCode": 0,
+        "seconds": 0.908,
+        "testCount": 15,
+        "outputSha256": "487e0f332bd9c65c25979c2569ee8427f240e2216c8295e33d6415e7c3a2973c"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:pi-tools"
+        ],
+        "exitCode": 0,
+        "seconds": 1.002,
+        "testCount": 19,
+        "outputSha256": "975cda94fc802be48ac1a51d23a48ee10196d083eb8c9008d81c2fb138066474"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:pi-shell"
+        ],
+        "exitCode": 0,
+        "seconds": 1.087,
+        "testCount": 4,
+        "outputSha256": "4a6b8da19cee055e4bf62ba2aee9c2f05eee037f1051e0b7aec13d6482eb78a3"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:pi-resources"
+        ],
+        "exitCode": 0,
+        "seconds": 1.013,
+        "testCount": 12,
+        "outputSha256": "05a33e1ad727cdab0dbe2ef09df884cec762ee6bfcaf1bd6c312352a12ba1453"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:pi-packages"
+        ],
+        "exitCode": 0,
+        "seconds": 3.376,
+        "testCount": 8,
+        "outputSha256": "93f8e01cbddb8b5375d97bcbfaf28a4dd076ce1ae4b8356328c2fb5435e7241d"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:pi-auth"
+        ],
+        "exitCode": 0,
+        "seconds": 0.916,
+        "testCount": 18,
+        "outputSha256": "7bd05f1b7798868fd46ee73e2ab5958d1add9084c1879cf9d8d7a3757c5b259f"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:product-core"
+        ],
+        "exitCode": 0,
+        "seconds": 0.734,
+        "testCount": 20,
+        "outputSha256": "9914cfb3a8af674c51c623a855666eded8e3e6cdc1c2f4b2648d56ef5e3cc4d0"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:product-sdk"
+        ],
+        "exitCode": 0,
+        "seconds": 0.969,
+        "testCount": 5,
+        "outputSha256": "fd718b5240b65b9ddd3e5c9276d141575d6c4fdf1868bd4281f177dfaef9baf3"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:product-worker"
+        ],
+        "exitCode": 0,
+        "seconds": 29.302,
+        "testCount": 48,
+        "outputSha256": "026b66d7ca6bc8443c0dcc687948e6aabdd5ed356663152b0547bda0eea943a9"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:desktop"
+        ],
+        "exitCode": 0,
+        "seconds": 6.883,
+        "testCount": 12,
+        "outputSha256": "4e5f4ec29acdaa199c90701fa37b9a6045de9fe588db82935bffc5276ce8c279"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:desktop-ui"
+        ],
+        "exitCode": 0,
+        "seconds": 11.355,
+        "outputSha256": "8f51c8dcfb47b574ed8416e3d45da02941f49f40045568b4f31316e48665a3de"
+      },
+      {
+        "command": [
+          ".venv/bin/python",
+          "scripts/check-ssot.py"
+        ],
+        "exitCode": 0,
+        "seconds": 0.15,
+        "testCount": 60,
+        "outputSha256": "2749bfddb4b74fa0ac35b8efc092c18a7d2d19cd089a9e60f90dda64d53cb84d"
+      },
+      {
+        "command": [
+          ".venv/bin/python",
+          "scripts/test-tools.py"
+        ],
+        "exitCode": 0,
+        "seconds": 0.089,
+        "testCount": 15,
+        "outputSha256": "47060195453f3c91118ef1d9c94c5d8f1726e608fe870bc724672a1b6c299b1f"
+      },
+      {
+        "command": [
+          ".venv/bin/python",
+          "scripts/check-docs.py",
+          "--structural-only"
+        ],
+        "exitCode": 0,
+        "seconds": 0.09,
+        "outputSha256": "2d17d023d8e46969c93afd2e853b92a95f2841b3e2f7de6d79b1e6d61e64321e"
+      },
+      {
+        "command": [
+          ".venv/bin/python",
+          "scripts/check-docs.py",
+          "--typecheck"
+        ],
+        "exitCode": 0,
+        "seconds": 0.385,
+        "outputSha256": "ee41753fc0618984ba462c254216d6ffc5b48090048e4c89f2bc20e06a1888f6"
+      }
+    ]
+  },
+  "finalUiRevision": {
+    "testedCommit": "e531a69ba3fd7bc94d25848af162f87673c40fe0",
+    "recordedAt": "2026-09-23T11:34:33.768247+00:00",
+    "results": [
+      {
+        "command": [
+          "npm",
+          "run",
+          "typecheck"
+        ],
+        "exitCode": 0,
+        "outputSha256": "ca27905bae0ff05202f06b1202f21718c69c2a76a72c41f79c5c9dd4c1c13f7b"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:desktop"
+        ],
+        "exitCode": 0,
+        "outputSha256": "1fd03ee22db071aec1ce439f87f2b844e1aab37468155600a52362737e88e221"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:desktop-ui"
+        ],
+        "exitCode": 0,
+        "outputSha256": "4eb9eb85bf4d0e3a2515b4deaa9120e9710d3fd95dc303ca5532978335fb878c"
+      }
+    ]
+  },
+  "environment": {
+    "platform": "darwin",
+    "node": {
+      "version": "24.21.0",
+      "arch": "arm64",
+      "executable": "<repo>/.artifacts/toolchains/node-v24.21.0-darwin-arm64/bin/node"
+    },
+    "macOS": {
+      "exit": 0,
+      "output": "27.0"
+    },
+    "machine": {
+      "exit": 0,
+      "output": "arm64"
+    },
+    "rosetta": {
+      "exit": 0,
+      "output": "0"
+    },
+    "git": {
+      "executable": "/opt/homebrew/bin/git",
+      "exit": 0,
+      "output": "git version 2.55.0"
+    },
+    "python3": {
+      "executable": "/opt/homebrew/bin/python3",
+      "exit": 0,
+      "output": "Python 3.14.7"
+    },
+    "projectPython": {
+      "executable": "<repo>/.venv/bin/python",
+      "exit": 0,
+      "output": "Python 3.14.7"
+    },
+    "npm": {
+      "executable": "<repo>/.artifacts/toolchains/node-v24.21.0-darwin-arm64/bin/npm",
+      "exit": 0,
+      "output": "11.19.0"
+    }
+  },
+  "electronRuntime": {
+    "electron": "44.4.5",
+    "chromium": "152.0.7977.130",
+    "node": "24.21.0",
+    "abi": "149",
+    "arch": "arm64"
+  },
+  "lockSha256": "d8bd6672a2ee403bfccd04e7a49a74139b7d97102c04c7e3dd27982a890c1e9d",
+  "releasePackages": [
+    {
+      "package": "@earendil-works/pi-ai",
+      "version": "0.87.0",
+      "metadataUrl": "https://registry.npmjs.org/%40earendil-works%2Fpi-ai/0.87.0",
+      "tarballUrl": "https://registry.npmjs.org/@earendil-works/pi-ai/-/pi-ai-0.87.0.tgz",
+      "integrity": "sha512-lbRm+EMY6Jx3l+HLpbqbm9Yrhkc5u7EffLk2id+zJQEoBuR5I+tijGiZU8zlnuuCclmQOgH0PVjL9PLbeqJ9MQ==",
+      "bytes": 836978,
+      "sha256": "f2adf9de809d035f76f8dadf3d148720ebeef4606a848ab36ee834d895ae812f",
+      "installedCopies": [
+        {
+          "path": "node_modules/@earendil-works/pi-ai",
+          "filesChecked": 772,
+          "declarationsPatched": 41
+        },
+        {
+          "path": "node_modules/@earendil-works/pi-coding-agent/node_modules/@earendil-works/pi-ai",
+          "filesChecked": 772,
+          "declarationsPatched": 41
+        }
+      ],
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "import": "./dist/index.js"
+        },
+        "./api/*": {
+          "types": "./dist/api/*.d.ts",
+          "import": "./dist/api/*.js"
+        },
+        "./oauth": {
+          "types": "./dist/oauth.d.ts",
+          "import": "./dist/oauth.js"
+        },
+        "./compat": {
+          "types": "./dist/compat.d.ts",
+          "import": "./dist/compat.js"
+        },
+        "./utils/*": {
+          "types": "./dist/utils/*.d.ts",
+          "import": "./dist/utils/*.js"
+        },
+        "./bun-oauth": {
+          "types": "./dist/bun-oauth.d.ts",
+          "import": "./dist/bun-oauth.js"
+        },
+        "./providers/*": {
+          "types": "./dist/providers/*.d.ts",
+          "import": "./dist/providers/*.js"
+        },
+        "./bedrock-provider": {
+          "types": "./dist/bedrock-provider.d.ts",
+          "import": "./dist/bedrock-provider.js"
+        }
+      },
+      "engines": {
+        "node": ">=22.19.0"
+      },
+      "scope": "HTTPS registry/lock/download SRI and installed package files; registry signatures not independently verified",
+      "localDeclarationPatch": {
+        "manifest": "patches/pi-ai-0.87.0-json-types.json",
+        "patchSha256": "57c11da43fd28c77389c4561b08cadca3706d8181cdd5c11e3eaf6d1bccf266e",
+        "scope": "41 declaration-only type imports per copy; runtime JS and model JSON match registry bytes"
+      }
+    },
+    {
+      "package": "@earendil-works/pi-coding-agent",
+      "version": "0.87.0",
+      "metadataUrl": "https://registry.npmjs.org/%40earendil-works%2Fpi-coding-agent/0.87.0",
+      "tarballUrl": "https://registry.npmjs.org/@earendil-works/pi-coding-agent/-/pi-coding-agent-0.87.0.tgz",
+      "integrity": "sha512-S9JJVGHya/h0e0M+zwPTB6RkPe7PmLLqfBUTssFYW5mxAti6oZEILn4jvaUImENRC3U9RwXAB6H4gw8xj2J0GQ==",
+      "bytes": 7227603,
+      "sha256": "9a6733c0e6a31d592b53dc60df43dd0c26fa793ccf2384ed123fc17b0448866a",
+      "installedCopies": [
+        {
+          "path": "node_modules/@earendil-works/pi-coding-agent",
+          "filesChecked": 1100,
+          "declarationsPatched": 0
+        }
+      ],
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "import": "./dist/index.js"
+        },
+        "./client": {
+          "source": "./src/client/index.ts"
+        },
+        "./rpc-entry": {
+          "import": "./dist/bundle/rpc-entry.js"
+        },
+        "./experimental/plugin": {
+          "source": "./src/experimental/plugin.ts"
+        }
+      },
+      "engines": {
+        "node": ">=22.19.0"
+      },
+      "scope": "HTTPS registry/lock/download SRI and installed package files; registry signatures not independently verified"
+    },
+    {
+      "package": "react",
+      "version": "19.3.0",
+      "metadataUrl": "https://registry.npmjs.org/react/19.3.0",
+      "tarballUrl": "https://registry.npmjs.org/react/-/react-19.3.0.tgz",
+      "integrity": "sha512-E8LUcbtBWt20bbl2YoHfx4ZDBdxVTfOKtCZn9cDSJ4l6/nuoApcpIBcj47t2wZoVX8g2ZHuMHbiShgCR1T5Sog==",
+      "bytes": 26394,
+      "sha256": "5a4024110c49476e1538a70fd65b9e59d038fcc280b78eb933c24e10453afbf9",
+      "installedCopies": [
+        {
+          "path": "node_modules/react",
+          "filesChecked": 27,
+          "declarationsPatched": 0
+        }
+      ],
+      "exports": {
+        ".": {
+          "default": "./index.js",
+          "react-server": "./react.react-server.js"
+        },
+        "./jsx-runtime": {
+          "default": "./jsx-runtime.js",
+          "react-server": "./jsx-runtime.react-server.js"
+        },
+        "./package.json": "./package.json",
+        "./jsx-dev-runtime": {
+          "default": "./jsx-dev-runtime.js",
+          "react-server": "./jsx-dev-runtime.react-server.js"
+        },
+        "./compiler-runtime": {
+          "default": "./compiler-runtime.js",
+          "react-server": "./compiler-runtime.js"
+        }
+      },
+      "engines": {
+        "node": ">=0.10.0"
+      },
+      "scope": "HTTPS registry/lock/download SRI and installed package files; registry signatures not independently verified"
+    },
+    {
+      "package": "react-dom",
+      "version": "19.3.0",
+      "metadataUrl": "https://registry.npmjs.org/react-dom/19.3.0",
+      "tarballUrl": "https://registry.npmjs.org/react-dom/-/react-dom-19.3.0.tgz",
+      "integrity": "sha512-JDk8dgif51OjFoDE70+OT9ICyYr+69HlmihNwp1+Nsfbna3t5sIiCa9ZJktDmQ4/1b/rn26hIAR2uYXDMr5r0Q==",
+      "bytes": 1409226,
+      "sha256": "dbeffb1e6cdbbbba07f799da4635333d0e20c210a32278dded85441ec4cb6a17",
+      "installedCopies": [
+        {
+          "path": "node_modules/react-dom",
+          "filesChecked": 43,
+          "declarationsPatched": 0
+        }
+      ],
+      "exports": {
+        ".": {
+          "default": "./index.js",
+          "react-server": "./react-dom.react-server.js"
+        },
+        "./client": {
+          "default": "./client.js",
+          "react-server": "./client.react-server.js"
+        },
+        "./server": {
+          "bun": "./server.bun.js",
+          "deno": "./server.node.js",
+          "node": "./server.node.js",
+          "worker": "./server.browser.js",
+          "browser": "./server.browser.js",
+          "default": "./server.node.js",
+          "workerd": "./server.edge.js",
+          "edge-light": "./server.edge.js",
+          "react-server": "./server.react-server.js"
+        },
+        "./static": {
+          "deno": "./static.browser.js",
+          "node": "./static.node.js",
+          "worker": "./static.browser.js",
+          "browser": "./static.browser.js",
+          "default": "./static.node.js",
+          "workerd": "./static.edge.js",
+          "edge-light": "./static.edge.js",
+          "react-server": "./static.react-server.js"
+        },
+        "./profiling": {
+          "default": "./profiling.js",
+          "react-server": "./profiling.react-server.js"
+        },
+        "./server.bun": {
+          "default": "./server.bun.js",
+          "react-server": "./server.react-server.js"
+        },
+        "./test-utils": "./test-utils.js",
+        "./server.edge": {
+          "default": "./server.edge.js",
+          "react-server": "./server.react-server.js"
+        },
+        "./server.node": {
+          "default": "./server.node.js",
+          "react-server": "./server.react-server.js"
+        },
+        "./static.edge": {
+          "default": "./static.edge.js",
+          "react-server": "./static.react-server.js"
+        },
+        "./static.node": {
+          "default": "./static.node.js",
+          "react-server": "./static.react-server.js"
+        },
+        "./package.json": "./package.json",
+        "./server.browser": {
+          "default": "./server.browser.js",
+          "react-server": "./server.react-server.js"
+        },
+        "./static.browser": {
+          "default": "./static.browser.js",
+          "react-server": "./static.react-server.js"
+        }
+      },
+      "engines": null,
+      "scope": "HTTPS registry/lock/download SRI and installed package files; registry signatures not independently verified"
+    },
+    {
+      "package": "@modelcontextprotocol/sdk",
+      "version": "1.30.0",
+      "metadataUrl": "https://registry.npmjs.org/%40modelcontextprotocol%2Fsdk/1.30.0",
+      "tarballUrl": "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.30.0.tgz",
+      "integrity": "sha512-xKd8OIzlqNzcqcNumGAa6g+PW2kjD5vrpcKOnfldAUPP3j7lnqMPwlTXQm8gF+UwH72z0lqaRbjr9hqGz0eITA==",
+      "bytes": 582844,
+      "sha256": "2cac3f3e38fec2815ed9efafa2947faf8c6957310684f99703f3d180f3e9af1a",
+      "installedCopies": [
+        {
+          "path": "node_modules/@modelcontextprotocol/sdk",
+          "filesChecked": 693,
+          "declarationsPatched": 0
+        }
+      ],
+      "exports": {
+        ".": {
+          "types": "./dist/esm/index.d.ts",
+          "import": "./dist/esm/index.js",
+          "require": "./dist/cjs/index.js"
+        },
+        "./*": {
+          "types": "./dist/esm/*.d.ts",
+          "import": "./dist/esm/*",
+          "require": "./dist/cjs/*"
+        },
+        "./client": {
+          "types": "./dist/esm/client/index.d.ts",
+          "import": "./dist/esm/client/index.js",
+          "require": "./dist/cjs/client/index.js"
+        },
+        "./server": {
+          "types": "./dist/esm/server/index.d.ts",
+          "import": "./dist/esm/server/index.js",
+          "require": "./dist/cjs/server/index.js"
+        },
+        "./validation": {
+          "types": "./dist/esm/validation/index.d.ts",
+          "import": "./dist/esm/validation/index.js",
+          "require": "./dist/cjs/validation/index.js"
+        },
+        "./experimental": {
+          "types": "./dist/esm/experimental/index.d.ts",
+          "import": "./dist/esm/experimental/index.js",
+          "require": "./dist/cjs/experimental/index.js"
+        },
+        "./validation/ajv": {
+          "types": "./dist/esm/validation/ajv-provider.d.ts",
+          "import": "./dist/esm/validation/ajv-provider.js",
+          "require": "./dist/cjs/validation/ajv-provider.js"
+        },
+        "./experimental/tasks": {
+          "types": "./dist/esm/experimental/tasks/index.d.ts",
+          "import": "./dist/esm/experimental/tasks/index.js",
+          "require": "./dist/cjs/experimental/tasks/index.js"
+        },
+        "./validation/cfworker": {
+          "types": "./dist/esm/validation/cfworker-provider.d.ts",
+          "import": "./dist/esm/validation/cfworker-provider.js",
+          "require": "./dist/cjs/validation/cfworker-provider.js"
+        }
+      },
+      "engines": {
+        "node": ">=18"
+      },
+      "scope": "HTTPS registry/lock/download SRI and installed package files; registry signatures not independently verified"
+    },
+    {
+      "package": "@types/node",
+      "version": "24.13.6",
+      "metadataUrl": "https://registry.npmjs.org/%40types%2Fnode/24.13.6",
+      "tarballUrl": "https://registry.npmjs.org/@types/node/-/node-24.13.6.tgz",
+      "integrity": "sha512-SGrw/h3KPFshy3OE6ZL53LMBG5vGQQ8/gIpiqz/kRZhPJ7HgwCEs8LBuNtWLa8dvGZVpSF7+Bf+c11HUrCb/yg==",
+      "bytes": 461826,
+      "sha256": "755b5147491e323c24541830f8eba438c1d1ef8931de725fc613b5439708464a",
+      "installedCopies": [
+        {
+          "path": "node_modules/@types/node",
+          "filesChecked": 75,
+          "declarationsPatched": 0
+        }
+      ],
+      "exports": null,
+      "engines": null,
+      "scope": "HTTPS registry/lock/download SRI and installed package files; registry signatures not independently verified"
+    },
+    {
+      "package": "@types/react",
+      "version": "19.3.0",
+      "metadataUrl": "https://registry.npmjs.org/%40types%2Freact/19.3.0",
+      "tarballUrl": "https://registry.npmjs.org/@types/react/-/react-19.3.0.tgz",
+      "integrity": "sha512-N0rFCuH9YoxG9/m61l9MfpJKfmLOVU0em7ipIz6TRgSSkvReLB9vL85GB+yr8Bs5leqpvg96JSwF4ZS1s4viQg==",
+      "bytes": 77822,
+      "sha256": "ffa77ffdbdc82e5f67a0fd74d750990375a7dfd8685ec7f10a27c0db128f7766",
+      "installedCopies": [
+        {
+          "path": "node_modules/@types/react",
+          "filesChecked": 16,
+          "declarationsPatched": 0
+        }
+      ],
+      "exports": {
+        ".": {
+          "types": {
+            "default": "./index.d.ts"
+          },
+          "types@<=5.0": {
+            "default": "./ts5.0/index.d.ts"
+          }
+        },
+        "./canary": {
+          "types": {
+            "default": "./canary.d.ts"
+          },
+          "types@<=5.0": {
+            "default": "./ts5.0/canary.d.ts"
+          }
+        },
+        "./jsx-runtime": {
+          "types": {
+            "default": "./jsx-runtime.d.ts"
+          },
+          "types@<=5.0": {
+            "default": "./ts5.0/jsx-runtime.d.ts"
+          }
+        },
+        "./experimental": {
+          "types": {
+            "default": "./experimental.d.ts"
+          },
+          "types@<=5.0": {
+            "default": "./ts5.0/experimental.d.ts"
+          }
+        },
+        "./package.json": "./package.json",
+        "./jsx-dev-runtime": {
+          "types": {
+            "default": "./jsx-dev-runtime.d.ts"
+          },
+          "types@<=5.0": {
+            "default": "./ts5.0/jsx-dev-runtime.d.ts"
+          }
+        },
+        "./compiler-runtime": {
+          "types": {
+            "default": "./compiler-runtime.d.ts"
+          }
+        }
+      },
+      "engines": null,
+      "scope": "HTTPS registry/lock/download SRI and installed package files; registry signatures not independently verified"
+    },
+    {
+      "package": "@types/react-dom",
+      "version": "19.3.0",
+      "metadataUrl": "https://registry.npmjs.org/%40types%2Freact-dom/19.3.0",
+      "tarballUrl": "https://registry.npmjs.org/@types/react-dom/-/react-dom-19.3.0.tgz",
+      "integrity": "sha512-ZI7bU42mZXXKHn/qNLEw2IrbiINU7X5+vfgdixBHkCNpYWXjKgfQ/P+uyGb5CjOLB9UcnTeg3rylQtV2hym44Q==",
+      "bytes": 8185,
+      "sha256": "0782e1cd4af4a6a030843235a48e55dc690c36f9428b0b672dc53350806dcf21",
+      "installedCopies": [
+        {
+          "path": "node_modules/@types/react-dom",
+          "filesChecked": 17,
+          "declarationsPatched": 0
+        }
+      ],
+      "exports": {
+        ".": {
+          "types": {
+            "default": "./index.d.ts"
+          }
+        },
+        "./canary": {
+          "types": {
+            "default": "./canary.d.ts"
+          }
+        },
+        "./client": {
+          "types": {
+            "default": "./client.d.ts"
+          }
+        },
+        "./server": {
+          "types": {
+            "default": "./server.d.ts"
+          }
+        },
+        "./static": {
+          "types": {
+            "default": "./static.d.ts"
+          }
+        },
+        "./server.bun": {
+          "types": {
+            "default": "./server.bun.d.ts"
+          }
+        },
+        "./test-utils": {
+          "types": {
+            "default": "./test-utils/index.d.ts"
+          }
+        },
+        "./server.edge": {
+          "types": {
+            "default": "./server.edge.d.ts"
+          }
+        },
+        "./server.node": {
+          "types": {
+            "default": "./server.node.d.ts"
+          }
+        },
+        "./static.edge": {
+          "types": {
+            "default": "./static.edge.d.ts"
+          }
+        },
+        "./static.node": {
+          "types": {
+            "default": "./static.node.d.ts"
+          }
+        },
+        "./experimental": {
+          "types": {
+            "default": "./experimental.d.ts"
+          }
+        },
+        "./package.json": "./package.json",
+        "./server.browser": {
+          "types": {
+            "default": "./server.browser.d.ts"
+          }
+        },
+        "./static.browser": {
+          "types": {
+            "default": "./static.browser.d.ts"
+          }
+        }
+      },
+      "engines": null,
+      "scope": "HTTPS registry/lock/download SRI and installed package files; registry signatures not independently verified"
+    },
+    {
+      "package": "electron",
+      "version": "44.4.5",
+      "metadataUrl": "https://registry.npmjs.org/electron/44.4.5",
+      "tarballUrl": "https://registry.npmjs.org/electron/-/electron-44.4.5.tgz",
+      "integrity": "sha512-SjgoaeYsSWZfJzubgQU7juvuXMTvn6/e1gAHdGFA/yuMbpF+I+skYqIJ6DdXBXHeWbkbpNpmwZCTpiivtlWZSw==",
+      "bytes": 198479,
+      "sha256": "712c161f94c755d94b4a1eefa2e97e76fca4f284bf6294b958bb82af3ae3e5e1",
+      "installedCopies": [
+        {
+          "path": "node_modules/electron",
+          "filesChecked": 9,
+          "declarationsPatched": 0
+        }
+      ],
+      "exports": null,
+      "engines": {
+        "node": ">= 22.12.0"
+      },
+      "scope": "HTTPS registry/lock/download SRI and installed package files; registry signatures not independently verified"
+    },
+    {
+      "package": "esbuild",
+      "version": "0.28.2",
+      "metadataUrl": "https://registry.npmjs.org/esbuild/0.28.2",
+      "tarballUrl": "https://registry.npmjs.org/esbuild/-/esbuild-0.28.2.tgz",
+      "integrity": "sha512-HKVLS8dvII+xoKW9kmqxbRKrnWEXfJJr/FZhhJmiqIB0e053QNYFqOBouTMO/k5sID4MvCiUCvv8b9M4h32wIA==",
+      "bytes": 34207,
+      "sha256": "e045f94c235c7adc50e77ba2a579c7bec41b496b6b47c3a7845f7c1e19959a88",
+      "installedCopies": [
+        {
+          "path": "node_modules/esbuild",
+          "filesChecked": 7,
+          "declarationsPatched": 0
+        }
+      ],
+      "exports": null,
+      "engines": {
+        "node": ">=18"
+      },
+      "scope": "HTTPS registry/lock/download SRI and installed package files; registry signatures not independently verified"
+    },
+    {
+      "package": "typescript",
+      "version": "7.0.2",
+      "metadataUrl": "https://registry.npmjs.org/typescript/7.0.2",
+      "tarballUrl": "https://registry.npmjs.org/typescript/-/typescript-7.0.2.tgz",
+      "integrity": "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA==",
+      "bytes": 365612,
+      "sha256": "da2513f4b95176d6dde8b51aab7afe8a927656c9d277369793f77f7e59371c08",
+      "installedCopies": [
+        {
+          "path": "node_modules/typescript",
+          "filesChecked": 416,
+          "declarationsPatched": 0
+        }
+      ],
+      "exports": {
+        ".": "./lib/version.cjs",
+        "./unstable/fs": "./dist/api/fs.js",
+        "./package.json": "./package.json",
+        "./unstable/ast": "./dist/ast/index.js",
+        "./unstable/sync": "./dist/api/sync/api.js",
+        "./unstable/async": "./dist/api/async/api.js",
+        "./unstable/proto": "./dist/api/proto.js",
+        "./unstable/ast/is": "./dist/ast/is.js",
+        "./unstable/ast/clone": "./dist/ast/clone.js",
+        "./unstable/ast/utils": "./dist/ast/utils.js",
+        "./unstable/ast/factory": "./dist/ast/factory.generated.js",
+        "./unstable/ast/scanner": "./dist/ast/scanner.js",
+        "./unstable/ast/visitor": "./dist/ast/visitor.js"
+      },
+      "engines": {
+        "node": ">=16.20.0"
+      },
+      "scope": "HTTPS registry/lock/download SRI and installed package files; registry signatures not independently verified"
+    }
+  ],
+  "electronBinary": {
+    "version": "44.4.5",
+    "url": "https://github.com/electron/electron/releases/download/v44.4.5/electron-v44.4.5-darwin-arm64.zip",
+    "sha256": "a212eee63ba2f45fd83bd28f77a3e3313a336ad17a4c25adf617942eef5e0e2c",
+    "bytes": 130418529,
+    "checksumSource": "Pinned electron npm package checksums.json",
+    "platform": "darwin",
+    "arch": "arm64",
+    "extraction": "/usr/bin/ditto; no lifecycle scripts; no Gatekeeper changes",
+    "signatureIndependentlyVerified": false
+  },
+  "community": {
+    "repository": "https://github.com/minghinmatthewlam/pi-gui",
+    "commit": "0b4cd334942ac01bfc6b3cba736a79984925d8cf",
+    "license": "MIT",
+    "filesReviewed": [
+      {
+        "path": "LICENSE",
+        "sha256": "887989ae1d3323becad917f0cdc9ca67f6c185416304b65f85c471fdbfbf798c"
+      },
+      {
+        "path": "apps/desktop/src/features/conversation/hooks/use-session-composer.tsx",
+        "sha256": "7b6f80bcbf414b5ed316dfd77fcc66759429d6fb212433998e917cfab0eb6b00"
+      },
+      {
+        "path": "apps/desktop/src/features/conversation/composer-surface.tsx",
+        "sha256": "1a706fc4a820d34c8a579875e429a5b402be13e309825abdcd685f8781c53775"
+      },
+      {
+        "path": "apps/desktop/src/features/conversation/timeline-layout.ts",
+        "sha256": "18a26bf6c90ee3fc4200c6914affa222d27be5f403a6bc95992d193dfa2268ba"
+      }
+    ],
+    "adoption": "Enter/Shift/IME guard only; added legacy 229 and repeat guards; no full Composer/timeline copy"
+  },
+  "modelCalls": 0,
+  "unverified": [
+    "Windows/Linux desktop",
+    "native IME hardware interaction",
+    "screen reader/manual UI acceptance (desktop was locked)",
+    "streaming model deltas",
+    "arbitrary secret detection",
+    "signing/distribution",
+    "production general sandbox"
+  ],
+  "releaseVerification": {
+    "testedCommit": "e531a69ba3fd7bc94d25848af162f87673c40fe0",
+    "command": [
+      ".venv/bin/python",
+      "scripts/verify-pi-release.py",
+      "--output-dir",
+      ".artifacts/c-desktop/release-confirmed"
+    ],
+    "exitCode": 0,
+    "workspaceDifference": "documentation only; code and lock unchanged",
+    "outputSha256": "18831064f460cfc892b25dbb867f04337b35639ed3103e83f87160411c1af265"
+  },
+  "cleanClone": {
+    "testedCommit": "e531a69ba3fd7bc94d25848af162f87673c40fe0",
+    "recordedAt": "2026-09-23T11:43:00.874649+00:00",
+    "scope": "New local shared clone at committed code, existing exact Node/npm and npm/Electron download cache; no developer node_modules copied",
+    "results": [
+      {
+        "command": [
+          "python3",
+          "scripts/bootstrap.py",
+          "--app",
+          "--offline"
+        ],
+        "exitCode": 0,
+        "outputSha256": "0199b6d748fcd40020e72a7d5985dd67e22e7ed4f2d70a7586d696a8923636eb"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "prepare:desktop",
+          "--",
+          "--offline"
+        ],
+        "exitCode": 0,
+        "outputSha256": "9f56e66db05ca94dc6df8ee58a58c2e4c3b094cd1b055592f25c9f3967c894b1"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "typecheck"
+        ],
+        "exitCode": 0,
+        "outputSha256": "ca27905bae0ff05202f06b1202f21718c69c2a76a72c41f79c5c9dd4c1c13f7b"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:desktop"
+        ],
+        "exitCode": 0,
+        "outputSha256": "9af4fc8ea9dd2076ec58bb7003932715df0b562ef45dbd9a396f3e572dfd4b63"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:desktop-ui"
+        ],
+        "exitCode": 0,
+        "outputSha256": "c4e95c8043a930ebc88dcf746b4d1a7a39fc28d3b12c922f16620fb9f0583a9e"
+      }
+    ]
+  },
+  "documentationVerification": {
+    "codeCommit": "e531a69ba3fd7bc94d25848af162f87673c40fe0",
+    "workspaceDifference": "Only the C report, SSOT/backlog/development documentation changed after code verification",
+    "checks": [
+      {
+        "command": [
+          ".venv/bin/python",
+          "scripts/check-ssot.py"
+        ],
+        "exitCode": 0,
+        "outputSha256": "5d71d10846cbf6731849d0ec1b374d5febcbcaa1a86d9fceecba8682ce42bcc3"
+      },
+      {
+        "command": [
+          ".venv/bin/python",
+          "scripts/test-tools.py"
+        ],
+        "exitCode": 0,
+        "outputSha256": "568787c7adfb8b6f2f5a3fca97074f8f8e45951409403a6cdcefe6eecc967ea7"
+      },
+      {
+        "command": [
+          ".venv/bin/python",
+          "scripts/check-docs.py",
+          "--typecheck"
+        ],
+        "exitCode": 0,
+        "outputSha256": "e35652babbb97f2acee5a1a58b9943e9935b45124c4560b95215ff226127d746"
+      }
+    ]
+  }
+}

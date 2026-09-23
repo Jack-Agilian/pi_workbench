@@ -81,3 +81,5 @@ B 的 [最小核心记录](../validation/b-2026-09-22.md) 将真实 SQLite/文�
 B-IPC 的 [持久报告](../validation/b-ipc-2026-09-23.md) 按 SDK、实际 macOS 进程/SQLite、协议合成输入和静态回归分别登记证据。每项引用已存在的被测代码 SHA，后续文档提交不冒充被测代码；own 能力不伪造上游 imports。实际进程清理也只支持所测固定后代，不推导通用沙箱或 M0 Gate 完成。
 
 B-IPC [审核修正](../validation/review-b-ipc-2026-09-23.md) 将原提交的失败复核与修正提交的成功证据分开保存。旧测试通过记录保留，但必须明确未覆盖冷启动和 ready 后首次落盘；历史成果复用不代表当前文件仍存在。新的 schema/IPC 版本与公开类方法采用范围均单列，不将测试数量当作 Gate。
+
+C 的 [桌面记录](../validation/c-desktop-2026-09-23.md) 分开记录完整回归代码 SHA 与仅 Renderer 修订 SHA；后续文档不冒充代码实测。社区片段固定源 commit/MIT，新增直接依赖及 Electron 二进制分别校验。真实本地工具与 SYNTHETIC 消息/IME/故障明确区分；锁屏条件下的程序化 Electron 检查不冒充人工 UI/原生输入法验收，M0 Gate 不自动晋级。

@@ -43,3 +43,5 @@ workspace ID → 真实目录由可信宿主注册，不能由 Renderer 临时�
 B-IPC 的进程监督、受限 IPC、单操作跨进程审批/资源锁和显式对账已实现。真实模型/Provider、桌面 UI、通用权限策略、自动恢复重跑、并行工作区、文件另存为、事件裁剪和系统密钥库均未实现。Mock 回调与真实 Pi Session/文件工具证据必须分别登记。BOOT-01/CORE-01/CORE-03/ART-01 只能按本次范围推进，三个 M0 Gate 保持 pending；唯一下一步为 C 的最小桌面界面。
 
 B-IPC 初版 schema v2 增加 worker_launches 宿主恢复日志；审核修正后的 v3 仅追加 Thread 原生引用的 native_persisted 标记。v1/v2 前向迁移已验证，未知版本拒绝，不支持降级。日志和标记都不保存 Pi 消息树，最新范围见 [审核修正报告](../validation/review-b-ipc-2026-09-23.md)。
+
+C 已后续采用同一核心并新增有限展示缓存/桌面查询，schema v4 与安全正文边界见 [C 契约](c-desktop-contract.md)。本文早期“桌面未实现/下一步 C”为 B 阶段范围，当前唯一顺序以 NEXT_STEPS 为准。

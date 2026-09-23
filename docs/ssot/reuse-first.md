@@ -91,7 +91,7 @@ Pi 根入口导出的 `AssistantMessageComponent`、`ToolExecutionComponent` 等
 | `heyhuynhgiabuu/openpi` | 定向借鉴 Customizations 页、设置、文件/Git/终端交互和权限边界测试 | 当前 README 将 SDK 放在 Electron main，不能误称其已有独立 sidecar；本项目保留 Worker 隔离 |
 | xterm.js + node-pty | 终端显示与 PTY 生命周期依赖现成库 | 不等于安全沙箱，不自动证明所有进程都已取消 |
 
-依据：[C01][C02][L01][L02]。社区 UI 当前仅做 README 级选型，不直接 import 别人的应用内部目录，不复制未核查模块；计划局部移植需补 commit、LICENSE、源文件列表、修改清单和回归测试。原有其他参考项目留作候选，不再同时拼装六套 UI。
+依据：[C01][C02][L01][L02]。社区 UI 最初仅做 README 级选型；C 已按 [固定来源/MIT/测试](../validation/c-desktop-2026-09-23.md) 局部移植键盘保护，其余组件仍待评估。不直接 import 别人的应用内部目录，不复制未核查模块；后续移植同样需 commit、LICENSE、源文件列表、修改清单和回归。原有其他参考项目留作候选，不再同时拼装六套 UI。
 
 单次工具 edit 的 patch 用 Pi 的结果；整个分支/工作区变更用 Git 自己的 diff，不能只拼接工具输出冒充工作区实际状态。显示器可以复用社区组件；Git 工作流策略和审批归产品。
 
