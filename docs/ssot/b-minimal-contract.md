@@ -22,7 +22,7 @@ workspace ID → 真实目录由可信宿主注册，不能由 Renderer 临时�
 
 取消立即撤销未开始许可，运行中操作仍需明确结算。idle/agent_end 观察均不能单独完成 Run。终结要求宿主报告 Pi 已 idle、宿主执行已清理、无待审批/待执行/执行中/unknown 操作；取消中只能终结为 cancelled，已完成副作用不伪报回滚。unknown 操作会立即使 Run 进入 unknown 并使当前绑定失效，阻止下次派发。
 
-未确认派发/外部副作用在重开后不重发。宿主确认旧 Worker 已停止或被隔离后，显式 recoverAfterCrash 将非终态执行改为 unknown、保留原操作审计身份并撤销挂起许可；随后逐操作和 Run 对账。对账缺少清理证据时继续占用名额。原模块测试使用合成宿主清理证据；B-IPC 另外依据所拥有的进程句柄、固定进程组及宿主专属清理记录结算，不声称覆盖任意恶意进程树。
+未确认派发/外部副作用在重开后不重发。冷启动独占宿主先用 fencePreviousHost 将旧 epoch 逻辑失效并保留 unknown/审计；这一动作不等于清理。宿主核验旧 Worker 停止后，recoverAfterCrash/逐操作和 Run 对账才可进入结算。对账缺少清理证据时继续占用名额。原模块测试使用合成宿主清理证据；B-IPC 另外依据所拥有的进程句柄、固定进程组及宿主专属清理记录结算，不声称覆盖任意恶意进程树。
 
 ## 持久事件与成果
 
@@ -42,4 +42,4 @@ workspace ID → 真实目录由可信宿主注册，不能由 Renderer 临时�
 
 B-IPC 的进程监督、受限 IPC、单操作跨进程审批/资源锁和显式对账已实现。真实模型/Provider、桌面 UI、通用权限策略、自动恢复重跑、并行工作区、文件另存为、事件裁剪和系统密钥库均未实现。Mock 回调与真实 Pi Session/文件工具证据必须分别登记。BOOT-01/CORE-01/CORE-03/ART-01 只能按本次范围推进，三个 M0 Gate 保持 pending；唯一下一步为 C 的最小桌面界面。
 
-B-IPC 将产品 schema 升为 user_version=2，仅增加 worker_launches 宿主恢复日志；已测试从 v1 保留原排队请求升级，未知版本继续拒绝。日志不保存 Pi 消息树。
+B-IPC 初版 schema v2 增加 worker_launches 宿主恢复日志；审核修正后的 v3 仅追加 Thread 原生引用的 native_persisted 标记。v1/v2 前向迁移已验证，未知版本拒绝，不支持降级。日志和标记都不保存 Pi 消息树，最新范围见 [审核修正报告](../validation/review-b-ipc-2026-09-23.md)。

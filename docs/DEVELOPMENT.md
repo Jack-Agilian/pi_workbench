@@ -245,3 +245,5 @@ npm run demo:product-worker -- crash
 驱动复用 ProductCore 命令、真实 SQLite、同一 IPC/Worker 和已注册 Pi write/edit。输出明确标记 SYNTHETIC；没有模型调用。每次使用独立临时 workspace/agentDir/Session/产品库，结束删除测试临时文件；演示打印生成的 Markdown 和结果摘要。`crash` 在实际文件写入后杀死 Worker，重开产品库仅核验原文件，Run 由 unknown 对账为 failed，已核实的成果仍归原 Operation。
 
 [进程契约](ssot/b-worker-contract.md) 说明权限、监护器与恢复范围。受限 Worker 仅支持当前验证的 macOS/Node 组合，其他平台报错。正常 entry 没有合成开关或模型驱动；测试 entry 的可信组合不能由 Renderer 命令选择。C 将补安全正文/工具摘要展示，当前类型标签投影不是聊天时间线。
+
+B-IPC [审核修正与回归](validation/review-b-ipc-2026-09-23.md) 仍使用同一测试/演示命令，Worker 套件现为 48 项。IPC v2 增加宿主持久确认的 Pi 原生路径；产品库 schema v3 前向迁移原生落盘标记。升级后的宿主和 Worker 必须使用同一协议；不支持将 v3 库交回旧运行时。冷启动独占宿主先 recover，再开放命令；缺清理凭据时授权失效且继续阻断，不能强行释放 Run。

@@ -125,4 +125,4 @@ P0 的 CORE-03 必须保证同 Workspace 至多一个活动写 Run；M0 可先�
 
 [最小契约](b-minimal-contract.md) 和 [限定证据](../validation/b-2026-09-22.md) 实现了产品创建/启动/取消/批准命令、宿主事务与全局单写、固定绑定、操作结算、持久 cursor 和真实 Markdown 索引；通过真实 Pi Session/Runtime/write 接入测试。snapshot/订阅/预览目前为宿主内部方法，资源激活和其他命令仍待实现，不表示第 2.1 节全部接口已开放。
 
-该阶段测试在同进程组合模块，取消和 unknown 的清理证据、崩溃输入为合成；产品库重开不会自动重新执行。后续 [B-IPC 契约](b-worker-contract.md) 与 [macOS 实测](../validation/b-ipc-2026-09-23.md) 已补真实子进程、单操作权限/资源绑定、退出确认与故障恢复；通用策略与其他平台不在此范围。Node SQLite 的文件权限缺口及文件非原子检查见 [B 边界](../validation/b-boundaries.md)，不能从测试隔离推导出生产沙箱。
+该阶段测试在同进程组合模块，取消和 unknown 的清理证据、崩溃输入为合成；产品库重开不会自动重新执行。后续 [B-IPC 契约](b-worker-contract.md) 与 [macOS 实测](../validation/b-ipc-2026-09-23.md)、[审核修正](../validation/review-b-ipc-2026-09-23.md) 已补真实子进程、单操作权限/资源绑定、退出确认与故障恢复；通用策略与其他平台不在此范围。Node SQLite 的文件权限缺口及文件非原子检查见 [B 边界](../validation/b-boundaries.md)，不能从测试隔离推导出生产沙箱。

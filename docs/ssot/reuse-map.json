@@ -76,7 +76,9 @@
           "EV-B-SDK-20260922",
           "EV-REVIEW-A4-LIFECYCLE-20260923",
           "EV-B-IPC-SDK-20260923",
-          "EV-B-IPC-MAC-20260923"
+          "EV-B-IPC-MAC-20260923",
+          "EV-REVIEW-B-IPC-SDK-20260923",
+          "EV-REVIEW-B-IPC-MAC-20260923"
         ]
       }
     },
@@ -90,10 +92,13 @@
       ],
       "upstreamSymbolsOrPaths": [
         "SessionManager",
-        "AgentSessionRuntime"
+        "AgentSessionRuntime",
+        "SessionManager.getSessionFile",
+        "SessionManager.open",
+        "AgentSessionRuntime.newSession"
       ],
       "reuse": "JSONL、分支、恢复保持 Pi",
-      "productDelta": "Thread 绑定和可重建索引",
+      "productDelta": "Thread原生路径由Pi公开getSessionFile分配，宿主SQLite持久确认及落盘标记；不保存消息或第二份树",
       "acceptanceGate": "保存/恢复/Fork不双写；替换前三类失败点和重绑定；失效旧对象不可继续使用",
       "implementationState": "in_progress",
       "adoption": {
@@ -139,7 +144,9 @@
           "EV-B-SDK-20260922",
           "EV-REVIEW-A4-LIFECYCLE-20260923",
           "EV-B-IPC-SDK-20260923",
-          "EV-B-IPC-MAC-20260923"
+          "EV-B-IPC-MAC-20260923",
+          "EV-REVIEW-B-IPC-SDK-20260923",
+          "EV-REVIEW-B-IPC-MAC-20260923"
         ]
       }
     },
@@ -862,7 +869,7 @@
       ],
       "upstreamSymbolsOrPaths": [],
       "reuse": "复用Pi原生任务执行，不重写",
-      "productDelta": "ProductCore持久Run/Operation/Approval与v2启动日志；WorkerSupervisor/guardian根据实际句柄和清理证据结算，非Pi协议",
+      "productDelta": "ProductCore持久Run/Operation/Approval、v2启动日志及v3原生落盘标记；Supervisor冷恢复先失效旧epoch授权，再按清理证据结算",
       "acceptanceGate": "幂等/绑定/取消/unknown；P0同Workspace写Run串行并覆盖等待审批与清理阶段",
       "implementationState": "in_progress",
       "adoption": {
@@ -879,7 +886,10 @@
           "EV-B-IPC-SDK-20260923",
           "EV-B-IPC-MAC-20260923",
           "EV-B-IPC-REVIEW-20260923",
-          "EV-B-IPC-REGRESSION-20260923"
+          "EV-B-IPC-REGRESSION-20260923",
+          "EV-REVIEW-B-IPC-DECISIONS-20260923",
+          "EV-REVIEW-B-IPC-MAC-20260923",
+          "EV-REVIEW-B-IPC-REGRESSION-20260923"
         ]
       }
     },
@@ -891,7 +901,7 @@
       ],
       "upstreamSymbolsOrPaths": [],
       "reuse": "复用文件库/预览器而非模型文字猜测",
-      "productDelta": "真实文件/版本/来源/验证",
+      "productDelta": "真实文件/版本/来源验证；已登记成果的历史恢复与当前missing/changed安全预览分离",
       "acceptanceGate": "missing file拒绝与安全预览",
       "implementationState": "in_progress",
       "adoption": {
@@ -906,7 +916,10 @@
           "EV-B-MAC-20260922",
           "EV-B-REGRESSION-20260922",
           "EV-B-IPC-SDK-20260923",
-          "EV-B-IPC-MAC-20260923"
+          "EV-B-IPC-MAC-20260923",
+          "EV-REVIEW-B-IPC-DECISIONS-20260923",
+          "EV-REVIEW-B-IPC-MAC-20260923",
+          "EV-REVIEW-B-IPC-REGRESSION-20260923"
         ]
       }
     },
@@ -1356,7 +1369,7 @@
       "id": "EV-B-IPC-SDK-20260923",
       "kind": "sdk",
       "result": "passed",
-      "scope": "真实Pi 0.87.0在OS Worker内加载批准资源，以明确合成驱动调用注册write/edit；审批/一次领取/版本与期限/活跃取消、原生Session跨Worker引用恢复及关闭/rebind检查。30项混合套件中的恶意wire与发送器背压为合成，不冒充真实Pi事件；真实模型0。",
+      "scope": "真实Pi 0.87.0在OS Worker内加载批准资源，以明确合成驱动调用注册write/edit；审批/一次领取/版本与期限/活跃取消、原生Session跨Worker引用恢复及关闭/rebind检查。30项混合套件中的恶意wire与发送器背压为合成，不冒充真实Pi事件；真实模型0。 后续复核限定：该原生恢复在beforeReady先落盘；首次落盘窗口由后续审核修正单独验证。",
       "commit": "0e9a01af0b91cdda096d30159f18734ca6504ced",
       "recordedAt": "2026-09-23T08:19:19.370897+00:00",
       "platforms": [
@@ -1368,7 +1381,7 @@
       "id": "EV-B-IPC-MAC-20260923",
       "kind": "platform",
       "result": "passed",
-      "scope": "macOS 27 arm64实际子进程IPC、测试SQLite读/创建拒绝、进程与App Server SIGKILL、固定非detach父子进程组消失/心跳停止/监听端口被OS拒绝；结果丢失重开库只核验不重写；证据缺失保留全局阻断。不涵盖任意恶意后代或其他平台。 收尾修正使缺清理记录的Run与已领取Operation显式unknown，仍不释放名额。",
+      "scope": "macOS 27 arm64实际子进程IPC、测试SQLite读/创建拒绝、进程与App Server SIGKILL、固定非detach父子进程组消失/心跳停止/监听端口被OS拒绝；结果丢失重开库只核验不重写；证据缺失保留全局阻断。不涵盖任意恶意后代或其他平台。 收尾修正使缺清理记录的Run与已领取Operation显式unknown，仍不释放名额。 后续复核限定：该收尾只覆盖旧宿主存活时；冷启动缺口及修正见review-b-ipc-2026-09-23报告。",
       "commit": "0e9a01af0b91cdda096d30159f18734ca6504ced",
       "recordedAt": "2026-09-23T08:19:19.370897+00:00",
       "platforms": [
@@ -1399,6 +1412,66 @@
         "darwin"
       ],
       "locator": "docs/validation/b-ipc-2026-09-23.md"
+    },
+    {
+      "id": "EV-REVIEW-B-IPC-FINDINGS-20260923",
+      "kind": "review",
+      "result": "failed",
+      "scope": "实际复核HEAD为d3bb551，产品代码与0e9a01a相同；外部审核R1/R2/R3经目标Mac复核成立，另将首次落盘引用R4风险实测确认；9项局部诊断与6项真实进程反例/对照。旧宿主活着的断连测试不覆盖冷恢复，ready前落盘不覆盖ready后首次落盘；不声称物理授权绕过。",
+      "commit": "d3bb551fa83dc4bcfe4b67a74c2ff1025ca42d2d",
+      "recordedAt": "2026-09-23T09:40:56.933308+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/review-b-ipc-2026-09-23.md"
+    },
+    {
+      "id": "EV-REVIEW-B-IPC-DECISIONS-20260923",
+      "kind": "review",
+      "result": "passed",
+      "scope": "四项局部修正复用现有Core/Supervisor/Pi Runtime；区分逻辑失效与清理、历史成果与当前可用性。原生路径握手使用公开类方法，IPC v2/schema v3，无新Harness/依赖/模型；保留Fork/import全部窗口等未覆盖范围。",
+      "commit": "91da6e29198b48cb1984e657272af93e276a220d",
+      "recordedAt": "2026-09-23T09:40:56.933308+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/review-b-ipc-2026-09-23.md"
+    },
+    {
+      "id": "EV-REVIEW-B-IPC-MAC-20260923",
+      "kind": "platform",
+      "result": "passed",
+      "scope": "macOS27 arm64真实宿主/Worker强杀、清理收据缺失pending/approved/executing冷恢复、成果登记后修改/删除、未登记与unknown负向、确认前宿主死亡、SQLite拒绝、v1/v2迁移。Worker48含合成wire/单元；独立cwd重复48与4驱动通过；不涵盖任意恶意后代或其他平台。",
+      "commit": "91da6e29198b48cb1984e657272af93e276a220d",
+      "recordedAt": "2026-09-23T09:40:56.933308+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/review-b-ipc-2026-09-23.md"
+    },
+    {
+      "id": "EV-REVIEW-B-IPC-SDK-20260923",
+      "kind": "sdk",
+      "result": "passed",
+      "scope": "实际Pi0.87.0的getSessionFile预分配路径、create/open/newSession factory与write/edit；ready后首次落盘及替换后落盘均真实kill后由下一Worker按原文件恢复。空Session/已知历史丢失/关闭回归通过；零模型，无手写JSONL，不代表所有Fork/import窗口。",
+      "commit": "91da6e29198b48cb1984e657272af93e276a220d",
+      "recordedAt": "2026-09-23T09:40:56.933308+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/review-b-ipc-2026-09-23.md"
+    },
+    {
+      "id": "EV-REVIEW-B-IPC-REGRESSION-20260923",
+      "kind": "static",
+      "result": "passed",
+      "scope": "严格类型、类型10/A1 15/A2 19+4/A3 12+8/A4 18/Core20/SDK5/Worker48通过；文档与应用offline初始化各两次、初始化后类型及独立cwd Worker48通过，4驱动通过。SSOT/脚本/结构与完整文档检查单列报告；锁和startup不变，M0 Gate未晋级。",
+      "commit": "91da6e29198b48cb1984e657272af93e276a220d",
+      "recordedAt": "2026-09-23T09:40:56.933308+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/review-b-ipc-2026-09-23.md"
     }
   ]
 }

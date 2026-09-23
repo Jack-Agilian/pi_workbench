@@ -44,4 +44,4 @@ B 模块级阶段记录：[最小产品核心验证](validation/b-2026-09-22.md)
 
 A4 阶段复审：[A4 审核 F01–F03 修正及回归](validation/review-a4-2026-09-23.md)。关闭/替换等待、跨盘词法检查和单账户配置约束已补齐；该次复审不含真实 Worker、Windows 文件行为或多账户隔离。
 
-当前 B-IPC：[真实进程/审批/恢复证据](validation/b-ipc-2026-09-23.md) · [进程契约](ssot/b-worker-contract.md)。限定 B-IPC 已通过，唯一下一步为 C 的最小桌面界面及安全正文/工具摘要投影；本轮未启动 C。
+当前 B-IPC：[审核修正与回归](validation/review-b-ipc-2026-09-23.md) · [原阶段进程证据](validation/b-ipc-2026-09-23.md) · [进程契约](ssot/b-worker-contract.md)。限定 B-IPC 已通过，唯一下一步为 C 的最小桌面界面及安全正文/工具摘要投影；本轮未启动 C。

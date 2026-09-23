@@ -35,11 +35,12 @@
           "evidenceRefs": [
             "EV-B-REVIEW-20260922",
             "EV-REVIEW-A4-DECISIONS-20260923",
-            "EV-B-IPC-REVIEW-20260923"
+            "EV-B-IPC-REVIEW-20260923",
+            "EV-REVIEW-B-IPC-DECISIONS-20260923"
           ]
         }
       ],
-      "statusReason": "B-IPC所有权、有限通信与恢复契约已收敛并自复审；社区UI准入和完整验收仍未完成。下一步C最小桌面界面。"
+      "statusReason": "B-IPC四项审核已局部修正并记录失败/成功范围；继续C最小桌面界面，社区UI准入与完整验收未完成。"
     },
     {
       "id": "BOOT-02",
@@ -121,7 +122,8 @@
             "EV-A4-INPUTS-20260922",
             "EV-B-INPUTS-20260922",
             "EV-B-IPC-REGRESSION-20260923",
-            "EV-B-IPC-INITIALIZATION-20260923"
+            "EV-B-IPC-INITIALIZATION-20260923",
+            "EV-REVIEW-B-IPC-REGRESSION-20260923"
           ]
         },
         {
@@ -146,11 +148,12 @@
             "EV-B-REGRESSION-20260922",
             "EV-REVIEW-A4-REGRESSION-20260923",
             "EV-B-IPC-REGRESSION-20260923",
-            "EV-B-IPC-INITIALIZATION-20260923"
+            "EV-B-IPC-INITIALIZATION-20260923",
+            "EV-REVIEW-B-IPC-REGRESSION-20260923"
           ]
         }
       ],
-      "statusReason": "A0–A4、B模块与B-IPC实际Worker/IPC及零模型回归通过；平台打包、完整产品接缝和三个M0 Gate仍未验收。"
+      "statusReason": "保持精确工具链/锁/声明补丁；B-IPC审核修正与A1–A4回归、两种初始化重复通过，M0 Gate仍pending。"
     },
     {
       "id": "BOOT-04",
@@ -259,11 +262,27 @@
             "EV-B-CORE-20260922",
             "EV-B-SDK-20260922",
             "EV-B-IPC-SDK-20260923",
-            "EV-B-IPC-MAC-20260923"
+            "EV-B-IPC-MAC-20260923",
+            "EV-REVIEW-B-IPC-SDK-20260923",
+            "EV-REVIEW-B-IPC-MAC-20260923"
+          ]
+        },
+        {
+          "id": "CORE-01-A02",
+          "requirement": "原生路径在Session使用前经宿主持久确认；首次落盘后崩溃按确定引用恢复，不扫描最新文件；区分未落盘与已知历史缺失",
+          "plannedChecks": [
+            "native-reference-durable-ack",
+            "native-first-persist-crash",
+            "native-missing-history",
+            "native-schema-migration"
+          ],
+          "evidenceRefs": [
+            "EV-REVIEW-B-IPC-SDK-20260923",
+            "EV-REVIEW-B-IPC-MAC-20260923"
           ]
         }
       ],
-      "statusReason": "实际Worker以Pi原生引用重开Session，SQLite只存产品意图/索引；schema v1到v2保留请求迁移通过。完整索引重建及验收前置仍未完成。"
+      "statusReason": "B-IPC原生路径在Session创建前经宿主持久确认，补ready后首次落盘与newSession替换恢复；schema v1/v2到v3通过，完整索引重建/Fork/import故障矩阵未完成。"
     },
     {
       "id": "CORE-02",
@@ -304,7 +323,9 @@
             "EV-B-CORE-20260922",
             "EV-B-SDK-20260922",
             "EV-B-IPC-SDK-20260923",
-            "EV-B-IPC-MAC-20260923"
+            "EV-B-IPC-MAC-20260923",
+            "EV-REVIEW-B-IPC-SDK-20260923",
+            "EV-REVIEW-B-IPC-MAC-20260923"
           ]
         },
         {
@@ -319,7 +340,9 @@
             "EV-A1-SDK-20260922",
             "EV-A1-CLOSEOUT-SDK-20260922",
             "EV-B-IPC-SDK-20260923",
-            "EV-B-IPC-MAC-20260923"
+            "EV-B-IPC-MAC-20260923",
+            "EV-REVIEW-B-IPC-SDK-20260923",
+            "EV-REVIEW-B-IPC-MAC-20260923"
           ]
         },
         {
@@ -334,7 +357,9 @@
           "evidenceRefs": [
             "EV-REVIEW-A4-LIFECYCLE-20260923",
             "EV-B-IPC-SDK-20260923",
-            "EV-B-IPC-MAC-20260923"
+            "EV-B-IPC-MAC-20260923",
+            "EV-REVIEW-B-IPC-SDK-20260923",
+            "EV-REVIEW-B-IPC-MAC-20260923"
           ]
         },
         {
@@ -347,11 +372,13 @@
           ],
           "evidenceRefs": [
             "EV-B-IPC-SDK-20260923",
-            "EV-B-IPC-MAC-20260923"
+            "EV-B-IPC-MAC-20260923",
+            "EV-REVIEW-B-IPC-SDK-20260923",
+            "EV-REVIEW-B-IPC-MAC-20260923"
           ]
         }
       ],
-      "statusReason": "B-IPC实际进程创建/替换/rebind关闭、旧绑定、App Server SIGKILL和清理证据失败路径通过，保留F01/A1回归；不涵盖任意恶意后代、生产打包或真实模型。"
+      "statusReason": "B-IPC冷启动旧epoch失效、严格IPC v2、原生引用确认及关闭等待回归通过，保留F01；不代表全部Fork/import窗口、任意恶意后代或真实模型。"
     },
     {
       "id": "CORE-03",
@@ -391,7 +418,8 @@
             "EV-B-CORE-20260922",
             "EV-B-SDK-20260922",
             "EV-B-IPC-SDK-20260923",
-            "EV-B-IPC-MAC-20260923"
+            "EV-B-IPC-MAC-20260923",
+            "EV-REVIEW-B-IPC-MAC-20260923"
           ]
         },
         {
@@ -404,7 +432,8 @@
             "EV-B-CORE-20260922",
             "EV-B-SDK-20260922",
             "EV-B-IPC-SDK-20260923",
-            "EV-B-IPC-MAC-20260923"
+            "EV-B-IPC-MAC-20260923",
+            "EV-REVIEW-B-IPC-MAC-20260923"
           ]
         },
         {
@@ -418,7 +447,8 @@
             "EV-B-CORE-20260922",
             "EV-B-SDK-20260922",
             "EV-B-IPC-SDK-20260923",
-            "EV-B-IPC-MAC-20260923"
+            "EV-B-IPC-MAC-20260923",
+            "EV-REVIEW-B-IPC-MAC-20260923"
           ]
         },
         {
@@ -431,11 +461,24 @@
           ],
           "evidenceRefs": [
             "EV-B-IPC-MAC-20260923",
-            "EV-B-IPC-SDK-20260923"
+            "EV-B-IPC-SDK-20260923",
+            "EV-REVIEW-B-IPC-MAC-20260923"
+          ]
+        },
+        {
+          "id": "CORE-03-A05",
+          "requirement": "冷恢复先失效旧授权，缺清理凭据仍unknown/blocked；旧审批与领取不恢复，保留原审计",
+          "plannedChecks": [
+            "cold-host-fencing",
+            "cold-missing-receipt",
+            "stale-approval-denial"
+          ],
+          "evidenceRefs": [
+            "EV-REVIEW-B-IPC-MAC-20260923"
           ]
         }
       ],
-      "statusReason": "B-IPC把幂等、全局单写、审批/一次领取/取消与unknown接上真实Worker；结果丢失重开只核验，订阅游标重接不执行工具。通用队列策略、UI和全部验收前置未完成。"
+      "statusReason": "缺清理收据的冷恢复撤销pending/approved、执行不确定标unknown，仍占全局名额；已登记成果变化可对账，未知副作用不重发，通用调度/UI未完成。"
     },
     {
       "id": "CORE-04",
@@ -818,11 +861,26 @@
             "EV-B-CORE-20260922",
             "EV-B-SDK-20260922",
             "EV-B-IPC-SDK-20260923",
-            "EV-B-IPC-MAC-20260923"
+            "EV-B-IPC-MAC-20260923",
+            "EV-REVIEW-B-IPC-MAC-20260923",
+            "EV-REVIEW-B-IPC-REGRESSION-20260923"
+          ]
+        },
+        {
+          "id": "ART-01-A02",
+          "requirement": "已登记历史成果变化不阻断原成功操作对账；未登记及未知副作用继续核验且不重放",
+          "plannedChecks": [
+            "registered-artifact-recovery",
+            "unregistered-artifact-mismatch",
+            "unknown-third-version"
+          ],
+          "evidenceRefs": [
+            "EV-REVIEW-B-IPC-MAC-20260923",
+            "EV-REVIEW-B-IPC-REGRESSION-20260923"
           ]
         }
       ],
-      "statusReason": "B-IPC宿主核验真实Markdown/hash并登记原Operation成果，丢结果恢复不重复写；另存为、完整展示与原子文件竞争仍未完成。"
+      "statusReason": "恢复复用匹配原Operation/绑定/目标/摘要的已登记历史成果；当前missing/changed由安全预览表达，未登记和unknown仍严格核验；另存为/UI未完成。"
     },
     {
       "id": "SKL-01",

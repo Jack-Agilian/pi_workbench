@@ -1,10 +1,10 @@
 # 从文档到可运行产品：复用优先
 
-状态：A0–A4 限定无模型探针、B 最小产品核心、B-IPC 真实子进程接缝已验证。决策依据：[SSOT](../ssot/README.md)，进程范围与证据见 [B-IPC 报告](../validation/b-ipc-2026-09-23.md)。工作项见 [backlog.json](backlog.json)。尚未创建 GitHub Issues。
+状态：A0–A4 限定无模型探针、B 最小产品核心、B-IPC 真实子进程接缝已验证。决策依据：[SSOT](../ssot/README.md)，进程范围与最新证据见 [B-IPC 审核修正报告](../validation/review-b-ipc-2026-09-23.md)。工作项见 [backlog.json](backlog.json)。尚未创建 GitHub Issues。
 
 ## 当前唯一开发项：C 的最小桌面界面
 
-B-IPC 已连接真实 Worker、受限 Node IPC、宿主审批/一次领取、Pi write/edit、成果核验与 macOS 固定进程组清理。实际 SIGKILL、结果丢失、原生 Session 重开和 SQLite 隔离有独立证据；不存在以 Worker 的 hostClean 自报结算的路径。范围不包含任意恶意后代、跨平台生产沙箱或真实模型。
+B-IPC 审核的冷恢复 fencing、已登记成果恢复、严格枚举和首次落盘引用四项已修正，48 项 Worker 混合检查及前序回归通过。B-IPC 已连接真实 Worker、受限 Node IPC、宿主审批/一次领取、Pi write/edit、成果核验与 macOS 固定进程组清理。实际 SIGKILL、结果丢失、原生 Session 重开和 SQLite 隔离有独立证据；不存在以 Worker 的 hostClean 自报结算的路径。范围不包含任意恶意后代、跨平台生产沙箱或真实模型。
 
 下一轮实施 C 的最小 Electron/React 桌面界面，复用现有 ProductCore 与 WorkerSupervisor，不再新建孤立探针。C 必须补消息正文/工具摘要的安全展示投影：当前 product-binding 只提供事件类型标签，不能直接作为聊天时间线，也不能原样透传整个 SDK 对象。社区组件仍按固定来源与许可审查后局部采用。
 
@@ -101,3 +101,7 @@ SEC-03 进入 in_progress；BOOT-03/CORE-02 仍 in_progress，三个 M0 Gate 仍
 ## 阶段记录：B-IPC（2026-09-23）
 
 [进程契约](../ssot/b-worker-contract.md) 与 [实际证据](../validation/b-ipc-2026-09-23.md) 记录真实 App Server/监护器/Worker、同一审批链路、30 项混合检查和四场景驱动。代码先提交，完整回归在该真实 SHA 上执行。依赖、锁与声明补丁不变；全局单写、M0 同 provider 单账户约束不变。缺清理证据继续阻断，未确认副作用不重发，三个 M0 Gate 不晋级。
+
+## 阶段记录：B-IPC 审核修正（2026-09-23）
+
+[四项修正](../validation/review-b-ipc-2026-09-23.md) 在既有功能分支完成；冷恢复、历史成果、IPC 枚举和原生路径握手补入产品链路，复用 Pi 公开 SessionManager/Runtime。原 30 项未覆盖的缺口保留失败证据，当前 Worker 48 项通过。全局单写、同 provider 单账户、三个 M0 Gate 状态及本轮不实施 C 的停止点不变；唯一开发顺序仍以顶部为准。

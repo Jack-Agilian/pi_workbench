@@ -48,3 +48,7 @@ R03 成功替换已连接产品绑定，三类失败仍只有 A1 单独探针，
 ## A4 外部审核 F01–F03 复审（2026-09-23）
 
 对 cd5ba58 审核在当前 B 基线重新核验：F01 关闭/替换并发与 F02 跨盘路径问题仍存在，已修正；F03 采用 M0 同 provider 单账户并加入固定白名单。真实被测代码为 `9b19f8ec2b2a6222c1baf58d2a991108bd7d3cba`；修正前失败、SDK/路径回归、限制及命令见 [复审报告](../validation/review-a4-2026-09-23.md)。NEXT_STEPS 已将当前 B 与历轮记录分开。原审核文件和 startup 快照未改，不扩展为真实Worker或多账户系统。
+
+## B-IPC 外部审核 R1–R4 修正（2026-09-23）
+
+[报告与真实被测提交](../validation/review-b-ipc-2026-09-23.md)：R1 冷恢复旧 epoch fencing、R2 历史 Artifact 对账、R3 字符串枚举严格检查均复现并修正；原报告补测项升级为已确认 R4，使用 Pi 公开文件引用在 Session 创建前由宿主提交并确认。真实强杀、重开库、未登记/未知副作用负向及后续 Worker 恢复均纳入原测试入口。schema v3 和 IPC v2 不引入第二份 Session 树或新 Harness；仍为 macOS 限定范围，没有推进 M0 Gate 或开始 C。

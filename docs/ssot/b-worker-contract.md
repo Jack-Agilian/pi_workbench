@@ -29,3 +29,19 @@ SQLite dispatch 事务的准备阶段启动宿主监护器，但监护器必须�
 清理记录验证 instanceId、runtimeBindingId、随机 nonce、实际 Worker 退出及进程组不存在。宿主只在所拥有的监护器确已退出且从未 arm 时自行记录零 Worker 启动证明；已 arm 的情况必须有监护器的 OS 观察。监护器也被杀或证据丢失时，close 共享同一个失败结果，保留审计与全局阻断，不猜测清理成功。没有用持久 PID 盲杀重启后的其他进程。
 
 验证范围为 macOS 固定、非 detach 的父/子测试命令及其心跳文件；监听端口在该 OS profile 下被拒绝，没有运行开放端口的 Shell 产品功能。没有证明任意恶意进程、重新 setsid 的后代、监护器也遭破坏后的自动恢复，或系统重启/断电时收据与 SQLite 的跨文件系统原子性。没有证据时继续阻断。文件版本检查不是原子 CAS，第三方文件竞争仍是 A2/B 已记录边界。
+
+## 审核修正后的恢复规则
+
+本项目 IPC 升为 v2，增加原生路径登记/确认消息；旧版本连接拒绝，不混用协议。tool/kind/code 必须是原始字符串枚举，数组或可转换对象不合法。
+
+冷启动的独占 App Server 必须先调用 recover，再开放产品命令。recover 首先按旧宿主 epoch 原子失效旧绑定、撤销 pending/approved 并将 executing 标为 unknown；这一步不声明进程已退出。随后才核对实际清理记录和副作用。缺清理证据仍报错、保留 unknown 和全局占用，不跳过逻辑失效。该入口不是多宿主抢占/选主协议；当前宿主仍拥有 Worker 时拒绝 recover。
+
+对 succeeded 且已持久登记的 Artifact，恢复复用原 Operation、目标和摘要匹配的历史记录；当前文件被改动或删除由预览返回 changed/missing，不阻止历史结算。首次登记仍核实文件，unknown 操作或第三种文件状态仍须对账，禁止吞异常或重写文件解除阻断。
+
+## 原生路径的持久确认
+
+Worker 使用 Pi 0.87.0 公开 SessionManager.create/open/getSessionFile；在 Runtime factory 创建 AgentSession 前，先将 Pi 分配的文件路径送交宿主。宿主校验实际连接、Run 绑定及批准的 Session 目录，拒绝越界/符号链接路径，将引用提交 SQLite 后才确认。Worker 按 requestId 等待确认，关闭会拒绝等待者，确认后仍检查关闭状态；首次创建和 newSession 替换都走此 factory。它是路径关联，不是另一份原生消息树，也不把“已登记路径”称为“已创建/发布 Session”。
+
+schema v3 在 Thread 的既有原生引用旁增加 native_persisted 标记，表示宿主已观察到该路径的文件。ready/closed 和清理后恢复可更新它；同路径不能从 true 降回 false。已知落盘文件丢失时不静默新建空历史。尚未落盘的预分配路径可以用 Pi.open 恢复为空 Session，产品 Run.input 保留首次 Assistant 前的意图；Pi 负责实际 JSONL 写入和读取。恢复读取确定引用，不扫描最新文件或按 mtime 猜测。v1/v2 库自动前向迁移；不提供回退到旧版本运行时的库降级。
+
+当前新增故障证据覆盖首次创建及 newSession 替换后首次落盘、宿主确认前死亡、已知落盘文件缺失。未扩展为 Fork/import 的全部落盘窗口、消息投影或生产通用恢复器。若文件在宿主首次观察前落盘又被外部删除，布尔标记无法证明这段不可见历史；不宣称跨文件/SQLite 原子持久性。

@@ -61,3 +61,7 @@ python scripts/test-tools.py
 ## B-IPC：2026-09-23
 
 [真实进程验证](../validation/b-ipc-2026-09-23.md) · [进程/审批/恢复契约](b-worker-contract.md) · [被测输入与命令](../validation/b-ipc-inputs.json)。30 项混合检查、四场景驱动及原回归通过；Pi 仍拥有 Session、工具实现与原生历史，App Server 仍唯一写产品库。实际 Worker OS 文件限制、App Server SIGKILL 后固定后代清理和结果丢失只核验不重写均已测试。限定 B-IPC 完成；相关能力保持 in_progress，三个 M0 Gate pending，唯一下一步为 C 最小桌面界面及安全展示投影。
+
+## B-IPC 审核修正（2026-09-23）
+
+[复核与修正证据](../validation/review-b-ipc-2026-09-23.md) 保留原 0e9a01a 的四项缺陷及实际被测修正 SHA。冷启动先失效旧授权再检查清理证明，已登记成果恢复与当前可用性分开，IPC v2 严格枚举及原生路径持久确认已回归；Worker 48、Core 20、SDK 5 及 A1–A4 通过。前节 30 项属于历史范围；相关能力保持 in_progress，三个 M0 Gate pending，唯一当前项仍为 C。

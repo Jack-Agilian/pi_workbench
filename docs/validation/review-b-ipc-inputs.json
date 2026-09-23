@@ -1,0 +1,497 @@
+{
+  "testedCodeCommit": "91da6e29198b48cb1984e657272af93e276a220d",
+  "revisionBaseline": "d3bb551fa83dc4bcfe4b67a74c2ff1025ca42d2d",
+  "developBaseline": "cd6c82b1995e9c0fc0007b790e2b24a47aaf0fa9",
+  "branch": "codex/b-worker-ipc",
+  "recordedAt": "2026-09-23T09:40:56.933308+00:00",
+  "codeTreeAtTests": "Clean committed code; only subsequent documentation edits. Same code after repeated offline initialization.",
+  "environment": {
+    "platform": "darwin",
+    "macOS": "27.0",
+    "build": "26A428",
+    "machine": "arm64",
+    "nodeArchitecture": "arm64",
+    "rosetta": "0",
+    "nodeVersion": "24.21.0",
+    "npmVersion": "11.19.0",
+    "nodeExecutable": "${REPOSITORY}/.artifacts/toolchains/node-v24.21.0-darwin-arm64/bin/node",
+    "gitExecutable": "/opt/homebrew/bin/git",
+    "gitVersion": "2.55.0",
+    "projectPython": "${REPOSITORY}/.venv/bin/python",
+    "pythonVersion": "3.14.7"
+  },
+  "piVersion": "0.87.0",
+  "packageLockSha256": "7cd35e4fc73c7e0b61112b515c6389505baf7d541e638bd7cf0ffe2dbf6e8e44",
+  "modelCalls": 0,
+  "reviewedOriginalCodeCommit": "0e9a01af0b91cdda096d30159f18734ca6504ced",
+  "originalSourceBlobChecks": [
+    {
+      "path": "apps/agent-server/core.ts",
+      "sha256": "9a410d770166f1e94e2abc01b2f2845ededb168a0c7d1af5cbed8294dbd34200",
+      "gitBlobSha": "66d5b842c93fa9fc2675fd98b2168df74979a20d",
+      "matchesSuppliedBytes": true
+    },
+    {
+      "path": "apps/agent-server/worker-supervisor.ts",
+      "sha256": "a654d0c778ef1f48c0ae7fa70757202026b45bbdea65183f7cbdd5465a2309ab",
+      "gitBlobSha": "6b51e6095081f616eccaa0c9ecc88d39d5327898",
+      "matchesSuppliedBytes": true
+    },
+    {
+      "path": "apps/agent-server/artifact.ts",
+      "sha256": "423a13a882c116c978b2d8d621e5ea62c1c30c735fb372969ddbe612c34474e4",
+      "gitBlobSha": "1a5960da956e56ead534181346661e709ad833c3",
+      "matchesSuppliedBytes": true
+    },
+    {
+      "path": "packages/app-contracts/index.ts",
+      "sha256": "29801bfa53fd6d5dfca380b1d87ac2e5f6b88a77853f7559af2d4349dc93fee0",
+      "gitBlobSha": "50e5550388dff20db76b67f48a8972cf3720edbf",
+      "matchesSuppliedBytes": true
+    },
+    {
+      "path": "packages/app-contracts/worker-ipc.ts",
+      "sha256": "7f0247d33badf6b447168613a36411720b00019e1882d6676612aab5b3bda474",
+      "gitBlobSha": "88b8fbcfe18f8e7b5aa91cda4fd47767785b8bb0",
+      "matchesSuppliedBytes": true
+    }
+  ],
+  "originalLocalDiagnostics": [
+    {
+      "case": "R1-pending",
+      "runState": "running",
+      "operationState": "pending",
+      "slotStillBlocked": true,
+      "staleApprovalAccepted": true
+    },
+    {
+      "case": "R1-executing",
+      "runState": "running",
+      "operationState": "executing",
+      "slotStillBlocked": true,
+      "staleApprovalAccepted": false
+    },
+    {
+      "case": "R2-deleted",
+      "error": "ENOENT",
+      "runState": "unknown",
+      "operationState": "succeeded",
+      "artifactAlreadyRecorded": true,
+      "previewStatus": "missing",
+      "slotStillBlocked": true
+    },
+    {
+      "case": "R2-changed",
+      "error": "artifact_content_mismatch",
+      "runState": "unknown",
+      "operationState": "succeeded",
+      "artifactAlreadyRecorded": true,
+      "previewStatus": "changed",
+      "slotStillBlocked": true
+    },
+    {
+      "case": "control",
+      "result": "recovered"
+    },
+    {
+      "case": "R3-tool",
+      "accepted": true,
+      "returnedValue": [
+        "write"
+      ]
+    },
+    {
+      "case": "R3-kind",
+      "accepted": true,
+      "returnedValue": [
+        "idle"
+      ]
+    },
+    {
+      "case": "R3-code",
+      "accepted": true,
+      "returnedValue": [
+        "protocol_failed"
+      ]
+    },
+    {
+      "case": "control-parser",
+      "result": "valid accepted, unknown field rejected"
+    }
+  ],
+  "originalRealProcessDiagnostics": [
+    {
+      "case": "R1-real-pending",
+      "actualHostSIGKILL": true,
+      "actualGroupStopped": true,
+      "receipt": "missing",
+      "runState": "running",
+      "operationState": "pending",
+      "staleApprovalAccepted": true,
+      "nextQueuedRunBlocked": true,
+      "fileAbsent": true
+    },
+    {
+      "case": "R1-real-executing",
+      "actualHostSIGKILL": true,
+      "actualGroupStopped": true,
+      "receipt": "missing",
+      "runState": "running",
+      "operationState": "executing",
+      "staleApprovalAccepted": false,
+      "nextQueuedRunBlocked": true,
+      "fileAbsent": true
+    },
+    {
+      "case": "R2-real-deleted",
+      "actualHostSIGKILL": true,
+      "realGuardianReceipt": true,
+      "registeredBeforeCrash": true,
+      "error": "ENOENT",
+      "runState": "unknown",
+      "operationState": "succeeded",
+      "preview": "missing",
+      "nextQueuedRunBlocked": true,
+      "fileNotRewritten": true
+    },
+    {
+      "case": "R2-real-changed",
+      "actualHostSIGKILL": true,
+      "realGuardianReceipt": true,
+      "registeredBeforeCrash": true,
+      "error": "artifact_content_mismatch",
+      "runState": "unknown",
+      "operationState": "succeeded",
+      "preview": "changed",
+      "nextQueuedRunBlocked": true,
+      "fileNotRewritten": true
+    },
+    {
+      "case": "R2-real-unchanged",
+      "actualHostSIGKILL": true,
+      "realGuardianReceipt": true,
+      "registeredBeforeCrash": true,
+      "error": null,
+      "runState": "failed",
+      "operationState": "succeeded",
+      "preview": "ready",
+      "nextQueuedRunBlocked": false,
+      "fileNotRewritten": true
+    },
+    {
+      "case": "native-late-real",
+      "actualPiPublicAppend": true,
+      "existedBeforeReady": false,
+      "persistedAfterReady": true,
+      "actualWorkerSIGKILL": true,
+      "realGuardianReceipt": true,
+      "fileBytesPreserved": true,
+      "nextNativeRef": null
+    }
+  ],
+  "checks": [
+    {
+      "command": "${REPOSITORY}/.artifacts/toolchains/node-v24.21.0-darwin-arm64/bin/npm run typecheck",
+      "exit": 0,
+      "passed": null,
+      "scope": "repository launcher with isolated SDK child",
+      "testedCodeCommit": "91da6e29198b48cb1984e657272af93e276a220d",
+      "rawLog": ".artifacts/b-ipc-fixes/regression-0.log",
+      "rawLogSha256": "ca27905bae0ff05202f06b1202f21718c69c2a76a72c41f79c5c9dd4c1c13f7b"
+    },
+    {
+      "command": "${REPOSITORY}/.artifacts/toolchains/node-v24.21.0-darwin-arm64/bin/npm run test:pi-types",
+      "exit": 0,
+      "passed": 10,
+      "scope": "repository launcher with isolated SDK child",
+      "testedCodeCommit": "91da6e29198b48cb1984e657272af93e276a220d",
+      "rawLog": ".artifacts/b-ipc-fixes/regression-1.log",
+      "rawLogSha256": "8f97b639fdc5295fa39f7d092399827c09415babd508e98ac9ff43cfd47126a0"
+    },
+    {
+      "command": "${REPOSITORY}/.artifacts/toolchains/node-v24.21.0-darwin-arm64/bin/npm run test:pi-probe",
+      "exit": 0,
+      "passed": 15,
+      "scope": "repository launcher with isolated SDK child",
+      "testedCodeCommit": "91da6e29198b48cb1984e657272af93e276a220d",
+      "rawLog": ".artifacts/b-ipc-fixes/regression-2.log",
+      "rawLogSha256": "0b56c4588d1d5fd01d0c5cc1f11209bd59580d9c21fd14c9fc9ad4a6db134d30"
+    },
+    {
+      "command": "${REPOSITORY}/.artifacts/toolchains/node-v24.21.0-darwin-arm64/bin/npm run test:pi-tools",
+      "exit": 0,
+      "passed": 19,
+      "scope": "repository launcher with isolated SDK child",
+      "testedCodeCommit": "91da6e29198b48cb1984e657272af93e276a220d",
+      "rawLog": ".artifacts/b-ipc-fixes/regression-3.log",
+      "rawLogSha256": "a8df801de21b458dc4ae3f749593ff3d6fca7bc25dbe2ae3c68f3a5f4a76ba56"
+    },
+    {
+      "command": "${REPOSITORY}/.artifacts/toolchains/node-v24.21.0-darwin-arm64/bin/npm run test:pi-shell",
+      "exit": 0,
+      "passed": 4,
+      "scope": "repository launcher with isolated SDK child",
+      "testedCodeCommit": "91da6e29198b48cb1984e657272af93e276a220d",
+      "rawLog": ".artifacts/b-ipc-fixes/regression-4.log",
+      "rawLogSha256": "80e05a4950d1604cc78a6a89e469ce615b24068429cd601779b0f01635e8ac2e"
+    },
+    {
+      "command": "${REPOSITORY}/.artifacts/toolchains/node-v24.21.0-darwin-arm64/bin/npm run test:pi-resources",
+      "exit": 0,
+      "passed": 12,
+      "scope": "repository launcher with isolated SDK child",
+      "testedCodeCommit": "91da6e29198b48cb1984e657272af93e276a220d",
+      "rawLog": ".artifacts/b-ipc-fixes/regression-5.log",
+      "rawLogSha256": "221a1757bddf443a3fd01d77580b25e6445951a2e3f8ca5783771469d229f3ef"
+    },
+    {
+      "command": "${REPOSITORY}/.artifacts/toolchains/node-v24.21.0-darwin-arm64/bin/npm run test:pi-packages",
+      "exit": 0,
+      "passed": 8,
+      "scope": "repository launcher with isolated SDK child",
+      "testedCodeCommit": "91da6e29198b48cb1984e657272af93e276a220d",
+      "rawLog": ".artifacts/b-ipc-fixes/regression-6.log",
+      "rawLogSha256": "6e09bb3baf7a78009c0de723d226ee03e9c7ffcf070a0d3aae52594a43b9ead9"
+    },
+    {
+      "command": "${REPOSITORY}/.artifacts/toolchains/node-v24.21.0-darwin-arm64/bin/npm run test:pi-auth",
+      "exit": 0,
+      "passed": 18,
+      "scope": "repository launcher with isolated SDK child",
+      "testedCodeCommit": "91da6e29198b48cb1984e657272af93e276a220d",
+      "rawLog": ".artifacts/b-ipc-fixes/regression-7.log",
+      "rawLogSha256": "66c7beceae85a463726f3690a967f1c8ae5b8d59b894335aba98a4e66f600d07"
+    },
+    {
+      "command": "${REPOSITORY}/.artifacts/toolchains/node-v24.21.0-darwin-arm64/bin/npm run test:product-core",
+      "exit": 0,
+      "passed": 20,
+      "scope": "repository launcher with isolated SDK child",
+      "testedCodeCommit": "91da6e29198b48cb1984e657272af93e276a220d",
+      "rawLog": ".artifacts/b-ipc-fixes/regression-8.log",
+      "rawLogSha256": "ed57af07f5a961f2b4d673de81a291353b98f35de150fe7ea0fbf784dae24604"
+    },
+    {
+      "command": "${REPOSITORY}/.artifacts/toolchains/node-v24.21.0-darwin-arm64/bin/npm run test:product-sdk",
+      "exit": 0,
+      "passed": 5,
+      "scope": "repository launcher with isolated SDK child",
+      "testedCodeCommit": "91da6e29198b48cb1984e657272af93e276a220d",
+      "rawLog": ".artifacts/b-ipc-fixes/regression-9.log",
+      "rawLogSha256": "0fb8484411c4fdd245bfaabc08a06282e5e43aee7467a2216ef14bd6159f5a85"
+    },
+    {
+      "command": "${REPOSITORY}/.artifacts/toolchains/node-v24.21.0-darwin-arm64/bin/npm run test:product-worker",
+      "exit": 0,
+      "passed": 48,
+      "scope": "repository launcher with isolated SDK child",
+      "testedCodeCommit": "91da6e29198b48cb1984e657272af93e276a220d",
+      "rawLog": ".artifacts/b-ipc-fixes/regression-10.log",
+      "rawLogSha256": "617ac5baab0415d2e1d0980d06dc2e882fbd9dbbbdda67d30d2a549c161b5094"
+    },
+    {
+      "command": "${REPOSITORY}/.venv/bin/python ${REPOSITORY}/scripts/bootstrap.py --offline",
+      "exit": 0,
+      "passed": null,
+      "scope": "repository launcher with isolated SDK child",
+      "testedCodeCommit": "91da6e29198b48cb1984e657272af93e276a220d",
+      "rawLog": ".artifacts/b-ipc-fixes/bootstrap-docs-1.log",
+      "rawLogSha256": "3a54a63f5170d0870f8687a54b0e423106f543f2dcca8f8b067077cd0cb9352c"
+    },
+    {
+      "command": "${REPOSITORY}/.venv/bin/python ${REPOSITORY}/scripts/bootstrap.py --offline",
+      "exit": 0,
+      "passed": null,
+      "scope": "repository launcher with isolated SDK child",
+      "testedCodeCommit": "91da6e29198b48cb1984e657272af93e276a220d",
+      "rawLog": ".artifacts/b-ipc-fixes/bootstrap-docs-2.log",
+      "rawLogSha256": "3a54a63f5170d0870f8687a54b0e423106f543f2dcca8f8b067077cd0cb9352c"
+    },
+    {
+      "command": "${REPOSITORY}/.venv/bin/python ${REPOSITORY}/scripts/bootstrap.py --app --offline",
+      "exit": 0,
+      "passed": null,
+      "scope": "repository launcher with isolated SDK child",
+      "testedCodeCommit": "91da6e29198b48cb1984e657272af93e276a220d",
+      "rawLog": ".artifacts/b-ipc-fixes/bootstrap-app-1.log",
+      "rawLogSha256": "c39ea051b4c9f8f9f65225813b60f00f5a133716501f2df7dd3649fe36ab367e"
+    },
+    {
+      "command": "${REPOSITORY}/.venv/bin/python ${REPOSITORY}/scripts/bootstrap.py --app --offline",
+      "exit": 0,
+      "passed": null,
+      "scope": "repository launcher with isolated SDK child",
+      "testedCodeCommit": "91da6e29198b48cb1984e657272af93e276a220d",
+      "rawLog": ".artifacts/b-ipc-fixes/bootstrap-app-2.log",
+      "rawLogSha256": "7d4c9159fca70bd68c4090d64e25707db61b5ad2334b41b044a74d00342037ed"
+    },
+    {
+      "command": "${REPOSITORY}/.artifacts/toolchains/node-v24.21.0-darwin-arm64/bin/npm run typecheck",
+      "exit": 0,
+      "passed": null,
+      "scope": "repository launcher with isolated SDK child",
+      "testedCodeCommit": "91da6e29198b48cb1984e657272af93e276a220d",
+      "rawLog": ".artifacts/b-ipc-fixes/post-init-types.log",
+      "rawLogSha256": "ca27905bae0ff05202f06b1202f21718c69c2a76a72c41f79c5c9dd4c1c13f7b"
+    },
+    {
+      "command": "${REPOSITORY}/.artifacts/toolchains/node-v24.21.0-darwin-arm64/bin/node ${REPOSITORY}/scripts/run-product-worker.mjs --demo allow",
+      "exit": 0,
+      "passed": null,
+      "scope": "independent temporary cwd",
+      "testedCodeCommit": "91da6e29198b48cb1984e657272af93e276a220d",
+      "rawLog": ".artifacts/b-ipc-fixes/demo-allow.log",
+      "rawLogSha256": "39cb9fdea9916ac290322500cf08dad30ee6e4760f6981ac24619686ff7fdcec"
+    },
+    {
+      "command": "${REPOSITORY}/.artifacts/toolchains/node-v24.21.0-darwin-arm64/bin/node ${REPOSITORY}/scripts/run-product-worker.mjs --demo deny",
+      "exit": 0,
+      "passed": null,
+      "scope": "independent temporary cwd",
+      "testedCodeCommit": "91da6e29198b48cb1984e657272af93e276a220d",
+      "rawLog": ".artifacts/b-ipc-fixes/demo-deny.log",
+      "rawLogSha256": "5703ec0151b957f67c28e5c2f7f3126e78692df0904a6f13c36ab861ca8cb39f"
+    },
+    {
+      "command": "${REPOSITORY}/.artifacts/toolchains/node-v24.21.0-darwin-arm64/bin/node ${REPOSITORY}/scripts/run-product-worker.mjs --demo cancel",
+      "exit": 0,
+      "passed": null,
+      "scope": "independent temporary cwd",
+      "testedCodeCommit": "91da6e29198b48cb1984e657272af93e276a220d",
+      "rawLog": ".artifacts/b-ipc-fixes/demo-cancel.log",
+      "rawLogSha256": "c620d5657069583849f74ff5c08310fb7f43602078c8a04f5c40fc6246afd74c"
+    },
+    {
+      "command": "${REPOSITORY}/.artifacts/toolchains/node-v24.21.0-darwin-arm64/bin/node ${REPOSITORY}/scripts/run-product-worker.mjs --demo crash",
+      "exit": 0,
+      "passed": null,
+      "scope": "independent temporary cwd",
+      "testedCodeCommit": "91da6e29198b48cb1984e657272af93e276a220d",
+      "rawLog": ".artifacts/b-ipc-fixes/demo-crash.log",
+      "rawLogSha256": "5ebafcc6195c8b5769fe564302eac02954d798cd840563b99614405cfa36a567"
+    },
+    {
+      "command": "${REPOSITORY}/.artifacts/toolchains/node-v24.21.0-darwin-arm64/bin/node ${REPOSITORY}/scripts/run-product-worker.mjs",
+      "exit": 0,
+      "passed": 48,
+      "scope": "independent temporary cwd",
+      "testedCodeCommit": "91da6e29198b48cb1984e657272af93e276a220d",
+      "rawLog": ".artifacts/b-ipc-fixes/independent-cwd-worker.log",
+      "rawLogSha256": "e02d19ab755478db90c4ed73a44a62df6b51e0eaebde2d6ae34085ad8f9415b6"
+    },
+    {
+      "command": ".venv/bin/python scripts/check-ssot.py",
+      "exit": 0,
+      "passed": 60,
+      "scope": "repository documentation/tools only; pending documentation changes listed separately",
+      "testedCodeCommit": "91da6e29198b48cb1984e657272af93e276a220d",
+      "rawLog": ".artifacts/b-ipc-fixes/verified-ssot.log",
+      "rawLogSha256": "7dcb33f9712b0c5fbb2a1baeff0ece9a9632cfb1f65839ef27da2bb9e7909027"
+    },
+    {
+      "command": ".venv/bin/python scripts/test-tools.py",
+      "exit": 0,
+      "passed": 15,
+      "scope": "repository documentation/tools only; pending documentation changes listed separately",
+      "testedCodeCommit": "91da6e29198b48cb1984e657272af93e276a220d",
+      "rawLog": ".artifacts/b-ipc-fixes/verified-tools.log",
+      "rawLogSha256": "47060195453f3c91118ef1d9c94c5d8f1726e608fe870bc724672a1b6c299b1f"
+    },
+    {
+      "command": ".venv/bin/python scripts/check-docs.py --structural-only --report .artifacts/b-ipc-fixes/final-structural.json",
+      "exit": 0,
+      "passed": 5,
+      "scope": "repository documentation/tools only; pending documentation changes listed separately",
+      "testedCodeCommit": "91da6e29198b48cb1984e657272af93e276a220d",
+      "rawLog": ".artifacts/b-ipc-fixes/verified-structural.log",
+      "rawLogSha256": "fad7a095ad97ddea7b9ce0ac7dff89c3a11edc690232ec34d4e5e91f1c53b126"
+    },
+    {
+      "command": ".venv/bin/python scripts/check-docs.py --typecheck --report .artifacts/b-ipc-fixes/final-docs.json",
+      "exit": 0,
+      "passed": 7,
+      "scope": "repository documentation/tools only; pending documentation changes listed separately",
+      "testedCodeCommit": "91da6e29198b48cb1984e657272af93e276a220d",
+      "rawLog": ".artifacts/b-ipc-fixes/verified-docs.log",
+      "rawLogSha256": "3c91c439106240dc65a4f682d2ae5d04f9eceee4362e23aad9ce11b76f1327e0"
+    }
+  ],
+  "notCovered": [
+    "Windows/Linux restricted mode",
+    "arbitrary malicious detached descendants",
+    "power loss / filesystem-SQLite atomicity",
+    "every Fork/import persistence window",
+    "actual OAuth/models",
+    "UI",
+    "packaging",
+    "fresh clone / CI"
+  ],
+  "originalReproductionHead": "d3bb551fa83dc4bcfe4b67a74c2ff1025ca42d2d",
+  "sourceFilesAtTest": [
+    {
+      "path": "apps/agent-server/core.test.ts",
+      "sha256": "cbe2f605036f9c955750e852282b1932537714d1ba9f8a4f76c408bf24320927"
+    },
+    {
+      "path": "apps/agent-server/core.ts",
+      "sha256": "6f8257427afab6002e4987069f194354b4885302eaf7b95e3db3fe954b847bd7"
+    },
+    {
+      "path": "apps/agent-server/tests/host-fixture.ts",
+      "sha256": "a565e12994e747076b7d4d220eadc10e08ef82e62bd74fe46c1bbe163286385a"
+    },
+    {
+      "path": "apps/agent-server/tests/ipc.test.ts",
+      "sha256": "0b752999bec377cb8f422e4fbe377f26b3b2ec6938403f49288ea8c484eea71d"
+    },
+    {
+      "path": "apps/agent-server/tests/protocol-fixture.ts",
+      "sha256": "8e1971f29ba179d96ca2e6769689fd9df73b00f9efdb9d83f346413b4e5ac576"
+    },
+    {
+      "path": "apps/agent-server/tests/recovery.test.ts",
+      "sha256": "a9f64c1e2738c0bd43b33927b79d697e82a593557d602b455d26c47e05abab45"
+    },
+    {
+      "path": "apps/agent-server/tests/worker-fixture.ts",
+      "sha256": "5c5e60c482d95d9481a8ced59f83fcecefd62c5d2ff81cce263254f5fbcf905b"
+    },
+    {
+      "path": "apps/agent-server/tests/worker.test.ts",
+      "sha256": "30e430480521a5bed727df859f2ec17d22cb2564b83190fe09f9ee794153cccd"
+    },
+    {
+      "path": "apps/agent-server/worker-supervisor.ts",
+      "sha256": "610efb7ab51dfbbc04d24c067dd28a81b97b70b54196ece07b7609d7ae32cc78"
+    },
+    {
+      "path": "packages/app-contracts/index.ts",
+      "sha256": "73b7e57f2e6ae42e553e6efde6bc4e446c9f6ce8a8f90f4f010136156003fad6"
+    },
+    {
+      "path": "packages/app-contracts/worker-ipc.ts",
+      "sha256": "9ce18f5dd654a7549703e432c20a8e07d03f2368fcc578bc88ce13de9fe5a1be"
+    },
+    {
+      "path": "packages/pi-adapter/worker-runtime.ts",
+      "sha256": "72989a674d6f1ac628a7a0ec0cb2cb1f0f092372515c21b39e6503d501761354"
+    }
+  ],
+  "documentationOnlyDifferences": [
+    "docs/DEVELOPMENT.md",
+    "docs/README.md",
+    "docs/planning/NEXT_STEPS.md",
+    "docs/planning/backlog.json",
+    "docs/ssot/README.md",
+    "docs/ssot/b-minimal-contract.md",
+    "docs/ssot/b-worker-contract.md",
+    "docs/ssot/integration-contracts.md",
+    "docs/ssot/maintenance.md",
+    "docs/ssot/reuse-map.json",
+    "docs/ssot/review-fixes.md",
+    "docs/validation/b-boundaries.md",
+    "docs/validation/b-ipc-2026-09-23.md",
+    "docs/validation/review-b-ipc-2026-09-23.md",
+    "docs/validation/review-b-ipc-inputs.json"
+  ]
+}
