@@ -2,9 +2,10 @@
 import assert from 'node:assert/strict';
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { app, type BrowserWindow } from 'electron';
+import { app, dialog, type BrowserWindow } from 'electron';
 import type { HostClient } from './host-client.ts';
 import type { DesktopHome, DesktopThread } from '../../packages/app-contracts/desktop.ts';
+import type { Command } from '../../packages/app-contracts/index.ts';
 export async function runSmoke(window: BrowserWindow, host: HostClient, profile: string) {
   const wc = window.webContents;
   const js = <T>(source: string): Promise<T> => wc.executeJavaScript(source, true);
@@ -101,5 +102,98 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
   }
   const first = home.threads[0]!; await click(first.title);
   await wait(() => js<boolean>(`document.querySelector('#composer')?.value === ${JSON.stringify(`草稿 ${first.id}`)}`), 'draft_restore');
-  console.log(JSON.stringify({ desktopSmoke: 'passed', versions: { electron: process.versions.electron, chromium: process.versions.chrome, node: process.versions.node, abi: process.versions.modules }, platform: process.platform, arch: process.arch, scenarios: counts, realModelCalls: 0 }));
+
+  // Trusted test-only transport fault after the real command is durably accepted.
+  // This lives in the smoke module, never the Renderer/preload or product protocol.
+  const request = host.request.bind(host); const attempts: Command[] = [];
+  let loseAck: Command['type'] | undefined;
+  host.request = async raw => {
+    if (raw.type === 'command') attempts.push(structuredClone(raw.command));
+    const result = await request(raw);
+    if (raw.type === 'command' && raw.command.type === loseAck) { loseAck = undefined; throw new Error('disconnected'); }
+    return result;
+  };
+  const create = async (title: string) => {
+    await fill('#title', title); await click('＋ 新建任务');
+    await wait(() => js<boolean>(`document.querySelector('h1')?.textContent === ${JSON.stringify(title)}`), 'retry_thread_created');
+    return (await host.request({ type: 'home' }) as DesktopHome).threads.find(t => t.title === title)!;
+  };
+  const reconnectUi = async () => {
+    await click('重新连接');
+    await wait(() => js<boolean>("!document.querySelector('.notice.error') && !document.querySelector('.new-thread').disabled"), 'retry_reconnect');
+  };
+  const submit = async (text: string, lost: boolean) => {
+    await fill('#composer', text); if (lost) loseAck = 'runs.start';
+    await js("document.querySelector('.composer').requestSubmit()");
+    await wait(() => js<boolean>(lost ? "document.querySelector('.composer button').textContent.includes('重试未确认任务') && !!document.querySelector('.notice.error')" : "document.querySelector('#composer').value === ''"), 'submit_ack_result');
+  };
+  const b = await create('SYNTHETIC retry B');
+  loseAck = 'threads.create'; await fill('#title', 'SYNTHETIC retry A'); await click('＋ 新建任务');
+  await wait(() => js<boolean>("document.querySelector('.new-thread').textContent.includes('重试新建任务') && !!document.querySelector('.notice.error')"), 'create_ack_lost');
+  assert.equal(await js<boolean>("document.querySelector('#title').disabled"), true);
+  const beforeRetry = await host.request({ type: 'home' }) as DesktopHome; assert.equal(beforeRetry.threads.length, 6);
+  const a = beforeRetry.threads.find(t => t.title === 'SYNTHETIC retry A')!;
+  await reconnectUi(); await click('＋ 重试新建任务');
+  await wait(() => js<boolean>("document.querySelector('h1')?.textContent === 'SYNTHETIC retry A' && !document.querySelector('#title').disabled"), 'create_retry_ack');
+  const creations = attempts.filter(c => c.type === 'threads.create' && c.title === a.title);
+  assert.equal(creations.length, 2); assert.deepEqual(creations[0], creations[1]);
+  assert.equal((await host.request({ type: 'home' }) as DesktopHome).threads.length, 6);
+
+  await submit('SYNTHETIC unconfirmed A', true);
+  assert.equal(await js<boolean>("document.querySelector('#composer').disabled"), true);
+  await reconnectUi(); await click(b.title);
+  await wait(() => js<boolean>("document.querySelector('h1')?.textContent === 'SYNTHETIC retry B'"), 'select_B');
+  await submit('SYNTHETIC successful B', false);
+  await click(a.title);
+  await wait(() => js<boolean>("document.querySelector('h1')?.textContent === 'SYNTHETIC retry A' && document.querySelector('.composer button').textContent.includes('重试未确认任务')"), 'restore_A_intent');
+  assert.equal(attempts.filter(c => c.type === 'runs.start' && c.threadId === a.id).length, 1); // No reconnect/selection replay.
+  await click('重试未确认任务 ↑');
+  await wait(() => js<boolean>("document.querySelector('#composer').value === ''"), 'A_retry_ack');
+  const aRuns = attempts.filter(c => c.type === 'runs.start' && c.threadId === a.id);
+  assert.equal(aRuns.length, 2); assert.deepEqual(aRuns[0], aRuns[1]);
+  assert.equal((await host.request({ type: 'thread', threadId: a.id }) as DesktopThread).runs.length, 1);
+
+  await click(b.title); await wait(() => js<boolean>("document.querySelector('h1')?.textContent === 'SYNTHETIC retry B'"), 'same_thread_retry');
+  const repeatedText = 'SYNTHETIC deliberate same content'; await submit(repeatedText, true); await reconnectUi();
+  await click('重试未确认任务 ↑'); await wait(() => js<boolean>("document.querySelector('#composer').value === ''"), 'B_retry_ack');
+  await submit(repeatedText, false); // A new, explicitly submitted intent, despite identical content.
+  const bRuns = attempts.filter(c => c.type === 'runs.start' && c.threadId === b.id && c.input === repeatedText);
+  assert.equal(bRuns.length, 3); assert.deepEqual(bRuns[0], bRuns[1]); assert.notEqual(bRuns[1]!.requestId, bRuns[2]!.requestId);
+  const bView = await host.request({ type: 'thread', threadId: b.id }) as DesktopThread;
+  assert.equal(bView.runs.length, 3); assert.equal(bView.inputs.filter(i => i.text === repeatedText).length, 2);
+  assert.equal(bView.artifacts.length, 0);
+  // Thread creation also allocates a fresh identity after confirmation, even with the same title.
+  await create(a.title);
+  const sameTitles = (await host.request({ type: 'home' }) as DesktopHome).threads.filter(t => t.title === a.title);
+  assert.equal(sameTitles.length, 2);
+  const allCreations = attempts.filter(c => c.type === 'threads.create' && c.title === a.title);
+  assert.equal(allCreations.length, 3); assert.notEqual(allCreations[1]!.requestId, allCreations[2]!.requestId);
+  host.request = request;
+
+  // Actual main before-quit path: a failed guardian receipt must reach the warning branch.
+  // Capture the native dialog invocation rather than requiring a human to dismiss it.
+  const leases = join(profile, 'state/leases'); let activeReceipt = '';
+  await wait(async () => {
+    const state = await host.request({ type: 'thread', threadId: b.id }) as DesktopThread;
+    if (!state.operations.some(op => op.state === 'pending')) return false;
+    const activeLeases = readdirSync(leases).filter(lease => !existsSync(join(leases, lease, 'cleanup.json')));
+    if (activeLeases.length !== 1) return false;
+    activeReceipt = join(leases, activeLeases[0]!, 'cleanup.json'); return true;
+  }, 'shutdown_pending_worker');
+  mkdirSync(activeReceipt); const finalHostPid = host.processId!;
+  const originalDialog = dialog.showMessageBox; const warnings: Electron.MessageBoxOptions[] = [];
+  dialog.showMessageBox = async (windowOrOptions: Electron.BaseWindow | Electron.MessageBoxOptions, options?: Electron.MessageBoxOptions) => {
+    warnings.push(options ?? windowOrOptions as Electron.MessageBoxOptions); return { response: 0, checkboxChecked: false };
+  };
+  try {
+    window.close();
+    await wait(async () => warnings.length === 1, 'unconfirmed_shutdown_warning');
+    assert.equal(warnings[0]!.title, '清理尚未确认'); assert.equal(window.isDestroyed(), false);
+    const closing = host.close(); assert.equal(host.close(), closing); await assert.rejects(closing, /host_cleanup_unconfirmed/);
+    assert.throws(() => process.kill(finalHostPid, 0));
+    const proof = JSON.parse(readFileSync(activeReceipt + '.tmp', 'utf8')) as { exited: boolean; groupGone: boolean; workerPid: number };
+    assert.equal(proof.exited, true); assert.equal(proof.groupGone, true); assert.throws(() => process.kill(-proof.workerPid, 0));
+  } finally { dialog.showMessageBox = originalDialog; }
+  console.log(JSON.stringify({ desktopSmoke: 'passed', versions: { electron: process.versions.electron, chromium: process.versions.chrome, node: process.versions.node, abi: process.versions.modules }, platform: process.platform, arch: process.arch, scenarios: counts,
+    reviewRegressions: ['create-ack-loss', 'interleaved-thread-ack-loss', 'same-thread-retry', 'explicit-identical-new-intent', 'actual-before-quit-cleanup-failure'], realModelCalls: 0 }));
 }

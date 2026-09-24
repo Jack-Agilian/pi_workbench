@@ -1,21 +1,22 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { existsSync, mkdtempSync, readFileSync, realpathSync, rmSync, statSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, renameSync, rmSync, statSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { DatabaseSync } from 'node:sqlite';
 import { DesktopHost } from '../agent-server/desktop-host.ts';
-import { parseDesktopRequest, type DesktopThread } from '../../packages/app-contracts/desktop.ts';
+import { parseDesktopRequest, type DesktopHome, type DesktopThread } from '../../packages/app-contracts/desktop.ts';
+import type { Ack } from '../../packages/app-contracts/index.ts';
 import { parsePresentation, displayText } from '../../packages/app-contracts/presentation.ts';
 import { shouldSubmit } from './composer-key.ts';
 import { HostClient } from './host-client.ts';
 import { repository } from '../agent-server/worker-launcher.ts';
 import { projectMessages } from '../../packages/pi-adapter/presentation.ts';
 import type { SessionEntry } from '@earendil-works/pi-coding-agent';
-const until = async (predicate: () => boolean, label: string) => {
+const until = async (predicate: () => boolean | Promise<boolean>, label: string) => {
   const end = Date.now() + 15000;
-  while (!predicate()) { if (Date.now() > end) throw new Error(`timeout:${label}`); await new Promise<void>(r => setTimeout(r, 25)); }
+  while (!await predicate()) { if (Date.now() > end) throw new Error(`timeout:${label}`); await new Promise<void>(r => setTimeout(r, 25)); }
 };
 function fixture() {
   const root = realpathSync(mkdtempSync(join(tmpdir(), 'c-desktop-'))); const host = new DesktopHost(root);
@@ -141,6 +142,52 @@ test('close during host reconnect shares completion and cannot publish a late ho
     assert.throws(() => process.kill(original, 0)); assert.equal(client.processId, original);
     await assert.rejects(client.connect(), /disconnected/);
   } finally { await client.close(); rmSync(root, { recursive: true, force: true }); }
+});
+for (const fault of ['missing-receipt', 'killed-during-close'] as const) test(`real App Server ${fault}: shared close failure, durable unknown and evidence-based recovery`, async () => {
+  const root = realpathSync(mkdtempSync(join(tmpdir(), 'c-close-failure-')));
+  const client = new HostClient(process.execPath, repository, root);
+  let reopened: HostClient | undefined;
+  try {
+    await client.connect(); const hostPid = client.processId!;
+    const thread = await client.request({ type: 'command', command: { type: 'threads.create', requestId: 'thread', workspaceId: 'demo-workspace', title: 'SYNTHETIC cleanup fault' } }) as Ack;
+    const start = { type: 'runs.start' as const, requestId: 'intent', threadId: thread.id, input: 'SYNTHETIC cleanup fault' };
+    const ack = await client.request({ type: 'command', command: start });
+    let snapshot: DesktopThread;
+    await until(async () => { snapshot = await client.request({ type: 'thread', threadId: thread.id }) as DesktopThread; return snapshot.operations.length === 1; }, 'approval');
+    const leases = join(root, 'state/leases'); assert.equal(readdirSync(leases).length, 1);
+    const receipt = join(leases, readdirSync(leases)[0]!, 'cleanup.json');
+    // Test-owned fault: block the real guardian's atomic receipt rename, after it stops the Worker.
+    // Never forge a successful receipt, and never add a fault switch to the desktop protocol.
+    if (fault === 'missing-receipt') mkdirSync(receipt);
+    const closing = client.close(); assert.equal(client.close(), closing);
+    const rejected = assert.rejects(closing, /host_cleanup_unconfirmed/);
+    if (fault === 'killed-during-close') process.kill(hostPid, 'SIGKILL');
+    await rejected; assert.equal(client.close(), closing);
+    const firstError = await closing.catch(error => error);
+    assert.equal(await client.close().catch(error => error), firstError);
+    assert.throws(() => process.kill(hostPid, 0));
+    const proofPath = fault === 'missing-receipt' ? receipt + '.tmp' : receipt;
+    await until(() => existsSync(proofPath), 'actual_guardian_receipt');
+    const proof = JSON.parse(readFileSync(proofPath, 'utf8')) as { exited: boolean; groupGone: boolean; workerPid: number };
+    assert.equal(proof.exited, true); assert.equal(proof.groupGone, true);
+    assert.throws(() => process.kill(proof.workerPid, 0)); assert.throws(() => process.kill(-proof.workerPid, 0));
+    reopened = new HostClient(process.execPath, repository, root); await reopened.connect();
+    let home = await reopened.request({ type: 'home' }) as DesktopHome;
+    snapshot = await reopened.request({ type: 'thread', threadId: thread.id }) as DesktopThread;
+    if (fault === 'missing-receipt') {
+      assert.equal(home.recovery, 'blocked'); assert.equal(snapshot.runs[0]!.state, 'unknown');
+      assert.equal(snapshot.operations[0]!.state, 'denied');
+      rmSync(receipt, { recursive: true }); renameSync(proofPath, receipt); // Restore the untouched, real guardian bytes.
+      home = await reopened.request({ type: 'recover' }) as DesktopHome;
+    }
+    assert.equal(home.recovery, 'ready');
+    snapshot = await reopened.request({ type: 'thread', threadId: thread.id }) as DesktopThread;
+    assert.equal(snapshot.runs[0]!.state, 'failed'); assert.equal(snapshot.runs.length, 1);
+    assert.equal(snapshot.operations.length, 1); assert.equal(snapshot.artifacts.length, 0);
+    assert.equal(existsSync(join(root, 'workspace', snapshot.operations[0]!.artifactPath!)), false);
+    assert.deepEqual(await reopened.request({ type: 'command', command: start }), ack);
+    assert.equal((await reopened.request({ type: 'thread', threadId: thread.id }) as DesktopThread).runs.length, 1);
+  } finally { await client.close().catch(() => {}); await reopened?.close(); rmSync(root, { recursive: true, force: true }); }
 });
 test('schema v3 forward migration preserves the pre-Assistant product intent and native metadata', async () => {
   const f = fixture();

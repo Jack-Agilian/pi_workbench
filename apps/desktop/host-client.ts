@@ -5,7 +5,8 @@ import { randomUUID } from 'node:crypto';
 import { parseDesktopRequest, type DesktopReply, type DesktopRequest, type DesktopValue } from '../../packages/app-contracts/desktop.ts';
 import { IpcSender } from '../../packages/pi-adapter/ipc-channel.ts';
 import { exact } from '../../packages/app-contracts/worker-ipc.ts';
-interface Connection { child: ChildProcess; sender: IpcSender; ended: Promise<void>; ready: Promise<void> }
+interface HostExit { code: number | null; signal: NodeJS.Signals | null }
+interface Connection { child: ChildProcess; sender: IpcSender; ended: Promise<HostExit>; ready: Promise<void> }
 /** Bounded, process-handle-bound transport. Disconnect rejects every pending request; nothing is replayed. */
 export class HostClient {
   private connection?: Connection;
@@ -23,9 +24,9 @@ export class HostClient {
       env: { HOME: home, USERPROFILE: home, TMPDIR: temp, TMP: temp, TEMP: temp, PATH: dirname(this.node),
         XDG_CONFIG_HOME: join(home, '.config'), PI_OFFLINE: '1', PI_SKIP_VERSION_CHECK: '1', PI_CODING_AGENT_DIR: join(home, 'agent'), NO_COLOR: '1' },
     });
-    let ready!: () => void; let failed!: (e: Error) => void; let ended!: () => void;
+    let ready!: () => void; let failed!: (e: Error) => void; let ended!: (exit: HostExit) => void;
     const connection: Connection = { child, sender: new IpcSender((m, cb) => child.send(m, cb)),
-      ready: new Promise<void>((r, e) => { ready = r; failed = e; }), ended: new Promise<void>(r => { ended = r; }) };
+      ready: new Promise<void>((r, e) => { ready = r; failed = e; }), ended: new Promise<HostExit>(r => { ended = r; }) };
     this.connection = connection;
     const fail = () => {
       connection.sender.close(); failed(new Error('disconnected'));
@@ -51,11 +52,11 @@ export class HostClient {
     child.on('error', fail); child.on('disconnect', fail);
     // With ignore/IPC stdio, this runtime can emit exit+disconnect without a close event.
     // Both are required before replacement; there are no stdout/stderr pipes left to drain.
-    let exited = false; let disconnected = false;
-    const complete = () => { if (exited && disconnected) { clearTimeout(startup); fail(); ended(); } };
-    child.once('exit', () => { exited = true; complete(); });
+    let exit: HostExit | undefined; let disconnected = false;
+    const complete = () => { if (exit && disconnected) { clearTimeout(startup); fail(); ended(exit); } };
+    child.once('exit', (code, signal) => { exit = { code, signal }; complete(); });
     child.once('disconnect', () => { disconnected = true; complete(); });
-    child.once('close', () => { if (!child.pid) { clearTimeout(startup); fail(); ended(); } });
+    child.once('close', () => { if (!child.pid) { clearTimeout(startup); fail(); ended({ code: null, signal: null }); } });
     return connection;
   }
   connect(): Promise<void> { return this.stopped ? Promise.reject(new Error('disconnected')) : (this.connection ?? this.start()).ready; }
@@ -85,15 +86,19 @@ export class HostClient {
   close(): Promise<void> {
     if (!this.closeResult) {
       this.stopped = true;
-      this.closeResult = Promise.all([this.stop(this.connection), this.reconnecting?.catch(() => {})]).then(() => {});
+      this.closeResult = Promise.all([this.stop(this.connection), this.reconnecting?.catch(() => {})]).then(([exit]) => {
+        // The trusted entry exits 0 only after DesktopHost.close succeeds. Termination
+        // alone admits a new host for reconciliation, but never proves a clean shutdown.
+        if (exit && (exit.code !== 0 || exit.signal !== null)) throw new Error('host_cleanup_unconfirmed');
+      });
     }
     return this.closeResult;
   }
-  private async stop(connection?: Connection): Promise<void> {
+  private async stop(connection?: Connection): Promise<HostExit | undefined> {
     if (!connection) return;
     if (connection.child.connected) connection.child.disconnect();
     let timer: ReturnType<typeof setTimeout> | undefined;
-    try { await Promise.race([connection.ended, new Promise<never>((_, reject) => { timer = setTimeout(() => reject(new Error('host_cleanup_unconfirmed')), 10000); })]); }
+    try { return await Promise.race([connection.ended, new Promise<never>((_, reject) => { timer = setTimeout(() => reject(new Error('host_cleanup_unconfirmed')), 10000); })]); }
     finally { clearTimeout(timer); }
   }
 }

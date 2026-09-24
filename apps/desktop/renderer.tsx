@@ -20,7 +20,9 @@ function App() {
   const preview = previewState?.threadId === selected ? previewState : null;
   const selectedRef = useRef(selected); selectedRef.current = selected;
   const generation = useRef(0); const commandPending = useRef(false); const previewGeneration = useRef(0);
-  const retry = useRef<{ threadId: string; input: string; requestId: string } | null>(null);
+  const pendingRuns = useRef(new Map<string, Extract<Command, { type: 'runs.start' }>>());
+  const pendingCreation = useRef<Extract<Command, { type: 'threads.create' }> | null>(null);
+  const unconfirmedRun = pendingRuns.current.get(selected);
   const draft = drafts[selected] ?? '';
   function failed(error: unknown) {
     const lost = error instanceof Error && error.message.includes('disconnected');
@@ -62,18 +64,21 @@ function App() {
     finally { commandPending.current = false; setBusy(false); }
   }
   async function createThread() {
-    const response = await command({ type: 'threads.create', requestId: id(), workspaceId: 'demo-workspace', title: title.trim() || '新的工作记录' });
-    if (response) { setTitle(''); setSelected(response.id); setTick(n => n + 1); }
+    if (commandPending.current || busy || disconnected) return;
+    const intent = pendingCreation.current ?? { type: 'threads.create', requestId: id(), workspaceId: 'demo-workspace', title: title.trim() || '新的工作记录' };
+    pendingCreation.current = intent;
+    const response = await command(intent);
+    if (response && pendingCreation.current === intent) { pendingCreation.current = null; setTitle(''); setSelected(response.id); setTick(n => n + 1); }
   }
   async function submit() {
-    if (!selected || !draft.trim() || busy || disconnected) return;
-    const current = selected; const input = draft;
-    const requestId = retry.current?.threadId === current && retry.current.input === input ? retry.current.requestId : id();
-    retry.current = { threadId: current, input, requestId };
-    const response = await command({ type: 'runs.start', requestId, threadId: current, input });
-    if (response) {
-      retry.current = null;
-      setDrafts(all => all[current] === input ? { ...all, [current]: '' } : all);
+    if (!selected || !draft.trim() || commandPending.current || busy || disconnected) return;
+    const current = selected;
+    const intent = pendingRuns.current.get(current) ?? { type: 'runs.start', requestId: id(), threadId: current, input: draft };
+    pendingRuns.current.set(current, intent);
+    const response = await command(intent);
+    if (response && pendingRuns.current.get(current) === intent) {
+      pendingRuns.current.delete(current);
+      setDrafts(all => all[current] === intent.input ? { ...all, [current]: '' } : all);
     }
   }
   async function showArtifact(artifactId: string) {
@@ -94,8 +99,8 @@ function App() {
       <div className="brand"><span className="brand-mark">π</span><div>Pi Workbench<small>把想法变成成果</small></div></div>
       <div className="workspace-label"><span className="workspace-icon">▧</span><div>演示工作区<small>本地 · 受管理目录</small></div></div>
       <label className="sr-only" htmlFor="title">新任务名称</label>
-      <input id="title" placeholder="新任务名称（可选）" maxLength={160} value={title} onChange={event => setTitle(event.target.value)} />
-      <button className="new-thread" onClick={() => void createThread()} disabled={busy || disconnected}><span>＋</span> 新建任务</button>
+      <input id="title" placeholder="新任务名称（可选）" maxLength={160} value={title} disabled={pendingCreation.current !== null} onChange={event => setTitle(event.target.value)} />
+      <button className="new-thread" onClick={() => void createThread()} disabled={busy || disconnected}><span>＋</span> {pendingCreation.current ? '重试新建任务' : '新建任务'}</button>
       <div className="section-label">我的任务 <span>{home?.threads.length ?? 0}</span></div>
       <nav aria-label="任务列表">{home?.threads.map(item => <button key={item.id} aria-label={item.title} className={`thread-link ${selected === item.id ? 'selected' : ''}`} aria-current={selected === item.id ? 'page' : undefined} onClick={() => setSelected(item.id)}><span>◷</span><span>{item.title}</span>{home.activeRuns.some(run => run.threadId === item.id) && <span className="activity-dot" aria-label="有活动任务" />}</button>)}</nav>
       <div className="sidebar-foot"><span className="status-dot" /> 本地工作台<small>无模型演示 · SYNTHETIC</small></div>
@@ -108,7 +113,7 @@ function App() {
       <div className="content-grid">
         <section className="conversation" aria-label="任务时间线">
           <div className="timeline" aria-live="polite">
-            {!currentRuns.length && <div className="empty"><span className="empty-mark">✧</span><h2>让第一份成果落地</h2><p>演示会把你的目标写入真实 Markdown 文件，<br />体验任务、审批和成果核验的完整过程。</p><div className="suggestions">{['整理本周工作记录','记录一次项目讨论','起草下一步行动清单'].map(text => <button key={text} disabled={!selected} onClick={() => setDrafts(all => ({ ...all, [selected]: text }))}>{text}<span>↗</span></button>)}</div>{!selected && <p className="hint">先在左侧新建一个任务</p>}</div>}
+            {!currentRuns.length && <div className="empty"><span className="empty-mark">✧</span><h2>让第一份成果落地</h2><p>演示会把你的目标写入真实 Markdown 文件，<br />体验任务、审批和成果核验的完整过程。</p><div className="suggestions">{['整理本周工作记录','记录一次项目讨论','起草下一步行动清单'].map(text => <button key={text} disabled={!selected || !!unconfirmedRun} onClick={() => setDrafts(all => ({ ...all, [selected]: text }))}>{text}<span>↗</span></button>)}</div>{!selected && <p className="hint">先在左侧新建一个任务</p>}</div>}
             {currentRuns.map((run, index) => <article className="run" key={run.id} data-run={run.id} data-state={run.state}>
               <div className="run-label"><span>任务 {String(index + 1).padStart(2, '0')}</span><span className={`state state-${run.state}`}>{labels[run.state]}</span>{active.has(run.state) && !['unknown','cancelling'].includes(run.state) && <button className="stop" disabled={busy || disconnected} onClick={() => void command({ type: 'runs.cancel', requestId: id(), runId: run.id })}>停止</button>}</div>
               <div className="message user"><span className="avatar">你</span><div><small>任务目标</small><p>{thread?.inputs.find(input => input.id === run.id)?.text}</p></div></div>
@@ -120,9 +125,9 @@ function App() {
             </article>)}
           </div>
           <form className="composer" onSubmit={event => { event.preventDefault(); void submit(); }}>
-            <label className="sr-only" htmlFor="composer">任务目标</label><textarea id="composer" placeholder={selected ? '描述你想完成的工作…' : '新建任务后，在这里描述你的目标…'} disabled={!selected} value={draft} maxLength={16384} onChange={event => setDrafts(all => ({ ...all, [selected]: event.target.value }))} onKeyDown={event => { if (shouldSubmit(event.nativeEvent)) { event.preventDefault(); void submit(); } }} />
-            <div className="composer-footer"><span>◎ 无模型 · 仅本地 Markdown</span><button className="primary" type="submit" disabled={!selected || !draft.trim() || busy || disconnected}>{isWorking ? '加入队列' : '发送任务'} <span>↑</span></button></div>
-            <p>Enter 发送 · Shift + Enter 换行 · 中文输入法选词不会发送</p>
+            <label className="sr-only" htmlFor="composer">任务目标</label><textarea id="composer" placeholder={selected ? '描述你想完成的工作…' : '新建任务后，在这里描述你的目标…'} disabled={!selected || !!unconfirmedRun} value={draft} maxLength={16384} onChange={event => setDrafts(all => ({ ...all, [selected]: event.target.value }))} onKeyDown={event => { if (shouldSubmit(event.nativeEvent)) { event.preventDefault(); void submit(); } }} />
+            <div className="composer-footer"><span>◎ 无模型 · 仅本地 Markdown</span><button className="primary" type="submit" disabled={!selected || !draft.trim() || busy || disconnected}>{unconfirmedRun ? '重试未确认任务' : isWorking ? '加入队列' : '发送任务'} <span>↑</span></button></div>
+            <p>{unconfirmedRun ? '此任务尚未收到确认；重试会核对同一次提交，确认前保留原内容。' : 'Enter 发送 · Shift + Enter 换行 · 中文输入法选词不会发送'}</p>
           </form>
         </section>
         <aside className="inspector" aria-label="审批与成果">

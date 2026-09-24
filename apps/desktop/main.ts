@@ -27,7 +27,7 @@ app.on('before-quit', event => {
   if (quitting) return; event.preventDefault(); if (closing) return; closing = true;
   void host.close().then(() => { quitting = true; app.quit(); }, () => {
     closing = false;
-    void dialog.showMessageBox({ type: 'warning', title: '清理尚未确认', message: '执行宿主尚未确认退出。', detail: '工作台保留了任务与操作记录。当前不能报告正常关闭，也不会重新执行未确认的操作。', buttons: ['知道了'] });
+    void dialog.showMessageBox({ type: 'warning', title: '清理尚未确认', message: '执行宿主的清理尚未确认完成。', detail: '工作台保留了任务与操作记录。当前不能报告正常关闭，也不会重新执行未确认的操作。', buttons: ['知道了'] });
     // Remain alive if cleanup cannot be verified. No false successful shutdown.
   });
 });
@@ -70,7 +70,8 @@ await window.loadURL(origin);
 if (process.argv.includes('--smoke-test')) {
   // Trusted test code only; not bundled into the Renderer or reachable through the preload API.
   const { runSmoke } = await import('./smoke.ts');
-  try { await runSmoke(window, host, profile); await host.close(); quitting = true; app.exit(0); }
+  // The smoke suite checks both successful reconnect cleanup and a terminal close failure.
+  try { await runSmoke(window, host, profile); quitting = true; app.exit(0); }
   catch (error) { console.error(error); await host.close().catch(() => {}); quitting = true; app.exit(1); }
 }
 
