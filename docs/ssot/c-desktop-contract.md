@@ -26,8 +26,9 @@ Pi 0.87.0 公开 SessionManager.getBranch 提供原生条目。Adapter 按当前
 - 合成驱动位于单独 entry，仅由可信 `--demo` 宿主选择；在实际 Worker 内调用注册后的真实 Pi write。用户输入只是 Markdown 内容，不能选择任意代码/工具/路径。执行前有固定演示延时以检查取消；它不是模型响应速度。
 - 取消请求接受、操作结算、Pi 结束和进程清理继续分离。unknown 保留阻断与原操作，核验按钮只调用已有 recover，绝不重发副作用。成果字节实际存在且摘要匹配才登记。
 - UI 以 snapshot.cursor 开始轮询持久事件，有变化再取替换快照。Thread 切换、异步预览与关闭有 generation/身份保护；重连重新取快照，不靠事件重放执行工具。草稿按 Thread 保存在窗口内；窗口重启不持久保留草稿。已发送输入仍在产品库。
+- 未确认 Run 命令按 Thread 保存原 requestId 和完整参数，创建 Thread 单独保留待确认意图；确认前内容暂不可编辑，可明确重试同一次提交。Ack 到达才清除对应意图；确认后相同内容的新任务仍生成新 ID。不会因切换 Thread、轮询或重连自动重发；未确认意图不跨窗口重启持久保存。
 - App Server 断连撤销所有在途请求，不自动重试；显式重连必须等待原宿主退出且 IPC 断开后才创建新宿主。此次运行时实测有 exit+disconnect 而没有 close 的组合；无 stdout/stderr 管道，因此用前两者确认旧 SQLite 写入进程退出。Worker/后代清理仍由 guardian 的既有证据确认，不能由这个宿主 PID 推导。
-- 应用关闭先阻止新请求/新宿主，等待既有 supervisor 清理、关闭数据库并退出 App Server。重复关闭共享完成/失败；清理失败保留告知和审计。关闭与重连竞争不会发布迟到宿主。App Server 被 SIGKILL 后 Worker 清理与冷恢复沿用 B-IPC。
+- 应用关闭先阻止新请求/新宿主，等待既有 supervisor 清理、关闭数据库并退出 App Server。HostClient 保留真实 code/signal：受信任 entry 只有清理成功才无信号退出 0，非零/信号/超时必须返回清理未确认。重复关闭共享完成或失败；清理失败保留告知和审计。此判断不用于永久拒绝异常退出后的显式重连；新宿主仍按既有证据对账。关闭与重连竞争不会发布迟到宿主。App Server 被 SIGKILL 后 Worker 清理与冷恢复沿用 B-IPC。原 C01/C02 缺陷及修正证据见 [审核复核](../validation/review-c-2026-09-24.md)。
 
 ## 采用与范围
 

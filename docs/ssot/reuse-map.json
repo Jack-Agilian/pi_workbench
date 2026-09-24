@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "decision": "reuse-first",
-  "reviewedOn": "2026-09-23",
+  "reviewedOn": "2026-09-24",
   "projectBaseCommit": "be9e1f0858e9188131c959d2438dede73c0e2215",
   "upstream": {
     "repository": "earendil-works/pi",
@@ -972,8 +972,8 @@
         "esbuild build"
       ],
       "reuse": "Electron公开窗口/沙盒/IPC，React渲染和esbuild构建；复用既有产品与Pi Worker链路",
-      "productDelta": "闭合产品桥、Thread/Run视图、审批/取消/成果与有界纯文本投影；显式无模型驱动",
-      "acceptanceGate": "真实桌面进程/来源/CSP、Thread隔离、审批/取消/恢复；平台/模型/Gate分别验收",
+      "productDelta": "闭合产品桥、Thread/Run视图、审批/取消/成果与有界纯文本投影；显式无模型驱动；关闭结果/重连接管分离，未确认命令按意图保留身份并显式重试",
+      "acceptanceGate": "真实桌面进程/来源/CSP、Thread隔离、审批/取消/恢复；平台/模型/Gate分别验收；确认丢失/交错重试、异常关闭与受证据约束的恢复",
       "implementationState": "in_progress",
       "adoption": {
         "status": "selected",
@@ -1071,7 +1071,11 @@
           "EV-C-SYNTHETIC-20260923",
           "EV-C-SDK-20260923",
           "EV-C-REGRESSION-20260923",
-          "EV-C-RELEASE-20260923"
+          "EV-C-RELEASE-20260923",
+          "EV-C-FIX-REVIEW-20260924",
+          "EV-C-FIX-MAC-20260924",
+          "EV-C-FIX-MOCK-20260924",
+          "EV-C-FIX-REGRESSION-20260924"
         ]
       }
     }
@@ -1676,6 +1680,66 @@
         "darwin"
       ],
       "locator": "docs/validation/c-desktop-2026-09-23.md"
+    },
+    {
+      "id": "EV-C-REVIEW-FAIL-20260924",
+      "kind": "review",
+      "result": "failed",
+      "scope": "基线C01/C02成立：Mac/Node24重跑原局部诊断，异常真实合成宿主关闭误报成功，Renderer摘录在跨Thread/创建确认丢失时重复ID分配。16个原包摘要/6个Git blob及摘录核验；不是基线完整Electron或权限逃逸证明。",
+      "commit": "6410741ff23c5e8fb6ba5596129fad804b393885",
+      "recordedAt": "2026-09-24T03:26:56.963956+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/review-c-2026-09-24.md"
+    },
+    {
+      "id": "EV-C-FIX-REVIEW-20260924",
+      "kind": "review",
+      "result": "passed",
+      "scope": "C01关闭结果与重连接管分开，C02按Thread/创建意图保存完整命令至确认；只改5个桌面源码/测试文件，不重写产品核心/Pi。代码审查及真实Mac回归通过，不覆盖跨窗口持久意图/真实模型。",
+      "commit": "ed9a3ce3a91ef51aac40bedbb1105770f9055a29",
+      "recordedAt": "2026-09-24T03:26:56.963956+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/review-c-2026-09-24.md"
+    },
+    {
+      "id": "EV-C-FIX-MAC-20260924",
+      "kind": "platform",
+      "result": "passed",
+      "scope": "实际AppServer/guardian缺收据及关闭中SIGKILL使close共享失败；重开真实SQLite保留unknown/阻断，原样真实收据恢复后对账不重发。实际Electron before-quit警告分支与原四场景通过；dialog只捕获参数，非人工弹窗/其他平台验收。",
+      "commit": "ed9a3ce3a91ef51aac40bedbb1105770f9055a29",
+      "recordedAt": "2026-09-24T03:26:56.963956+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/review-c-2026-09-24.md"
+    },
+    {
+      "id": "EV-C-FIX-MOCK-20260924",
+      "kind": "mock",
+      "result": "passed",
+      "scope": "明确合成确认丢失故障置于真实ProductCore提交之后，实际React/Electron验证创建、跨Thread、同Thread重试与确认后相同内容新意图；命令/数据库实体断言通过。无自动重发、真实Provider或跨窗口持久化。",
+      "commit": "ed9a3ce3a91ef51aac40bedbb1105770f9055a29",
+      "recordedAt": "2026-09-24T03:26:56.963956+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/review-c-2026-09-24.md"
+    },
+    {
+      "id": "EV-C-FIX-REGRESSION-20260924",
+      "kind": "static",
+      "result": "passed",
+      "scope": "严格类型、SSOT60/脚本15/文档5与7类，Pi类型10/A1 15/A2 19+4/A3 12+8/A4 18/Core20/SDK5/Worker48/桌面14及Electron原四场景+审核回归全通过。初始化/干净克隆/发行下载本次未重跑，Gate不晋级。",
+      "commit": "ed9a3ce3a91ef51aac40bedbb1105770f9055a29",
+      "recordedAt": "2026-09-24T03:26:56.963956+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/review-c-2026-09-24.md"
     }
   ]
 }

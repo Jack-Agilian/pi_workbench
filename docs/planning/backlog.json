@@ -80,11 +80,15 @@
             "EV-C-REVIEW-20260923",
             "EV-C-MAC-20260923",
             "EV-C-SYNTHETIC-20260923",
-            "EV-C-REGRESSION-20260923"
+            "EV-C-REGRESSION-20260923",
+            "EV-C-FIX-REVIEW-20260924",
+            "EV-C-FIX-MAC-20260924",
+            "EV-C-FIX-MOCK-20260924",
+            "EV-C-FIX-REGRESSION-20260924"
           ]
         }
       ],
-      "statusReason": "限定C最小macOS桌面已接真实产品/Worker链路；仅无模型合成驱动。完整UI、流式事件、双平台及M0 Gate未完成。"
+      "statusReason": "限定C及C01/C02复审修正通过：异常关闭共享失败、未确认命令身份不跨任务覆盖，实际Electron/产品回归已测；完整UI、跨窗口持久意图、双平台与M0 Gate仍未完成。"
     },
     {
       "id": "BOOT-03",
@@ -199,11 +203,15 @@
             "EV-C-REVIEW-20260923",
             "EV-C-MAC-20260923",
             "EV-C-SYNTHETIC-20260923",
-            "EV-C-REGRESSION-20260923"
+            "EV-C-REGRESSION-20260923",
+            "EV-C-FIX-REVIEW-20260924",
+            "EV-C-FIX-MAC-20260924",
+            "EV-C-FIX-MOCK-20260924",
+            "EV-C-FIX-REGRESSION-20260924"
           ]
         }
       ],
-      "statusReason": "限定C最小macOS桌面已接真实产品/Worker链路；仅无模型合成驱动。完整UI、流式事件、双平台及M0 Gate未完成。"
+      "statusReason": "限定C及C01/C02复审修正通过：异常关闭共享失败、未确认命令身份不跨任务覆盖，实际Electron/产品回归已测；完整UI、跨窗口持久意图、双平台与M0 Gate仍未完成。"
     },
     {
       "id": "BOOT-05",
@@ -611,11 +619,15 @@
             "EV-C-REVIEW-20260923",
             "EV-C-MAC-20260923",
             "EV-C-SYNTHETIC-20260923",
-            "EV-C-REGRESSION-20260923"
+            "EV-C-REGRESSION-20260923",
+            "EV-C-FIX-REVIEW-20260924",
+            "EV-C-FIX-MAC-20260924",
+            "EV-C-FIX-MOCK-20260924",
+            "EV-C-FIX-REGRESSION-20260924"
           ]
         }
       ],
-      "statusReason": "限定C最小macOS桌面已接真实产品/Worker链路；仅无模型合成驱动。完整UI、流式事件、双平台及M0 Gate未完成。"
+      "statusReason": "限定C及C01/C02复审修正通过：异常关闭共享失败、未确认命令身份不跨任务覆盖，实际Electron/产品回归已测；完整UI、跨窗口持久意图、双平台与M0 Gate仍未完成。"
     },
     {
       "id": "SEC-02",
@@ -787,11 +799,15 @@
             "EV-C-REVIEW-20260923",
             "EV-C-MAC-20260923",
             "EV-C-SYNTHETIC-20260923",
-            "EV-C-REGRESSION-20260923"
+            "EV-C-REGRESSION-20260923",
+            "EV-C-FIX-REVIEW-20260924",
+            "EV-C-FIX-MAC-20260924",
+            "EV-C-FIX-MOCK-20260924",
+            "EV-C-FIX-REGRESSION-20260924"
           ]
         }
       ],
-      "statusReason": "限定C最小macOS桌面已接真实产品/Worker链路；仅无模型合成驱动。完整UI、流式事件、双平台及M0 Gate未完成。"
+      "statusReason": "限定C及C01/C02复审修正通过：异常关闭共享失败、未确认命令身份不跨任务覆盖，实际Electron/产品回归已测；完整UI、跨窗口持久意图、双平台与M0 Gate仍未完成。"
     },
     {
       "id": "UI-02",
@@ -831,11 +847,15 @@
             "EV-C-REVIEW-20260923",
             "EV-C-MAC-20260923",
             "EV-C-SYNTHETIC-20260923",
-            "EV-C-REGRESSION-20260923"
+            "EV-C-REGRESSION-20260923",
+            "EV-C-FIX-REVIEW-20260924",
+            "EV-C-FIX-MAC-20260924",
+            "EV-C-FIX-MOCK-20260924",
+            "EV-C-FIX-REGRESSION-20260924"
           ]
         }
       ],
-      "statusReason": "限定C最小macOS桌面已接真实产品/Worker链路；仅无模型合成驱动。完整UI、流式事件、双平台及M0 Gate未完成。"
+      "statusReason": "限定C及C01/C02复审修正通过：异常关闭共享失败、未确认命令身份不跨任务覆盖，实际Electron/产品回归已测；完整UI、跨窗口持久意图、双平台与M0 Gate仍未完成。"
     },
     {
       "id": "GIT-01",
@@ -1434,7 +1454,7 @@
   ],
   "decisionSource": "../ssot/README.md",
   "historicalSource": "../startup/docs/08-delivery-and-references.md",
-  "updatedOn": "2026-09-23",
+  "updatedOn": "2026-09-24",
   "milestones": [
     {
       "id": "M0-UI",
@@ -1448,7 +1468,9 @@
       "prerequisites": [],
       "evidenceRefs": [
         "EV-C-SYNTHETIC-20260923",
-        "EV-C-MAC-20260923"
+        "EV-C-MAC-20260923",
+        "EV-C-FIX-MAC-20260924",
+        "EV-C-FIX-MOCK-20260924"
       ],
       "acceptance": "Mac Mock桌面任务、审批/取消/恢复及真实Markdown文件；不冒充Pi或模型"
     },

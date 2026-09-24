@@ -1,0 +1,422 @@
+{
+  "testedCommit": "ed9a3ce3a91ef51aac40bedbb1105770f9055a29",
+  "recordedAt": "2026-09-24T03:22:04.641690+00:00",
+  "results": [
+    {
+      "command": [
+        "npm",
+        "run",
+        "check:environment"
+      ],
+      "exitCode": 0,
+      "seconds": 0.289,
+      "rawOutputSha256": "e5bf052638bae533d3e2a8ba27b584b7115930409dcdbe7cebae96a7b862096c"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "exitCode": 0,
+      "seconds": 2.196,
+      "rawOutputSha256": "ca27905bae0ff05202f06b1202f21718c69c2a76a72c41f79c5c9dd4c1c13f7b"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-types"
+      ],
+      "exitCode": 0,
+      "seconds": 2.879,
+      "rawOutputSha256": "a6ac0771edda65fb68bbf25249eaac6082fd7494bee1dee98a0be50fb067edd1",
+      "testCount": 10
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-probe"
+      ],
+      "exitCode": 0,
+      "seconds": 0.931,
+      "rawOutputSha256": "72d76663f0d423dc3b1a2888afc6f7991612599772c88b8ff3e0c78f39d11298",
+      "testCount": 15
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-tools"
+      ],
+      "exitCode": 0,
+      "seconds": 1.052,
+      "rawOutputSha256": "ffb555b1e2b3ce260497369053449a82d1bfbc2fb27b522f5f1f3565ac261414",
+      "testCount": 19
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-shell"
+      ],
+      "exitCode": 0,
+      "seconds": 1.205,
+      "rawOutputSha256": "f9f4a05bf006b9529f0a5491668481c5a25a85df88341dc3caef0b3f1e8b26c8",
+      "testCount": 4
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-resources"
+      ],
+      "exitCode": 0,
+      "seconds": 1.105,
+      "rawOutputSha256": "cf8523e32ac72f508e1e5cf74f5fd2fa011cbea8dd17c9da11ba32a61cb12dca",
+      "testCount": 12
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-packages"
+      ],
+      "exitCode": 0,
+      "seconds": 3.641,
+      "rawOutputSha256": "dc2207cd6291bc1adc4f7aa3fa08058b75541cb60557feb0d9b4992bb0831901",
+      "testCount": 8
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-auth"
+      ],
+      "exitCode": 0,
+      "seconds": 0.946,
+      "rawOutputSha256": "146bcfac6a08ef97968ccd050c288dc146c279a93ba1490626bd572fbb25dc8b",
+      "testCount": 18
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:product-core"
+      ],
+      "exitCode": 0,
+      "seconds": 0.711,
+      "rawOutputSha256": "cb6aa9efc0bfbb1176c1870ce0dba71a040480e81ee503fce333e7d4197980b0",
+      "testCount": 20
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:product-sdk"
+      ],
+      "exitCode": 0,
+      "seconds": 1.0,
+      "rawOutputSha256": "dfdede9d4a56c53cc7f4b98f29d1cc677fbd5213dca3675e375e092f22f86d91",
+      "testCount": 5
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:product-worker"
+      ],
+      "exitCode": 0,
+      "seconds": 31.013,
+      "rawOutputSha256": "125e91d5b37eda6f6d1ca3d042a56599dfce37c693d633d4a705536a3712d696",
+      "testCount": 48
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:desktop"
+      ],
+      "exitCode": 0,
+      "seconds": 9.73,
+      "rawOutputSha256": "ddfae23175991d1f473e2a049a7077892d3301ee9a4aa5b0c5339cf5d88b3f90",
+      "testCount": 14
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:desktop-ui"
+      ],
+      "exitCode": 0,
+      "seconds": 12.574,
+      "rawOutputSha256": "8c80315d596e9c1fbf15cb95b07e0687be0144d1a2a5f4626bac2d0327c9aac0",
+      "summary": {
+        "desktopSmoke": "passed",
+        "versions": {
+          "electron": "44.4.5",
+          "chromium": "152.0.7977.130",
+          "node": "24.21.0",
+          "abi": "149"
+        },
+        "platform": "darwin",
+        "arch": "arm64",
+        "scenarios": [
+          {
+            "scenario": "allow",
+            "runId": "486ce908-513c-4e73-9413-93d3b02ad869",
+            "state": "completed",
+            "nativeProjection": 3
+          },
+          {
+            "scenario": "deny",
+            "runId": "f04960b0-88bc-45b0-8c39-e75b1c366e0e",
+            "state": "failed",
+            "nativeProjection": 2
+          },
+          {
+            "scenario": "cancel",
+            "runId": "f2bb8564-f803-4bd9-ae6b-99b8ec1a9e82",
+            "state": "cancelled",
+            "nativeProjection": 2
+          },
+          {
+            "scenario": "crash",
+            "runId": "76785ece-e11d-4183-a666-1d9929840757",
+            "state": "failed",
+            "nativeProjection": 2
+          }
+        ],
+        "reviewRegressions": [
+          "create-ack-loss",
+          "interleaved-thread-ack-loss",
+          "same-thread-retry",
+          "explicit-identical-new-intent",
+          "actual-before-quit-cleanup-failure"
+        ],
+        "realModelCalls": 0
+      }
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/check-ssot.py"
+      ],
+      "exitCode": 0,
+      "seconds": 0.206,
+      "rawOutputSha256": "0062f3ec6d03409863fc70c54a5920822c35259d23c8b761d9c8642ef54724ca"
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/test-tools.py"
+      ],
+      "exitCode": 0,
+      "seconds": 0.13,
+      "rawOutputSha256": "6ef8491ad200eaab54664ac1731ae02e6cdf5581b0a117c2c6ba7ee58504e111"
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/check-docs.py",
+        "--structural-only"
+      ],
+      "exitCode": 0,
+      "seconds": 0.126,
+      "rawOutputSha256": "7140b378a504ae93b120e96e2728e096e558348e46af34a14b5f4ac1c945ba4e"
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/check-docs.py",
+        "--typecheck"
+      ],
+      "exitCode": 0,
+      "seconds": 0.444,
+      "rawOutputSha256": "e35652babbb97f2acee5a1a58b9943e9935b45124c4560b95215ff226127d746"
+    }
+  ],
+  "baseline-host-close": {
+    "node": "v24.21.0",
+    "platform": "darwin",
+    "results": [
+      {
+        "case": "success",
+        "realChild": true,
+        "fixture": {
+          "synthetic": true,
+          "cleanup": true,
+          "requestedExitCode": 0,
+          "mode": "success"
+        },
+        "actualExit": {
+          "code": 0,
+          "signal": null
+        },
+        "closeOutcome": "resolved",
+        "processGone": true,
+        "diagnostic": "normal control"
+      },
+      {
+        "case": "cleanup_failure",
+        "realChild": true,
+        "fixture": {
+          "synthetic": true,
+          "cleanup": false,
+          "requestedExitCode": 1,
+          "mode": "cleanup_failure"
+        },
+        "actualExit": {
+          "code": 1,
+          "signal": null
+        },
+        "closeOutcome": "resolved",
+        "processGone": true,
+        "diagnostic": "C01 reproduced: abnormal termination still returned successful close"
+      },
+      {
+        "case": "killed",
+        "realChild": true,
+        "fixture": {
+          "synthetic": true,
+          "cleanup": false,
+          "requestedExitCode": null,
+          "mode": "killed"
+        },
+        "actualExit": {
+          "code": null,
+          "signal": "SIGKILL"
+        },
+        "closeOutcome": "resolved",
+        "processGone": true,
+        "diagnostic": "C01 reproduced: abnormal termination still returned successful close"
+      }
+    ]
+  },
+  "baseline-renderer-retry": {
+    "node": "v24.21.0",
+    "typeHandling": "native type stripping, not typechecking",
+    "scope": "unmodified handler excerpt; synthetic state and idempotent receiver; no React or ProductCore runtime",
+    "results": [
+      {
+        "case": "same-thread immediate retry control",
+        "requestIds": [
+          "request-1",
+          "request-1"
+        ],
+        "syntheticAcceptedRuns": 1
+      },
+      {
+        "case": "unacknowledged A, successful B, explicit retry A",
+        "requestIds": [
+          {
+            "thread": "thread-A",
+            "id": "request-1"
+          },
+          {
+            "thread": "thread-B",
+            "id": "request-2"
+          },
+          {
+            "thread": "thread-A",
+            "id": "request-3"
+          }
+        ],
+        "syntheticAcceptedRunsInA": 2,
+        "diagnostic": "C02 reproduced: one global retry slot loses A identity"
+      },
+      {
+        "case": "thread create acknowledgement lost then user retries",
+        "requestIds": [
+          "request-1",
+          "request-2"
+        ],
+        "syntheticAcceptedThreads": 2,
+        "diagnostic": "C02 reproduced: createThread allocates new id on each retry"
+      }
+    ]
+  },
+  "baseline": "6410741ff23c5e8fb6ba5596129fad804b393885",
+  "developAtStart": "590c89d1fc1cb905a90cd1277753107296627a31",
+  "branch": "codex/c-minimal-desktop",
+  "environment": {
+    "platform": "darwin",
+    "node": {
+      "version": "24.21.0",
+      "arch": "arm64",
+      "executable": "<repo>/.artifacts/toolchains/node-v24.21.0-darwin-arm64/bin/node"
+    },
+    "macOS": {
+      "exit": 0,
+      "output": "27.0"
+    },
+    "machine": {
+      "exit": 0,
+      "output": "arm64"
+    },
+    "rosetta": {
+      "exit": 0,
+      "output": "0"
+    },
+    "git": {
+      "executable": "/opt/homebrew/bin/git",
+      "exit": 0,
+      "output": "git version 2.55.0"
+    },
+    "python3": {
+      "executable": "/opt/homebrew/bin/python3",
+      "exit": 0,
+      "output": "Python 3.14.7"
+    },
+    "projectPython": {
+      "executable": "<repo>/.venv/bin/python",
+      "exit": 0,
+      "output": "Python 3.14.7"
+    },
+    "npm": {
+      "executable": "<repo>/.artifacts/toolchains/node-v24.21.0-darwin-arm64/bin/npm",
+      "exit": 0,
+      "output": "11.19.0"
+    }
+  },
+  "sourceReview": {
+    "name": "Pi_Workbench_C_Review_6410741",
+    "reviewSha256": "db443ad2dc1382ffa5b4938a82ce4c689a290abfe52d551aabcaf5621495d6f6",
+    "manifestSha256": "86262052c31ea196cac26194dca0a4e46b49bbfbcc1e01a69da225ce6901ba38",
+    "manifestEntriesVerified": 16,
+    "completeGitBlobsVerified": 6,
+    "rendererExcerptMatchedBaselineSubstring": true
+  },
+  "scope": {
+    "actualModelCalls": 0,
+    "faultInputs": "explicitly synthetic; actual OS processes, SQLite, Pi tools and Electron in final regressions",
+    "manualNativeDialog": false,
+    "bootstrapRerun": false,
+    "cleanCloneRerun": false,
+    "dependenciesChanged": false,
+    "startupChanged": false
+  },
+  "codeFiles": [
+    {
+      "path": "apps/desktop/desktop.test.ts",
+      "sha256": "df7c5a0f8c2fd4be54b853953bd1406a3dfc1267f5a09a16b11be30e496231b4"
+    },
+    {
+      "path": "apps/desktop/host-client.ts",
+      "sha256": "c3c14dd99ebfa2ef8e1c85f3188de9cd6bea1b8ba3a40c4c1e6573f0fd656ced"
+    },
+    {
+      "path": "apps/desktop/main.ts",
+      "sha256": "15dacece7b3c9b4249279bd2f1b9eea8dd898cdb9ae35b5f0b07b0d131ad705d"
+    },
+    {
+      "path": "apps/desktop/renderer.tsx",
+      "sha256": "6ee507f43d467decf9508a3e43720b3149a537491693c4f1d1cc7eea6195c07d"
+    },
+    {
+      "path": "apps/desktop/smoke.ts",
+      "sha256": "dad183613dd284ad94f06dc9a07139bf06c3c0e237988695b566fe8465b995b7"
+    }
+  ]
+}

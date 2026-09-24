@@ -83,3 +83,5 @@ B-IPC 的 [持久报告](../validation/b-ipc-2026-09-23.md) 按 SDK、实际 mac
 B-IPC [审核修正](../validation/review-b-ipc-2026-09-23.md) 将原提交的失败复核与修正提交的成功证据分开保存。旧测试通过记录保留，但必须明确未覆盖冷启动和 ready 后首次落盘；历史成果复用不代表当前文件仍存在。新的 schema/IPC 版本与公开类方法采用范围均单列，不将测试数量当作 Gate。
 
 C 的 [桌面记录](../validation/c-desktop-2026-09-23.md) 分开记录完整回归代码 SHA 与仅 Renderer 修订 SHA；后续文档不冒充代码实测。社区片段固定源 commit/MIT，新增直接依赖及 Electron 二进制分别校验。真实本地工具与 SYNTHETIC 消息/IME/故障明确区分；锁屏条件下的程序化 Electron 检查不冒充人工 UI/原生输入法验收，M0 Gate 不自动晋级。
+
+C 的 [审核修正](../validation/review-c-2026-09-24.md) 将原始基线的失败诊断与修正代码的成功回归分开登记。真实宿主退出/清理失败、显式恢复准入和 Renderer 命令身份分别断言；实际提交后丢弃确认的测试不冒充网络故障或模型 fixture。原生 dialog 参数捕获不等于人工弹窗验收，未重跑的初始化/新克隆不得沿用成当前 SHA 的测试。
