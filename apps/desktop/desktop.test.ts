@@ -14,6 +14,7 @@ import { HostClient } from './host-client.ts';
 import { repository } from '../agent-server/worker-launcher.ts';
 import { projectMessages } from '../../packages/pi-adapter/presentation.ts';
 import type { SessionEntry } from '@earendil-works/pi-coding-agent';
+import { digest, parametersDigest } from '../../packages/pi-adapter/controlled-tools.ts';
 const until = async (predicate: () => boolean | Promise<boolean>, label: string) => {
   const end = Date.now() + 15000;
   while (!await predicate()) { if (Date.now() > end) throw new Error(`timeout:${label}`); await new Promise<void>(r => setTimeout(r, 25)); }
@@ -171,6 +172,10 @@ for (const fault of ['missing-receipt', 'killed-during-close'] as const) test(`r
     const proof = JSON.parse(readFileSync(proofPath, 'utf8')) as { exited: boolean; groupGone: boolean; workerPid: number };
     assert.equal(proof.exited, true); assert.equal(proof.groupGone, true);
     assert.throws(() => process.kill(proof.workerPid, 0)); assert.throws(() => process.kill(-proof.workerPid, 0));
+    const audit = new DatabaseSync(join(root, 'host/product.sqlite'), { readOnly: true });
+    const cancellation = audit.prepare('SELECT cancel_requested AS requested FROM worker_launches').get()!.requested;
+    audit.close();
+    if (fault === 'missing-receipt') assert.equal(cancellation, 1);
     reopened = new HostClient(process.execPath, repository, root); await reopened.connect();
     let home = await reopened.request({ type: 'home' }) as DesktopHome;
     snapshot = await reopened.request({ type: 'thread', threadId: thread.id }) as DesktopThread;
@@ -182,7 +187,9 @@ for (const fault of ['missing-receipt', 'killed-during-close'] as const) test(`r
     }
     assert.equal(home.recovery, 'ready');
     snapshot = await reopened.request({ type: 'thread', threadId: thread.id }) as DesktopThread;
-    assert.equal(snapshot.runs[0]!.state, 'failed'); assert.equal(snapshot.runs.length, 1);
+    // SIGKILL may beat the shutdown intent's durable commit. Follow the real audit,
+    // never infer an accepted cancellation from the client-side close call alone.
+    assert.equal(snapshot.runs[0]!.state, cancellation === 1 ? 'cancelled' : 'failed'); assert.equal(snapshot.runs.length, 1);
     assert.equal(snapshot.operations.length, 1); assert.equal(snapshot.artifacts.length, 0);
     assert.equal(existsSync(join(root, 'workspace', snapshot.operations[0]!.artifactPath!)), false);
     assert.deepEqual(await reopened.request({ type: 'command', command: start }), ack);
@@ -193,13 +200,49 @@ test('schema v3 forward migration preserves the pre-Assistant product intent and
   const f = fixture();
   try {
     f.host.core.handle(f.start); const original = f.snapshot(); const native = f.host.core.nativeSessionReference(f.thread);
-    await f.host.close();
+    // Construct an abruptly stopped legacy database with no Worker launched. A graceful
+    // DesktopHost.close now intentionally cancels queued work, which is not this fixture.
+    f.host.core.close();
     const db = new DatabaseSync(join(f.root, 'host/product.sqlite'));
     db.exec('DROP TABLE run_display; PRAGMA user_version=3;'); db.close();
     const reopened = new DesktopHost(f.root);
     try {
       const restored = reopened.request({ type: 'thread', threadId: f.thread }) as DesktopThread;
       assert.deepEqual(restored, original); assert.deepEqual(reopened.core.nativeSessionReference(f.thread), native);
+    } finally { await reopened.close(); }
+  } finally { rmSync(f.root, { recursive: true, force: true }); }
+});
+test('desktop shutdown settles queued work and real fixed descendants without changing existing tool/guardian ownership', async () => {
+  const f = fixture();
+  try {
+    f.host.core.handle(f.start);
+    const args = { path: 'descendants.md', content: '# SYNTHETIC descendants\n' };
+    const entry = join(repository, 'apps/agent-server/tests/worker-fixture.ts');
+    const descendants = join(repository, 'apps/agent-server/tests/descendant-fixture.mjs');
+    const completion = f.host.supervisor.startNext({ tool: 'write', target: args.path, parametersDigest: parametersDigest(args), fileVersion: null,
+      expectedContentDigest: digest(args.content), deadline: Date.now() + 30000 }, { path: entry, extraRead: [entry, descendants], allowFixedChildren: true,
+      args: [JSON.stringify({ mode: 'descendants', database: join(f.root, 'host/product.sqlite'), tool: 'write', args })] });
+    assert.ok(completion);
+    await until(() => f.snapshot().operations.length === 1, 'descendant_approval');
+    const op = f.snapshot().operations[0]!;
+    f.host.supervisor.command({ type: 'approvals.resolve', requestId: 'approve-descendants', operationId: op.id, parametersDigest: op.parametersDigest, decision: 'allow' });
+    const workspace = join(f.root, 'workspace');
+    await until(() => existsSync(join(workspace, '.worker-stage')) && readFileSync(join(workspace, '.worker-stage'), 'utf8') === 'descendants', 'fixed_descendants');
+    f.host.core.handle({ ...f.start, requestId: 'queued' });
+    const pids = [f.host.supervisor.workerPid!, f.host.supervisor.guardianPid!, ...['fixed-parent','fixed-child'].map(role => Number(readFileSync(join(workspace, role + '.pid'), 'utf8')))];
+    const close = f.host.close(); assert.equal(f.host.close(), close); await close; await completion;
+    for (const pid of pids) assert.throws(() => process.kill(pid, 0));
+    assert.equal(existsSync(join(workspace, 'port-denied')), true); assert.equal(existsSync(join(workspace, 'unexpected-port')), false);
+    const heartbeat = ['fixed-parent','fixed-child'].map(role => readFileSync(join(workspace, role + '.heartbeat'), 'utf8'));
+    await new Promise<void>(resolve => setTimeout(resolve, 100));
+    assert.deepEqual(['fixed-parent','fixed-child'].map(role => readFileSync(join(workspace, role + '.heartbeat'), 'utf8')), heartbeat);
+    const reopened = new DesktopHost(f.root);
+    try {
+      const view = reopened.request({ type: 'thread', threadId: f.thread }) as DesktopThread;
+      assert.equal(view.runs.length, 2); assert.ok(view.runs.every(run => run.state === 'cancelled'));
+      assert.equal(view.operations.length, 1); assert.equal(view.operations[0]!.state, 'failed');
+      assert.equal(view.artifacts.length, 0); assert.equal(existsSync(join(workspace, args.path)), false);
+      assert.equal(reopened.core.workerLaunches().length, 1);
     } finally { await reopened.close(); }
   } finally { await f.dispose(); }
 });

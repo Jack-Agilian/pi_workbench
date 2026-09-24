@@ -26,7 +26,7 @@ function App() {
   const draft = drafts[selected] ?? '';
   function failed(error: unknown) {
     const lost = error instanceof Error && error.message.includes('disconnected');
-    setDisconnected(lost); setProblem(lost ? '与执行宿主的连接已断开。重连后先读取持久状态，不会自动重发任务。' : '请求未获确认，请刷新状态后检查。审批可能已过期，任务也可能正在停止。');
+    setDisconnected(lost); setProblem(lost ? '与执行宿主的连接已断开。重新连接会结束尚未完成的任务并保留记录，不会自动重发。' : '请求未获确认，请刷新状态后检查。审批可能已过期，任务也可能正在停止。');
   }
   useEffect(() => {
     let disposed = false;

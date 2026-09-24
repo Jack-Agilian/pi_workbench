@@ -94,6 +94,11 @@ export class HostClient {
     }
     return this.closeResult;
   }
+  /** A failed close remains failed. Only an explicitly created NEW client may take over after this barrier. */
+  async waitForExit(): Promise<void> {
+    if (!this.stopped) throw new Error('host_not_closed');
+    await Promise.all([this.stop(this.connection), this.reconnecting?.catch(() => {})]);
+  }
   private async stop(connection?: Connection): Promise<HostExit | undefined> {
     if (!connection) return;
     if (connection.child.connected) connection.child.disconnect();

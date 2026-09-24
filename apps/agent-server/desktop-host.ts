@@ -1,5 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { randomUUID } from 'node:crypto';
 import { parseDesktopRequest, type DesktopHome, type DesktopValue } from '../../packages/app-contracts/desktop.ts';
 import { displayText } from '../../packages/app-contracts/presentation.ts';
 import { contentId, inspectContent } from '../../packages/pi-adapter/approved-resources.ts';
@@ -80,7 +81,23 @@ export class DesktopHost {
     } catch { this.blocked = true; }
   }
   close(): Promise<void> {
-    if (!this.closeResult) { this.closing = true; this.closeResult = this.supervisor.close().finally(() => this.core.close()); }
+    if (!this.closeResult) {
+      this.closing = true;
+      this.closeResult = (async () => {
+        try {
+          // Closing the owned host ends its queued/active work. Keep every intent and
+          // cancellation in the existing product audit; unknown needs reconciliation.
+          try {
+            for (const thread of this.core.listThreads()) for (const run of this.core.snapshot(thread.id).runs) {
+              if (['queued','starting','running'].includes(run.state)) this.supervisor.command({ type: 'runs.cancel', requestId: randomUUID(), runId: run.id });
+            }
+          } finally { await this.supervisor.close(); }
+          // A stopped process is insufficient: use the original guardian receipts,
+          // Operation/file checks and native references before closing SQLite.
+          this.supervisor.recover();
+        } finally { this.core.close(); }
+      })();
+    }
     return this.closeResult;
   }
 }
