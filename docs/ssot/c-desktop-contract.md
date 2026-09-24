@@ -37,3 +37,5 @@ Electron 44.4.5、React/React DOM 19.3.0、esbuild 0.28.2 和 React 类型 19.3.
 社区准入仅局部移植 pi-gui `0b4cd334942ac01bfc6b3cba736a79984925d8cf` 的 Enter/Shift/IME 防误发送逻辑，增加 legacy 229/repeat 保护，移除上游 steer/followUp。完整 Composer/timeline 与其 SessionDriver 耦合，未整体复制。许可与来源见 [THIRD_PARTY_NOTICES](../../THIRD_PARTY_NOTICES.md)；不能把这段移植称为整个社区工作台已复用。
 
 尚无真实 Provider/模型、系统凭据库、消息流式渲染、扩展 UI、任意工作区选择、文件另存为、完整历史分页、终端、Windows 桌面/执行验证、签名安装和生产通用沙箱。窗口截图与 Electron 程序化断言不等于原生输入法、屏幕阅读器或人工全平台验收。M0 三个 Gate 保持 pending，下一实施增量按 NEXT_STEPS 顶部单列。
+
+后续 [D1 退出契约](d-platform-contract.md) 已补正常宿主关闭时持久取消活动/排队 Run、真实对账后退出，以及关闭失败后在原窗口创建新客户端恢复。C 的共享失败语义保留；D1 是后续增量，不把原 C 测试记录改写为已覆盖正常 Electron 退出矩阵。

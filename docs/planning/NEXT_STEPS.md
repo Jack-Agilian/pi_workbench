@@ -1,16 +1,14 @@
 # 从文档到可运行产品：复用优先
 
-状态：A0–A4 限定无模型探针、B 最小产品核心、B-IPC 真实子进程接缝及 C 最小无模型桌面已限定验证。决策依据：[SSOT](../ssot/README.md)，进程范围与最新证据见 [B-IPC 审核修正报告](../validation/review-b-ipc-2026-09-23.md)。工作项见 [backlog.json](backlog.json)。尚未创建 GitHub Issues。
+状态：A0–A4 限定无模型探针、B 最小产品核心、B-IPC 真实子进程接缝、C 最小无模型桌面及 D1 Mac 退出闭环已限定验证；D 整体仍进行中。决策依据：[SSOT](../ssot/README.md)，最新范围见 [D1 报告](../validation/d-exit-2026-09-24.md)。工作项见 [backlog.json](backlog.json)。尚未创建 GitHub Issues。
 
-## 当前唯一开发项：D 的平台执行竖切（待启动）
+## 当前唯一开发项：D2 的 Shell/PTY 产品接入（下一增量）
 
-B-IPC 及四项审核修正已快进集成 develop（`590c89d`）。C 的最小 Electron/React 桌面已交付到独立功能分支，复用现有 ProductCore、WorkerSupervisor 和受限 Pi 工具链路；详情见 [C 契约](../ssot/c-desktop-contract.md) 与 [真实代码/平台证据](../validation/c-desktop-2026-09-23.md)。安全正文投影、宿主工具卡、审批/取消、真实 Markdown 预览和断连恢复已经有限验证，不再把事件类型标签当聊天正文。
+C 及 C01/C02 修正已按用户授权快进集成 develop（`6bde632`），推送后独立核对远端 SHA。D1 的 Mac 退出闭环已在 `codex/d-platform-execution` 实施并限定验证；范围见 [D 契约](../ssot/d-platform-contract.md) 与 [真实退出/代码证据](../validation/d-exit-2026-09-24.md)。正常关闭会持久取消活动/排队任务，复用真实 guardian 与文件对账；失败保留窗口，实际按钮可重连、核验。12 个真正退出的 Electron 场景、15 项桌面检查及原回归通过，不把 SIGKILL 当正常退出。
 
-下一轮只推进 D：继续 Mac 执行/应用退出闭环，并准备 Windows 中文/空格路径、Shell/PTY 与受管进程清理的最小竖切。复用 Pi Operations 与成熟平台库；在可用 Windows 环境实测前保持未支持/未验证，不以静态路径测试或 Mac 结果代替。终端/平台新依赖须单独核验公开发行与许可，不自动开启市场或真实模型。
+下一轮只推进 D2：把 Shell/PTY 接入既有产品命令、审批、Operation、受限 IPC 和 Pi Operations，核验成熟终端库的发行、许可及 ABI，再做必要的平台适配。Windows 需要真实测试环境；目前尚未确认，不自动安装虚拟机、不以 Mac 或静态路径测试代替。D 整体仍在进行，终端产品接入和 Windows 中文/空格路径、resize、取消、进程清理均不能由 D1 推导。
 
-本轮停止在限定 C；C 功能分支尚未自动合并 develop。正文流式 delta、全历史分页、真实工作区选择和扩展 UI 等 UI 余项仍留在 backlog；这些不是并列的第二个“当前开发项”。M0-UI、M0-SDK、M0-Pi 保持 pending，待完整范围评审；不存在真实账户/模型、签名安装或双平台验收声明。以下 A0–A4/B/C 小节是历史阶段记录，以本栏为唯一当前顺序。
-
-2026-09-24 的 [C 审核复核](../validation/review-c-2026-09-24.md) 确认并修正异常宿主退出被误报关闭成功、跨 Thread/创建命令的未确认身份丢失。14 项桌面检查、实际 Electron 原四场景与新增审核用例及 A/B 回归通过；C01/C02 不再阻塞限定 C。修正保留在原 C 分支等待集成，本轮没有合并 develop 或启动 D。
+本轮停在 D1，D 功能分支尚未自动合并 develop。UI 流式正文、完整历史、真实工作区选择、市场、模型和生产安装仍留在 backlog；它们不是并列的第二个“当前开发项”。M0-UI、M0-SDK、M0-Pi 保持 pending。以下 A0–A4/B/C 小节为历史阶段记录，以本栏为唯一当前顺序。
 
 ## 1. 下一增量不是再造平台
 

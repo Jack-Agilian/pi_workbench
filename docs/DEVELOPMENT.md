@@ -270,3 +270,17 @@ npm run test:desktop-ui
 `test:desktop` 使用独立临时 workspace/profile 和禁网 SDK；`test:desktop-ui` 启动真正 Electron 窗口，走 UI/受限 IPC/真实 Worker 的允许、拒绝、取消、宿主强杀恢复四场景，并检查文本注入、脱敏、文件变化、线程/草稿隔离。测试截图及日志放 `.artifacts/c-desktop/`，临时 profile 在测试后移除。窗口测试可在锁屏下执行，但不能据此声称人工/原生输入法/读屏验收。
 
 源码工具从自身路径定位仓库；在其他 cwd 可使用 `npm --prefix /path/to/checkout run desktop`。独立宿主仍使用项目 Node，Renderer 只接产品 DTO。详细支持范围和消息投影限制见 [C 契约](ssot/c-desktop-contract.md)。没有安装发布工具、全局包或更改系统安全设置。
+
+## D1：Mac 应用退出闭环
+
+沿用上述精确工具链和 Electron 安装，无新依赖：
+
+```bash
+npm run test:desktop-shutdown
+```
+
+该命令在独立中文/空格临时目录逐一启动实际 Electron，覆盖 12 个退出/信号/恢复场景，并在宿主及受管进程退出后只读核查测试库。成功场景清理测试目录；失败会保留受管理临时证据位置到 `.artifacts/desktop-shutdown/`，不会删除尚未核验的进程证据。所有任务/故障是明确合成输入，真实模型调用为零。
+
+关闭窗口或终止桌面会持久取消仍由该宿主拥有的活动/排队任务，核对真实清理和文件证据后才完成退出。证据不足保留窗口；可选择“重新连接”读取旧审计，再“核验并恢复”。重连不是忽略 unknown 的强制继续按钮。旧宿主已强杀时，以实际持久状态为准，不能推定它收到过关闭请求。
+
+现有 `test:desktop` 增至 15 项，包含固定父/子进程退出与心跳检查；`test:desktop-ui` 保留 C 四场景与审核回归。平台限制、正常退出与 SIGKILL 的区别见 [D 契约](ssot/d-platform-contract.md) 和 [被测 SHA/结果](validation/d-exit-2026-09-24.md)。本增量没有 Shell/PTY 产品接入或 Windows 实测。

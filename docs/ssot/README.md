@@ -73,3 +73,7 @@ python scripts/test-tools.py
 ## C 审核修正：2026-09-24
 
 [复核与修正证据](../validation/review-c-2026-09-24.md) 保留基线 `6410741` 的两项反例，修正异常宿主关闭结果和按命令意图保留重试身份。14 项桌面检查、实际 Electron 四场景及新增确认丢失/关闭失败用例与前序回归通过。旧 12 项不覆盖这两个缺口；相关任务保持 in_progress，三个 M0 Gate pending。没有新增依赖、合并 develop 或启动 D。
+
+## D1 Mac 退出闭环：2026-09-24
+
+C 及修正随后已按用户授权集成 develop（`6bde632`），D 分支从该基线创建。[D 契约](d-platform-contract.md) · [实际代码/退出证据](../validation/d-exit-2026-09-24.md) · [命令摘要](../validation/d-exit-inputs.json)。12 个真实 Electron 退出场景、15 项桌面检查和原回归通过；复用产品取消/对账及 guardian，缺证据仍 unknown/blocked，并保留原窗口的显式恢复路径。D1 完成有限范围，D 整体仍进行中；下一增量是 D2 Shell/PTY 产品接入，Windows 环境尚未确认，三个 M0 Gate pending。

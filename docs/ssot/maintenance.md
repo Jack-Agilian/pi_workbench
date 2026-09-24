@@ -85,3 +85,5 @@ B-IPC [审核修正](../validation/review-b-ipc-2026-09-23.md) 将原提交的�
 C 的 [桌面记录](../validation/c-desktop-2026-09-23.md) 分开记录完整回归代码 SHA 与仅 Renderer 修订 SHA；后续文档不冒充代码实测。社区片段固定源 commit/MIT，新增直接依赖及 Electron 二进制分别校验。真实本地工具与 SYNTHETIC 消息/IME/故障明确区分；锁屏条件下的程序化 Electron 检查不冒充人工 UI/原生输入法验收，M0 Gate 不自动晋级。
 
 C 的 [审核修正](../validation/review-c-2026-09-24.md) 将原始基线的失败诊断与修正代码的成功回归分开登记。真实宿主退出/清理失败、显式恢复准入和 Renderer 命令身份分别断言；实际提交后丢弃确认的测试不冒充网络故障或模型 fixture。原生 dialog 参数捕获不等于人工弹窗验收，未重跑的初始化/新克隆不得沿用成当前 SHA 的测试。
+
+D1 的 [退出记录](../validation/d-exit-2026-09-24.md) 将实际 Electron 正常退出、SIGKILL、真实收据与对账、固定后代及合成故障分别说明。Mac 中文目录不是 Windows 证据，正常代码 0 不是任意后代清理证明；D1 通过不完成整个 D、BOOT-05/终端或 M0 Gate。

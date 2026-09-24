@@ -879,7 +879,7 @@
       ],
       "upstreamSymbolsOrPaths": [],
       "reuse": "复用Pi原生任务执行，不重写",
-      "productDelta": "ProductCore持久Run/Operation/Approval、v2启动日志及v3原生落盘标记；Supervisor冷恢复先失效旧epoch授权，再按清理证据结算；C沿用同一核心，v4仅增有限展示缓存",
+      "productDelta": "ProductCore持久Run/Operation/Approval、v2启动日志及v3原生落盘标记；Supervisor冷恢复先失效旧epoch授权，再按清理证据结算；C沿用同一核心，v4仅增有限展示缓存；D1复用产品取消与既有恢复，在宿主关闭时结算活动/排队工作并保留审计",
       "acceptanceGate": "幂等/绑定/取消/unknown；P0同Workspace写Run串行并覆盖等待审批与清理阶段",
       "implementationState": "in_progress",
       "adoption": {
@@ -902,7 +902,11 @@
           "EV-REVIEW-B-IPC-REGRESSION-20260923",
           "EV-C-SDK-20260923",
           "EV-C-MAC-20260923",
-          "EV-C-REGRESSION-20260923"
+          "EV-C-REGRESSION-20260923",
+          "EV-D1-REVIEW-20260924",
+          "EV-D1-MAC-20260924",
+          "EV-D1-SYNTHETIC-20260924",
+          "EV-D1-REGRESSION-20260924"
         ]
       }
     },
@@ -972,7 +976,7 @@
         "esbuild build"
       ],
       "reuse": "Electron公开窗口/沙盒/IPC，React渲染和esbuild构建；复用既有产品与Pi Worker链路",
-      "productDelta": "闭合产品桥、Thread/Run视图、审批/取消/成果与有界纯文本投影；显式无模型驱动；关闭结果/重连接管分离，未确认命令按意图保留身份并显式重试",
+      "productDelta": "闭合产品桥、Thread/Run视图、审批/取消/成果与有界纯文本投影；显式无模型驱动；关闭结果/重连接管分离，未确认命令按意图保留身份并显式重试；D1正常退出/信号统一结算，关闭失败后原窗口显式恢复，候选新宿主不迟到发布",
       "acceptanceGate": "真实桌面进程/来源/CSP、Thread隔离、审批/取消/恢复；平台/模型/Gate分别验收；确认丢失/交错重试、异常关闭与受证据约束的恢复",
       "implementationState": "in_progress",
       "adoption": {
@@ -1075,7 +1079,11 @@
           "EV-C-FIX-REVIEW-20260924",
           "EV-C-FIX-MAC-20260924",
           "EV-C-FIX-MOCK-20260924",
-          "EV-C-FIX-REGRESSION-20260924"
+          "EV-C-FIX-REGRESSION-20260924",
+          "EV-D1-REVIEW-20260924",
+          "EV-D1-MAC-20260924",
+          "EV-D1-SYNTHETIC-20260924",
+          "EV-D1-REGRESSION-20260924"
         ]
       }
     }
@@ -1740,6 +1748,54 @@
         "darwin"
       ],
       "locator": "docs/validation/review-c-2026-09-24.md"
+    },
+    {
+      "id": "EV-D1-REVIEW-20260924",
+      "kind": "review",
+      "result": "passed",
+      "scope": "复用既有ProductCore取消/对账、Supervisor与guardian；只补桌面关闭/恢复，候选实例关闭屏障，Electron公开退出事件；无新依赖/schema/Worker协议/Renderer权限。D1范围通过，Shell/PTY和Windows待下一增量。",
+      "commit": "7d10f3cd600ec5b75417f4203995d8c0aa4155f7",
+      "recordedAt": "2026-09-24T03:58:36.888080+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/d-exit-2026-09-24.md"
+    },
+    {
+      "id": "EV-D1-MAC-20260924",
+      "kind": "platform",
+      "result": "passed",
+      "scope": "Mac arm64实际Electron 12退出场景、Node宿主/Worker/guardian PID和进程组、真实清理收据、退出后只读SQLite/文件核验；固定parent/child心跳停止及监听被OS拒绝。SIGKILL明确异常，不推导恶意后代/开放端口/Windows/人工输入法。",
+      "commit": "7d10f3cd600ec5b75417f4203995d8c0aa4155f7",
+      "recordedAt": "2026-09-24T03:58:36.888080+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/d-exit-2026-09-24.md"
+    },
+    {
+      "id": "EV-D1-SYNTHETIC-20260924",
+      "kind": "mock",
+      "result": "passed",
+      "scope": "明确合成输入与故障置于真实产品链路：缺正式收据、第三种文件版本保留unknown/blocked，实际按钮显式重连/核验后才能正常退出；候选Node SIGSTOP/CONT制造关闭竞态。无真实模型，不把恢复测试动作当产品自动修复。",
+      "commit": "7d10f3cd600ec5b75417f4203995d8c0aa4155f7",
+      "recordedAt": "2026-09-24T03:58:36.888080+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/d-exit-2026-09-24.md"
+    },
+    {
+      "id": "EV-D1-REGRESSION-20260924",
+      "kind": "static",
+      "result": "passed",
+      "scope": "严格类型及Pi类型10/A1 15/A2 19+4/A3 12+8/A4 18/Core20/SDK5/Worker48/桌面15、实际C四场景+审核用例、D退出12场景全通过；SSOT60/脚本15/文档5与7类。初始化/发行/新克隆未重跑，M0 Gate仍pending。",
+      "commit": "7d10f3cd600ec5b75417f4203995d8c0aa4155f7",
+      "recordedAt": "2026-09-24T03:58:36.888080+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/d-exit-2026-09-24.md"
     }
   ]
 }

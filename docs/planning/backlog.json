@@ -38,11 +38,15 @@
             "EV-B-IPC-REVIEW-20260923",
             "EV-REVIEW-B-IPC-DECISIONS-20260923",
             "EV-C-SDK-20260923",
-            "EV-C-MAC-20260923"
+            "EV-C-MAC-20260923",
+            "EV-D1-REVIEW-20260924",
+            "EV-D1-MAC-20260924",
+            "EV-D1-SYNTHETIC-20260924",
+            "EV-D1-REGRESSION-20260924"
           ]
         }
       ],
-      "statusReason": "B-IPC已集成develop，C限定桌面及社区局部移植已记录来源/证据；下一项D平台执行竖切尚未开始。"
+      "statusReason": "C已按授权集成develop；D1 Mac正常退出、取消结算、证据不足保留窗口及显式恢复通过。仅限定退出/恢复增量，下一项D2 Shell/PTY产品接入；Windows环境未确认、完整任务范围与M0 Gate未完成。"
     },
     {
       "id": "BOOT-02",
@@ -84,11 +88,15 @@
             "EV-C-FIX-REVIEW-20260924",
             "EV-C-FIX-MAC-20260924",
             "EV-C-FIX-MOCK-20260924",
-            "EV-C-FIX-REGRESSION-20260924"
+            "EV-C-FIX-REGRESSION-20260924",
+            "EV-D1-REVIEW-20260924",
+            "EV-D1-MAC-20260924",
+            "EV-D1-SYNTHETIC-20260924",
+            "EV-D1-REGRESSION-20260924"
           ]
         }
       ],
-      "statusReason": "限定C及C01/C02复审修正通过：异常关闭共享失败、未确认命令身份不跨任务覆盖，实际Electron/产品回归已测；完整UI、跨窗口持久意图、双平台与M0 Gate仍未完成。"
+      "statusReason": "C已按授权集成develop；D1 Mac正常退出、取消结算、证据不足保留窗口及显式恢复通过。仅限定退出/恢复增量，下一项D2 Shell/PTY产品接入；Windows环境未确认、完整任务范围与M0 Gate未完成。"
     },
     {
       "id": "BOOT-03",
@@ -207,11 +215,15 @@
             "EV-C-FIX-REVIEW-20260924",
             "EV-C-FIX-MAC-20260924",
             "EV-C-FIX-MOCK-20260924",
-            "EV-C-FIX-REGRESSION-20260924"
+            "EV-C-FIX-REGRESSION-20260924",
+            "EV-D1-REVIEW-20260924",
+            "EV-D1-MAC-20260924",
+            "EV-D1-SYNTHETIC-20260924",
+            "EV-D1-REGRESSION-20260924"
           ]
         }
       ],
-      "statusReason": "限定C及C01/C02复审修正通过：异常关闭共享失败、未确认命令身份不跨任务覆盖，实际Electron/产品回归已测；完整UI、跨窗口持久意图、双平台与M0 Gate仍未完成。"
+      "statusReason": "C已按授权集成develop；D1 Mac正常退出、取消结算、证据不足保留窗口及显式恢复通过。仅限定退出/恢复增量，下一项D2 Shell/PTY产品接入；Windows环境未确认、完整任务范围与M0 Gate未完成。"
     },
     {
       "id": "BOOT-05",
@@ -449,7 +461,11 @@
             "EV-B-IPC-MAC-20260923",
             "EV-REVIEW-B-IPC-MAC-20260923",
             "EV-C-SDK-20260923",
-            "EV-C-MAC-20260923"
+            "EV-C-MAC-20260923",
+            "EV-D1-REVIEW-20260924",
+            "EV-D1-MAC-20260924",
+            "EV-D1-SYNTHETIC-20260924",
+            "EV-D1-REGRESSION-20260924"
           ]
         },
         {
@@ -508,7 +524,7 @@
           ]
         }
       ],
-      "statusReason": "缺清理收据的冷恢复撤销pending/approved、执行不确定标unknown，仍占全局名额；已登记成果变化可对账，未知副作用不重发，通用调度/UI未完成。"
+      "statusReason": "C已按授权集成develop；D1 Mac正常退出、取消结算、证据不足保留窗口及显式恢复通过。仅限定退出/恢复增量，下一项D2 Shell/PTY产品接入；Windows环境未确认、完整任务范围与M0 Gate未完成。"
     },
     {
       "id": "CORE-04",
@@ -623,11 +639,15 @@
             "EV-C-FIX-REVIEW-20260924",
             "EV-C-FIX-MAC-20260924",
             "EV-C-FIX-MOCK-20260924",
-            "EV-C-FIX-REGRESSION-20260924"
+            "EV-C-FIX-REGRESSION-20260924",
+            "EV-D1-REVIEW-20260924",
+            "EV-D1-MAC-20260924",
+            "EV-D1-SYNTHETIC-20260924",
+            "EV-D1-REGRESSION-20260924"
           ]
         }
       ],
-      "statusReason": "限定C及C01/C02复审修正通过：异常关闭共享失败、未确认命令身份不跨任务覆盖，实际Electron/产品回归已测；完整UI、跨窗口持久意图、双平台与M0 Gate仍未完成。"
+      "statusReason": "C已按授权集成develop；D1 Mac正常退出、取消结算、证据不足保留窗口及显式恢复通过。仅限定退出/恢复增量，下一项D2 Shell/PTY产品接入；Windows环境未确认、完整任务范围与M0 Gate未完成。"
     },
     {
       "id": "SEC-02",
@@ -803,11 +823,15 @@
             "EV-C-FIX-REVIEW-20260924",
             "EV-C-FIX-MAC-20260924",
             "EV-C-FIX-MOCK-20260924",
-            "EV-C-FIX-REGRESSION-20260924"
+            "EV-C-FIX-REGRESSION-20260924",
+            "EV-D1-REVIEW-20260924",
+            "EV-D1-MAC-20260924",
+            "EV-D1-SYNTHETIC-20260924",
+            "EV-D1-REGRESSION-20260924"
           ]
         }
       ],
-      "statusReason": "限定C及C01/C02复审修正通过：异常关闭共享失败、未确认命令身份不跨任务覆盖，实际Electron/产品回归已测；完整UI、跨窗口持久意图、双平台与M0 Gate仍未完成。"
+      "statusReason": "C已按授权集成develop；D1 Mac正常退出、取消结算、证据不足保留窗口及显式恢复通过。仅限定退出/恢复增量，下一项D2 Shell/PTY产品接入；Windows环境未确认、完整任务范围与M0 Gate未完成。"
     },
     {
       "id": "UI-02",
@@ -851,11 +875,15 @@
             "EV-C-FIX-REVIEW-20260924",
             "EV-C-FIX-MAC-20260924",
             "EV-C-FIX-MOCK-20260924",
-            "EV-C-FIX-REGRESSION-20260924"
+            "EV-C-FIX-REGRESSION-20260924",
+            "EV-D1-REVIEW-20260924",
+            "EV-D1-MAC-20260924",
+            "EV-D1-SYNTHETIC-20260924",
+            "EV-D1-REGRESSION-20260924"
           ]
         }
       ],
-      "statusReason": "限定C及C01/C02复审修正通过：异常关闭共享失败、未确认命令身份不跨任务覆盖，实际Electron/产品回归已测；完整UI、跨窗口持久意图、双平台与M0 Gate仍未完成。"
+      "statusReason": "C已按授权集成develop；D1 Mac正常退出、取消结算、证据不足保留窗口及显式恢复通过。仅限定退出/恢复增量，下一项D2 Shell/PTY产品接入；Windows环境未确认、完整任务范围与M0 Gate未完成。"
     },
     {
       "id": "GIT-01",
@@ -1470,7 +1498,9 @@
         "EV-C-SYNTHETIC-20260923",
         "EV-C-MAC-20260923",
         "EV-C-FIX-MAC-20260924",
-        "EV-C-FIX-MOCK-20260924"
+        "EV-C-FIX-MOCK-20260924",
+        "EV-D1-MAC-20260924",
+        "EV-D1-SYNTHETIC-20260924"
       ],
       "acceptance": "Mac Mock桌面任务、审批/取消/恢复及真实Markdown文件；不冒充Pi或模型"
     },

@@ -46,6 +46,8 @@ A4 阶段复审：[A4 审核 F01–F03 修正及回归](validation/review-a4-202
 
 B-IPC 阶段：[审核修正与回归](validation/review-b-ipc-2026-09-23.md) · [原阶段进程证据](validation/b-ipc-2026-09-23.md) · [进程契约](ssot/b-worker-contract.md)。限定 B-IPC 已通过，该阶段的下一步为 C；后续 C 实施见下方。
 
-当前 C：[最小桌面验证](validation/c-desktop-2026-09-23.md) · [桌面/展示契约](ssot/c-desktop-contract.md) · [发行和命令摘要](validation/c-desktop-inputs.json)。Electron/React 已连既有产品和 Worker 链路，支持明确合成的审批/取消/恢复与真实 Markdown。下一项为 D 平台执行竖切，尚未启动；三个 M0 Gate 仍 pending。
+C 阶段：[最小桌面验证](validation/c-desktop-2026-09-23.md) · [桌面/展示契约](ssot/c-desktop-contract.md) · [发行和命令摘要](validation/c-desktop-inputs.json)。Electron/React 已连既有产品和 Worker 链路，支持明确合成的审批/取消/恢复与真实 Markdown。后续 C 修正与 D1 进展见下方，三个 M0 Gate 仍 pending。
 
-C 最新修正：[C01/C02 审核复核](validation/review-c-2026-09-24.md) · [输入摘要](validation/review-c-inputs.json)。异常关闭失败与跨任务未确认命令身份已补齐，实际 Electron 和前序回归通过；仍在原 C 功能分支，未自动合并。
+C 修正：[C01/C02 审核复核](validation/review-c-2026-09-24.md) · [输入摘要](validation/review-c-inputs.json)。异常关闭失败与跨任务未确认命令身份已补齐，实际 Electron 和前序回归通过；其后按用户授权快进合入 develop（`6bde632`）。
+
+当前 D1：[Mac 退出验证](validation/d-exit-2026-09-24.md) · [平台契约](ssot/d-platform-contract.md) · [输入摘要](validation/d-exit-inputs.json)。正常退出结算和失败后的窗口内恢复已限定通过，D 分支待集成；唯一下一增量为 D2 Shell/PTY 产品接入。Windows 尚未实测，D 整体与三个 M0 Gate 未完成。
