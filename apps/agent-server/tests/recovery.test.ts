@@ -151,3 +151,10 @@ test('schema v2 migration preserves existing native reference as known persisted
   f.reopen(); assert.deepEqual(f.core.nativeSessionReference(f.thread), native);
   const read = new DatabaseSync(f.database, { readOnly: true }); assert.equal(read.prepare('PRAGMA user_version').get()?.user_version, 5); read.close();
 });
+test('schema v4 upgrade adds Shell projection without changing existing file audit', async t => {
+  const f = createScenario(); t.after(f.dispose); const done = f.start(); await f.approval(); await done;
+  const before = f.core.snapshot(f.thread); const inputs = f.core.runInputs(f.thread); f.core.close();
+  const previous = new DatabaseSync(f.database); previous.exec('DROP TABLE shell_display; PRAGMA user_version=4;'); previous.close();
+  f.reopen(); assert.deepEqual(f.core.snapshot(f.thread), before); assert.deepEqual(f.core.runInputs(f.thread), inputs);
+  const read = new DatabaseSync(f.database, { readOnly: true }); assert.equal(read.prepare('PRAGMA user_version').get()?.user_version, 5); assert.equal(read.prepare('SELECT count(*) AS count FROM shell_display').get()?.count, 0); read.close();
+});
