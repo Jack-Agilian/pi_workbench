@@ -567,7 +567,7 @@
         "PowerShellOperations"
       ],
       "reuse": "保留Shell语义和工具结果",
-      "productDelta": "受管进程与OS策略",
+      "productDelta": "限定Mac非交互Bash接产品审批/Operation/IPC；公开Operations委托原guardian监督独立Shell组、空凭据/禁网OS限制、有界完成输出和持久收据，不复用文件摘要推导命令副作用",
       "acceptanceGate": "保留定义/增量/取消；绑定操作、中文路径和受管理进程停止核验；残留可见",
       "implementationState": "in_progress",
       "adoption": {
@@ -598,7 +598,12 @@
         "testEvidence": [
           "EV-A2-INPUTS-20260922",
           "EV-A2-SDK-20260922",
-          "EV-A2-MAC-SHELL-20260922"
+          "EV-A2-MAC-SHELL-20260922",
+          "EV-D2S-REVIEW-20260928",
+          "EV-D2S-SDK-20260928",
+          "EV-D2S-MAC-20260928",
+          "EV-D2S-REGRESSION-20260928",
+          "EV-D2S-V4-20260928"
         ]
       }
     },
@@ -879,7 +884,7 @@
       ],
       "upstreamSymbolsOrPaths": [],
       "reuse": "复用Pi原生任务执行，不重写",
-      "productDelta": "ProductCore持久Run/Operation/Approval、v2启动日志及v3原生落盘标记；Supervisor冷恢复先失效旧epoch授权，再按清理证据结算；C沿用同一核心，v4仅增有限展示缓存；D1复用产品取消与既有恢复，在宿主关闭时结算活动/排队工作并保留审计",
+      "productDelta": "ProductCore持久Run/Operation/Approval、v2启动日志及v3原生落盘标记；Supervisor冷恢复先失效旧epoch授权，再按清理证据结算；C沿用同一核心，v4仅增有限展示缓存；D1复用产品取消与既有恢复，在宿主关闭时结算活动/排队工作并保留审计；D2-S SQL v5增加Shell意图/结果投影，取消与命令副作用分开，崩溃只对账原Operation",
       "acceptanceGate": "幂等/绑定/取消/unknown；P0同Workspace写Run串行并覆盖等待审批与清理阶段",
       "implementationState": "in_progress",
       "adoption": {
@@ -909,7 +914,12 @@
           "EV-D1-REGRESSION-20260924",
           "EV-D1-REREVIEW-20260928",
           "EV-D1-RECHECK-MAC-20260928",
-          "EV-D1-RECHECK-MOCK-20260928"
+          "EV-D1-RECHECK-MOCK-20260928",
+          "EV-D2S-REVIEW-20260928",
+          "EV-D2S-SDK-20260928",
+          "EV-D2S-MAC-20260928",
+          "EV-D2S-REGRESSION-20260928",
+          "EV-D2S-V4-20260928"
         ]
       }
     },
@@ -979,7 +989,7 @@
         "esbuild build"
       ],
       "reuse": "Electron公开窗口/沙盒/IPC，React渲染和esbuild构建；复用既有产品与Pi Worker链路",
-      "productDelta": "闭合产品桥、Thread/Run视图、审批/取消/成果与有界纯文本投影；显式无模型驱动；关闭结果/重连接管分离，未确认命令按意图保留身份并显式重试；D1正常退出/信号统一结算，关闭失败后原窗口显式恢复，候选新宿主不迟到发布",
+      "productDelta": "闭合产品桥、Thread/Run视图、审批/取消/成果与有界纯文本投影；显式无模型驱动；关闭结果/重连接管分离，未确认命令按意图保留身份并显式重试；D1正常退出/信号统一结算，关闭失败后原窗口显式恢复，候选新宿主不迟到发布；D2-S展示固定命令审批/profile/期限及stdout/stderr有界完成快照，交互终端尚未接入",
       "acceptanceGate": "真实桌面进程/来源/CSP、Thread隔离、审批/取消/恢复；平台/模型/Gate分别验收；确认丢失/交错重试、异常关闭与受证据约束的恢复",
       "implementationState": "in_progress",
       "adoption": {
@@ -1089,7 +1099,12 @@
           "EV-D1-REGRESSION-20260924",
           "EV-D1-REREVIEW-20260928",
           "EV-D1-RECHECK-MAC-20260928",
-          "EV-D1-RECHECK-MOCK-20260928"
+          "EV-D1-RECHECK-MOCK-20260928",
+          "EV-D2S-REVIEW-20260928",
+          "EV-D2S-SDK-20260928",
+          "EV-D2S-MAC-20260928",
+          "EV-D2S-REGRESSION-20260928",
+          "EV-D2S-V4-20260928"
         ]
       }
     }
@@ -1838,6 +1853,66 @@
         "darwin"
       ],
       "locator": "docs/validation/review-d1-2026-09-28.md"
+    },
+    {
+      "id": "EV-D2S-REVIEW-20260928",
+      "kind": "review",
+      "result": "passed",
+      "scope": "限定D2-S复用Pi Bash ToolDefinition/Operations与原产品/guardian；独立Bash组和单次宿主批准执行，无新依赖/无任意Renderer命令/无终端。SQL v5、IPC v4与限制见报告。",
+      "commit": "f0f23fc871479c7f8a7fce68dfba776472520e02",
+      "recordedAt": "2026-09-28T08:33:05.971997+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/d2-shell-2026-09-28.md"
+    },
+    {
+      "id": "EV-D2S-SDK-20260928",
+      "kind": "sdk",
+      "result": "passed",
+      "scope": "实际Pi0.87.0注册bash工具通过公开Operations接既有Worker/产品审批；18项Shell检查中实际工具执行与合成协议生产者明确区分，零Provider调用。",
+      "commit": "f0f23fc871479c7f8a7fce68dfba776472520e02",
+      "recordedAt": "2026-09-28T08:33:05.971997+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/d2-shell-2026-09-28.md"
+    },
+    {
+      "id": "EV-D2S-MAC-20260928",
+      "kind": "platform",
+      "result": "passed",
+      "scope": "Mac arm64真实Bash/独立组、固定后代、OS数据库/资源/收据拒绝和loopback拒绝；真实宿主SIGKILL/结果丢失重开库，Electron Shell三场景及18个退出场景。非任意恶意进程/PTY/Windows证明。",
+      "commit": "f0f23fc871479c7f8a7fce68dfba776472520e02",
+      "recordedAt": "2026-09-28T08:33:05.971997+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/d2-shell-2026-09-28.md"
+    },
+    {
+      "id": "EV-D2S-REGRESSION-20260928",
+      "kind": "static",
+      "result": "passed",
+      "scope": "f0f23fc上25命令全通过：类型、A1-A4、Core20/SDK5/Worker49/Shell18/桌面15、旧UI、新Shell UI、退出18、四CLI、SSOT60/脚本15/文档5及7。未重跑初始化/新克隆/发行下载。",
+      "commit": "f0f23fc871479c7f8a7fce68dfba776472520e02",
+      "recordedAt": "2026-09-28T08:33:05.971997+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/d2-shell-2026-09-28.md"
+    },
+    {
+      "id": "EV-D2S-V4-20260928",
+      "kind": "static",
+      "result": "passed",
+      "scope": "补充v4实际SQLite升级到v5且完整文件审计快照/输入不变；本提交仅新增测试，Worker50及类型通过，其余命令在前一代码SHA。",
+      "commit": "7a43b02ae72ea0501fc14ca987c54a3c15049a33",
+      "recordedAt": "2026-09-28T08:33:05.971997+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/d2-shell-2026-09-28.md"
     }
   ]
 }

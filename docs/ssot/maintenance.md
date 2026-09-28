@@ -87,3 +87,5 @@ C 的 [桌面记录](../validation/c-desktop-2026-09-23.md) 分开记录完整�
 C 的 [审核修正](../validation/review-c-2026-09-24.md) 将原始基线的失败诊断与修正代码的成功回归分开登记。真实宿主退出/清理失败、显式恢复准入和 Renderer 命令身份分别断言；实际提交后丢弃确认的测试不冒充网络故障或模型 fixture。原生 dialog 参数捕获不等于人工弹窗验收，未重跑的初始化/新克隆不得沿用成当前 SHA 的测试。
 
 D1 的 [退出记录](../validation/d-exit-2026-09-24.md) 将实际 Electron 正常退出、SIGKILL、真实收据与对账、固定后代及合成故障分别说明。Mac 中文目录不是 Windows 证据，正常代码 0 不是任意后代清理证明；D1 通过不完成整个 D、BOOT-05/终端或 M0 Gate。
+
+D2-S 的 [Shell 记录](../validation/d2-shell-2026-09-28.md) 将完整回归实现 SHA 与仅补 v4 迁移测试 SHA 分开登记。命令退出、组清理、外部副作用、成果和 bounded 输出各自核验，CLI crash 驱动退出 0 不等于产品 Run 成功；D2-S 不自动完成交互终端、Windows 或 M0 Gate。

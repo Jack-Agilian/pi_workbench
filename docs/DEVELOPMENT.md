@@ -284,3 +284,20 @@ npm run test:desktop-shutdown
 关闭窗口或终止桌面会持久取消仍由该宿主拥有的活动/排队任务，核对真实清理和文件证据后才完成退出。证据不足保留窗口；可选择“重新连接”读取旧审计，再“核验并恢复”。重连不是忽略 unknown 的强制继续按钮。旧宿主已强杀时，以实际持久状态为准，不能推定它收到过关闭请求。
 
 现有 `test:desktop` 增至 15 项，包含固定父/子进程退出与心跳检查；`test:desktop-ui` 保留 C 四场景与审核回归。平台限制、正常退出与 SIGKILL 的区别见 [D 契约](ssot/d-platform-contract.md) 和 [被测 SHA/结果](validation/d-exit-2026-09-24.md)。本增量没有 Shell/PTY 产品接入或 Windows 实测。
+
+
+## D2-S 非交互 Shell
+
+沿用项目 Node/Pi 与唯一锁文件，无需新增依赖。`npm run desktop` 中创建任务后可使用“填入只读命令演示”或“填入可停止命令演示”，检查命令/profile/截止时间后批准。只提供两个固定演示，不将输入当作自由 Shell；执行、超时和文件副作用状态分别显示。
+
+```bash
+npm run test:product-shell
+npm run test:desktop-shell
+npm run test:desktop-shutdown
+npm run demo:product-shell -- allow
+npm run demo:product-shell -- deny
+npm run demo:product-shell -- cancel
+npm run demo:product-shell -- crash
+```
+
+CLI 演示将审计/profile 留在 `.artifacts/shell-demos/`；crash 演示故意保留 unknown/blocked，不自动重发或宣称正常关闭。测试禁真实账户/模型，使用受管临时目录。实际 SHA、故障范围、每项命令与失败修正见 [D2-S 报告](validation/d2-shell-2026-09-28.md)。Shell 完成输出为有界快照，不是交互终端；D2-T/Windows/生产发行未完成。

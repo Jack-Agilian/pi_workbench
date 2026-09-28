@@ -95,11 +95,16 @@
             "EV-D1-REGRESSION-20260924",
             "EV-D1-REREVIEW-20260928",
             "EV-D1-RECHECK-MAC-20260928",
-            "EV-D1-RECHECK-MOCK-20260928"
+            "EV-D1-RECHECK-MOCK-20260928",
+            "EV-D2S-REVIEW-20260928",
+            "EV-D2S-SDK-20260928",
+            "EV-D2S-MAC-20260928",
+            "EV-D2S-REGRESSION-20260928",
+            "EV-D2S-V4-20260928"
           ]
         }
       ],
-      "statusReason": "C已按授权集成develop；D1 Mac正常退出、取消结算、证据不足保留窗口及显式恢复通过。仅限定退出/恢复增量，下一项D2 Shell/PTY产品接入；Windows环境未确认、完整任务范围与M0 Gate未完成。 2026-09-28 D1复审未发现新增阻断，Mac退出矩阵重跑通过；仅文档维护，尚未合并或推进D2。"
+      "statusReason": "C已按授权集成develop；D1 Mac正常退出、取消结算、证据不足保留窗口及显式恢复通过。仅限定退出/恢复增量，下一项D2 Shell/PTY产品接入；Windows环境未确认、完整任务范围与M0 Gate未完成。 2026-09-28 D1复审未发现新增阻断，Mac退出矩阵重跑通过；仅文档维护，尚未合并或推进D2。 D2-S限定Mac非交互Bash产品链路通过；独立组/命令结果与副作用分开，D2-T、Windows及完整Gate仍未完成。"
     },
     {
       "id": "BOOT-03",
@@ -468,7 +473,12 @@
             "EV-D1-REVIEW-20260924",
             "EV-D1-MAC-20260924",
             "EV-D1-SYNTHETIC-20260924",
-            "EV-D1-REGRESSION-20260924"
+            "EV-D1-REGRESSION-20260924",
+            "EV-D2S-REVIEW-20260928",
+            "EV-D2S-SDK-20260928",
+            "EV-D2S-MAC-20260928",
+            "EV-D2S-REGRESSION-20260928",
+            "EV-D2S-V4-20260928"
           ]
         },
         {
@@ -527,7 +537,7 @@
           ]
         }
       ],
-      "statusReason": "C已按授权集成develop；D1 Mac正常退出、取消结算、证据不足保留窗口及显式恢复通过。仅限定退出/恢复增量，下一项D2 Shell/PTY产品接入；Windows环境未确认、完整任务范围与M0 Gate未完成。"
+      "statusReason": "C已按授权集成develop；D1 Mac正常退出、取消结算、证据不足保留窗口及显式恢复通过。仅限定退出/恢复增量，下一项D2 Shell/PTY产品接入；Windows环境未确认、完整任务范围与M0 Gate未完成。 D2-S限定Mac非交互Bash产品链路通过；独立组/命令结果与副作用分开，D2-T、Windows及完整Gate仍未完成。"
     },
     {
       "id": "CORE-04",
@@ -568,7 +578,12 @@
           "evidenceRefs": [
             "EV-A2-SDK-20260922",
             "EV-B-IPC-SDK-20260923",
-            "EV-B-IPC-MAC-20260923"
+            "EV-B-IPC-MAC-20260923",
+            "EV-D2S-REVIEW-20260928",
+            "EV-D2S-SDK-20260928",
+            "EV-D2S-MAC-20260928",
+            "EV-D2S-REGRESSION-20260928",
+            "EV-D2S-V4-20260928"
           ]
         },
         {
@@ -597,11 +612,16 @@
             "EV-A2-SDK-20260922",
             "EV-A2-MAC-SHELL-20260922",
             "EV-B-IPC-SDK-20260923",
-            "EV-B-IPC-MAC-20260923"
+            "EV-B-IPC-MAC-20260923",
+            "EV-D2S-REVIEW-20260928",
+            "EV-D2S-SDK-20260928",
+            "EV-D2S-MAC-20260928",
+            "EV-D2S-REGRESSION-20260928",
+            "EV-D2S-V4-20260928"
           ]
         }
       ],
-      "statusReason": "B-IPC实际Worker内复用Pi write/edit与既有Operations，拒绝/版本/期限/取消通过；原子写入约束、完整Shell产品路径与其他平台仍未完成。"
+      "statusReason": "B-IPC实际Worker内复用Pi write/edit与既有Operations，拒绝/版本/期限/取消通过；原子写入约束、完整Shell产品路径与其他平台仍未完成。 D2-S限定Mac非交互Bash产品链路通过；独立组/命令结果与副作用分开，D2-T、Windows及完整Gate仍未完成。"
     },
     {
       "id": "SEC-01",
@@ -687,7 +707,12 @@
           "evidenceRefs": [
             "EV-A2-SDK-20260922",
             "EV-B-IPC-SDK-20260923",
-            "EV-B-IPC-MAC-20260923"
+            "EV-B-IPC-MAC-20260923",
+            "EV-D2S-REVIEW-20260928",
+            "EV-D2S-SDK-20260928",
+            "EV-D2S-MAC-20260928",
+            "EV-D2S-REGRESSION-20260928",
+            "EV-D2S-V4-20260928"
           ]
         },
         {
@@ -713,11 +738,16 @@
           "evidenceRefs": [
             "EV-A2-SDK-20260922",
             "EV-B-IPC-SDK-20260923",
-            "EV-B-IPC-MAC-20260923"
+            "EV-B-IPC-MAC-20260923",
+            "EV-D2S-REVIEW-20260928",
+            "EV-D2S-SDK-20260928",
+            "EV-D2S-MAC-20260928",
+            "EV-D2S-REGRESSION-20260928",
+            "EV-D2S-V4-20260928"
           ]
         }
       ],
-      "statusReason": "B-IPC宿主计划绑定摘要/目标/fileVersion/期限/资源锁，领取后同一IPC授权；实际Worker SQLite拒绝与文件冲突通过。非原子CAS，通用策略/其他平台未验收。"
+      "statusReason": "B-IPC宿主计划绑定摘要/目标/fileVersion/期限/资源锁，领取后同一IPC授权；实际Worker SQLite拒绝与文件冲突通过。非原子CAS，通用策略/其他平台未验收。 D2-S限定Mac非交互Bash产品链路通过；独立组/命令结果与副作用分开，D2-T、Windows及完整Gate仍未完成。"
     },
     {
       "id": "SEC-03",

@@ -1,16 +1,14 @@
 # 从文档到可运行产品：复用优先
 
-状态：A0–A4 限定无模型探针、B 最小产品核心、B-IPC 真实子进程接缝、C 最小无模型桌面及 D1 Mac 退出闭环已限定验证；D 整体仍进行中。决策依据：[SSOT](../ssot/README.md)，最新范围见 [D1 报告](../validation/d-exit-2026-09-24.md)。工作项见 [backlog.json](backlog.json)。尚未创建 GitHub Issues。
+状态：A0–A4 限定无模型探针、B 最小产品核心、B-IPC 真实子进程接缝、C 最小无模型桌面、D1 Mac 退出闭环及 D2-S 非交互 Shell 已限定验证；D 整体仍进行中。决策依据：[SSOT](../ssot/README.md)，最新范围见 [D2-S 报告](../validation/d2-shell-2026-09-28.md)。工作项见 [backlog.json](backlog.json)。尚未创建 GitHub Issues。
 
-## 当前唯一开发项：D2 的 Shell/PTY 产品接入（下一增量）
+## 当前唯一开发项：D2-T 单用户交互终端（下一增量）
 
-C 及 C01/C02 修正已按用户授权快进集成 develop（`6bde632`），推送后独立核对远端 SHA。D1 的 Mac 退出闭环已在 `codex/d-platform-execution` 实施并限定验证；范围见 [D 契约](../ssot/d-platform-contract.md) 与 [真实退出/代码证据](../validation/d-exit-2026-09-24.md)。正常关闭会持久取消活动/排队任务，复用真实 guardian 与文件对账；失败保留窗口，实际按钮可重连、核验。12 个真正退出的 Electron 场景、15 项桌面检查及原回归通过，不把 SIGKILL 当正常退出。
+D1 及复审已按用户授权快进合入 develop（`3d307e9`），推送后独立核对远端 SHA。D2-S 从该集成基线建立 `codex/d2-shell`，限定 Mac 无模型非交互 Bash 的审批/执行/取消/恢复已实施；详情见 [D2-S 报告](../validation/d2-shell-2026-09-28.md) 与 [D 契约](../ssot/d-platform-contract.md)。没有新增依赖、真实模型或任意 Renderer 命令执行入口。
 
-下一轮只推进 D2：把 Shell/PTY 接入既有产品命令、审批、Operation、受限 IPC 和 Pi Operations，核验成熟终端库的发行、许可及 ABI，再做必要的平台适配。Windows 需要真实测试环境；目前尚未确认，不自动安装虚拟机、不以 Mac 或静态路径测试代替。D 整体仍在进行，终端产品接入和 Windows 中文/空格路径、resize、取消、进程清理均不能由 D1 推导。
+下一轮推进 D2-T：核验 xterm.js/node-pty 的精确发行、许可及实际 Node ABI，再接单个用户显式授权的交互 TerminalSession；其输入权限与 Agent 非交互 Bash 分开。端到端消费确认、resize、Ctrl-C、断连和终端特有进程组仍待实施，D2-S 的有界完成输出快照不冒充终端流控。D2-X 的实际 Bash 退出检查已纳入 D1 矩阵；PTY 和 Windows 部分仍须后续独立验证。
 
-2026-09-28 [D1 复审](../validation/review-d1-2026-09-28.md) 在 `4b56f89` 重跑局部 7 项、桌面 15 项和实际 Electron 退出 12 场景，未发现新增阻断项；建议限定范围合入，但本轮没有合并。D2 先做 D2-S 受限非交互 Shell，再做 D2-T 单用户终端及 D2-X 退出矩阵。实际发行包的 Shell detached 进程组不能沿用 Worker 组清理证明，前置边界见 [D 契约](../ssot/d-platform-contract.md)。
-
-本轮停在 D1 复审，D 功能分支尚未自动合并 develop。UI 流式正文、完整历史、真实工作区选择、市场、模型和生产安装仍留在 backlog；它们不是并列的第二个“当前开发项”。M0-UI、M0-SDK、M0-Pi 保持 pending。以下 A0–A4/B/C 小节为历史阶段记录，以本栏为唯一当前顺序。
+本轮停在 D2-S，D2-S 功能分支尚未合并 develop。Windows 环境未确认，不自动安装虚拟机，也不把 Mac 中文路径结果作为 Windows 证据。UI 完整历史、自由工作区、市场、真实模型及生产发行留在 backlog，三个 M0 Gate 仍 pending。以下 A0–D1 记录为历史，以本栏为唯一当前顺序。
 
 ## 1. 下一增量不是再造平台
 

@@ -81,3 +81,8 @@ C 及修正随后已按用户授权集成 develop（`6bde632`），D 分支从�
 ## D1 审核复核：2026-09-28
 
 [复审证据](../validation/review-d1-2026-09-28.md) 核验审核包摘要/源文件并在 `4b56f89` 重跑局部检查、桌面与真实退出矩阵，未发现新增合并阻断项。仅更正 AGENTS 现状描述、登记复审与 D2 前置边界；运行代码和依赖未改变，未合并 develop、未启动 D2。上一轮完整 A/B/C 回归不能冒充本次重跑，三个 M0 Gate 保持 pending。
+
+
+## D2-S 非交互 Bash：2026-09-28
+
+D1 及复审已按授权集成 develop（`3d307e9`）。[D2-S 报告](../validation/d2-shell-2026-09-28.md) · [契约与复用原因](d-platform-contract.md)：Pi Bash 通过公开 Operations 委托既有 guardian 的宿主批准执行，独立 Shell 组、审批、取消、收据及结果丢失恢复分别验证。SQL v5/IPC v4 只扩展必要产品投影/消息；没有新依赖或真实模型。D2-S 分支待审，下一开发项为 D2-T 单用户终端；Windows/完整 D 和 M0 Gate 未完成。

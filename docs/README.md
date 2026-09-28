@@ -50,4 +50,7 @@ C 阶段：[最小桌面验证](validation/c-desktop-2026-09-23.md) · [桌面/�
 
 C 修正：[C01/C02 审核复核](validation/review-c-2026-09-24.md) · [输入摘要](validation/review-c-inputs.json)。异常关闭失败与跨任务未确认命令身份已补齐，实际 Electron 和前序回归通过；其后按用户授权快进合入 develop（`6bde632`）。
 
-当前 D1：[Mac 退出验证](validation/d-exit-2026-09-24.md) · [平台契约](ssot/d-platform-contract.md) · [输入摘要](validation/d-exit-inputs.json)。正常退出结算和失败后的窗口内恢复已限定通过，D 分支待集成；唯一下一增量为 D2 Shell/PTY 产品接入。Windows 尚未实测，D 整体与三个 M0 Gate 未完成。
+D1 阶段：[Mac 退出验证](validation/d-exit-2026-09-24.md) · [平台契约](ssot/d-platform-contract.md) · [输入摘要](validation/d-exit-inputs.json)。正常退出结算和失败后的窗口内恢复已限定通过；当时的下一增量为 D2 Shell/PTY 产品接入，后续集成见下方。Windows 尚未实测，D 整体与三个 M0 Gate 未完成。
+
+
+最新 D2-S：[非交互 Shell 产品链路](validation/d2-shell-2026-09-28.md) · [执行/恢复边界](ssot/d-platform-contract.md)。D1 已合入 develop，限定 Shell 增量独立待审；下一步只推进 D2-T，交互终端与 Windows 不由此宣称完成。
