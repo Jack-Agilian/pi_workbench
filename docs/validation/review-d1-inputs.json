@@ -1,0 +1,556 @@
+{
+  "testedCommit": "4b56f89e96acae04e3e6fb2c9b5f79b553740385",
+  "recordedAt": "2026-09-28T07:56:09.074275+00:00",
+  "scope": "D1 review, no runtime-code edits; documentation/AGENTS changes after runtime tests",
+  "packageVerification": {
+    "head": "4b56f89e96acae04e3e6fb2c9b5f79b553740385",
+    "manifestEntriesVerified": 17,
+    "sourceFiles": [
+      {
+        "path": "apps/desktop/host-client.ts",
+        "gitBlob": "211f2d6fc0aa24a83463ee65faa2c8b32eb13aa9",
+        "matchesCodeCommitAndWorkingTree": true
+      },
+      {
+        "path": "packages/app-contracts/desktop.ts",
+        "gitBlob": "9f7a75395a32ef8cecdc921f93bf1ab44603ef5c",
+        "matchesCodeCommitAndWorkingTree": true
+      },
+      {
+        "path": "packages/app-contracts/index.ts",
+        "gitBlob": "63b2907c86784767c7ee6b7b3dd845c3f4eb77bc",
+        "matchesCodeCommitAndWorkingTree": true
+      },
+      {
+        "path": "packages/app-contracts/presentation.ts",
+        "gitBlob": "0ab4eb5d6dce7db03cad1d7510f80bad3a53dc1c",
+        "matchesCodeCommitAndWorkingTree": true
+      },
+      {
+        "path": "packages/app-contracts/worker-ipc.ts",
+        "gitBlob": "a468a6e964bdd48b8d9b1430bb51d08f6c178528",
+        "matchesCodeCommitAndWorkingTree": true
+      },
+      {
+        "path": "packages/pi-adapter/ipc-channel.ts",
+        "gitBlob": "af1c67c8668773b71fe7e0f781f229226510b2b0",
+        "matchesCodeCommitAndWorkingTree": true
+      },
+      {
+        "path": "apps/agent-server/desktop-host.ts",
+        "gitBlob": "922b2ff38e1a462341ab3000f52d0b2743b6f7c1",
+        "matchesCodeCommitAndWorkingTree": true
+      }
+    ],
+    "reviewSha256": "581365c910357ccb6af32187e2acae5e9d3b15444a48bd651296aed5cfbf80e7",
+    "manifestSha256": "5b896d04f23ed3a6dc4a3130248315b2324c1ba61c7c00bed9b1cc97574004ac"
+  },
+  "environment": {
+    "platform": "darwin",
+    "os": "27.0",
+    "arch": "arm64",
+    "node": "24.21.0",
+    "npm": "11.19.0",
+    "rosetta": false
+  },
+  "commands": [
+    {
+      "label": "environment",
+      "command": [
+        ".artifacts/toolchains/node-v24.21.0-darwin-arm64/bin/node",
+        "scripts/check-environment.mjs"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T07:52:24.463065+00:00",
+      "finishedAt": "2026-09-28T07:52:24.743829+00:00",
+      "rawLogSha256": "533e4cc3fdd707c2300667f76f0735029b5b4a7da6166fcc458eb2810521b228"
+    },
+    {
+      "label": "review-host-close",
+      "command": [
+        ".artifacts/toolchains/node-v24.21.0-darwin-arm64/bin/node",
+        ".artifacts/review-d1-20260928/package/harness/host-close.mjs"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T07:52:24.744046+00:00",
+      "finishedAt": "2026-09-28T07:52:28.114236+00:00",
+      "rawLogSha256": "6baebb19197d7108cd2d2427570400656b2559e7642bce1113fe7ad5c15d7758"
+    },
+    {
+      "label": "review-close-orchestration",
+      "command": [
+        ".artifacts/toolchains/node-v24.21.0-darwin-arm64/bin/node",
+        ".artifacts/review-d1-20260928/package/harness/close-orchestration.mjs"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T07:52:28.114464+00:00",
+      "finishedAt": "2026-09-28T07:52:28.146177+00:00",
+      "rawLogSha256": "5dcbf38497763f2f7be8ce404eff73fc2a82168b40c5981ffdb26d27abaf2da1"
+    },
+    {
+      "label": "typecheck",
+      "command": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T07:52:28.146401+00:00",
+      "finishedAt": "2026-09-28T07:52:30.325522+00:00",
+      "rawLogSha256": "ca27905bae0ff05202f06b1202f21718c69c2a76a72c41f79c5c9dd4c1c13f7b"
+    },
+    {
+      "label": "desktop",
+      "command": [
+        "npm",
+        "run",
+        "test:desktop"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T07:52:30.325789+00:00",
+      "finishedAt": "2026-09-28T07:52:40.866926+00:00",
+      "rawLogSha256": "d6d3a3d75f9ab806e68773268abe8157ecce3bb0aef26cd3a2e41451e3131ccc"
+    },
+    {
+      "label": "desktop-shutdown",
+      "command": [
+        "npm",
+        "run",
+        "test:desktop-shutdown"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T07:52:40.867357+00:00",
+      "finishedAt": "2026-09-28T07:53:04.571404+00:00",
+      "rawLogSha256": "a67e19a832d49a6d3fb2f21c012e580a5ad3d5a2fbdb04b4f7908c53c49d818e"
+    }
+  ],
+  "localHarnessHost": {
+    "node": "v24.21.0",
+    "platform": "darwin",
+    "results": [
+      {
+        "case": "success",
+        "realChild": true,
+        "fixture": {
+          "synthetic": true,
+          "cleanup": true,
+          "requestedExitCode": 0,
+          "mode": "success"
+        },
+        "actualExit": {
+          "code": 0,
+          "signal": null
+        },
+        "closeOutcome": "resolved",
+        "processGone": true,
+        "diagnostic": "normal close verified"
+      },
+      {
+        "case": "cleanup_failure",
+        "realChild": true,
+        "fixture": {
+          "synthetic": true,
+          "cleanup": false,
+          "requestedExitCode": 1,
+          "mode": "cleanup_failure"
+        },
+        "actualExit": {
+          "code": 1,
+          "signal": null
+        },
+        "closeOutcome": "rejected:host_cleanup_unconfirmed",
+        "processGone": true,
+        "diagnostic": "abnormal close remains rejected; explicit exit barrier resolves"
+      },
+      {
+        "case": "killed",
+        "realChild": true,
+        "fixture": {
+          "synthetic": true,
+          "cleanup": false,
+          "requestedExitCode": null,
+          "mode": "killed"
+        },
+        "actualExit": {
+          "code": null,
+          "signal": "SIGKILL"
+        },
+        "closeOutcome": "rejected:host_cleanup_unconfirmed",
+        "processGone": true,
+        "diagnostic": "abnormal close remains rejected; explicit exit barrier resolves"
+      }
+    ]
+  },
+  "localHarnessClose": {
+    "platform": "darwin",
+    "node": "v24.21.0",
+    "scope": "verbatim method + synthetic core/supervisor ports; no Pi/SQLite/Electron",
+    "results": [
+      {
+        "case": "none",
+        "passed": true,
+        "sharedClosePromise": true,
+        "cancelled": [
+          "queued",
+          "starting",
+          "running"
+        ],
+        "calls": [
+          "cancel:queued",
+          "cancel:starting",
+          "cancel:running",
+          "cleanup_requested",
+          "cleanup_settled",
+          "reconcile",
+          "database_closed"
+        ],
+        "outcome": "resolved"
+      },
+      {
+        "case": "cleanup",
+        "passed": true,
+        "sharedClosePromise": true,
+        "cancelled": [
+          "queued",
+          "starting",
+          "running"
+        ],
+        "calls": [
+          "cancel:queued",
+          "cancel:starting",
+          "cancel:running",
+          "cleanup_requested",
+          "cleanup_settled",
+          "database_closed"
+        ],
+        "outcome": "SYNTHETIC_cleanup"
+      },
+      {
+        "case": "reconcile",
+        "passed": true,
+        "sharedClosePromise": true,
+        "cancelled": [
+          "queued",
+          "starting",
+          "running"
+        ],
+        "calls": [
+          "cancel:queued",
+          "cancel:starting",
+          "cancel:running",
+          "cleanup_requested",
+          "cleanup_settled",
+          "reconcile",
+          "database_closed"
+        ],
+        "outcome": "SYNTHETIC_reconcile"
+      },
+      {
+        "case": "cancel",
+        "passed": true,
+        "sharedClosePromise": true,
+        "cancelled": [
+          "queued"
+        ],
+        "calls": [
+          "cancel:queued",
+          "cleanup_requested",
+          "cleanup_settled",
+          "database_closed"
+        ],
+        "outcome": "SYNTHETIC_cancel"
+      }
+    ]
+  },
+  "desktopTests": {
+    "passed": 15,
+    "failed": 0,
+    "skipped": 0
+  },
+  "shutdown": {
+    "desktopShutdown": "passed",
+    "platform": "darwin",
+    "arch": "arm64",
+    "node": "24.21.0",
+    "synthetic": true,
+    "realModelCalls": 0,
+    "results": [
+      {
+        "scenario": "idle",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "willQuit": true,
+        "warning": false,
+        "states": [],
+        "hostCount": 1,
+        "capturedProcesses": 1,
+        "receipts": 0
+      },
+      {
+        "scenario": "starting",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "willQuit": true,
+        "warning": false,
+        "states": [
+          "cancelled",
+          "cancelled"
+        ],
+        "hostCount": 1,
+        "capturedProcesses": 2,
+        "receipts": 1
+      },
+      {
+        "scenario": "approval",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "willQuit": true,
+        "warning": false,
+        "states": [
+          "cancelled",
+          "cancelled"
+        ],
+        "hostCount": 1,
+        "capturedProcesses": 3,
+        "receipts": 1
+      },
+      {
+        "scenario": "executing",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "willQuit": true,
+        "warning": false,
+        "states": [
+          "cancelled",
+          "cancelled"
+        ],
+        "hostCount": 1,
+        "capturedProcesses": 3,
+        "receipts": 1
+      },
+      {
+        "scenario": "cancelling",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "willQuit": true,
+        "warning": false,
+        "states": [
+          "cancelled"
+        ],
+        "hostCount": 1,
+        "capturedProcesses": 2,
+        "receipts": 1
+      },
+      {
+        "scenario": "completed",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "willQuit": true,
+        "warning": false,
+        "states": [
+          "completed"
+        ],
+        "hostCount": 1,
+        "capturedProcesses": 1,
+        "receipts": 1
+      },
+      {
+        "scenario": "sigterm",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "willQuit": true,
+        "warning": false,
+        "states": [
+          "cancelled",
+          "cancelled"
+        ],
+        "hostCount": 1,
+        "capturedProcesses": 3,
+        "receipts": 1
+      },
+      {
+        "scenario": "sigint",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "willQuit": true,
+        "warning": false,
+        "states": [
+          "cancelled",
+          "cancelled"
+        ],
+        "hostCount": 1,
+        "capturedProcesses": 3,
+        "receipts": 1
+      },
+      {
+        "scenario": "sigkill",
+        "exit": {
+          "code": null,
+          "signal": "SIGKILL"
+        },
+        "willQuit": false,
+        "warning": false,
+        "states": [
+          "cancelled",
+          "cancelled"
+        ],
+        "hostCount": 1,
+        "capturedProcesses": 3,
+        "receipts": 1
+      },
+      {
+        "scenario": "missing-proof",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "willQuit": true,
+        "warning": true,
+        "states": [
+          "cancelled",
+          "cancelled"
+        ],
+        "hostCount": 2,
+        "capturedProcesses": 4,
+        "receipts": 1
+      },
+      {
+        "scenario": "unresolved",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "willQuit": true,
+        "warning": true,
+        "states": [
+          "cancelled",
+          "cancelled"
+        ],
+        "hostCount": 2,
+        "capturedProcesses": 4,
+        "receipts": 1
+      },
+      {
+        "scenario": "recovery-close-race",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "willQuit": true,
+        "warning": true,
+        "states": [
+          "cancelled",
+          "cancelled"
+        ],
+        "hostCount": 3,
+        "capturedProcesses": 5,
+        "receipts": 1
+      }
+    ]
+  },
+  "shellScopeStaticOnly": {
+    "package": "@earendil-works/pi-coding-agent",
+    "version": "0.87.0",
+    "lockVersion": "0.87.0",
+    "lockIntegrity": "sha512-S9JJVGHya/h0e0M+zwPTB6RkPe7PmLLqfBUTssFYW5mxAti6oZEILn4jvaUImENRC3U9RwXAB6H4gw8xj2J0GQ==",
+    "scope": "static inspection of installed release; no shell/PTY execution or deep import",
+    "files": [
+      {
+        "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/tools/bash.js",
+        "sha256": "8acde89e7e1ad7ab013ccbf4b2cbfe847422de46f9451ca796f889ab37fee307"
+      },
+      {
+        "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/tools/bash.d.ts",
+        "sha256": "1ef24fc8026ef55aa0f31498aed6ebac9f59d013b5216cc3f9aa2ea3b7840dc2"
+      },
+      {
+        "path": "node_modules/@earendil-works/pi-coding-agent/dist/index.d.ts",
+        "sha256": "1e89f64c284248e8004bc040be1b8d886f20c158091d4e466cb130fa9d13d458"
+      },
+      {
+        "path": "apps/agent-server/worker-guardian.ts",
+        "sha256": "13af6abf9cd7899f85b186e483e931cae74a8552aae1a588111c9f07196a63ea"
+      },
+      {
+        "path": "apps/agent-server/worker-supervisor.ts",
+        "sha256": "4203db41baedbea24817c5225749cdea517dc7fef3d00b8c4708e1700e281054"
+      }
+    ]
+  },
+  "notRerun": [
+    "full A1-A4/ProductCore/SDK/Worker suite",
+    "test:desktop-ui",
+    "bootstrap",
+    "fresh clone",
+    "dependency release download",
+    "Windows/Linux application",
+    "manual dialog/IME",
+    "Shell/PTY runtime integration",
+    "GitHub Actions query"
+  ],
+  "realModelCalls": 0,
+  "documentationChecks": [
+    {
+      "label": "ssot",
+      "command": [
+        ".venv/bin/python",
+        "scripts/check-ssot.py"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T07:58:52.098283+00:00",
+      "finishedAt": "2026-09-28T07:58:52.188006+00:00",
+      "rawLogSha256": "9f5958ebcae8550eb99b0a8404e75c1da57acd14a9d4abdaa3b66738c0ff19a2"
+    },
+    {
+      "label": "tools",
+      "command": [
+        ".venv/bin/python",
+        "scripts/test-tools.py"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T07:58:52.188179+00:00",
+      "finishedAt": "2026-09-28T07:58:52.251381+00:00",
+      "rawLogSha256": "c7aee9500b2bb75ffe3977438ce4e7e3786f2c37d5ac0d00b16e5e99f0a2c7cd"
+    },
+    {
+      "label": "structure",
+      "command": [
+        ".venv/bin/python",
+        "scripts/check-docs.py",
+        "--structural-only"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T07:58:52.251522+00:00",
+      "finishedAt": "2026-09-28T07:58:52.385003+00:00",
+      "rawLogSha256": "98a35e535077ae42b19c4258b59307f62c92f8ec3940d2f8bdf0edc5a5fb4188"
+    },
+    {
+      "label": "docs-typecheck",
+      "command": [
+        ".venv/bin/python",
+        "scripts/check-docs.py",
+        "--typecheck"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T07:58:52.385111+00:00",
+      "finishedAt": "2026-09-28T07:58:52.734783+00:00",
+      "rawLogSha256": "37316f08e8d774ab8d36f2d03edab66707c4c151063c2f3cb35a00477775a3ac"
+    }
+  ]
+}

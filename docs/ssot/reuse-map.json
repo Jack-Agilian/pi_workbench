@@ -906,7 +906,10 @@
           "EV-D1-REVIEW-20260924",
           "EV-D1-MAC-20260924",
           "EV-D1-SYNTHETIC-20260924",
-          "EV-D1-REGRESSION-20260924"
+          "EV-D1-REGRESSION-20260924",
+          "EV-D1-REREVIEW-20260928",
+          "EV-D1-RECHECK-MAC-20260928",
+          "EV-D1-RECHECK-MOCK-20260928"
         ]
       }
     },
@@ -1083,7 +1086,10 @@
           "EV-D1-REVIEW-20260924",
           "EV-D1-MAC-20260924",
           "EV-D1-SYNTHETIC-20260924",
-          "EV-D1-REGRESSION-20260924"
+          "EV-D1-REGRESSION-20260924",
+          "EV-D1-REREVIEW-20260928",
+          "EV-D1-RECHECK-MAC-20260928",
+          "EV-D1-RECHECK-MOCK-20260928"
         ]
       }
     }
@@ -1796,6 +1802,42 @@
         "darwin"
       ],
       "locator": "docs/validation/d-exit-2026-09-24.md"
+    },
+    {
+      "id": "EV-D1-REREVIEW-20260928",
+      "kind": "review",
+      "result": "passed",
+      "scope": "核验审核包17个摘要和7个Git blob；复审DesktopHost/HostClient/Electron关闭与恢复路径，未发现新增D1合并阻断。已安装Pi0.87.0的Shell detached和文件ExecutionPlan仅静态核对，D2未实施。",
+      "commit": "4b56f89e96acae04e3e6fb2c9b5f79b553740385",
+      "recordedAt": "2026-09-28T07:56:09.074275+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/review-d1-2026-09-28.md"
+    },
+    {
+      "id": "EV-D1-RECHECK-MAC-20260928",
+      "kind": "platform",
+      "result": "passed",
+      "scope": "4b56f89上Mac arm64重跑桌面15项、实际Electron退出12场景通过；限定D1退出/恢复，未重跑完整A/B/C、人工UI、其他平台或Shell/PTY集成。",
+      "commit": "4b56f89e96acae04e3e6fb2c9b5f79b553740385",
+      "recordedAt": "2026-09-28T07:56:09.074275+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/review-d1-2026-09-28.md"
+    },
+    {
+      "id": "EV-D1-RECHECK-MOCK-20260928",
+      "kind": "mock",
+      "result": "passed",
+      "scope": "审核包原HostClient+真实Node子进程/合成宿主3项，原close方法+合成core/supervisor端口4项，在Mac项目Node24.21.0通过；7项局部检查本身不是Pi/SQLite/Electron验收。",
+      "commit": "4b56f89e96acae04e3e6fb2c9b5f79b553740385",
+      "recordedAt": "2026-09-28T07:56:09.074275+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/review-d1-2026-09-28.md"
     }
   ]
 }

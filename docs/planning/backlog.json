@@ -92,11 +92,14 @@
             "EV-D1-REVIEW-20260924",
             "EV-D1-MAC-20260924",
             "EV-D1-SYNTHETIC-20260924",
-            "EV-D1-REGRESSION-20260924"
+            "EV-D1-REGRESSION-20260924",
+            "EV-D1-REREVIEW-20260928",
+            "EV-D1-RECHECK-MAC-20260928",
+            "EV-D1-RECHECK-MOCK-20260928"
           ]
         }
       ],
-      "statusReason": "C已按授权集成develop；D1 Mac正常退出、取消结算、证据不足保留窗口及显式恢复通过。仅限定退出/恢复增量，下一项D2 Shell/PTY产品接入；Windows环境未确认、完整任务范围与M0 Gate未完成。"
+      "statusReason": "C已按授权集成develop；D1 Mac正常退出、取消结算、证据不足保留窗口及显式恢复通过。仅限定退出/恢复增量，下一项D2 Shell/PTY产品接入；Windows环境未确认、完整任务范围与M0 Gate未完成。 2026-09-28 D1复审未发现新增阻断，Mac退出矩阵重跑通过；仅文档维护，尚未合并或推进D2。"
     },
     {
       "id": "BOOT-03",
@@ -1482,7 +1485,7 @@
   ],
   "decisionSource": "../ssot/README.md",
   "historicalSource": "../startup/docs/08-delivery-and-references.md",
-  "updatedOn": "2026-09-24",
+  "updatedOn": "2026-09-28",
   "milestones": [
     {
       "id": "M0-UI",

@@ -29,3 +29,12 @@ D 按可审查增量推进。D1 是 macOS 应用退出闭环；后续才是 Shel
 固定不脱离进程组的父/子命令另由现有 Worker fixture 验证，检查 PID、心跳文件稳定和 OS 拒绝监听端口；不等于任意恶意/setsid 后代、开放网络端口回收或通用沙箱证明。原生 dialog 只核对调用参数，没有人工点击验收。实际代码 SHA、命令和限制见 [D1 验证](../validation/d-exit-2026-09-24.md)。
 
 下一增量为 D2：在同一产品审批、Operation、IPC 与工具边界接入 Shell/PTY，核验终端库的发行/许可/ABI，再实现必要平台接缝。Windows 需要真实可用环境；当前没有已确认环境和实测证据，继续明确未支持。不要以 D1 的 Mac 中文目录、已有 Pi Bash 探针或类型通过替代 Windows 验证。BOOT-05、终端完整采用和 M0 Gate 尚未完成。
+
+## D1 复审确认的 D2 前置边界（2026-09-28）
+
+[D1 复审](../validation/review-d1-2026-09-28.md) 未发现新增合并阻断项；以下是下一增量的准入条件，不是已实现能力。
+
+- Agent 非交互 Shell 继续复用 Pi 公开 ToolDefinition/Operations；用户交互 TerminalSession 单独授权，默认不向 Agent 开放输入能力。终端库仍是待核验候选，不能将审核建议当作发行/许可/ABI 验证。
+- 已安装 Pi 0.87.0 的本地 Shell 在 POSIX 使用 `detached: true`；现有 guardian 只证明 Worker 所在组已消失。D2 必须监督实际 Shell/PTY 正常创建的进程组，并覆盖 Worker/宿主死亡，不能沿用 D1 固定同组后代的结论。通过公开 Operations 委托受管后端，不 deep-import 或全局替换 spawn。
+- 当前 ExecutionPlan 只包含 write/edit。D2 应区分文件、Shell 与终端事实；命令退出、进程清理、外部副作用和 Artifact 分别记录。无成果命令可以成功，失败命令可能已经产生副作用；恢复不能自动重发或以文件不存在证明无副作用。
+- 按 D2-S 受限非交互命令、D2-T 单用户终端、D2-X 真实 Shell/PTY 退出矩阵分增量验收；Windows 仍需实际环境。本次复审不启动其中任何增量。

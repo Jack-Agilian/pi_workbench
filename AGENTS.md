@@ -1,6 +1,6 @@
 # Repository working agreement
 
-本仓库当前是文档与工程准备，不是已经实现的 App。默认技术方向来自用户已确认的 Pi 桌面工作台需求；不要宣称已经实现或实测。
+本仓库已实现限定的 macOS 无模型桌面、Pi SDK/真实 Worker 接入及 D1 退出与恢复闭环；具体基线、验证范围与未完成项以 `docs/ssot/` 和 `docs/planning/NEXT_STEPS.md` 为准。Shell/PTY 产品接入、其他平台、真实模型和生产发行尚未完成，不得将局部实现或历史报告扩大为完整产品或本轮实测。
 
 ## 修改与验证
 
