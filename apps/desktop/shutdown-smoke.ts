@@ -9,10 +9,11 @@ import type { Ack } from '../../packages/app-contracts/index.ts';
 import type { DesktopHome, DesktopThread } from '../../packages/app-contracts/desktop.ts';
 
 export async function runShutdownSmoke(window: BrowserWindow, currentHost: () => HostClient, profile: string, scenario: string, pendingHost: () => HostClient | undefined) {
-  if (!['idle','starting','approval','executing','cancelling','completed','sigterm','sigint','sigkill','missing-proof','unresolved','recovery-close-race','shell-running','shell-cancelling','shell-completed','shell-sigterm','shell-sigkill','shell-missing-proof'].includes(scenario)) throw new Error('unknown_shutdown_scenario');
+  if (!['idle','starting','approval','executing','cancelling','completed','sigterm','sigint','sigkill','missing-proof','unresolved','recovery-close-race','shell-running','shell-cancelling','shell-completed','shell-sigterm','shell-sigkill','shell-missing-proof','model-running','model-cancelling','model-completed','model-sigterm','model-sigkill','model-missing-proof'].includes(scenario)) throw new Error('unknown_shutdown_scenario');
+  const modelMode = scenario.startsWith('model-');
   const shellMode = scenario.startsWith('shell-');
-  const completedMode = scenario === 'completed' || scenario === 'shell-completed';
-  const cancellingMode = scenario === 'cancelling' || scenario === 'shell-cancelling';
+  const completedMode = scenario === 'completed' || scenario === 'shell-completed' || scenario === 'model-completed';
+  const cancellingMode = scenario === 'cancelling' || scenario === 'shell-cancelling' || scenario === 'model-cancelling';
   const host = currentHost(); const pids = new Set<number>([host.processId!]);
   const result: { scenario: string; synthetic: true; hostPids: number[]; processPids: number[]; readyForSignal: boolean; willQuit: boolean; warning: boolean; raceWaitVerified?: boolean; blockedState?: string; beforeState?: string; threadId?: string; completedFile?: { path: string; text: string; mtime: string } } = {
     scenario, synthetic: true, hostPids: [host.processId!], processPids: [], readyForSignal: false, willQuit: false, warning: false,
@@ -32,10 +33,13 @@ export async function runShutdownSmoke(window: BrowserWindow, currentHost: () =>
   if (scenario === 'idle') { record(); app.quit(); return; }
   const thread = await host.request({ type: 'command', command: { type: 'threads.create', requestId: 'shutdown-thread', workspaceId: 'demo-workspace', title: 'SYNTHETIC 中文退出 ' + scenario } }) as Ack;
   result.threadId = thread.id;
-  await host.request({ type: 'command', command: { type: 'runs.start', requestId: 'shutdown-run', threadId: thread.id, input: shellMode ? completedMode ? '/demo-shell' : '/demo-shell-wait' : 'SYNTHETIC shutdown only; no model' } });
+  await host.request({ type: 'command', command: { type: 'runs.start', requestId: 'shutdown-run', threadId: thread.id, input: modelMode ? completedMode ? 'SYNTHETIC completed' : '[long]' : shellMode ? completedMode ? '/demo-shell' : '/demo-shell-wait' : 'SYNTHETIC shutdown only; no model' } });
   const snapshot = async () => await currentHost().request({ type: 'thread', threadId: thread.id }) as DesktopThread;
   if (scenario === 'starting') {
     assert.equal((await snapshot()).runs[0]!.state, 'starting');
+  } else if (modelMode) {
+    await wait(async () => completedMode ? (await snapshot()).runs[0]!.state === 'completed' : (await snapshot()).presentations.some(p=>p.value.messages.some(m=>m.role==='assistant')), 'model_stream');
+    if (cancellingMode) { const run=(await snapshot()).runs[0]!; await host.request({type:'command',command:{type:'runs.cancel',requestId:'shutdown-cancel',runId:run.id}}); }
   } else {
     await wait(async () => (await snapshot()).operations.some(op => op.state === 'pending'), 'pending');
   }
@@ -60,8 +64,8 @@ export async function runShutdownSmoke(window: BrowserWindow, currentHost: () =>
   // Preserve a queued intent in the same product database; close must cancel it without dispatch.
   if (!completedMode && !cancellingMode) await host.request({ type: 'command', command: { type: 'runs.start', requestId: 'shutdown-queued', threadId: thread.id, input: 'SYNTHETIC queued must never dispatch' } });
   captureChildren(host.processId!); record();
-  if (['sigterm','sigint','sigkill','shell-sigterm','shell-sigkill'].includes(scenario)) { result.readyForSignal = true; record(); return; }
-  if (!['missing-proof','unresolved','recovery-close-race','shell-missing-proof'].includes(scenario)) { window.close(); app.quit(); return; }
+  if (['sigterm','sigint','sigkill','shell-sigterm','shell-sigkill','model-sigterm','model-sigkill'].includes(scenario)) { result.readyForSignal = true; record(); return; }
+  if (!['missing-proof','unresolved','recovery-close-race','shell-missing-proof','model-missing-proof'].includes(scenario)) { window.close(); app.quit(); return; }
 
   const leases = join(profile, 'state/leases');
   const active = readdirSync(leases).filter(lease => !existsSync(join(leases, lease, 'cleanup.json'))); assert.equal(active.length, 1);
@@ -111,7 +115,7 @@ export async function runShutdownSmoke(window: BrowserWindow, currentHost: () =>
     await window.webContents.executeJavaScript("document.querySelector('.notice[role=status] button').click()", true);
     await wait(async () => (await snapshot()).runs.every(run => run.state === 'cancelled'), 'reconciled_cancellation');
     const restored = await snapshot(); assert.equal(restored.runs.length, 2); assert.ok(restored.runs.every(run => run.state === 'cancelled'));
-    assert.equal(restored.operations.length, 1); assert.equal(restored.artifacts.length, 0);
+    assert.equal(restored.operations.length, modelMode ? 0 : 1); assert.equal(restored.artifacts.length, 0);
     record(); window.close();
   } finally { dialog.showMessageBox = showDialog; }
 }

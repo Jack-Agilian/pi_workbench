@@ -1,8 +1,9 @@
+import type { ModelOutcome } from './model.ts';
 import { identifier, parseCommand, type Ack, type Command, type ProductEvent, type RunView, type Snapshot, type ThreadView } from './index.ts';
 import { exact, record } from './worker-ipc.ts';
 import type { Presentation } from './presentation.ts';
-export interface DesktopThread extends Snapshot { inputs: { id: string; text: string }[]; presentations: { runId: string; value: Presentation }[] }
-export interface DesktopHome { mode: 'synthetic'; threads: ThreadView[]; activeRuns: RunView[]; recovery: 'ready' | 'blocked' }
+export interface DesktopThread extends Snapshot { modelOutcomes?: {runId:string;value:ModelOutcome|null}[]; inputs: { id: string; text: string }[]; presentations: { runId: string; value: Presentation }[] }
+export interface DesktopHome { mode: 'synthetic' | 'model-offline' | 'model'; model?: {status:'not_configured'|'key_required'|'ready';provider:string;model:string;limits?:{endpoint:string;requests:number;estimatedUsd:number;outputTokens:number}}; threads: ThreadView[]; activeRuns: RunView[]; recovery: 'ready' | 'blocked' }
 export type Preview = { status: 'ready' | 'changed' | 'missing' | 'unavailable'; text?: string };
 export type DesktopRequest =
   | { type: 'home' } | { type: 'recover' }
@@ -27,6 +28,7 @@ export function parseDesktopRequest(raw: unknown): DesktopRequest {
   return result;
 }
 export interface DesktopApi {
+  selectModelCredential(): Promise<void>;
   home(): Promise<DesktopHome>; thread(threadId: string): Promise<DesktopThread>;
   events(threadId: string, cursor: number): Promise<ProductEvent[]>;
   command(command: Command): Promise<Ack>; preview(artifactId: string): Promise<Preview>;

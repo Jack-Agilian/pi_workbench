@@ -204,7 +204,7 @@ test('schema v3 forward migration preserves the pre-Assistant product intent and
     // DesktopHost.close now intentionally cancels queued work, which is not this fixture.
     f.host.core.close();
     const db = new DatabaseSync(join(f.root, 'host/product.sqlite'));
-    db.exec('DROP TABLE shell_display; DROP TABLE run_display; PRAGMA user_version=3;'); db.close();
+    db.exec('DROP TABLE model_requests; DROP TABLE model_outcomes; DROP TABLE shell_display; DROP TABLE run_display; PRAGMA user_version=3;'); db.close();
     const reopened = new DesktopHost(f.root);
     try {
       const restored = reopened.request({ type: 'thread', threadId: f.thread }) as DesktopThread;
@@ -245,4 +245,32 @@ test('desktop shutdown settles queued work and real fixed descendants without ch
       assert.equal(reopened.core.workerLaunches().length, 1);
     } finally { await reopened.close(); }
   } finally { await f.dispose(); }
+});
+test('model config missing blocks Run; ephemeral credential is absent from DTO/SQLite and lost on reconnect',async()=>{
+ const root=realpathSync(mkdtempSync(join(tmpdir(),'m1-config-')));
+ const host=new DesktopHost(root,{mode:'live'});
+ try{const thread=host.request({type:'command',command:{type:'threads.create',requestId:'thread',workspaceId:'demo-workspace',title:'SYNTHETIC'}}) as Ack;
+ assert.equal((host.request({type:'home'}) as DesktopHome).model?.status,'not_configured');
+ assert.throws(()=>host.setModelKey('SYNTHETIC_ONLY'));
+ assert.throws(()=>host.request({type:'command',command:{type:'runs.start',requestId:'unconfigured',threadId:thread.id,input:'SYNTHETIC'}}));
+ assert.equal(host.core.snapshot(thread.id).runs.length,0);
+ }finally{await host.close();}
+ const config={version:1 as const,authorizationId:'synthetic-config',approved:true,dataScope:'synthetic_non_sensitive' as const,provider:'anthropic',model:'claude-sonnet-4-5',endpoint:'https://api.anthropic.com',maxRequests:1,maxOutputTokens:64,timeoutMs:5000,maxEstimatedCostUsd:5};
+ const configuration=join(root,'test-model.json'); const {writeFileSync}=await import('node:fs');writeFileSync(configuration,JSON.stringify(config),{mode:0o600});
+ const client=new HostClient(process.execPath,repository,root,'--model',configuration,true);
+ const secret='SYNTHETIC_EPHEMERAL_KEY_NOT_REAL';
+ try{await client.connect();assert.equal((await client.request({type:'home'}) as DesktopHome).model?.status,'key_required');await client.setModelKey(secret);
+ const ready=await client.request({type:'home'}) as DesktopHome;assert.equal(ready.model?.status,'ready');assert.equal(JSON.stringify(ready).includes(secret),false);
+ await client.reconnect();assert.equal((await client.request({type:'home'}) as DesktopHome).model?.status,'key_required');
+ assert.equal(readFileSync(join(root,'host/product.sqlite')).includes(Buffer.from(secret)),false);
+ }finally{await client.close();rmSync(root,{recursive:true,force:true});}
+});
+test('native credential file selection rejects repository files, public modes and symlinks',async()=>{
+ const {writeFileSync,chmodSync,symlinkSync}=await import('node:fs');const {useModelCredentialFile}=await import('./model-credential.ts');
+ const root=realpathSync(mkdtempSync(join(tmpdir(),'m1-key-')));const repo=join(root,'repository');mkdirSync(repo);let accepted=0;
+ const path=join(root,'synthetic.key');writeFileSync(path,'SYNTHETIC_ONLY\n',{mode:0o600});
+ try{await useModelCredentialFile(path,repo,async key=>{assert.equal(key,'SYNTHETIC_ONLY');accepted++;});chmodSync(path,0o644);await assert.rejects(useModelCredentialFile(path,repo,async()=>{accepted++;}));chmodSync(path,0o600);
+ symlinkSync(path,join(root,'link.key'));await assert.rejects(useModelCredentialFile(join(root,'link.key'),repo,async()=>{accepted++;}));
+ const inRepo=join(repo,'bad.key');writeFileSync(inRepo,'SYNTHETIC_ONLY',{mode:0o600});await assert.rejects(useModelCredentialFile(inRepo,repo,async()=>{accepted++;}));assert.equal(accepted,1);
+ }finally{rmSync(root,{recursive:true,force:true});}
 });

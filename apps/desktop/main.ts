@@ -3,6 +3,7 @@ import { readFileSync, mkdirSync, realpathSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
+import { useModelCredentialFile } from './model-credential.ts';
 import { HostClient } from './host-client.ts';
 import { parseDesktopRequest, type DesktopReply } from '../../packages/app-contracts/desktop.ts';
 const outputDirectory = dirname(fileURLToPath(import.meta.url));
@@ -10,14 +11,16 @@ const root = resolve(outputDirectory, '../..');
 // Arguments come only from the local launch script. None is an IPC/Renderer option.
 const nodeArg = process.argv.find(arg => arg.startsWith('--host-node='));
 const profileArg = process.argv.find(arg => arg.startsWith('--demo-profile='));
-if (!process.argv.includes('--demo') || !nodeArg || !profileArg) throw new Error('explicit_demo_launch_required');
+const mode=process.argv.includes('--model')?'--model':process.argv.includes('--model-offline')?'--model-offline':'--demo';
+const modelConfig=process.argv.find(a=>a.startsWith('--model-config='))?.slice('--model-config='.length);
+if (!['--demo','--model','--model-offline'].some(m=>process.argv.includes(m)) || !nodeArg || !profileArg) throw new Error('explicit_demo_launch_required');
 const node = realpathSync(nodeArg.slice('--host-node='.length)); const profile = resolve(profileArg.slice('--demo-profile='.length));
 if (execFileSync(node, ['-p','process.versions.node'], { env: {}, encoding: 'utf8' }).trim() !== '24.21.0') throw new Error('host_runtime_mismatch');
 mkdirSync(join(profile, 'browser'), { recursive: true, mode: 0o700 });
 app.setPath('userData', join(profile, 'browser'));
 const single = app.requestSingleInstanceLock();
 if (!single) app.exit(0);
-let host = new HostClient(node, root, profile);
+let host = new HostClient(node, root, profile, mode, modelConfig, process.argv.includes('--model-smoke-test'));
 const origin = 'workbench://desktop/index.html';
 protocol.registerSchemesAsPrivileged([{ scheme: 'workbench', privileges: { standard: true, secure: true, supportFetchAPI: true } }]);
 app.commandLine.appendSwitch('disable-background-networking');
@@ -55,6 +58,17 @@ protocol.handle('workbench', request => {
 });
 const trusted = (event: Electron.IpcMainInvokeEvent) => window && event.sender === window.webContents && event.senderFrame === window.webContents.mainFrame && event.senderFrame.url === origin;
 let inFlight = 0;
+let credentialDialog = false;
+ipcMain.handle('workbench:credential', async (event, ...args: unknown[]) => {
+  if (!trusted(event) || args.length || mode !== '--model' || closing || shutdownFailed || reconnecting || credentialDialog) return false;
+  credentialDialog = true; const owner = host;
+  try {
+    const result = await dialog.showOpenDialog(window!, { title: '选择本次模型凭据（仓库外的私有 .key 文件）', properties: ['openFile'], filters: [{ name: 'Private API key', extensions: ['key'] }] });
+    if (result.canceled || result.filePaths.length !== 1 || host !== owner || closing || shutdownFailed || reconnecting || !trusted(event)) return false;
+    await useModelCredentialFile(result.filePaths[0]!, root, key => owner.setModelKey(key));
+    return true;
+  } catch { return false; } finally { credentialDialog = false; }
+});
 ipcMain.handle('workbench:request', async (event, raw: unknown): Promise<DesktopReply> => {
   if (!trusted(event)) return { ok: false, code: 'invalid_request' };
   if (closing || shutdownFailed) return { ok: false, code: 'disconnected' };
@@ -72,7 +86,7 @@ ipcMain.handle('workbench:reconnect', async event => {
     const old = host; await old.waitForExit();
     if (replacement) { await replacement.waitForExit(); replacement = undefined; }
     if (closing || quitting) throw new Error('disconnected');
-    const candidate = new HostClient(node, root, profile); replacement = candidate;
+    const candidate = new HostClient(node, root, profile, mode, modelConfig, process.argv.includes('--model-smoke-test')); replacement = candidate;
     try {
       await candidate.connect();
       if (closing || quitting || host !== old) throw new Error('disconnected');
@@ -96,6 +110,11 @@ if (shutdownScenario) {
   // Unlike the UI smoke suite, this driver must exit through the actual app.quit path.
   try { await runShutdownSmoke(window, () => host, profile, shutdownScenario.slice('--shutdown-test='.length), () => replacement); }
   catch (error) { console.error(error); await host.close().catch(() => {}); app.exit(1); }
+  return;
+}
+if (process.argv.includes('--model-smoke-test')) {
+  const {runModelSmoke}=await import('./model-smoke.ts');
+  try {await runModelSmoke(window,host);app.quit();}catch(error){console.error(error);await host.close().catch(()=>{});app.exit(1);}
   return;
 }
 if (process.argv.includes('--shell-smoke-test')) {

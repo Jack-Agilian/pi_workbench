@@ -1,3 +1,7 @@
+import { modelFetch } from './model-fetch.ts';
+import { modelStream } from './model-stream.ts';
+import { modelServices, modelOutcome } from './model-services.ts';
+import type { ModelSelection } from '../app-contracts/model.ts';
 // A single approved Pi Runtime in a real Worker; no ProductCore/database imports.
 import type { BashOperations } from '@earendil-works/pi-coding-agent';
 import type { ShellOutcome } from '../app-contracts/shell.ts';
@@ -19,7 +23,8 @@ interface WorkerDriver {
   testOnly?: { afterSessionCreated?: (close: () => Promise<void>) => Promise<void>; beforeBind?: (close: () => Promise<void>) => Promise<void> };
   beforeReady?(runtime: AgentSessionRuntime, close: () => Promise<void>): Promise<void>;
   afterGrant?(signal: AbortSignal): Promise<void>;
-  execute(runtime: AgentSessionRuntime, signal: AbortSignal): Promise<void>;
+  model?: (options: {cwd:string;agentDir:string}, selection: ModelSelection, key: string, fetch: typeof globalThis.fetch) => ReturnType<typeof modelServices>;
+  execute?(runtime: AgentSessionRuntime, signal: AbortSignal): Promise<void>;
 }
 export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
   const instanceId = process.argv[2]!; const runtimeBindingId = process.argv[3]!;
@@ -37,11 +42,11 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
   const references = new Map<string, { resolve(): void; reject(error: Error): void }>();
   let reservedReference: string | null = null;
   let priorEntries = new Set<string>();
-  const send = (body: WireBody, requestId = `worker-${++sequence}`) => sender.send({ version: 4, instanceId, runtimeBindingId, requestId, body } satisfies Envelope);
+  const send = (body: WireBody, requestId = `worker-${++sequence}`) => sender.send({ version: 5, instanceId, runtimeBindingId, requestId, body } satisfies Envelope);
   const publish = () => runtime && started && !closed ? send({ type: 'presentation', projection: projectMessages(runtime.session.sessionManager.getBranch().filter(entry => !priorEntries.has(entry.id))) }) : Promise.resolve();
   function close(): Promise<void> {
     if (closing) return closing;
-    closed = true; subscriptionGeneration++; unbind(); abort.abort(new Error('worker_closed')); tools?.revoke();
+    closed = true; transport.close(); stream?.close(); subscriptionGeneration++; unbind(); abort.abort(new Error('worker_closed')); tools?.revoke();
     shellPending?.reject(new Error('worker_closed')); shellPending = undefined;
     for (const grant of grants.values()) grant.resolve(undefined); grants.clear();
     for (const reference of references.values()) reference.reject(new Error('worker_closed')); references.clear();
@@ -53,6 +58,9 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
     });
     return closing;
   }
+  const transport = modelFetch(send);
+  let key: string | undefined;
+  let stream: ReturnType<typeof modelStream> | undefined;
   const fail = () => { void close().catch(() => { sender.close(); if (process.connected) process.disconnect(); process.exitCode = 1; }); };
   const shellBackend: BashOperations = { exec: async (_command, _cwd, execution) => {
     if (!shellGrant || shellPending || closed || abort.signal.aborted) throw new Error('shell_not_admitted');
@@ -85,7 +93,7 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
           target: operation.target ? relative(c.workspace, operation.target) : '.', resourceLock: c.resources.id }, requestId);
         try { const approval = await promise; if (approval) await driver?.afterGrant?.(abort.signal); return approval; } finally { grants.delete(requestId); }
       } });
-    const definitions = [defineTool(tools.write), defineTool(tools.edit), defineTool(tools.bash)];
+    const definitions = c.model ? [] : [defineTool(tools.write), defineTool(tools.edit), defineTool(tools.bash)];
     const factory: CreateAgentSessionRuntimeFactory = async options => {
       if (closed) throw new Error('worker_closed');
       const reference = options.sessionManager.getSessionFile();
@@ -96,9 +104,11 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
       void send({ type: 'session-reference', nativeRef: reference }, requestId).catch(() => references.get(requestId)?.reject(new Error('native_reference_failed')));
       try { await accepted; } finally { references.delete(requestId); }
       if (closed) throw new Error('worker_closed'); reservedReference = reference;
-      const services = await createIsolatedServices(options); services.resourceLoader = resources.loader;
+      if (Boolean(c.model) !== Boolean(driver?.model)) throw new Error('model_composition_mismatch');
+      const configured = c.model && driver?.model ? await driver.model(options, c.model, key ?? '', transport.fetch) : undefined; key = undefined;
+      const services = configured?.services ?? await createIsolatedServices(options); if (!c.model) services.resourceLoader = resources.loader;
       const result = await createAgentSession({ ...services, sessionManager: options.sessionManager, sessionStartEvent: options.sessionStartEvent,
-        tools: ['write','edit','bash'], customTools: definitions, noTools: 'builtin', thinkingLevel: 'off' });
+        ...(configured ? { model: configured.model } : {}), tools: c.model ? [] : ['write','edit','bash'], customTools: definitions, noTools: c.model ? 'all' : 'builtin', thinkingLevel: 'off' });
       try { await driver?.testOnly?.afterSessionCreated?.(close); } catch (error) { result.session.dispose(); throw error; }
       if (closed) { result.session.dispose(); throw new Error('worker_closed'); }
       return { ...result, services, diagnostics: services.diagnostics };
@@ -114,7 +124,7 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
       await driver?.testOnly?.beforeBind?.(close);
       if (closed || generation !== subscriptionGeneration) throw new Error('worker_closed');
       unbind = bindProductSession(session, c.binding, (_binding, event) => {
-        if (!closed && generation === subscriptionGeneration) void send({ type: 'observation', ...event }).catch(fail);
+        if (!closed && generation === subscriptionGeneration && !(c.model && ['message_update','message_start','message_end'].includes(event.eventType))) void send({ type: 'observation', ...event }).catch(fail);
       });
     };
     runtime.setBeforeSessionInvalidate(() => { subscriptionGeneration++; unbind(); });
@@ -127,9 +137,11 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
     const message = parseEnvelope(raw);
     if (message.instanceId !== instanceId || message.runtimeBindingId !== runtimeBindingId) throw new Error('stale_host');
     const { body, requestId } = message;
+    if (['model-http-head','model-http-chunk','model-http-error'].includes(body.type)) { if(!transport.receive(requestId,body))throw new Error('unexpected_http_response');return; }
+    if (body.type === 'model-key') { if(creating || key !== undefined || !driver?.model)throw new Error('unexpected_model_key'); key=body.key;return; }
     if (seen.has(requestId)) return;
     if (seen.size >= 128) throw new Error('request_limit'); seen.add(requestId);
-    if (body.type === 'cancel') { abort.abort(new Error('cancel_requested')); tools?.revoke(); for (const g of grants.values()) g.resolve(undefined); return; }
+    if (body.type === 'cancel') { abort.abort(new Error('cancel_requested')); tools?.revoke(); transport.close(); if (config?.model) void runtime?.session.abort().catch(fail); for (const g of grants.values()) g.resolve(undefined); return; }
     if (body.type === 'close') { fail(); return; }
     if (closed) return;
     if (body.type === 'shell-result') { if (shellPending?.requestId === requestId) shellPending.resolve(body.outcome); return; }
@@ -153,7 +165,17 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
       executing = (async () => {
         priorEntries = new Set(runtime!.session.sessionManager.getBranch().map(entry => entry.id));
         let ok = false;
-        try { abort.signal.throwIfAborted(); verifyContent(config!.resources); await driver.execute(runtime!, abort.signal); ok = !abort.signal.aborted; }
+        try {
+          abort.signal.throwIfAborted(); verifyContent(config!.resources);
+          if (config!.model) {
+            if (runtime!.session.getActiveToolNames().length) throw new Error('model_tools_enabled');
+            stream = modelStream(runtime!.session, priorEntries, projection => send({type:'presentation',projection}));
+            const unsubscribe = runtime!.session.subscribe(event => stream?.observe(event));
+            try { await runtime!.session.prompt(config!.binding.input); } finally { unsubscribe(); await stream.finish(); stream.close(); }
+            const outcome = modelOutcome(runtime!.session, config!.model.mode === 'offline', abort.signal.aborted);
+            await send({type:'model-outcome',outcome}); ok = outcome.reason === 'stop' || outcome.reason === 'length';
+          } else { await driver.execute!(runtime!, abort.signal); ok = !abort.signal.aborted; }
+        }
         catch { ok = false; }
         await publish();
         for (const operationId of claimed) await send({ type: 'result', operationId, ok });

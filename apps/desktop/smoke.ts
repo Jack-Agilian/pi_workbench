@@ -30,7 +30,7 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
   const counts = [];
   for (const scenario of ['allow','deny','cancel','crash']) {
     console.log(`desktopSmoke scenario: ${scenario}`);
-    await fill('#title', `SYNTHETIC ${scenario}`); await click('＋ 新建任务');
+    await fill('#title', `SYNTHETIC ${scenario}`); await click('＋ 新建会话');
     await wait(() => js<boolean>(`document.querySelector('h1')?.textContent === ${JSON.stringify(`SYNTHETIC ${scenario}`)}`), 'thread');
     const text = `SYNTHETIC ${scenario} 中文任务 <img src=x onerror="globalThis.injection=true"> sk-syntheticSecret123456789`;
     await fill('#composer', text);
@@ -114,7 +114,7 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
     return result;
   };
   const create = async (title: string) => {
-    await fill('#title', title); await click('＋ 新建任务');
+    await fill('#title', title); await click('＋ 新建会话');
     await wait(() => js<boolean>(`document.querySelector('h1')?.textContent === ${JSON.stringify(title)}`), 'retry_thread_created');
     return (await host.request({ type: 'home' }) as DesktopHome).threads.find(t => t.title === title)!;
   };
@@ -125,15 +125,15 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
   const submit = async (text: string, lost: boolean) => {
     await fill('#composer', text); if (lost) loseAck = 'runs.start';
     await js("document.querySelector('.composer').requestSubmit()");
-    await wait(() => js<boolean>(lost ? "document.querySelector('.composer button').textContent.includes('重试未确认任务') && !!document.querySelector('.notice.error')" : "document.querySelector('#composer').value === ''"), 'submit_ack_result');
+    await wait(() => js<boolean>(lost ? "document.querySelector('.composer button').textContent.includes('重试未确认请求') && !!document.querySelector('.notice.error')" : "document.querySelector('#composer').value === ''"), 'submit_ack_result');
   };
   const b = await create('SYNTHETIC retry B');
-  loseAck = 'threads.create'; await fill('#title', 'SYNTHETIC retry A'); await click('＋ 新建任务');
-  await wait(() => js<boolean>("document.querySelector('.new-thread').textContent.includes('重试新建任务') && !!document.querySelector('.notice.error')"), 'create_ack_lost');
+  loseAck = 'threads.create'; await fill('#title', 'SYNTHETIC retry A'); await click('＋ 新建会话');
+  await wait(() => js<boolean>("document.querySelector('.new-thread').textContent.includes('重试新建会话') && !!document.querySelector('.notice.error')"), 'create_ack_lost');
   assert.equal(await js<boolean>("document.querySelector('#title').disabled"), true);
   const beforeRetry = await host.request({ type: 'home' }) as DesktopHome; assert.equal(beforeRetry.threads.length, 6);
   const a = beforeRetry.threads.find(t => t.title === 'SYNTHETIC retry A')!;
-  await reconnectUi(); await click('＋ 重试新建任务');
+  await reconnectUi(); await click('＋ 重试新建会话');
   await wait(() => js<boolean>("document.querySelector('h1')?.textContent === 'SYNTHETIC retry A' && !document.querySelector('#title').disabled"), 'create_retry_ack');
   const creations = attempts.filter(c => c.type === 'threads.create' && c.title === a.title);
   assert.equal(creations.length, 2); assert.deepEqual(creations[0], creations[1]);
@@ -145,9 +145,9 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
   await wait(() => js<boolean>("document.querySelector('h1')?.textContent === 'SYNTHETIC retry B'"), 'select_B');
   await submit('SYNTHETIC successful B', false);
   await click(a.title);
-  await wait(() => js<boolean>("document.querySelector('h1')?.textContent === 'SYNTHETIC retry A' && document.querySelector('.composer button').textContent.includes('重试未确认任务')"), 'restore_A_intent');
+  await wait(() => js<boolean>("document.querySelector('h1')?.textContent === 'SYNTHETIC retry A' && document.querySelector('.composer button').textContent.includes('重试未确认请求')"), 'restore_A_intent');
   assert.equal(attempts.filter(c => c.type === 'runs.start' && c.threadId === a.id).length, 1); // No reconnect/selection replay.
-  await click('重试未确认任务 ↑');
+  await click('重试未确认请求 ↑');
   await wait(() => js<boolean>("document.querySelector('#composer').value === ''"), 'A_retry_ack');
   const aRuns = attempts.filter(c => c.type === 'runs.start' && c.threadId === a.id);
   assert.equal(aRuns.length, 2); assert.deepEqual(aRuns[0], aRuns[1]);
@@ -155,7 +155,7 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
 
   await click(b.title); await wait(() => js<boolean>("document.querySelector('h1')?.textContent === 'SYNTHETIC retry B'"), 'same_thread_retry');
   const repeatedText = 'SYNTHETIC deliberate same content'; await submit(repeatedText, true); await reconnectUi();
-  await click('重试未确认任务 ↑'); await wait(() => js<boolean>("document.querySelector('#composer').value === ''"), 'B_retry_ack');
+  await click('重试未确认请求 ↑'); await wait(() => js<boolean>("document.querySelector('#composer').value === ''"), 'B_retry_ack');
   await submit(repeatedText, false); // A new, explicitly submitted intent, despite identical content.
   const bRuns = attempts.filter(c => c.type === 'runs.start' && c.threadId === b.id && c.input === repeatedText);
   assert.equal(bRuns.length, 3); assert.deepEqual(bRuns[0], bRuns[1]); assert.notEqual(bRuns[1]!.requestId, bRuns[2]!.requestId);

@@ -1,3 +1,5 @@
+import { ModelHttp } from './model-http.ts';
+import { parseModelConfiguration, parseModelSelection, type ModelSelection, type ModelConfiguration } from '../../packages/app-contracts/model.ts';
 import { parseShellIntent, parseShellOutcome, type ShellIntent, type ShellOutcome } from '../../packages/app-contracts/shell.ts';
 import { parametersDigest } from '../../packages/pi-adapter/controlled-tools.ts';
 import { randomUUID } from 'node:crypto';
@@ -15,11 +17,14 @@ import { launchSpec, shellLaunch, spawnGuardian, type LaunchSpec, type TrustedWo
 /** Host-approved one-operation intent. Not a Renderer command and not accepted from the Worker. */
 export interface FileExecutionPlan { tool: 'write' | 'edit'; target: string; parametersDigest: string; fileVersion: string | null; expectedContentDigest: string; deadline: number }
 export interface ShellExecutionPlan { tool: 'bash'; target: '.'; parametersDigest: string; shell: ShellIntent; deadline: number }
-export type ExecutionPlan = FileExecutionPlan | ShellExecutionPlan;
+export interface ModelExecutionPlan { tool: 'none'; model: ModelSelection; deadline: number }
+export interface ModelAccess { key: string; configuration: ModelConfiguration; requestUrl: string; reserveCostUsd: number; fetch?: typeof globalThis.fetch }
+export type ExecutionPlan = FileExecutionPlan | ShellExecutionPlan | ModelExecutionPlan;
 interface Journal { binding: Dispatch; config: WorkerInit; plan: ExecutionPlan; spec: LaunchSpec; lease: string }
 interface Active {
   journal: Journal; child: ChildProcess; sender: IpcSender; done: Promise<void>; resolve: () => void; reject: (error: unknown) => void;
   pid?: number; armed: boolean; hello: boolean; ready: boolean; closed: boolean; result?: boolean; nativeRef?: string;
+  httpSequence?:number; modelAccess?: ModelAccess; http?: ModelHttp;
   shellRequest?: { id: string; operationId: string };
   requests: Map<string, string>; replies: Map<string, WireBody>; pending: Map<string, string>; startedAt: number;
 }
@@ -39,6 +44,7 @@ export class WorkerSupervisor {
     const active = this.active;
     if (active && command.type === 'approvals.resolve') this.deliverApproval(active, command.operationId);
     if (active && command.type === 'runs.cancel' && command.runId === active.journal.binding.runId) {
+      void active.http?.close().catch(()=>{});
       if (active.journal.plan.tool === 'bash') void active.sender.send({ kind: 'shell-cancel' }).catch(() => this.stop(active));
       void this.send(active, { type: 'cancel' }).catch(() => this.stop(active));
       // Acknowledgement means request persisted. Hung SDK/driver is killed after bounded grace.
@@ -47,22 +53,33 @@ export class WorkerSupervisor {
     return ack;
   }
   /** Only trusted host composition selects plans/entry. Product commands cannot set either. */
-  startNext(plan: ExecutionPlan, entry?: TrustedWorkerEntry): Promise<void> | undefined {
+  startNext(plan: ExecutionPlan, entry?: TrustedWorkerEntry, modelAccess?: ModelAccess): Promise<void> | undefined {
     if (this.active) return this.active.done;
-    plan = structuredClone(plan); if (plan.tool === 'bash') Object.freeze(plan.shell); Object.freeze(plan);
-    sha256(plan.parametersDigest);
+    plan = structuredClone(plan); if (plan.tool === 'bash') Object.freeze(plan.shell); if (plan.tool === 'none') Object.freeze(plan.model); Object.freeze(plan);
+    if (plan.tool === 'none') {
+      parseModelSelection(plan.model);
+      if (plan.model.mode === 'live') {
+        if (!modelAccess || !modelAccess.key || /[\r\n\0]/.test(modelAccess.key) || modelAccess.key.length > 8192) throw new Error('model_not_configured');
+        const configuration = parseModelConfiguration(structuredClone(modelAccess.configuration));
+        if (!configuration.approved || (['provider','model','endpoint','maxOutputTokens','timeoutMs'] as const).some(k => configuration[k] !== plan.model[k])) throw new Error('model_policy_mismatch');
+        const url = new URL(modelAccess.requestUrl); const endpoint = new URL(configuration.endpoint);
+        if (url.origin !== endpoint.origin || url.username || url.password || url.hash || !Number.isFinite(modelAccess.reserveCostUsd) || modelAccess.reserveCostUsd < 0) throw new Error('model_access_not_admitted');
+        modelAccess = Object.freeze({ ...modelAccess, configuration: Object.freeze(configuration) });
+      } else if (modelAccess) throw new Error('offline_model_access');
+    }
+    else sha256(plan.parametersDigest);
     if (plan.tool === 'bash') { parseShellIntent(plan.shell); if (plan.target !== '.' || parametersDigest({ command: plan.shell.command, timeout: plan.shell.timeoutMs / 1000 }) !== plan.parametersDigest) throw new Error('shell_parameters_mismatch'); }
-    else { sha256(plan.expectedContentDigest); if (plan.fileVersion !== null) sha256(plan.fileVersion); }
-    if (!['write','edit','bash'].includes(plan.tool) || plan.deadline <= Date.now() || plan.deadline > Date.now() + 120_000) throw new Error('invalid_execution_plan');
+    else if (plan.tool !== 'none') { sha256(plan.expectedContentDigest); if (plan.fileVersion !== null) sha256(plan.fileVersion); }
+    if (!['write','edit','bash','none'].includes(plan.tool) || plan.deadline <= Date.now() || plan.deadline > Date.now() + 120_000) throw new Error('invalid_execution_plan');
     let journal: Journal | undefined; let child: ChildProcess | undefined;
     let binding: Dispatch | undefined;
     try { binding = this.core.dispatchNext(dispatch => {
-      const workspace = this.core.workspacePath(dispatch.workspaceId); if (plan.tool !== 'bash') artifactPath(workspace, plan.target);
+      const workspace = this.core.workspacePath(dispatch.workspaceId); if (plan.tool !== 'bash' && plan.tool !== 'none') artifactPath(workspace, plan.target);
       const lease = join(this.options.stateDirectory, 'leases', randomUUID());
       const agentDir = join(this.options.stateDirectory, 'workers', randomUUID());
       const sessions = join(this.options.stateDirectory, 'sessions', dispatch.threadId);
       for (const dir of [lease, agentDir, sessions]) mkdirSync(dir, { recursive: true, mode: 0o700 });
-      const config: WorkerInit = { binding: dispatch, workspace, agentDir, sessions, resources: structuredClone(this.options.resources), deadline: plan.deadline };
+      const config: WorkerInit = { binding: dispatch, workspace, agentDir, sessions, resources: structuredClone(this.options.resources), deadline: plan.deadline, ...(plan.tool === 'none' ? { model: plan.model } : {}) };
       const spec = launchSpec(config, { instanceId: randomUUID(), nonce: randomUUID() }, { lease, databaseDirectory: this.options.databaseDirectory }, entry);
       if (plan.tool === 'bash') spec.shell = shellLaunch(plan.shell, workspace, lease);
       journal = { binding: dispatch, config, plan: Object.freeze({ ...plan }), spec, lease };
@@ -76,6 +93,14 @@ export class WorkerSupervisor {
     const sender = new IpcSender((message, callback) => guardian.send(message, callback));
     const active: Active = { journal, child: guardian, sender, done, resolve, reject, armed: false, hello: false, ready: false, closed: false, requests: new Map(), replies: new Map(), pending: new Map(), startedAt: Date.now() };
     this.active = active;
+    if(plan.tool==='none' && modelAccess){ active.modelAccess=modelAccess; const access=modelAccess;
+      active.http=new ModelHttp(access.requestUrl, (bytes,body)=>{
+        if(bytes>24000)throw new Error('model_input_limit');
+        const request=JSON.parse(body) as Record<string,unknown>;
+        if (!request || Array.isArray(request) || request.model !== plan.model.model || request.stream !== true || !Number.isSafeInteger(request.max_tokens) || Number(request.max_tokens)<1 || Number(request.max_tokens)>plan.model.maxOutputTokens || (request.tools !== undefined && (!Array.isArray(request.tools) || request.tools.length))) throw new Error('model_payload_not_approved');
+        this.core.reserveModelRequest(active.journal.binding,access.configuration.authorizationId,parametersDigest(access.configuration),access.configuration.maxRequests,access.reserveCostUsd,access.configuration.maxEstimatedCostUsd);
+      },access.fetch);
+    }
     guardian.on('message', raw => { try { this.receive(active, raw); } catch { this.stop(active); } });
     guardian.on('error', () => this.stop(active));
     guardian.once('exit', () => { void this.finish(active); });
@@ -87,7 +112,7 @@ export class WorkerSupervisor {
   }
   private send(active: Active, body: WireBody, requestId = `host-${++this.sequence}`): Promise<void> {
     const { spec } = active.journal;
-    return active.sender.send({ version: 4, instanceId: spec.instanceId, runtimeBindingId: spec.runtimeBindingId, requestId, body } satisfies Envelope);
+    return active.sender.send({ version: 5, instanceId: spec.instanceId, runtimeBindingId: spec.runtimeBindingId, requestId, body } satisfies Envelope);
   }
   private receive(active: Active, raw: unknown) {
     if (this.active !== active) return; // closure bound to actual child handle, never routable by message strings
@@ -102,6 +127,12 @@ export class WorkerSupervisor {
     if (outer.kind !== 'worker') throw new Error('unknown_guardian_message');
     const message = parseEnvelope(outer.message); const { body, requestId } = message; const { binding, config, plan, spec } = active.journal;
     if (message.instanceId !== spec.instanceId || message.runtimeBindingId !== binding.runtimeBindingId) throw new Error('stale_connection');
+    if (body.type==='model-http' || body.type==='model-http-read') {
+      if(plan.tool!=='none'||plan.model.mode!=='live'||!active.ready||active.closed||active.result!==undefined||Date.now()>=plan.deadline||this.core.snapshot(binding.threadId).runs.find(r=>r.id===binding.runId)?.state!=='running')throw new Error('model_http_not_admitted');
+      const number=Number(requestId.replace(/^http-/,''));if(requestId!==`http-${number}`||number!==(active.httpSequence??0)+1||number>4096)throw new Error('model_http_sequence');active.httpSequence=number;
+      if(!active.http)throw new Error('model_transport_missing');
+      active.http.receive(body, reply=>this.send(active,reply,requestId));return;
+    }
     const serialized = JSON.stringify(body); const prior = active.requests.get(requestId);
     if (prior) {
       if (prior !== serialized) throw new Error('request_id_conflict');
@@ -111,7 +142,7 @@ export class WorkerSupervisor {
     switch (body.type) {
       case 'hello':
         if (active.hello || body.pid !== active.pid) throw new Error('unexpected_worker'); active.hello = true;
-        void this.send(active, { type: 'init', config }).catch(() => this.stop(active)); break;
+        void (async()=>{if(plan.tool==='none')await this.send(active,{type:'model-key',key:active.modelAccess?.key ?? 'SYNTHETIC_OFFLINE_KEY'});await this.send(active,{type:'init',config});})().catch(() => this.stop(active)); break;
       case 'session-reference': {
         if (!active.hello || active.closed) throw new Error('unexpected_native_reference');
         this.nativeReference(active, body.nativeRef, true);
@@ -123,7 +154,7 @@ export class WorkerSupervisor {
         verifyContent(config.resources); this.nativeReference(active, body.nativeRef);
         this.core.markRunning(binding); active.ready = true; void this.send(active, { type: 'start' }).catch(() => this.stop(active)); break;
       case 'operation': {
-        if (!active.ready || body.tool !== plan.tool || body.target !== plan.target || body.parametersDigest !== plan.parametersDigest || body.resourceLock !== config.resources.id) throw new Error('operation_not_in_host_plan');
+        if (plan.tool === 'none' || !active.ready || body.tool !== plan.tool || body.target !== plan.target || body.parametersDigest !== plan.parametersDigest || body.resourceLock !== config.resources.id) throw new Error('operation_not_in_host_plan');
         verifyContent(config.resources);
         if (active.pending.size) throw new Error('one_operation_per_run');
         const op = this.core.requestOperation(binding, { toolCallId: body.toolCallId, tool: plan.tool, parametersDigest: this.approvalDigest(active.journal), deadline: plan.deadline, ...(plan.tool === 'bash' ? { shell: plan.shell } : { artifactPath: plan.target }) });
@@ -137,7 +168,7 @@ export class WorkerSupervisor {
         void active.sender.send({ kind: 'shell-start', operationId: op.id, deadline: plan.deadline }).catch(() => this.stop(active)); break;
       }
       case 'result': {
-        if (!active.pending.has(body.operationId)) throw new Error('unowned_operation');
+        if (plan.tool === 'none' || !active.pending.has(body.operationId)) throw new Error('unowned_operation');
         const operation = this.core.snapshot(binding.threadId).operations.find(op => op.id === body.operationId);
         if (plan.tool === 'bash') { if (!operation) throw new Error('missing_shell_operation'); this.shellCompleted(active); break; }
         if (operation?.state !== 'executing') throw new Error('result_before_claim');
@@ -147,6 +178,7 @@ export class WorkerSupervisor {
         } else if (version === plan.fileVersion) this.core.finishOperation(binding, operation.id, 'failed');
         else this.core.finishOperation(binding, operation.id, 'unknown'); break;
       }
+      case 'model-outcome': if(plan.tool!=='none'||!active.ready||active.closed||body.outcome.synthetic!==(plan.model.mode==='offline'))throw new Error('model_outcome_not_admitted'); this.core.recordModelOutcome(binding,body.outcome);break;
       case 'observation': if (active.ready && !active.closed) this.core.observe(binding, body); break;
       case 'presentation': if (!active.ready || active.closed) throw new Error('unexpected_presentation'); this.core.projectSession(binding, body.projection); break;
       case 'done': if (!active.ready || active.result !== undefined) throw new Error('unexpected_done'); active.result = body.ok; void this.send(active, { type: 'close' }).catch(() => this.stop(active)); break;
@@ -157,6 +189,7 @@ export class WorkerSupervisor {
   }
   private approvalDigest(journal: Journal): string {
     const { plan, binding, config } = journal;
+    if(plan.tool==='none')throw new Error('model_has_no_operation');
     return plan.tool === 'bash' ? parametersDigest({ intent: plan.shell, toolParametersDigest: plan.parametersDigest, workspace: config.workspace, binding, deadline: plan.deadline }) : plan.parametersDigest;
   }
   private shellReceipt(journal: Journal, operationId: string): ShellOutcome | undefined {
@@ -202,7 +235,7 @@ export class WorkerSupervisor {
     this.core.bindNativeSession(active.journal.binding, reference, persisted); active.nativeRef = reference;
   }
   private fileVersion(journal: Journal): string | null {
-    if (journal.plan.tool === 'bash') throw new Error('shell_has_no_file_precondition');
+    if (journal.plan.tool === 'bash' || journal.plan.tool === 'none') throw new Error('shell_has_no_file_precondition');
     const path = join(journal.config.workspace, artifactPath(journal.config.workspace, journal.plan.target));
     if (!existsSync(path)) return null;
     return inspectMarkdown(journal.config.workspace, journal.plan.target).digest;
@@ -210,6 +243,7 @@ export class WorkerSupervisor {
   private deliverApproval(active: Active, operationId: string) {
     const requestId = active.pending.get(operationId); if (!requestId || active.replies.has(requestId)) return;
     const { binding, plan, config } = active.journal;
+    if(plan.tool==='none')throw new Error('model_has_no_operation');
     const op = this.core.snapshot(binding.threadId).operations.find(o => o.id === operationId); if (!op) return;
     let reply: WireBody = { type: 'deny' };
     if (op.state === 'approved') {
@@ -221,7 +255,7 @@ export class WorkerSupervisor {
     } else if (op.state !== 'denied') return;
     active.replies.set(requestId, reply); void this.send(active, reply, requestId).catch(() => this.stop(active));
   }
-  private stop(active: Active) { if (active.child.connected) active.child.disconnect(); }
+  private stop(active: Active) { void active.http?.close().catch(()=>{}); if (active.child.connected) active.child.disconnect(); }
   close(): Promise<void> { const active = this.active; if (!active) return this.closeResult ?? Promise.resolve(); this.stop(active); return active.done; }
   private clean(journal: Journal): boolean {
     try {
@@ -239,12 +273,13 @@ export class WorkerSupervisor {
         writeFileSync(spec.receipt, JSON.stringify({ instanceId: spec.instanceId, runtimeBindingId: binding.runtimeBindingId,
           nonce: spec.nonce, workerPid: null, exited: true, groupGone: true }), { flag: 'wx', mode: 0o600 });
       }
+      await active.http?.close();
       const clean = this.clean(active.journal);
       if (clean) {
         const snap = this.core.snapshot(binding.threadId); const run = snap.runs.find(r => r.id === binding.runId)!;
         const outstanding = snap.operations.some(o => o.runId === run.id && ['pending','approved','executing','unknown'].includes(o.state));
         if (active.closed && active.result !== undefined && run.state !== 'unknown' && !outstanding) {
-          this.core.settle(binding, run.state === 'cancelling' ? 'cancelled' : active.result && snap.operations.filter(o => o.runId === run.id).length === 1 && snap.operations.some(o => o.runId === run.id && o.state === 'succeeded') ? 'completed' : 'failed', { piIdle: true, hostClean: true });
+          this.core.settle(binding, run.state === 'cancelling' ? 'cancelled' : active.result && (active.journal.plan.tool === 'none' ? ['stop','length'].includes(this.core.modelOutcome(run.id)?.reason ?? '') && !snap.operations.some(o=>o.runId===run.id) : snap.operations.filter(o => o.runId === run.id).length === 1 && snap.operations.some(o => o.runId === run.id && o.state === 'succeeded')) ? 'completed' : 'failed', { piIdle: true, hostClean: true });
         } else {
           this.core.recoverAfterCrash();
           if (run.state === 'starting' && !outstanding) this.core.reconcileRun(run.id, 'failed', { piIdle: true, hostClean: true });
@@ -279,14 +314,14 @@ export class WorkerSupervisor {
           this.core.recordShellOutcome(binding, op.id, outcome);
           if (outcome.signal !== null && !outcome.timedOut && !cancelRequested) throw new Error('shell_side_effect_unresolved');
           this.core.reconcileOperation(op.id, outcome.exitCode === 0 && !outcome.timedOut ? 'succeeded' : 'failed');
-        } else if (op.state === 'unknown' && plan.tool !== 'bash') {
+        } else if (op.state === 'unknown' && plan.tool !== 'bash' && plan.tool !== 'none') {
           const version = this.fileVersion(journal);
           if (version === plan.expectedContentDigest) this.core.reconcileOperation(op.id, 'succeeded', version);
           else if (version === plan.fileVersion) this.core.reconcileOperation(op.id, 'failed');
           else throw new Error('side_effect_unresolved');
         }
         const current = this.core.snapshot(binding.threadId).operations.find(o => o.id === op.id)!;
-        if (plan.tool !== 'bash' && current.state === 'succeeded') this.core.reconcileArtifact(binding, op.id, plan.target);
+        if (plan.tool !== 'bash' && plan.tool !== 'none' && current.state === 'succeeded') this.core.reconcileArtifact(binding, op.id, plan.target);
       }
       this.core.reconcileRun(binding.runId, cancelRequested ? 'cancelled' : 'failed', { piIdle: true, hostClean: true });
     }

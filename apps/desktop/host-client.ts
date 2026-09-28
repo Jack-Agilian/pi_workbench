@@ -15,11 +15,12 @@ export class HostClient {
   private stopped = false;
   private closeResult?: Promise<void>;
   private readonly node: string; private readonly root: string; private readonly profile: string;
-  constructor(node: string, root: string, profile: string) { this.node = node; this.root = root; this.profile = profile; }
+  private readonly mode: '--demo'|'--model'|'--model-offline';private readonly configuration?:string; private readonly denyModelNetwork: boolean;
+  constructor(node: string, root: string, profile: string, mode:'--demo'|'--model'|'--model-offline'='--demo', configuration?:string, denyModelNetwork=false) { this.denyModelNetwork=denyModelNetwork; this.node = node; this.root = root; this.profile = profile;this.mode=mode;this.configuration=configuration; }
   get processId() { return this.connection?.child.pid; }
   private start(): Connection {
     const home = join(this.profile, 'server-home'); const temp = join(home, 'tmp'); mkdirSync(temp, { recursive: true });
-    const child = spawn(this.node, ['--import', join(this.root, 'scripts/probe-no-network.mjs'), join(this.root, 'apps/agent-server/desktop-entry.ts'), '--demo', this.profile], {
+    const child = spawn(this.node, [...(this.mode==='--model'&&!this.denyModelNetwork?[]:['--import', join(this.root, 'scripts/probe-no-network.mjs')]), join(this.root, 'apps/agent-server/desktop-entry.ts'), this.mode, this.profile, ...(this.configuration?[this.configuration]:[])], {
       cwd: this.profile, stdio: ['ignore','ignore','ignore','ipc'], serialization: 'json',
       env: { HOME: home, USERPROFILE: home, TMPDIR: temp, TMP: temp, TEMP: temp, PATH: dirname(this.node),
         XDG_CONFIG_HOME: join(home, '.config'), PI_OFFLINE: '1', PI_SKIP_VERSION_CHECK: '1', PI_CODING_AGENT_DIR: join(home, 'agent'), NO_COLOR: '1' },
@@ -61,7 +62,11 @@ export class HostClient {
   }
   connect(): Promise<void> { return this.stopped ? Promise.reject(new Error('disconnected')) : (this.connection ?? this.start()).ready; }
   async request(raw: DesktopRequest): Promise<DesktopValue> {
-    const request = parseDesktopRequest(raw); const connection = this.connection;
+    return this.exchange({request:parseDesktopRequest(raw)});
+  }
+  async setModelKey(key:string):Promise<void> { if(typeof key!=='string'||!key||key.length>8192||/[\r\n\0]/.test(key))throw new Error('invalid_credential');await this.exchange({credential:key}); }
+  private async exchange(payload:object):Promise<DesktopValue> {
+    const connection = this.connection;
     if (this.stopped || !connection || !connection.child.connected) throw new Error('disconnected');
     await connection.ready;
     if (this.connection !== connection || !connection.child.connected) throw new Error('disconnected');
@@ -70,7 +75,7 @@ export class HostClient {
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => { this.pending.delete(id); reject(new Error('disconnected')); }, 10000);
       this.pending.set(id, { connection, resolve, reject, timer });
-      void connection.sender.send({ id, request }).catch(() => { clearTimeout(timer); this.pending.delete(id); reject(new Error('disconnected')); });
+      void connection.sender.send({ id, ...payload }).catch(() => { clearTimeout(timer); this.pending.delete(id); reject(new Error('disconnected')); });
     });
   }
   /** Explicit restart only after the owned old host exits. Product command retry remains caller-controlled. */

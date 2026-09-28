@@ -9,7 +9,7 @@ export async function runShellSmoke(window: BrowserWindow, host: HostClient) {
   const click=(text:string)=>js(`(()=>{const b=[...document.querySelectorAll('button')].find(b=>b.textContent.trim()===${JSON.stringify(text)});if(!b||b.disabled)throw Error('button unavailable');b.click()})()`);
   await wait(()=>js<boolean>("!!document.querySelector('.new-thread')"),'mounted');
   for(const mode of ['allow','deny','cancel']) {
-    await click('＋ 新建任务');
+    await click('＋ 新建会话');
     await wait(()=>js<boolean>("!document.querySelector('button.new-thread').disabled && !!document.querySelector('.thread-link.selected')"),'thread');
     await click(mode==='cancel'?'填入可停止命令演示':'填入只读命令演示');
     await wait(()=>js<boolean>("!document.querySelector('button[type=submit]').disabled"),'composer');

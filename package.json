@@ -32,7 +32,13 @@
     "test:desktop-shutdown": "node scripts/test-desktop-shutdown.mjs",
     "test:product-shell": "node scripts/run-product-worker.mjs --shell",
     "test:desktop-shell": "node scripts/launch-desktop.mjs --demo --shell-smoke-test",
-    "demo:product-shell": "node scripts/run-product-worker.mjs --shell-demo"
+    "demo:product-shell": "node scripts/run-product-worker.mjs --shell-demo",
+    "test:model-integration-offline": "node scripts/run-product-worker.mjs --model",
+    "model:config": "node scripts/model-config.mjs",
+    "desktop:model": "node scripts/launch-desktop.mjs --model",
+    "test:desktop-model": "node scripts/launch-desktop.mjs --model-offline --model-smoke-test",
+    "test:model-network": "node scripts/test-model-network.mjs",
+    "test:model-config": "node scripts/test-model-config.mjs"
   },
   "dependencies": {
     "@earendil-works/pi-ai": "0.87.0",

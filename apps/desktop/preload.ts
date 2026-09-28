@@ -7,6 +7,7 @@ async function request<T>(payload: DesktopRequest): Promise<T> {
   return reply.value as T;
 }
 const api: DesktopApi = {
+  selectModelCredential: async () => { if(!await ipcRenderer.invoke('workbench:credential'))throw new Error('credential_rejected'); },
   home: () => request<DesktopHome>({ type: 'home' }),
   thread: threadId => request<DesktopThread>({ type: 'thread', threadId }),
   events: (threadId, cursor) => request<ProductEvent[]>({ type: 'events', threadId, cursor }),

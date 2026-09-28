@@ -17,10 +17,10 @@ const wait = async (predicate, label) => {
   while (!predicate()) { if (Date.now() > end) throw new Error('shutdown_timeout:' + label); await delay(25); }
 };
 const results = [];
-for (const scenario of ['idle','starting','approval','executing','cancelling','completed','sigterm','sigint','sigkill','missing-proof','unresolved','recovery-close-race','shell-running','shell-cancelling','shell-completed','shell-sigterm','shell-sigkill','shell-missing-proof']) {
+for (const scenario of ['idle','starting','approval','executing','cancelling','completed','sigterm','sigint','sigkill','missing-proof','unresolved','recovery-close-race','shell-running','shell-cancelling','shell-completed','shell-sigterm','shell-sigkill','shell-missing-proof','model-running','model-cancelling','model-completed','model-sigterm','model-sigkill','model-missing-proof']) {
   const killed = scenario.endsWith('sigkill');
   const profile = realpathSync(mkdtempSync(join(tmpdir(), '工作台 退出-')));
-  const child = spawn(binary, [join(repository, 'dist/desktop/main.mjs'), '--demo', `--host-node=${realpathSync(process.execPath)}`, `--demo-profile=${profile}`, `--shutdown-test=${scenario}`],
+  const child = spawn(binary, [join(repository, 'dist/desktop/main.mjs'), scenario.startsWith('model-') ? '--model-offline' : '--demo', `--host-node=${realpathSync(process.execPath)}`, `--demo-profile=${profile}`, `--shutdown-test=${scenario}`],
     { cwd: profile, env: { ...sterileEnvironment(join(profile, 'home')), LANG: 'zh_CN.UTF-8' }, stdio: ['ignore','pipe','pipe'] });
   let output = ''; let exit;
   const collect = bytes => { if (output.length < 1_000_000) output += String(bytes); };
@@ -30,14 +30,14 @@ for (const scenario of ['idle','starting','approval','executing','cancelling','c
   const manifest = join(profile, 'shutdown.json'); const read = () => JSON.parse(readFileSync(manifest, 'utf8'));
   let verified = false;
   try {
-    if (['sigterm','sigint','sigkill','shell-sigterm','shell-sigkill'].includes(scenario)) {
+    if (['sigterm','sigint','sigkill','shell-sigterm','shell-sigkill','model-sigterm','model-sigkill'].includes(scenario)) {
       await wait(() => exit || (existsSync(manifest) && read().readyForSignal), 'signal_ready');
       assert.equal(exit, undefined); child.kill(scenario.endsWith('sigterm') ? 'SIGTERM' : scenario === 'sigint' ? 'SIGINT' : 'SIGKILL');
     }
     await wait(() => exit, scenario + '_exit');
     assert.deepEqual(exit, killed ? { code: null, signal: 'SIGKILL' } : { code: 0, signal: null });
     const observed = read(); assert.equal(observed.willQuit, !killed);
-    assert.equal(observed.warning, ['missing-proof','unresolved','recovery-close-race','shell-missing-proof'].includes(scenario));
+    assert.equal(observed.warning, ['missing-proof','unresolved','recovery-close-race','shell-missing-proof','model-missing-proof'].includes(scenario));
     if (observed.warning) assert.equal(observed.blockedState, 'unknown');
     if (scenario === 'recovery-close-race') assert.equal(observed.raceWaitVerified, true);
     await wait(() => observed.processPids.every(gone), 'owned_processes_gone');
@@ -58,8 +58,8 @@ for (const scenario of ['idle','starting','approval','executing','cancelling','c
     try {
       const runs = db.prepare('SELECT state FROM runs').all(); states = runs.map(run => run.state);
       if (scenario === 'idle') assert.equal(runs.length, 0);
-      else if (['completed','shell-completed'].includes(scenario)) assert.deepEqual(states, ['completed']);
-      else { assert.equal(runs.length, ['cancelling','shell-cancelling'].includes(scenario) ? 1 : 2); assert.ok(states.every(state => state === 'cancelled')); }
+      else if (['completed','shell-completed','model-completed'].includes(scenario)) assert.deepEqual(states, ['completed']);
+      else { assert.equal(runs.length, ['cancelling','shell-cancelling','model-cancelling'].includes(scenario) ? 1 : 2); assert.ok(states.every(state => state === 'cancelled')); }
       assert.equal(db.prepare('SELECT count(*) AS count FROM worker_launches').get().count, scenario === 'idle' ? 0 : 1);
       assert.equal(db.prepare('SELECT count(*) AS count FROM artifacts').get().count, scenario === 'completed' ? 1 : 0);
     } finally { db.close(); }

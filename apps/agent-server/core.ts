@@ -1,3 +1,4 @@
+import { parseModelOutcome, type ModelOutcome } from '../../packages/app-contracts/model.ts';
 import { parseShellIntent, parseShellOutcome, type ShellIntent, type ShellOutcome, type ShellView } from '../../packages/app-contracts/shell.ts';
 // Product intents/indexes and disposable display projections; Pi owns authoritative messages and the Session tree.
 import { randomUUID } from 'node:crypto';
@@ -30,7 +31,7 @@ export class ProductCore {
       if (path !== ':memory:') chmodSync(path, 0o600);
       this.db.exec('PRAGMA busy_timeout=1000; PRAGMA synchronous=FULL;');
       const version = this.one<{ user_version: number }>('PRAGMA user_version').user_version;
-      if (![0, 1, 2, 3, 4, 5].includes(version)) throw new Error('unsupported_database_version');
+      if (![0, 1, 2, 3, 4, 5, 6].includes(version)) throw new Error('unsupported_database_version');
       if (version === 0) {
         this.db.exec(`BEGIN IMMEDIATE;
           CREATE TABLE workspaces(id TEXT PRIMARY KEY, path TEXT NOT NULL UNIQUE) STRICT;
@@ -63,6 +64,10 @@ export class ProductCore {
         CREATE TABLE run_display(run_id TEXT PRIMARY KEY REFERENCES runs(id), projection TEXT NOT NULL) STRICT;
         PRAGMA user_version=4; COMMIT;`);
       if (version < 5) this.db.exec(`BEGIN IMMEDIATE; CREATE TABLE shell_display(operation_id TEXT PRIMARY KEY REFERENCES operations(id), intent TEXT NOT NULL, outcome TEXT) STRICT; PRAGMA user_version=5; COMMIT;`);
+      if (version < 6) this.db.exec(`BEGIN IMMEDIATE;
+        CREATE TABLE model_outcomes(run_id TEXT PRIMARY KEY REFERENCES runs(id), outcome TEXT NOT NULL) STRICT;
+        CREATE TABLE model_requests(run_id TEXT PRIMARY KEY REFERENCES runs(id), authorization_id TEXT NOT NULL, policy_digest TEXT NOT NULL, reserved_cost REAL NOT NULL) STRICT;
+        PRAGMA user_version=6; COMMIT;`);
       this.transaction(() => {
         for (const workspace of workspaces) {
           identifier(workspace.id); const canonical = realpathSync(workspace.path);
@@ -178,6 +183,21 @@ export class ProductCore {
   /** Trusted host scheduling only. Renderer cannot select an executable or plan. */
   nextQueuedIntent(): { id: string; input: string } | undefined { return this.get("SELECT id,input FROM runs WHERE state='queued' ORDER BY rowid LIMIT 1"); }
   runInputs(threadId: string): { id: string; input: string }[] { return this.all('SELECT id,input FROM runs WHERE thread_id=? ORDER BY rowid', threadId); }
+  recordModelOutcome(binding: Binding, raw: unknown): void {
+    const value = parseModelOutcome(raw);
+    this.mutate(() => { const run=this.bound(binding); if(this.get('SELECT 1 FROM model_outcomes WHERE run_id=?',run.id))throw new Error('model_outcome_duplicate');
+      this.db.prepare('INSERT INTO model_outcomes VALUES (?,?)').run(run.id,JSON.stringify(value));this.event(run.threadId,run.id,'model.'+value.reason,run.id); });
+  }
+  modelOutcome(runId:string):ModelOutcome|null { const row=this.get<{outcome:string}>('SELECT outcome FROM model_outcomes WHERE run_id=?',runId);return row?parseModelOutcome(JSON.parse(row.outcome)):null; }
+  reserveModelRequest(binding:Binding, authorizationId:string, policyDigest:string, maxRequests:number, cost:number, maxCost:number):void {
+    identifier(authorizationId); sha256(policyDigest);
+    if (!Number.isSafeInteger(maxRequests) || maxRequests < 1 || maxRequests > 20 || !Number.isFinite(cost) || cost < 0 || !Number.isFinite(maxCost) || maxCost <= 0 || maxCost > 10) throw new Error('model_budget_invalid');
+    this.mutate(()=>{const run=this.bound(binding);if(run.state!=='running')throw new Error('model_run_not_running');
+      const prior=this.all<{policy_digest:string;reserved_cost:number}>('SELECT policy_digest,reserved_cost FROM model_requests WHERE authorization_id=?',authorizationId);
+      if(prior.some(r=>r.policy_digest!==policyDigest)||prior.length>=maxRequests||prior.reduce((n,r)=>n+r.reserved_cost,0)+cost>maxCost)throw new Error('model_budget_exhausted');
+      this.db.prepare('INSERT INTO model_requests VALUES (?,?,?,?)').run(run.id,authorizationId,policyDigest,cost);this.event(run.threadId,run.id,'model.request_reserved',run.id);
+    });
+  }
   projectSession(binding: Binding, raw: unknown): void {
     const projection = parsePresentation(raw);
     this.mutate(() => {

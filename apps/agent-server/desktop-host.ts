@@ -1,3 +1,5 @@
+import { parseModelConfiguration, type ModelConfiguration } from '../../packages/app-contracts/model.ts';
+import type { ModelAccess, ModelExecutionPlan } from './worker-supervisor.ts';
 import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
@@ -19,7 +21,11 @@ export class DesktopHost {
   private closing = false;
   private closeResult?: Promise<void>;
   private running = false;
-  constructor(profile: string) {
+  private readonly modelMode?: {mode:'offline'|'live';configuration?:ModelConfiguration;requestUrl?:string;reserveCostUsd?:number};
+  private modelKey?:string;
+  constructor(profile: string, model?: {mode:'offline'|'live';configuration?:ModelConfiguration;requestUrl?:string;reserveCostUsd?:number}) {
+    this.modelMode=model;
+    if(model?.configuration)parseModelConfiguration(model.configuration);
     mkdirSync(profile, { recursive: true, mode: 0o700 }); const root = realpathSync(profile);
     const workspace = join(root, 'workspace'); const database = join(root, 'host'); const state = join(root, 'state'); const resourcesRoot = join(root, 'resources');
     for (const dir of [workspace, database, state, resourcesRoot]) mkdirSync(dir, { recursive: true, mode: 0o700 });
@@ -36,8 +42,19 @@ export class DesktopHost {
   private recover() { try { this.supervisor.recover(); this.blocked = false; } catch { this.blocked = true; } }
   private home(): DesktopHome {
     const threads = this.core.listThreads();
-    return { mode: 'synthetic', threads: threads.map(t => ({ ...t, title: displayText(t.title, 160) })), recovery: this.blocked ? 'blocked' : 'ready',
-      activeRuns: threads.flatMap(t => this.core.snapshot(t.id).runs).filter(r => ['starting','running','cancelling','unknown'].includes(r.state)) };
+    const config = this.modelMode?.configuration;
+    const model: DesktopHome['model'] = !this.modelMode ? undefined : {
+      status: this.modelMode.mode === 'offline' ? 'ready' : !config?.approved ? 'not_configured' : this.modelKey ? 'ready' : 'key_required',
+      provider: config?.provider ?? (this.modelMode.mode === 'offline' ? 'workbench-synthetic' : ''),
+      model: config?.model ?? (this.modelMode.mode === 'offline' ? 'synthetic-text' : ''),
+      ...(config ? { limits: { endpoint: config.endpoint, requests: config.maxRequests, estimatedUsd: config.maxEstimatedCostUsd, outputTokens: config.maxOutputTokens } } : {}),
+    };
+    return {
+      mode: this.modelMode ? this.modelMode.mode === 'offline' ? 'model-offline' : 'model' : 'synthetic',
+      ...(model ? { model } : {}), threads: threads.map(t => ({ ...t, title: displayText(t.title, 160) })),
+      recovery: this.blocked ? 'blocked' : 'ready',
+      activeRuns: threads.flatMap(t => this.core.snapshot(t.id).runs).filter(r => ['starting','running','cancelling','unknown'].includes(r.state)),
+    };
   }
   request(raw: unknown): DesktopValue {
     if (this.closing) throw new Error('host_closing');
@@ -46,7 +63,7 @@ export class DesktopHost {
       case 'home': return this.home();
       case 'thread': {
         const snapshot = this.core.snapshot(request.threadId);
-        return { ...snapshot, operations: snapshot.operations.map(op => op.shell ? { ...op, shell: { ...op.shell, outcome: op.shell.outcome ? { ...op.shell.outcome, stdout: displayText(op.shell.outcome.stdout, 8192), stderr: displayText(op.shell.outcome.stderr, 8192) } : null } } : op), thread: { ...snapshot.thread, title: displayText(snapshot.thread.title, 160) },
+        return { ...snapshot, modelOutcomes: snapshot.runs.map(r=>({runId:r.id,value:this.core.modelOutcome(r.id)})), operations: snapshot.operations.map(op => op.shell ? { ...op, shell: { ...op.shell, outcome: op.shell.outcome ? { ...op.shell.outcome, stdout: displayText(op.shell.outcome.stdout, 8192), stderr: displayText(op.shell.outcome.stderr, 8192) } : null } } : op), thread: { ...snapshot.thread, title: displayText(snapshot.thread.title, 160) },
           inputs: this.core.runInputs(request.threadId).map(r => ({ id: r.id, text: displayText(r.input, 16384) })),
           presentations: snapshot.runs.map(r => ({ runId: r.id, value: this.core.presentation(r.id) })) };
       }
@@ -57,19 +74,27 @@ export class DesktopHost {
       }
       case 'recover': this.recover(); this.pump(); return this.home();
       case 'command': {
+        if(request.command.type==='runs.start' && this.modelMode?.mode==='live' && (!this.modelMode.configuration?.approved||!this.modelKey))throw new Error('model_not_configured');
         const ack = this.supervisor.command(request.command); this.pump(); return ack;
       }
     }
   }
+  setModelKey(key:string):void {
+    if(this.closing||this.running||this.modelMode?.mode!=='live'||!this.modelMode.configuration?.approved||typeof key!=='string'||!key||key.length>8192||/[\r\n\0]/.test(key))throw new Error('model_key_not_admitted');
+    this.modelKey=key;
+  }
   /** Only this trusted driver selects the registered write, exact bytes, target and deadline. */
   pump(): void {
-    if (this.closing || this.blocked || this.running) return;
+    if (this.closing || this.blocked || this.running || (this.modelMode?.mode==='live' && (!this.modelMode.configuration?.approved || !this.modelKey))) return;
     const next = this.core.nextQueuedIntent(); if (!next) return;
     const shell = shellDemo(next.input);
     const args = demoIntent(next.id, next.input);
     const entry = join(repository, 'packages/pi-adapter/desktop-demo-worker.ts');
     try {
-      const completion = this.supervisor.startNext(shell ? { tool: 'bash', target: '.', shell, parametersDigest: parametersDigest({ command: shell.command, timeout: shell.timeoutMs / 1000 }), deadline: Date.now() + 120_000 } : { tool: 'write', target: args.path, parametersDigest: parametersDigest(args),
+      const config=this.modelMode?.configuration;
+      const modelPlan:ModelExecutionPlan|undefined=this.modelMode?{tool:'none',deadline:Date.now()+(config?.timeoutMs??30000),model:{mode:this.modelMode.mode,provider:config?.provider??'workbench-synthetic',model:config?.model??'synthetic-text',endpoint:config?.endpoint??'synthetic://no-network',maxOutputTokens:config?.maxOutputTokens??1024,timeoutMs:config?.timeoutMs??30000}}:undefined;
+      const access:ModelAccess|undefined=config && this.modelKey && this.modelMode?.requestUrl && this.modelMode.reserveCostUsd!==undefined?{key:this.modelKey,configuration:config,requestUrl:this.modelMode.requestUrl,reserveCostUsd:this.modelMode.reserveCostUsd}:undefined;
+      const completion = modelPlan?this.supervisor.startNext(modelPlan,{path:join(repository, this.modelMode?.mode==='offline'?'packages/pi-adapter/model-test-worker.ts':'packages/pi-adapter/model-worker.ts')},access):this.supervisor.startNext(shell ? { tool: 'bash', target: '.', shell, parametersDigest: parametersDigest({ command: shell.command, timeout: shell.timeoutMs / 1000 }), deadline: Date.now() + 120_000 } : { tool: 'write', target: args.path, parametersDigest: parametersDigest(args),
         fileVersion: null, expectedContentDigest: digest(args.content), deadline: Date.now() + 120_000 },
       shell ? { path: join(repository, 'packages/pi-adapter/shell-demo-worker.ts'), args: [JSON.stringify({ command: shell.command, timeout: shell.timeoutMs / 1000 })] } : { path: entry, args: [JSON.stringify({ runId: next.id, input: next.input })] });
       if (!completion) return;
@@ -84,7 +109,7 @@ export class DesktopHost {
   }
   close(): Promise<void> {
     if (!this.closeResult) {
-      this.closing = true;
+      this.closing = true; this.modelKey=undefined;
       this.closeResult = (async () => {
         try {
           // Closing the owned host ends its queued/active work. Keep every intent and
