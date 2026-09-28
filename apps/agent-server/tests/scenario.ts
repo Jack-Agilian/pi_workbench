@@ -10,8 +10,8 @@ import { digest, parametersDigest } from '../../../packages/pi-adapter/controlle
 export async function until(predicate: () => boolean, label: string, ms = 10000) {
   const start = Date.now(); while (!predicate()) { if (Date.now() - start > ms) throw new Error(`timeout:${label}`); await new Promise<void>(r => setTimeout(r, 20)); }
 }
-export function createScenario(mode = 'normal', persistNative = false) {
-  const root = realpathSync(mkdtempSync(join(tmpdir(), 'b-worker-'))); const cwd = join(root, 'workspace'); const dbdir = join(root, 'host'); const state = join(root, 'state'); const resource = join(root, 'resources');
+export function createScenario(mode = 'normal', persistNative = false, rootPrefix = 'b-worker-') {
+  const root = realpathSync(mkdtempSync(join(tmpdir(), rootPrefix))); const cwd = join(root, 'workspace'); const dbdir = join(root, 'host'); const state = join(root, 'state'); const resource = join(root, 'resources');
   for (const dir of [cwd, dbdir, state, resource]) mkdirSync(dir);
   writeFileSync(join(resource, 'package.json'), JSON.stringify({ name: 'synthetic-b-ipc-resources', version: '1.0.0', pi: { skills: [] } }));
   const files = inspectContent(resource); const resources = { root: resource, id: contentId(files), files, expectedSkillNames: [] };

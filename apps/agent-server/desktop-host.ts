@@ -7,6 +7,7 @@ import { contentId, inspectContent } from '../../packages/pi-adapter/approved-re
 import { digest, parametersDigest } from '../../packages/pi-adapter/controlled-tools.ts';
 import { demoIntent } from '../../packages/pi-adapter/demo-intent.ts';
 import { ProductCore } from './core.ts';
+import { shellDemo } from './shell-demo.ts';
 import { WorkerSupervisor } from './worker-supervisor.ts';
 import { repository } from './worker-launcher.ts';
 
@@ -45,7 +46,7 @@ export class DesktopHost {
       case 'home': return this.home();
       case 'thread': {
         const snapshot = this.core.snapshot(request.threadId);
-        return { ...snapshot, thread: { ...snapshot.thread, title: displayText(snapshot.thread.title, 160) },
+        return { ...snapshot, operations: snapshot.operations.map(op => op.shell ? { ...op, shell: { ...op.shell, outcome: op.shell.outcome ? { ...op.shell.outcome, stdout: displayText(op.shell.outcome.stdout, 8192), stderr: displayText(op.shell.outcome.stderr, 8192) } : null } } : op), thread: { ...snapshot.thread, title: displayText(snapshot.thread.title, 160) },
           inputs: this.core.runInputs(request.threadId).map(r => ({ id: r.id, text: displayText(r.input, 16384) })),
           presentations: snapshot.runs.map(r => ({ runId: r.id, value: this.core.presentation(r.id) })) };
       }
@@ -64,12 +65,13 @@ export class DesktopHost {
   pump(): void {
     if (this.closing || this.blocked || this.running) return;
     const next = this.core.nextQueuedIntent(); if (!next) return;
+    const shell = shellDemo(next.input);
     const args = demoIntent(next.id, next.input);
     const entry = join(repository, 'packages/pi-adapter/desktop-demo-worker.ts');
     try {
-      const completion = this.supervisor.startNext({ tool: 'write', target: args.path, parametersDigest: parametersDigest(args),
+      const completion = this.supervisor.startNext(shell ? { tool: 'bash', target: '.', shell, parametersDigest: parametersDigest({ command: shell.command, timeout: shell.timeoutMs / 1000 }), deadline: Date.now() + 120_000 } : { tool: 'write', target: args.path, parametersDigest: parametersDigest(args),
         fileVersion: null, expectedContentDigest: digest(args.content), deadline: Date.now() + 120_000 },
-      { path: entry, args: [JSON.stringify({ runId: next.id, input: next.input })] });
+      shell ? { path: join(repository, 'packages/pi-adapter/shell-demo-worker.ts'), args: [JSON.stringify({ command: shell.command, timeout: shell.timeoutMs / 1000 })] } : { path: entry, args: [JSON.stringify({ runId: next.id, input: next.input })] });
       if (!completion) return;
       this.running = true;
       void completion.catch(() => { this.blocked = true; }).finally(() => {

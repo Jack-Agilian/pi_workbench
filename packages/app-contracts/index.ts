@@ -1,3 +1,4 @@
+import type { ShellView } from './shell.ts';
 // Product-only JSON contracts. No Pi, Node or Electron types cross this boundary.
 export type RunState = 'queued' | 'starting' | 'running' | 'cancelling' | 'unknown' | 'completed' | 'failed' | 'cancelled';
 export type OperationState = 'pending' | 'approved' | 'executing' | 'unknown' | 'succeeded' | 'failed' | 'denied';
@@ -9,7 +10,7 @@ export type Command =
 export interface Ack { accepted: true; id: string }
 export interface ThreadView { id: string; workspaceId: string; title: string }
 export interface RunView { id: string; threadId: string; state: RunState }
-export interface OperationView { id: string; runId: string; toolCallId: string; tool: string; parametersDigest: string; artifactPath: string | null; deadline: number; state: OperationState }
+export interface OperationView { shell?: ShellView; id: string; runId: string; toolCallId: string; tool: string; parametersDigest: string; artifactPath: string | null; deadline: number; state: OperationState }
 export interface ArtifactView { id: string; runId: string; operationId: string; path: string; version: number; digest: string; bytes: number }
 export interface RuntimeObservation { kind: 'activity' | 'idle' | 'diagnostic'; eventType: string; sourceType: string | null }
 export interface ProductEvent { seq: number; runSeq: number; threadId: string; runId: string; kind: string; entityId: string; eventType: string | null; sourceType: string | null }

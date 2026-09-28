@@ -98,6 +98,12 @@ if (shutdownScenario) {
   catch (error) { console.error(error); await host.close().catch(() => {}); app.exit(1); }
   return;
 }
+if (process.argv.includes('--shell-smoke-test')) {
+  const { runShellSmoke } = await import('./shell-smoke.ts');
+  try { await runShellSmoke(window, host); app.quit(); }
+  catch (error) { console.error(error); await host.close().catch(() => {}); app.exit(1); }
+  return;
+}
 if (process.argv.includes('--smoke-test')) {
   // Trusted test code only; not bundled into the Renderer or reachable through the preload API.
   const { runSmoke } = await import('./smoke.ts');

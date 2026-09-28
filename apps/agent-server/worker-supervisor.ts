@@ -1,3 +1,5 @@
+import { parseShellIntent, parseShellOutcome, type ShellIntent, type ShellOutcome } from '../../packages/app-contracts/shell.ts';
+import { parametersDigest } from '../../packages/pi-adapter/controlled-tools.ts';
 import { randomUUID } from 'node:crypto';
 import { existsSync, lstatSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -8,14 +10,17 @@ import { IpcSender } from '../../packages/pi-adapter/ipc-channel.ts';
 import { inside, verifyContent } from '../../packages/pi-adapter/approved-resources.ts';
 import { ProductCore } from './core.ts';
 import { artifactPath, inspectMarkdown } from './artifact.ts';
-import { launchSpec, spawnGuardian, type LaunchSpec, type TrustedWorkerEntry } from './worker-launcher.ts';
+import { launchSpec, shellLaunch, spawnGuardian, type LaunchSpec, type TrustedWorkerEntry } from './worker-launcher.ts';
 
 /** Host-approved one-operation intent. Not a Renderer command and not accepted from the Worker. */
-export interface ExecutionPlan { tool: 'write' | 'edit'; target: string; parametersDigest: string; fileVersion: string | null; expectedContentDigest: string; deadline: number }
+export interface FileExecutionPlan { tool: 'write' | 'edit'; target: string; parametersDigest: string; fileVersion: string | null; expectedContentDigest: string; deadline: number }
+export interface ShellExecutionPlan { tool: 'bash'; target: '.'; parametersDigest: string; shell: ShellIntent; deadline: number }
+export type ExecutionPlan = FileExecutionPlan | ShellExecutionPlan;
 interface Journal { binding: Dispatch; config: WorkerInit; plan: ExecutionPlan; spec: LaunchSpec; lease: string }
 interface Active {
   journal: Journal; child: ChildProcess; sender: IpcSender; done: Promise<void>; resolve: () => void; reject: (error: unknown) => void;
   pid?: number; armed: boolean; hello: boolean; ready: boolean; closed: boolean; result?: boolean; nativeRef?: string;
+  shellRequest?: { id: string; operationId: string };
   requests: Map<string, string>; replies: Map<string, WireBody>; pending: Map<string, string>; startedAt: number;
 }
 export interface SupervisorOptions { stateDirectory: string; databaseDirectory: string; resources: ResourceSelection; readyTimeoutMs?: number }
@@ -34,6 +39,7 @@ export class WorkerSupervisor {
     const active = this.active;
     if (active && command.type === 'approvals.resolve') this.deliverApproval(active, command.operationId);
     if (active && command.type === 'runs.cancel' && command.runId === active.journal.binding.runId) {
+      if (active.journal.plan.tool === 'bash') void active.sender.send({ kind: 'shell-cancel' }).catch(() => this.stop(active));
       void this.send(active, { type: 'cancel' }).catch(() => this.stop(active));
       // Acknowledgement means request persisted. Hung SDK/driver is killed after bounded grace.
       const timer = setTimeout(() => this.stop(active), 400); void active.done.then(() => clearTimeout(timer), () => clearTimeout(timer));
@@ -43,18 +49,22 @@ export class WorkerSupervisor {
   /** Only trusted host composition selects plans/entry. Product commands cannot set either. */
   startNext(plan: ExecutionPlan, entry?: TrustedWorkerEntry): Promise<void> | undefined {
     if (this.active) return this.active.done;
-    sha256(plan.parametersDigest); sha256(plan.expectedContentDigest); if (plan.fileVersion !== null) sha256(plan.fileVersion);
-    if (!['write','edit'].includes(plan.tool) || plan.deadline <= Date.now() || plan.deadline > Date.now() + 120_000) throw new Error('invalid_execution_plan');
+    plan = structuredClone(plan); if (plan.tool === 'bash') Object.freeze(plan.shell); Object.freeze(plan);
+    sha256(plan.parametersDigest);
+    if (plan.tool === 'bash') { parseShellIntent(plan.shell); if (plan.target !== '.' || parametersDigest({ command: plan.shell.command, timeout: plan.shell.timeoutMs / 1000 }) !== plan.parametersDigest) throw new Error('shell_parameters_mismatch'); }
+    else { sha256(plan.expectedContentDigest); if (plan.fileVersion !== null) sha256(plan.fileVersion); }
+    if (!['write','edit','bash'].includes(plan.tool) || plan.deadline <= Date.now() || plan.deadline > Date.now() + 120_000) throw new Error('invalid_execution_plan');
     let journal: Journal | undefined; let child: ChildProcess | undefined;
     let binding: Dispatch | undefined;
     try { binding = this.core.dispatchNext(dispatch => {
-      const workspace = this.core.workspacePath(dispatch.workspaceId); artifactPath(workspace, plan.target);
+      const workspace = this.core.workspacePath(dispatch.workspaceId); if (plan.tool !== 'bash') artifactPath(workspace, plan.target);
       const lease = join(this.options.stateDirectory, 'leases', randomUUID());
       const agentDir = join(this.options.stateDirectory, 'workers', randomUUID());
       const sessions = join(this.options.stateDirectory, 'sessions', dispatch.threadId);
       for (const dir of [lease, agentDir, sessions]) mkdirSync(dir, { recursive: true, mode: 0o700 });
       const config: WorkerInit = { binding: dispatch, workspace, agentDir, sessions, resources: structuredClone(this.options.resources), deadline: plan.deadline };
       const spec = launchSpec(config, { instanceId: randomUUID(), nonce: randomUUID() }, { lease, databaseDirectory: this.options.databaseDirectory }, entry);
+      if (plan.tool === 'bash') spec.shell = shellLaunch(plan.shell, workspace, lease);
       journal = { binding: dispatch, config, plan: Object.freeze({ ...plan }), spec, lease };
       // Guardian exists before commit, but may not launch any Worker until the committed host arms it.
       child = spawnGuardian(spec, lease); return JSON.stringify(journal);
@@ -77,7 +87,7 @@ export class WorkerSupervisor {
   }
   private send(active: Active, body: WireBody, requestId = `host-${++this.sequence}`): Promise<void> {
     const { spec } = active.journal;
-    return active.sender.send({ version: 3, instanceId: spec.instanceId, runtimeBindingId: spec.runtimeBindingId, requestId, body } satisfies Envelope);
+    return active.sender.send({ version: 4, instanceId: spec.instanceId, runtimeBindingId: spec.runtimeBindingId, requestId, body } satisfies Envelope);
   }
   private receive(active: Active, raw: unknown) {
     if (this.active !== active) return; // closure bound to actual child handle, never routable by message strings
@@ -88,6 +98,7 @@ export class WorkerSupervisor {
     }
     if (outer.kind === 'spawned') { if (active.pid || typeof outer.pid !== 'number' || !Number.isSafeInteger(outer.pid)) throw new Error('invalid_spawn'); active.pid = outer.pid; return; }
     if (outer.kind === 'cleanup') return;
+    if (outer.kind === 'shell-complete') { this.shellCompleted(active); return; }
     if (outer.kind !== 'worker') throw new Error('unknown_guardian_message');
     const message = parseEnvelope(outer.message); const { body, requestId } = message; const { binding, config, plan, spec } = active.journal;
     if (message.instanceId !== spec.instanceId || message.runtimeBindingId !== binding.runtimeBindingId) throw new Error('stale_connection');
@@ -115,12 +126,20 @@ export class WorkerSupervisor {
         if (!active.ready || body.tool !== plan.tool || body.target !== plan.target || body.parametersDigest !== plan.parametersDigest || body.resourceLock !== config.resources.id) throw new Error('operation_not_in_host_plan');
         verifyContent(config.resources);
         if (active.pending.size) throw new Error('one_operation_per_run');
-        const op = this.core.requestOperation(binding, { toolCallId: body.toolCallId, tool: plan.tool, parametersDigest: plan.parametersDigest, deadline: plan.deadline, artifactPath: plan.target });
+        const op = this.core.requestOperation(binding, { toolCallId: body.toolCallId, tool: plan.tool, parametersDigest: this.approvalDigest(active.journal), deadline: plan.deadline, ...(plan.tool === 'bash' ? { shell: plan.shell } : { artifactPath: plan.target }) });
         active.pending.set(op.id, requestId); this.deliverApproval(active, op.id); break;
+      }
+      case 'shell-exec': {
+        if (plan.tool !== 'bash' || !active.ready || active.closed || active.shellRequest || !active.pending.has(body.operationId) || body.parametersDigest !== plan.parametersDigest || Date.now() >= plan.deadline) throw new Error('shell_not_authorized');
+        const snap = this.core.snapshot(binding.threadId); const op = snap.operations.find(o => o.id === body.operationId);
+        if (op?.state !== 'executing' || snap.runs.find(r => r.id === binding.runId)?.state !== 'running') throw new Error('shell_not_authorized');
+        verifyContent(config.resources); active.shellRequest = { id: requestId, operationId: op.id };
+        void active.sender.send({ kind: 'shell-start', operationId: op.id, deadline: plan.deadline }).catch(() => this.stop(active)); break;
       }
       case 'result': {
         if (!active.pending.has(body.operationId)) throw new Error('unowned_operation');
         const operation = this.core.snapshot(binding.threadId).operations.find(op => op.id === body.operationId);
+        if (plan.tool === 'bash') { if (!operation) throw new Error('missing_shell_operation'); this.shellCompleted(active); break; }
         if (operation?.state !== 'executing') throw new Error('result_before_claim');
         const version = this.fileVersion(active.journal);
         if (body.ok && version === plan.expectedContentDigest) {
@@ -134,6 +153,36 @@ export class WorkerSupervisor {
       case 'closed': active.closed = true; this.nativeReference(active, body.nativeRef); break;
       case 'fault': this.stop(active); break;
       default: throw new Error('unexpected_worker_message');
+    }
+  }
+  private approvalDigest(journal: Journal): string {
+    const { plan, binding, config } = journal;
+    return plan.tool === 'bash' ? parametersDigest({ intent: plan.shell, toolParametersDigest: plan.parametersDigest, workspace: config.workspace, binding, deadline: plan.deadline }) : plan.parametersDigest;
+  }
+  private shellReceipt(journal: Journal, operationId: string): ShellOutcome | undefined {
+    if (!journal.spec.shell) return;
+    try {
+      const r = exact(JSON.parse(readFileSync(journal.spec.shell.receipt, 'utf8')), ['instanceId','runtimeBindingId','nonce','operationId','pid','groupGone','outcome']);
+      if (r.instanceId !== journal.spec.instanceId || r.runtimeBindingId !== journal.binding.runtimeBindingId || r.nonce !== journal.spec.nonce || r.groupGone !== true || (r.operationId !== operationId && r.operationId !== null)) return;
+      if (r.pid !== null && (typeof r.pid !== 'number' || !Number.isSafeInteger(r.pid) || r.pid <= 0)) return;
+      const outcome = parseShellOutcome(r.outcome);
+      if (r.operationId === null && (r.pid !== null || outcome.sideEffects !== 'not-started')) return;
+      return outcome;
+    } catch { return; }
+  }
+  private shellCompleted(active: Active): void {
+    if (!active.shellRequest) return;
+    const { journal, shellRequest } = active; const outcome = this.shellReceipt(journal, shellRequest.operationId); if (!outcome) return;
+    const op = this.core.snapshot(journal.binding.threadId).operations.find(o => o.id === shellRequest.operationId);
+    if (op?.state === 'executing') {
+      this.core.recordShellOutcome(journal.binding, op.id, outcome);
+      const run = this.core.snapshot(journal.binding.threadId).runs.find(r => r.id === journal.binding.runId);
+      const interrupted = outcome.signal !== null && !outcome.timedOut && run?.state !== 'cancelling';
+      this.core.finishOperation(journal.binding, op.id, interrupted ? 'unknown' : outcome.exitCode === 0 && !outcome.timedOut ? 'succeeded' : 'failed');
+    }
+    if (!active.replies.has(shellRequest.id)) {
+      const reply: WireBody = { type: 'shell-result', outcome }; active.replies.set(shellRequest.id, reply);
+      void this.send(active, reply, shellRequest.id).catch(() => this.stop(active));
     }
   }
   private nativeFile(journal: Journal, reference: string): boolean {
@@ -153,6 +202,7 @@ export class WorkerSupervisor {
     this.core.bindNativeSession(active.journal.binding, reference, persisted); active.nativeRef = reference;
   }
   private fileVersion(journal: Journal): string | null {
+    if (journal.plan.tool === 'bash') throw new Error('shell_has_no_file_precondition');
     const path = join(journal.config.workspace, artifactPath(journal.config.workspace, journal.plan.target));
     if (!existsSync(path)) return null;
     return inspectMarkdown(journal.config.workspace, journal.plan.target).digest;
@@ -164,9 +214,9 @@ export class WorkerSupervisor {
     let reply: WireBody = { type: 'deny' };
     if (op.state === 'approved') {
       try {
-        verifyContent(config.resources); if (this.fileVersion(active.journal) !== plan.fileVersion) throw new Error('file_version_changed');
-        this.core.claimOperation(binding, operationId, plan.parametersDigest);
-        reply = { type: 'grant', operationId, parametersDigest: plan.parametersDigest, expiresAt: plan.deadline, fileVersion: plan.fileVersion };
+        verifyContent(config.resources); if (plan.tool !== 'bash' && this.fileVersion(active.journal) !== plan.fileVersion) throw new Error('file_version_changed');
+        this.core.claimOperation(binding, operationId, this.approvalDigest(active.journal));
+        reply = { type: 'grant', operationId, parametersDigest: plan.parametersDigest, expiresAt: plan.deadline, fileVersion: plan.tool === 'bash' ? null : plan.fileVersion };
       } catch { this.stop(active); return; }
     } else if (op.state !== 'denied') return;
     active.replies.set(requestId, reply); void this.send(active, reply, requestId).catch(() => this.stop(active));
@@ -176,6 +226,7 @@ export class WorkerSupervisor {
   private clean(journal: Journal): boolean {
     try {
       const r = exact(JSON.parse(readFileSync(journal.spec.receipt, 'utf8')), ['instanceId','runtimeBindingId','nonce','workerPid','exited','groupGone']);
+      if (journal.plan.tool === 'bash' && !this.shellReceipt(journal, this.core.snapshot(journal.binding.threadId).operations.find(o => o.runId === journal.binding.runId)?.id ?? 'not-requested')) return false;
       return r.instanceId === journal.spec.instanceId && r.runtimeBindingId === journal.binding.runtimeBindingId && r.nonce === journal.spec.nonce && r.exited === true && r.groupGone === true;
     } catch { return false; }
   }
@@ -222,14 +273,20 @@ export class WorkerSupervisor {
         else if (native.persisted) throw new Error('native_session_missing');
       }
       for (const op of this.core.snapshot(binding.threadId).operations.filter(o => o.runId === binding.runId)) {
-        if (op.state === 'unknown') {
+        if (op.state === 'unknown' && plan.tool === 'bash') {
+          const outcome = this.shellReceipt(journal, op.id);
+          if (!outcome) throw new Error('shell_evidence_missing');
+          this.core.recordShellOutcome(binding, op.id, outcome);
+          if (outcome.signal !== null && !outcome.timedOut && !cancelRequested) throw new Error('shell_side_effect_unresolved');
+          this.core.reconcileOperation(op.id, outcome.exitCode === 0 && !outcome.timedOut ? 'succeeded' : 'failed');
+        } else if (op.state === 'unknown' && plan.tool !== 'bash') {
           const version = this.fileVersion(journal);
           if (version === plan.expectedContentDigest) this.core.reconcileOperation(op.id, 'succeeded', version);
           else if (version === plan.fileVersion) this.core.reconcileOperation(op.id, 'failed');
           else throw new Error('side_effect_unresolved');
         }
         const current = this.core.snapshot(binding.threadId).operations.find(o => o.id === op.id)!;
-        if (current.state === 'succeeded') this.core.reconcileArtifact(binding, op.id, plan.target);
+        if (plan.tool !== 'bash' && current.state === 'succeeded') this.core.reconcileArtifact(binding, op.id, plan.target);
       }
       this.core.reconcileRun(binding.runId, cancelRequested ? 'cancelled' : 'failed', { piIdle: true, hostClean: true });
     }

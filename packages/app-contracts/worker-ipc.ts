@@ -1,7 +1,8 @@
 // Workbench protocol, not Pi SDK API. No product database or SDK types on this channel.
+import { parseShellOutcome, type ShellOutcome } from './shell.ts';
 import { identifier, sha256, type Dispatch } from './index.ts';
 import { parsePresentation, type Presentation } from './presentation.ts';
-export const IPC_VERSION = 3;
+export const IPC_VERSION = 4;
 export const MAX_MESSAGE_BYTES = 65_536;
 export interface ResourceSelection { root: string; id: string; files: readonly { path: string; sha256: string }[]; expectedSkillNames: readonly string[] }
 export interface WorkerInit { binding: Dispatch; workspace: string; agentDir: string; sessions: string; resources: ResourceSelection; deadline: number }
@@ -12,16 +13,18 @@ export type WireBody =
   | { type: 'session-reference-accepted' }
   | { type: 'ready'; resourceLock: string; nativeRef: string | null }
   | { type: 'start' } | { type: 'cancel' } | { type: 'close' }
-  | { type: 'operation'; toolCallId: string; tool: 'write' | 'edit'; parametersDigest: string; target: string; resourceLock: string }
+  | { type: 'operation'; toolCallId: string; tool: 'write' | 'edit' | 'bash'; parametersDigest: string; target: string; resourceLock: string }
   | { type: 'grant'; operationId: string; parametersDigest: string; expiresAt: number; fileVersion: string | null }
   | { type: 'deny' }
+  | { type: 'shell-exec'; operationId: string; parametersDigest: string }
+  | { type: 'shell-result'; outcome: ShellOutcome }
   | { type: 'result'; operationId: string; ok: boolean }
   | { type: 'observation'; kind: 'activity' | 'idle' | 'diagnostic'; eventType: string; sourceType: string | null }
   | { type: 'presentation'; projection: Presentation }
   | { type: 'done'; ok: boolean }
   | { type: 'closed'; nativeRef: string | null }
   | { type: 'fault'; code: 'initialization_failed' | 'execution_failed' | 'protocol_failed' };
-export interface Envelope { version: 3; instanceId: string; runtimeBindingId: string; requestId: string; body: WireBody }
+export interface Envelope { version: 4; instanceId: string; runtimeBindingId: string; requestId: string; body: WireBody }
 export function record(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value) || ![Object.prototype, null].includes(Object.getPrototypeOf(value))) throw new Error('invalid_record');
   const fields = Object.getOwnPropertyDescriptors(value);
@@ -60,8 +63,10 @@ export function parseEnvelope(value: unknown): Envelope {
     case 'ready': check('resourceLock','nativeRef'); sha256(b.resourceLock); nullablePath(b.nativeRef); break;
     case 'session-reference': check('nativeRef'); string(b.nativeRef); break;
     case 'start': case 'cancel': case 'close': case 'deny': case 'session-reference-accepted': check(); break;
-    case 'operation': check('toolCallId','tool','parametersDigest','target','resourceLock'); identifier(b.toolCallId); if (typeof b.tool !== 'string' || !['write','edit'].includes(b.tool)) throw new Error('tool_not_admitted'); sha256(b.parametersDigest); string(b.target); sha256(b.resourceLock); break;
+    case 'operation': check('toolCallId','tool','parametersDigest','target','resourceLock'); identifier(b.toolCallId); if (typeof b.tool !== 'string' || !['write','edit','bash'].includes(b.tool)) throw new Error('tool_not_admitted'); sha256(b.parametersDigest); string(b.target); sha256(b.resourceLock); break;
     case 'grant': check('operationId','parametersDigest','expiresAt','fileVersion'); identifier(b.operationId); sha256(b.parametersDigest); number(b.expiresAt); if (b.fileVersion !== null) sha256(b.fileVersion); break;
+    case 'shell-exec': check('operationId','parametersDigest'); identifier(b.operationId); sha256(b.parametersDigest); break;
+    case 'shell-result': check('outcome'); b.outcome = parseShellOutcome(b.outcome); obj.body = b; break;
     case 'result': check('operationId','ok'); identifier(b.operationId); boolean(b.ok); break;
     case 'done': check('ok'); boolean(b.ok); break;
     case 'presentation': check('projection'); b.projection = parsePresentation(b.projection); obj.body = b; break;

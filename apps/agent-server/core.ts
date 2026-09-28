@@ -1,3 +1,4 @@
+import { parseShellIntent, parseShellOutcome, type ShellIntent, type ShellOutcome, type ShellView } from '../../packages/app-contracts/shell.ts';
 // Product intents/indexes and disposable display projections; Pi owns authoritative messages and the Session tree.
 import { randomUUID } from 'node:crypto';
 import { chmodSync, realpathSync } from 'node:fs';
@@ -29,7 +30,7 @@ export class ProductCore {
       if (path !== ':memory:') chmodSync(path, 0o600);
       this.db.exec('PRAGMA busy_timeout=1000; PRAGMA synchronous=FULL;');
       const version = this.one<{ user_version: number }>('PRAGMA user_version').user_version;
-      if (![0, 1, 2, 3, 4].includes(version)) throw new Error('unsupported_database_version');
+      if (![0, 1, 2, 3, 4, 5].includes(version)) throw new Error('unsupported_database_version');
       if (version === 0) {
         this.db.exec(`BEGIN IMMEDIATE;
           CREATE TABLE workspaces(id TEXT PRIMARY KEY, path TEXT NOT NULL UNIQUE) STRICT;
@@ -61,6 +62,7 @@ export class ProductCore {
       if (version < 4) this.db.exec(`BEGIN IMMEDIATE;
         CREATE TABLE run_display(run_id TEXT PRIMARY KEY REFERENCES runs(id), projection TEXT NOT NULL) STRICT;
         PRAGMA user_version=4; COMMIT;`);
+      if (version < 5) this.db.exec(`BEGIN IMMEDIATE; CREATE TABLE shell_display(operation_id TEXT PRIMARY KEY REFERENCES operations(id), intent TEXT NOT NULL, outcome TEXT) STRICT; PRAGMA user_version=5; COMMIT;`);
       this.transaction(() => {
         for (const workspace of workspaces) {
           identifier(workspace.id); const canonical = realpathSync(workspace.path);
@@ -238,7 +240,8 @@ export class ProductCore {
       this.event(run.threadId, run.id, 'observation.' + kind, run.id, origin); return true;
     });
   }
-  requestOperation(binding: Binding, intent: { toolCallId: string; tool: string; parametersDigest: string; deadline: number; artifactPath?: string }): OperationView {
+  requestOperation(binding: Binding, intent: { toolCallId: string; tool: string; parametersDigest: string; deadline: number; artifactPath?: string; shell?: ShellIntent }): OperationView {
+    if (intent.shell) { parseShellIntent(intent.shell); if (intent.tool !== 'bash' || intent.artifactPath !== undefined) throw new Error('shell_file_conflict'); }
     identifier(intent.toolCallId); identifier(intent.tool); sha256(intent.parametersDigest);
     if (!Number.isFinite(intent.deadline) || intent.deadline <= Date.now() || intent.deadline > Date.now() + 86_400_000) throw new Error('invalid_deadline');
     return this.mutate(() => {
@@ -252,6 +255,7 @@ export class ProductCore {
       }
       const id = randomUUID();
       this.db.prepare("INSERT INTO operations(id,run_id,binding_id,tool_call_id,tool,digest,deadline,artifact_path,state) VALUES (?,?,?,?,?,?,?,?,'pending')").run(id, run.id, binding.runtimeBindingId, intent.toolCallId, intent.tool, intent.parametersDigest, intent.deadline, target);
+      if (intent.shell) this.db.prepare('INSERT INTO shell_display VALUES (?,?,NULL)').run(id, JSON.stringify(intent.shell));
       this.db.prepare("INSERT INTO approvals VALUES (?,'pending')").run(id);
       this.event(run.threadId, run.id, 'approval.requested', id);
       return this.operationView(this.operation(id));
@@ -376,7 +380,17 @@ export class ProductCore {
   }
   private operationView(op: Operation): OperationView {
     const { id, runId, toolCallId, tool, parametersDigest, artifactPath, deadline, state } = op;
-    return { id, runId, toolCallId, tool, parametersDigest, artifactPath, deadline, state };
+    const row = this.get<{ intent: string; outcome: string | null }>('SELECT intent,outcome FROM shell_display WHERE operation_id=?', id);
+    const shell: ShellView | undefined = row ? { intent: parseShellIntent(JSON.parse(row.intent)), outcome: row.outcome ? parseShellOutcome(JSON.parse(row.outcome)) : null } : undefined;
+    return { id, runId, toolCallId, tool, parametersDigest, artifactPath, deadline, state, ...(shell ? { shell } : {}) };
+  }
+  recordShellOutcome(binding: Binding, id: string, value: ShellOutcome): void {
+    const outcome = parseShellOutcome(value);
+    this.mutate(() => { const op = this.operation(id); if (op.runId !== binding.runId || op.runtimeBindingId !== binding.runtimeBindingId || op.tool !== 'bash') throw new Error('shell_binding_mismatch');
+      const prior = this.one<{ outcome: string | null }>('SELECT outcome FROM shell_display WHERE operation_id=?', id); const serialized = JSON.stringify(outcome);
+      if (prior.outcome) { if (prior.outcome !== serialized) throw new Error('shell_result_conflict'); return; }
+      this.db.prepare('UPDATE shell_display SET outcome=? WHERE operation_id=?').run(serialized, id); this.event(binding.threadId, binding.runId, 'shell.outcome', id);
+    });
   }
   snapshot(threadId: string): Snapshot {
     return this.transaction(() => ({

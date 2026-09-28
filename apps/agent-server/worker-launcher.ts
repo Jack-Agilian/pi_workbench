@@ -4,9 +4,12 @@ import { mkdirSync, realpathSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { inside } from '../../packages/pi-adapter/path-scope.ts';
+import type { ShellLaunch } from './shell-execution.ts';
+import type { ShellIntent } from '../../packages/app-contracts/shell.ts';
 import type { WorkerInit } from '../../packages/app-contracts/worker-ipc.ts';
 export const repository = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 export interface LaunchSpec {
+  shell?: ShellLaunch;
   instanceId: string; runtimeBindingId: string; nonce: string; receipt: string;
   executable: string; args: string[]; cwd: string; env: Record<string, string>; deadline: number;
 }
@@ -47,4 +50,17 @@ export function spawnGuardian(spec: LaunchSpec, lease: string): ChildProcess {
   guardian.on('error', () => {}); // Spawn failure can arrive after the surrounding SQLite transaction rolls back.
   if (!guardian.pid) throw new Error('guardian_spawn_failed');
   return guardian;
+}
+
+/** Restricted Mac backend selected by the host, never by a Worker or Renderer. */
+export function shellLaunch(intent: ShellIntent, workspace: string, lease: string): ShellLaunch {
+  if (process.platform !== 'darwin' || process.arch !== 'arm64') throw new Error('restricted_shell_platform_unsupported');
+  const cwd = realpathSync(workspace); const runtime = resolve(dirname(realpathSync(process.execPath)), '..');
+  const home = join(lease, 'shell-home'); mkdirSync(home, { recursive: true, mode: 0o700 });
+  const env = sterileEnvironment(home); env.PATH = '/usr/bin:/bin'; env.LANG = 'en_US.UTF-8';
+  const profile = ['(version 1)', '(allow default)', '(deny network*)', '(deny file-read*)', '(allow file-read-metadata)', '(deny file-write*)',
+    `(allow file-read* (subpath ${JSON.stringify(cwd)}) (subpath ${JSON.stringify(runtime)}) (subpath ${JSON.stringify(home)}))`,
+    '(allow file-read* (subpath "/System") (subpath "/usr/lib") (subpath "/usr/bin") (subpath "/bin") (literal "/") (literal "/dev/null") (literal "/dev/urandom") (literal "/dev/random") (subpath "/dev/fd"))',
+    `(allow file-write* (subpath ${JSON.stringify(cwd)}) (subpath ${JSON.stringify(home)}) (literal "/dev/null"))`].join(' ');
+  return { intent, profile, cwd, env, receipt: join(lease, 'shell.json') };
 }

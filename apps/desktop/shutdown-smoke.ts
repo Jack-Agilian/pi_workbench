@@ -9,7 +9,10 @@ import type { Ack } from '../../packages/app-contracts/index.ts';
 import type { DesktopHome, DesktopThread } from '../../packages/app-contracts/desktop.ts';
 
 export async function runShutdownSmoke(window: BrowserWindow, currentHost: () => HostClient, profile: string, scenario: string, pendingHost: () => HostClient | undefined) {
-  if (!['idle','starting','approval','executing','cancelling','completed','sigterm','sigint','sigkill','missing-proof','unresolved','recovery-close-race'].includes(scenario)) throw new Error('unknown_shutdown_scenario');
+  if (!['idle','starting','approval','executing','cancelling','completed','sigterm','sigint','sigkill','missing-proof','unresolved','recovery-close-race','shell-running','shell-cancelling','shell-completed','shell-sigterm','shell-sigkill','shell-missing-proof'].includes(scenario)) throw new Error('unknown_shutdown_scenario');
+  const shellMode = scenario.startsWith('shell-');
+  const completedMode = scenario === 'completed' || scenario === 'shell-completed';
+  const cancellingMode = scenario === 'cancelling' || scenario === 'shell-cancelling';
   const host = currentHost(); const pids = new Set<number>([host.processId!]);
   const result: { scenario: string; synthetic: true; hostPids: number[]; processPids: number[]; readyForSignal: boolean; willQuit: boolean; warning: boolean; raceWaitVerified?: boolean; blockedState?: string; beforeState?: string; threadId?: string; completedFile?: { path: string; text: string; mtime: string } } = {
     scenario, synthetic: true, hostPids: [host.processId!], processPids: [], readyForSignal: false, willQuit: false, warning: false,
@@ -29,23 +32,24 @@ export async function runShutdownSmoke(window: BrowserWindow, currentHost: () =>
   if (scenario === 'idle') { record(); app.quit(); return; }
   const thread = await host.request({ type: 'command', command: { type: 'threads.create', requestId: 'shutdown-thread', workspaceId: 'demo-workspace', title: 'SYNTHETIC 中文退出 ' + scenario } }) as Ack;
   result.threadId = thread.id;
-  await host.request({ type: 'command', command: { type: 'runs.start', requestId: 'shutdown-run', threadId: thread.id, input: 'SYNTHETIC shutdown only; no model' } });
+  await host.request({ type: 'command', command: { type: 'runs.start', requestId: 'shutdown-run', threadId: thread.id, input: shellMode ? completedMode ? '/demo-shell' : '/demo-shell-wait' : 'SYNTHETIC shutdown only; no model' } });
   const snapshot = async () => await currentHost().request({ type: 'thread', threadId: thread.id }) as DesktopThread;
   if (scenario === 'starting') {
     assert.equal((await snapshot()).runs[0]!.state, 'starting');
   } else {
     await wait(async () => (await snapshot()).operations.some(op => op.state === 'pending'), 'pending');
   }
-  if (['executing','cancelling','completed','unresolved'].includes(scenario)) {
+  if (shellMode || ['executing','cancelling','completed','unresolved'].includes(scenario)) {
     const op = (await snapshot()).operations[0]!;
     await host.request({ type: 'command', command: { type: 'approvals.resolve', requestId: 'shutdown-approve', operationId: op.id, parametersDigest: op.parametersDigest, decision: 'allow' } });
-    if (scenario === 'completed') {
+    if (completedMode) {
       await wait(async () => (await snapshot()).runs[0]!.state === 'completed', 'completed');
-      const path = op.artifactPath!; const file = join(profile, 'workspace', path);
-      result.completedFile = { path, text: readFileSync(file, 'utf8'), mtime: statSync(file, { bigint: true }).mtimeNs.toString() };
+      if (!shellMode) { const path = op.artifactPath!; const file = join(profile, 'workspace', path);
+      result.completedFile = { path, text: readFileSync(file, 'utf8'), mtime: statSync(file, { bigint: true }).mtimeNs.toString() }; }
     } else {
+      if (shellMode) await wait(() => existsSync(join(profile, 'workspace/shell-heartbeat.txt')), 'shell_started');
       assert.equal((await snapshot()).operations[0]!.state, 'executing');
-      if (scenario === 'cancelling') {
+      if (cancellingMode) {
         await host.request({ type: 'command', command: { type: 'runs.cancel', requestId: 'shutdown-cancel', runId: op.runId } });
         assert.equal((await snapshot()).runs[0]!.state, 'cancelling');
       }
@@ -54,10 +58,10 @@ export async function runShutdownSmoke(window: BrowserWindow, currentHost: () =>
   }
   result.beforeState = (await snapshot()).runs[0]!.state;
   // Preserve a queued intent in the same product database; close must cancel it without dispatch.
-  if (!['completed','cancelling'].includes(scenario)) await host.request({ type: 'command', command: { type: 'runs.start', requestId: 'shutdown-queued', threadId: thread.id, input: 'SYNTHETIC queued must never dispatch' } });
+  if (!completedMode && !cancellingMode) await host.request({ type: 'command', command: { type: 'runs.start', requestId: 'shutdown-queued', threadId: thread.id, input: 'SYNTHETIC queued must never dispatch' } });
   captureChildren(host.processId!); record();
-  if (['sigterm','sigint','sigkill'].includes(scenario)) { result.readyForSignal = true; record(); return; }
-  if (!['missing-proof','unresolved','recovery-close-race'].includes(scenario)) { window.close(); app.quit(); return; }
+  if (['sigterm','sigint','sigkill','shell-sigterm','shell-sigkill'].includes(scenario)) { result.readyForSignal = true; record(); return; }
+  if (!['missing-proof','unresolved','recovery-close-race','shell-missing-proof'].includes(scenario)) { window.close(); app.quit(); return; }
 
   const leases = join(profile, 'state/leases');
   const active = readdirSync(leases).filter(lease => !existsSync(join(leases, lease, 'cleanup.json'))); assert.equal(active.length, 1);

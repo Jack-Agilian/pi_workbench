@@ -29,7 +29,10 @@
     "desktop": "node scripts/launch-desktop.mjs --demo",
     "test:desktop": "node scripts/test-desktop.mjs",
     "test:desktop-ui": "node scripts/launch-desktop.mjs --demo --smoke-test",
-    "test:desktop-shutdown": "node scripts/test-desktop-shutdown.mjs"
+    "test:desktop-shutdown": "node scripts/test-desktop-shutdown.mjs",
+    "test:product-shell": "node scripts/run-product-worker.mjs --shell",
+    "test:desktop-shell": "node scripts/launch-desktop.mjs --demo --shell-smoke-test",
+    "demo:product-shell": "node scripts/run-product-worker.mjs --shell-demo"
   },
   "dependencies": {
     "@earendil-works/pi-ai": "0.87.0",

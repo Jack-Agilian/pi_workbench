@@ -1,4 +1,7 @@
 // A single approved Pi Runtime in a real Worker; no ProductCore/database imports.
+import type { BashOperations } from '@earendil-works/pi-coding-agent';
+import type { ShellOutcome } from '../app-contracts/shell.ts';
+import { constants as osConstants } from 'node:os';
 import { existsSync } from 'node:fs';
 import { relative } from 'node:path';
 import { createAgentSession, createAgentSessionRuntime, defineTool, SessionManager, type AgentSessionRuntime, type CreateAgentSessionRuntimeFactory } from '@earendil-works/pi-coding-agent';
@@ -27,16 +30,19 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
   let closed = false; let started = false; let unbind = () => {}; let subscriptionGeneration = 0;
   const abort = new AbortController();
   const grants = new Map<string, { resolve: (value: ToolApproval | undefined) => void; localId: string }>();
+  let shellGrant: { operationId: string; parametersDigest: string } | undefined;
+  let shellPending: { requestId: string; resolve(outcome: ShellOutcome): void; reject(error: Error): void } | undefined;
   const claimed = new Set<string>();
   const seen = new Set<string>();
   const references = new Map<string, { resolve(): void; reject(error: Error): void }>();
   let reservedReference: string | null = null;
   let priorEntries = new Set<string>();
-  const send = (body: WireBody, requestId = `worker-${++sequence}`) => sender.send({ version: 3, instanceId, runtimeBindingId, requestId, body } satisfies Envelope);
+  const send = (body: WireBody, requestId = `worker-${++sequence}`) => sender.send({ version: 4, instanceId, runtimeBindingId, requestId, body } satisfies Envelope);
   const publish = () => runtime && started && !closed ? send({ type: 'presentation', projection: projectMessages(runtime.session.sessionManager.getBranch().filter(entry => !priorEntries.has(entry.id))) }) : Promise.resolve();
   function close(): Promise<void> {
     if (closing) return closing;
     closed = true; subscriptionGeneration++; unbind(); abort.abort(new Error('worker_closed')); tools?.revoke();
+    shellPending?.reject(new Error('worker_closed')); shellPending = undefined;
     for (const grant of grants.values()) grant.resolve(undefined); grants.clear();
     for (const reference of references.values()) reference.reject(new Error('worker_closed')); references.clear();
     closing = Promise.resolve().then(async () => {
@@ -48,24 +54,38 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
     return closing;
   }
   const fail = () => { void close().catch(() => { sender.close(); if (process.connected) process.disconnect(); process.exitCode = 1; }); };
+  const shellBackend: BashOperations = { exec: async (_command, _cwd, execution) => {
+    if (!shellGrant || shellPending || closed || abort.signal.aborted) throw new Error('shell_not_admitted');
+    const requestId = `shell-${++sequence}`;
+    const response = new Promise<ShellOutcome>((resolve, reject) => { shellPending = { requestId, resolve, reject }; });
+    const onAbort = () => shellPending?.reject(new Error('shell_cancelled'));
+    execution.signal?.addEventListener('abort', onAbort, { once: true });
+    try {
+      await send({ type: 'shell-exec', ...shellGrant }, requestId); const outcome = await response;
+      execution.onData(Buffer.from(outcome.stdout)); execution.onData(Buffer.from(outcome.stderr));
+      if (outcome.truncated) execution.onData(Buffer.from('\n[Workbench transport output limit reached]\n'));
+      if (outcome.timedOut) throw new Error(`timeout:${execution.timeout}`);
+      return { exitCode: outcome.exitCode ?? (outcome.signal ? 128 + (osConstants.signals[outcome.signal as keyof typeof osConstants.signals] ?? 0) : 1) };
+    } finally { execution.signal?.removeEventListener('abort', onAbort); shellPending = undefined; }
+  } };
   async function initialize(c: WorkerInit) {
     if (c.binding.runtimeBindingId !== runtimeBindingId) throw new Error('binding_mismatch');
     config = c;
     const resources = contentLoader({ cwd: c.workspace, agentDir: c.agentDir }); resources.select(c.resources); await resources.loader.reload();
     if (closed || resources.loaded?.id !== c.resources.id) throw new Error('resource_admission_blocked'); verifyContent(c.resources);
     tools = createControlledTools({ binding: { runId: c.binding.runId, runtimeBindingId, runtimeEpoch: 1, workspaceRef: c.workspace },
-      deadline: () => c.deadline, bash: { exec: async () => { throw new Error('shell_not_admitted'); } }, observe: () => {},
+      deadline: () => c.deadline, bash: shellBackend, observe: () => {},
       authorize: async operation => {
-        if (closed || !operation.target || !['write','edit'].includes(operation.tool)) throw new Error('tool_not_admitted');
+        if (closed || !['write','edit','bash'].includes(operation.tool) || (operation.tool !== 'bash' && !operation.target)) throw new Error('tool_not_admitted');
         verifyContent(c.resources);
         await publish();
         const requestId = `operation-${++sequence}`;
         const promise = new Promise<ToolApproval | undefined>(resolve => { grants.set(requestId, { resolve, localId: operation.operationId }); });
-        await send({ type: 'operation', toolCallId: operation.toolCallId, tool: operation.tool as 'write' | 'edit', parametersDigest: operation.parametersDigest,
-          target: relative(c.workspace, operation.target), resourceLock: c.resources.id }, requestId);
+        await send({ type: 'operation', toolCallId: operation.toolCallId, tool: operation.tool as 'write' | 'edit' | 'bash', parametersDigest: operation.parametersDigest,
+          target: operation.target ? relative(c.workspace, operation.target) : '.', resourceLock: c.resources.id }, requestId);
         try { const approval = await promise; if (approval) await driver?.afterGrant?.(abort.signal); return approval; } finally { grants.delete(requestId); }
       } });
-    const definitions = [defineTool(tools.write), defineTool(tools.edit)];
+    const definitions = [defineTool(tools.write), defineTool(tools.edit), defineTool(tools.bash)];
     const factory: CreateAgentSessionRuntimeFactory = async options => {
       if (closed) throw new Error('worker_closed');
       const reference = options.sessionManager.getSessionFile();
@@ -78,7 +98,7 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
       if (closed) throw new Error('worker_closed'); reservedReference = reference;
       const services = await createIsolatedServices(options); services.resourceLoader = resources.loader;
       const result = await createAgentSession({ ...services, sessionManager: options.sessionManager, sessionStartEvent: options.sessionStartEvent,
-        tools: ['write','edit'], customTools: definitions, noTools: 'builtin', thinkingLevel: 'off' });
+        tools: ['write','edit','bash'], customTools: definitions, noTools: 'builtin', thinkingLevel: 'off' });
       try { await driver?.testOnly?.afterSessionCreated?.(close); } catch (error) { result.session.dispose(); throw error; }
       if (closed) { result.session.dispose(); throw new Error('worker_closed'); }
       return { ...result, services, diagnostics: services.diagnostics };
@@ -112,6 +132,7 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
     if (body.type === 'cancel') { abort.abort(new Error('cancel_requested')); tools?.revoke(); for (const g of grants.values()) g.resolve(undefined); return; }
     if (body.type === 'close') { fail(); return; }
     if (closed) return;
+    if (body.type === 'shell-result') { if (shellPending?.requestId === requestId) shellPending.resolve(body.outcome); return; }
     if (body.type === 'session-reference-accepted') { references.get(requestId)?.resolve(); return; }
     if (body.type === 'init') {
       if (creating) throw new Error('already_initialized');
@@ -122,6 +143,7 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
       const pending = grants.get(requestId); if (!pending) return;
       if (body.type === 'grant') {
         if (abort.signal.aborted || body.expiresAt > config!.deadline || Date.now() >= body.expiresAt) { pending.resolve(undefined); return; }
+        shellGrant = { operationId: body.operationId, parametersDigest: body.parametersDigest };
         claimed.add(body.operationId); pending.resolve({ ...body, operationId: pending.localId });
       } else pending.resolve(undefined); return;
     }

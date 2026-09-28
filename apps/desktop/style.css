@@ -759,3 +759,6 @@ details p {
     font-size:21px;
   }
 }
+.shell-output { max-width: 100%; overflow: hidden; font-size: 12px; }
+.shell-output pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 240px; overflow-y: auto; }
+.tool-card > div { min-width: 0; overflow-wrap: anywhere; }

@@ -3,12 +3,15 @@ import { spawn, type ChildProcess } from 'node:child_process';
 import { readFileSync, renameSync, writeFileSync } from 'node:fs';
 import type { CleanupReceipt, LaunchSpec } from './worker-launcher.ts';
 import { IpcSender } from '../../packages/pi-adapter/ipc-channel.ts';
-import { parseEnvelope } from '../../packages/app-contracts/worker-ipc.ts';
+import { ShellExecution } from './shell-execution.ts';
+import { identifier } from '../../packages/app-contracts/index.ts';
+import { exact, parseEnvelope } from '../../packages/app-contracts/worker-ipc.ts';
 const spec = JSON.parse(readFileSync(process.argv[2]!, 'utf8')) as LaunchSpec;
 let worker: ChildProcess | undefined;
 let exited = false;
 let closing: Promise<void> | undefined;
 const parent = new IpcSender((message, callback) => process.send!(message, callback));
+const shell = spec.shell ? new ShellExecution(spec.shell, spec, () => { if (process.connected) void parent.send({ kind: 'shell-complete' }).catch(() => close()); }) : undefined;
 const delay = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
 function groupGone(): boolean {
   if (!worker?.pid) return true;
@@ -21,12 +24,15 @@ function signalGroup(signal: NodeJS.Signals) {
 function close(): Promise<void> {
   if (closing) return closing;
   closing = (async () => {
+    const shellStopped = shell?.stop(); let shellClean = true;
+    void shellStopped?.catch(() => { shellClean = false; });
     signalGroup('SIGTERM');
     for (let i = 0; i < 20 && ((worker?.pid && !exited) || !groupGone()); i++) await delay(25);
     signalGroup('SIGKILL');
     for (let i = 0; i < 160 && ((worker?.pid && !exited) || !groupGone()); i++) await delay(25);
+    await shellStopped?.catch(() => { shellClean = false; });
     const receipt: CleanupReceipt = { instanceId: spec.instanceId, runtimeBindingId: spec.runtimeBindingId, nonce: spec.nonce,
-      workerPid: worker?.pid ?? null, exited: !worker?.pid || exited, groupGone: groupGone() };
+      workerPid: worker?.pid ?? null, exited: !worker?.pid || exited, groupGone: groupGone() && shellClean };
     // Only the host-owned directory is writable here; the Worker profile denies it.
     writeFileSync(spec.receipt + '.tmp', JSON.stringify(receipt), { flag: 'wx', mode: 0o600 }); renameSync(spec.receipt + '.tmp', spec.receipt);
     if (process.connected) await parent.send({ kind: 'cleanup' }).catch(() => {});
@@ -56,6 +62,14 @@ process.on('message', raw => {
   try {
     if (raw && typeof raw === 'object' && 'kind' in raw && raw.kind === 'arm' && Object.keys(raw).length === 1) {
       startWorker(); return;
+    }
+    if (raw && typeof raw === 'object' && 'kind' in raw && raw.kind === 'shell-start') {
+      const r = exact(raw, ['kind','operationId','deadline']); identifier(r.operationId);
+      if (!shell || closing || !worker || typeof r.deadline !== 'number' || r.deadline !== spec.deadline || Date.now() >= r.deadline) throw new Error('shell_not_admitted');
+      shell.start(r.operationId as string, r.deadline); return;
+    }
+    if (raw && typeof raw === 'object' && 'kind' in raw && raw.kind === 'shell-cancel') {
+      exact(raw, ['kind']); void shell?.stop().catch(() => close()); return;
     }
     const message = parseEnvelope(raw);
     if (!worker || message.instanceId !== spec.instanceId || message.runtimeBindingId !== spec.runtimeBindingId || closing) throw new Error('stale_host');

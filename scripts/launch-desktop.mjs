@@ -5,15 +5,16 @@ import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-if (process.argv.slice(2).some(arg => !['--demo','--smoke-test'].includes(arg)) || !process.argv.includes('--demo')) throw new Error('explicit_demo_required');
+if (process.argv.slice(2).some(arg => !['--demo','--smoke-test','--shell-smoke-test'].includes(arg)) || !process.argv.includes('--demo')) throw new Error('explicit_demo_required');
 if (process.platform !== 'darwin' || process.arch !== 'arm64') throw new Error('desktop_platform_not_verified');
 const executable = join(root, 'node_modules/electron/dist/Electron.app/Contents/MacOS/Electron');
 if (!existsSync(executable)) throw new Error('Run npm run prepare:desktop first; launch never downloads dependencies.');
 await import('./build-desktop.mjs');
-const test = process.argv.includes('--smoke-test');
+const shellTest = process.argv.includes('--shell-smoke-test');
+const test = process.argv.includes('--smoke-test') || shellTest;
 const profile = test ? realpathSync(mkdtempSync(join(tmpdir(), 'pi-desktop-ui-'))) : join(root, '.artifacts/desktop-demo');
 mkdirSync(join(profile, 'home/tmp'), { recursive: true });
-const child = spawn(executable, [join(root, 'dist/desktop/main.mjs'), '--demo', `--host-node=${realpathSync(process.execPath)}`, `--demo-profile=${profile}`, ...(test ? ['--smoke-test'] : [])], {
+const child = spawn(executable, [join(root, 'dist/desktop/main.mjs'), '--demo', `--host-node=${realpathSync(process.execPath)}`, `--demo-profile=${profile}`, ...(test ? [shellTest ? '--shell-smoke-test' : '--smoke-test'] : [])], {
   cwd: profile, stdio: 'inherit', env: { HOME: join(profile, 'home'), TMPDIR: join(profile, 'home/tmp'), PATH: dirname(process.execPath),
     LANG: 'zh_CN.UTF-8', NO_COLOR: '1' },
 });
