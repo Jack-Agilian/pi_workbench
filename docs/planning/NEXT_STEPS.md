@@ -2,15 +2,15 @@
 
 状态：A0–A4 限定无模型探针、B 最小产品核心、B-IPC 真实子进程接缝、C 最小无模型桌面、D1 Mac 退出闭环及 D2-S 非交互 Shell 已限定验证；D 整体仍进行中。决策依据：[SSOT](../ssot/README.md)，最新范围见 [D2-S 报告](../validation/d2-shell-2026-09-28.md)。工作项见 [backlog.json](backlog.json)。尚未创建 GitHub Issues。
 
-## 当前唯一开发项：D2-T 单用户交互终端（下一增量）
+## 当前唯一开发项：M1 真实无工具会话
 
-D1 及复审已按用户授权快进合入 develop（`3d307e9`），推送后独立核对远端 SHA。D2-S 从该集成基线建立 `codex/d2-shell`，限定 Mac 无模型非交互 Bash 的审批/执行/取消/恢复已实施；详情见 [D2-S 报告](../validation/d2-shell-2026-09-28.md) 与 [D 契约](../ssot/d-platform-contract.md)。没有新增依赖、真实模型或任意 Renderer 命令执行入口。
+用户已采纳 [真实模型优先路线](REAL_MODEL_NEXT_STEPS.md)。D2-S 与 S01 修正已快进集成 develop（`22cf2889f5b1812028ed3cbbeab0b271c0c613dc`），推送后独立读回一致。M1 在此基线上复用 Pi AgentSession/ModelRuntime/凭据入口，连接现有产品 Run、Worker、正文流和原生恢复，不重建 Harness。
 
-下一轮推进 D2-T：核验 xterm.js/node-pty 的精确发行、许可及实际 Node ABI，再接单个用户显式授权的交互 TerminalSession；其输入权限与 Agent 非交互 Bash 分开。端到端消费确认、resize、Ctrl-C、断连和终端特有进程组仍待实施，D2-S 的有界完成输出快照不冒充终端流控。D2-X 的实际 Bash 退出检查已纳入 D1 矩阵；PTY 和 Windows 部分仍须后续独立验证。
+M1-A：独立配置入口、实际零工具 Session、模型结果结算、有界流式展示、取消/上下文/重开与离线测试。M1-B：指定 Provider/模型、批准的数据和调用/费用预算、受控出口就绪后，进行最小真实服务验收；用户将稍后自行配置，当前不调用真实模型。配置缺失不妨碍 M1-A 实施。
 
-D2-S 的 [S01 复审修正](../validation/review-d2s-2026-09-28.md) 已验证非法 UTF-8 输出预算与真实故障恢复；没有改变唯一下一开发项。审核提出的 M1/M2 优先建议尚未成为主线，真实模型仍需另行授权。
+完成 M1 后停止并审核，下一阶段才是 M2 有限文件工具 Agent。PTY（D2-T/D2-X）、Windows、市场与 OAuth 后置，不是首次 Mac 真实会话的前置。D2-S 的边界和回归保留，尚未验证项不因此完成。三个 M0 Gate 另按既有验收逐项核对。
 
-本轮停在 D2-S 复审，D2-S 功能分支尚未合并 develop。Windows 环境未确认，不自动安装虚拟机，也不把 Mac 中文路径结果作为 Windows 证据。UI 完整历史、自由工作区、市场、真实模型及生产发行留在 backlog，三个 M0 Gate 仍 pending。以下 A0–D1 记录为历史，以本栏为唯一当前顺序。
+下方为历史阶段与能力分解；当前顺序只以上栏为准。
 
 ## 1. 下一增量不是再造平台
 

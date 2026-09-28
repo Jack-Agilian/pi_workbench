@@ -51,3 +51,7 @@ D1 结束时的下一增量规划为 D2：在同一产品审批、Operation、IP
 - 命令自然成功可无 Artifact；非零退出、取消、超时都不推导文件已回滚。已经启动的命令结果标为 sideEffects=possible。崩溃时有效自然退出收据只用来对账原 Operation，不重新执行；异常信号中断而未持久取消/超时的操作仍 unknown/blocked。没有可验证收据则不释放全局名额。本轮不实现通用 Shell 外部副作用解决器。
 
 演示入口仅由 trusted --demo 组合选择两个固定命令；输入 `/demo-shell` 或 `/demo-shell-wait` 选择演示，其他文本继续原 Markdown 路径，不将用户文本解释为 Shell。CLI 四场景也是同一 DesktopHost/产品命令链路的明确合成驱动，不是新 CLI 产品。执行证据见 [D2-S 报告](../validation/d2-shell-2026-09-28.md)；下一项 D2-T，终端及 Windows 仍未实现/验证。
+
+## 路线调整（2026-09-28）
+
+D2-S/S01 已集成 develop。此前“下一项 D2-T”为历史安排；按 [当前路线](../planning/NEXT_STEPS.md) 优先 M1/M2，PTY 不阻塞无工具真实会话。Shell 禁网、进程组和收据边界继续保留，新增模型出口不授予工具联网权限。

@@ -1,6 +1,6 @@
 # Repository working agreement
 
-本仓库已实现限定的 macOS 无模型桌面、Pi SDK/真实 Worker 接入、D1 退出与恢复闭环及限定的 D2-S 非交互 Bash 产品接入；具体基线、验证范围与未完成项以 `docs/ssot/` 和 `docs/planning/NEXT_STEPS.md` 为准。交互 PTY、其他平台、真实模型和生产发行尚未完成，不得将局部实现或历史报告扩大为完整产品或本轮实测。
+本仓库已实现限定的 macOS 无模型桌面、Pi SDK/真实 Worker 接入、D1 退出与恢复闭环及限定的 D2-S 非交互 Bash 产品接入；具体基线、验证范围与未完成项以 `docs/ssot/` 和 `docs/planning/NEXT_STEPS.md` 为准。当前唯一开发项为 M1 无工具会话（先离线接入，再获授权服务验收），术语见 `docs/ssot/glossary.md`。交互 PTY、其他平台、真实模型和生产发行尚未完成，不得将局部实现或历史报告扩大为完整产品或本轮实测。
 
 ## 修改与验证
 

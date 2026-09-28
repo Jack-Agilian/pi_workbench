@@ -1529,6 +1529,150 @@
           "evidenceRefs": []
         }
       ]
+    },
+    {
+      "id": "MODEL-01",
+      "priority": "P0",
+      "ownerRole": "Tech Lead",
+      "state": "in_progress",
+      "githubIssueNumber": null,
+      "dependencies": [],
+      "sourceDependencyText": "2026-09-28用户采纳真实模型优先，限定已有能力之上的增量；不替代原完整任务",
+      "workAndAcceptance": "M1-A：真实Pi prompt与零Operation结算; 有界真实SDK流式/最终投影和控制优先; 原生上下文重开及请求不重发; 取消/关闭/错误与受管清理; 非秘密配置/内存凭据/模型出口准入与预算",
+      "reuseRefs": [
+        "models-auth",
+        "agent-session",
+        "product-coordination",
+        "desktop-ui"
+      ],
+      "implementationStatus": "in_progress",
+      "githubIssueUrl": null,
+      "issueVerificationStatus": "not_checked",
+      "issueEvidence": [],
+      "acceptanceDependencies": [],
+      "requiredEvidenceKinds": [
+        "sdk",
+        "platform"
+      ],
+      "acceptanceCriteria": [
+        {
+          "id": "MODEL-01-A01",
+          "requirement": "真实Pi prompt与零Operation结算",
+          "plannedChecks": [
+            "m1-a-zero-tools"
+          ],
+          "evidenceRefs": []
+        },
+        {
+          "id": "MODEL-01-A02",
+          "requirement": "有界真实SDK流式/最终投影和控制优先",
+          "plannedChecks": [
+            "m1-a-stream-final"
+          ],
+          "evidenceRefs": []
+        },
+        {
+          "id": "MODEL-01-A03",
+          "requirement": "原生上下文重开及请求不重发",
+          "plannedChecks": [
+            "m1-a-context-resume"
+          ],
+          "evidenceRefs": []
+        },
+        {
+          "id": "MODEL-01-A04",
+          "requirement": "取消/关闭/错误与受管清理",
+          "plannedChecks": [
+            "m1-a-cancel-close"
+          ],
+          "evidenceRefs": []
+        },
+        {
+          "id": "MODEL-01-A05",
+          "requirement": "非秘密配置/内存凭据/模型出口准入与预算",
+          "plannedChecks": [
+            "m1-a-configuration"
+          ],
+          "evidenceRefs": []
+        }
+      ],
+      "statusReason": "限定增量，尚无本次验收证据；不依赖PTY/Windows完成。"
+    },
+    {
+      "id": "MODEL-02",
+      "priority": "P0",
+      "ownerRole": "Tech Lead",
+      "state": "proposed",
+      "githubIssueNumber": null,
+      "dependencies": [
+        "MODEL-01"
+      ],
+      "sourceDependencyText": "2026-09-28用户采纳真实模型优先，限定已有能力之上的增量；不替代原完整任务",
+      "workAndAcceptance": "M1-B：获授权单Provider/模型Mac真实文本/继续/重开/取消证据及用量",
+      "reuseRefs": [
+        "models-auth",
+        "agent-session",
+        "product-coordination",
+        "desktop-ui"
+      ],
+      "implementationStatus": "not_implemented",
+      "githubIssueUrl": null,
+      "issueVerificationStatus": "not_checked",
+      "issueEvidence": [],
+      "acceptanceDependencies": [],
+      "requiredEvidenceKinds": [
+        "model",
+        "platform"
+      ],
+      "acceptanceCriteria": [
+        {
+          "id": "MODEL-02-A01",
+          "requirement": "获授权单Provider/模型Mac真实文本/继续/重开/取消证据及用量",
+          "plannedChecks": [
+            "m1-b-live"
+          ],
+          "evidenceRefs": []
+        }
+      ],
+      "statusReason": "限定增量，尚无本次验收证据；不依赖PTY/Windows完成。"
+    },
+    {
+      "id": "MODEL-03",
+      "priority": "P0",
+      "ownerRole": "Tech Lead",
+      "state": "proposed",
+      "githubIssueNumber": null,
+      "dependencies": [
+        "MODEL-02"
+      ],
+      "sourceDependencyText": "2026-09-28用户采纳真实模型优先，限定已有能力之上的增量；不替代原完整任务",
+      "workAndAcceptance": "M2：原生循环多次顺序文件操作及逐操作授权/恢复",
+      "reuseRefs": [
+        "models-auth",
+        "agent-session",
+        "product-coordination",
+        "desktop-ui"
+      ],
+      "implementationStatus": "not_implemented",
+      "githubIssueUrl": null,
+      "issueVerificationStatus": "not_checked",
+      "issueEvidence": [],
+      "acceptanceDependencies": [],
+      "requiredEvidenceKinds": [
+        "model",
+        "platform"
+      ],
+      "acceptanceCriteria": [
+        {
+          "id": "MODEL-03-A01",
+          "requirement": "原生循环多次顺序文件操作及逐操作授权/恢复",
+          "plannedChecks": [
+            "m2-file-agent"
+          ],
+          "evidenceRefs": []
+        }
+      ],
+      "statusReason": "限定增量，尚无本次验收证据；不依赖PTY/Windows完成。"
     }
   ],
   "decisionSource": "../ssot/README.md",

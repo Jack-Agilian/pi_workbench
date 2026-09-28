@@ -90,3 +90,7 @@ D1 及复审已按授权集成 develop（`3d307e9`）。[D2-S 报告](../validat
 ## D2-S 审核修正：2026-09-28
 
 [S01 复审与证据](../validation/review-d2s-2026-09-28.md) 在原提交实际 Mac 后端复现非法 UTF-8 导致有效命令收据被拒绝；修正解码后字节预算，原收据校验和权限不放宽。修正 SHA 上 Shell 28、Worker 50、Electron Shell 三场景/退出 18 及前序回归通过。未合并分支，唯一下一开发项仍 D2-T，M0 Gate 保持 pending。
+
+## M1 路线采纳（2026-09-28）
+
+D2-S/S01 已集成 develop（`22cf288`）。此前 D2-T 为下一项的阶段表述保留为历史；当前唯一开发项已调整为 M1 无工具会话，详情见 [NEXT_STEPS](../planning/NEXT_STEPS.md) 与 [术语](glossary.md)。用户将稍后配置服务与预算，当前未授权真实模型调用。
