@@ -116,3 +116,14 @@ test('M1 deadline terminates active generation; recovery does not retry the requ
   assert.equal(f.core.snapshot(f.thread).runs.find(r=>r.id===run)!.state,'unknown');f.supervisor.recover();assert.equal(f.core.snapshot(f.thread).runs.find(r=>r.id===run)!.state,'failed');assert.equal(f.core.workerLaunches().length,1);
  }finally{await f.dispose();}
 });
+test('M1 oversized SYNTHETIC stream is coalesced, truncated only for display and finalized from native history',async()=>{
+ const f=createScenario();try{
+  f.supervisor.command({type:'runs.cancel',requestId:'initial-cancel',runId:f.run});const run=f.supervisor.command({type:'runs.start',requestId:'full-long-stream',threadId:f.thread,input:'[long]'}).id;
+  await f.supervisor.startNext({...plan(),deadline:Date.now()+30000},entry);
+  assert.equal(f.core.snapshot(f.thread).runs.find(r=>r.id===run)!.state,'completed');
+  const projection=f.core.presentation(run);const assistant=projection.messages.find(m=>m.role==='assistant')!;assert.equal(assistant.truncated,true);assert.ok(assistant.text.length<=2048);assert.notEqual(assistant.id,'streaming');
+  const displays=f.core.eventsAfter(f.thread,0).filter(e=>e.runId===run&&e.kind==='display.replaced');assert.ok(displays.length>2&&displays.length<=62);
+  const ref=f.core.nativeSessionReference(f.thread);assert.equal(ref.persisted,true);assert.ok(readFileSync(ref.reference!,'utf8').includes('中文测试 '.repeat(700)));
+  const cursor=f.core.snapshot(f.thread).cursor;await f.supervisor.close();assert.equal(f.core.snapshot(f.thread).cursor,cursor);
+ }finally{await f.dispose();}
+});
