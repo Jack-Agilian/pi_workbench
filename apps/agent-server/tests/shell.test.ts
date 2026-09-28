@@ -12,6 +12,7 @@ import { until } from './scenario.ts';
 import { parametersDigest } from '../../../packages/pi-adapter/controlled-tools.ts';
 import { repository, sterileEnvironment } from '../worker-launcher.ts';
 import { shellScenario } from './shell-scenario.ts';
+import { parseShellOutcome, SHELL_OUTPUT_MAX_BYTES } from '../../../packages/app-contracts/shell.ts';
 const delay = (ms: number) => new Promise<void>(r => setTimeout(r, ms));
 
 const outcome = (f: ReturnType<typeof shellScenario>) => f.core.snapshot(f.thread).operations[0]?.shell?.outcome;
@@ -51,6 +52,44 @@ test('shell output is bounded while draining UTF-8 and cancellation remains avai
   const f=shellScenario("i=0; while [ $i -lt 5000 ]; do printf '中文😀'; printf 'err' >&2; i=$((i+1)); done");
   try { const done=f.launch(); await f.approval(); await done; const out=outcome(f)!;assert.equal(out.truncated,true);assert.ok(Buffer.byteLength(out.stdout)<=4003);assert.ok(Buffer.byteLength(out.stderr)<=4003);assert.equal(f.core.snapshot(f.thread).runs[0]!.state,'completed'); } finally { await f.dispose(); }
 });
+// SYNTHETIC byte fixtures through actual approved Pi Bash, guardian and Mac sandbox.
+const replacement = '\uFFFD';
+for (const sample of [
+  { name: 'ASCII raw boundary', data: Buffer.alloc(4000, 0x61), text: 'a'.repeat(4000), truncated: false },
+  { name: 'invalid below decoded limit', data: Buffer.alloc(2600, 0xff), text: replacement.repeat(2600), truncated: false },
+  { name: 'invalid 3000', data: Buffer.alloc(3000, 0xff), text: replacement.repeat(2730), truncated: true },
+  { name: 'invalid 4000 raw boundary', data: Buffer.alloc(4000, 0xff), text: replacement.repeat(2730), truncated: true },
+  { name: 'invalid 5000 over raw limit', data: Buffer.alloc(5000, 0xff), text: replacement.repeat(2730), truncated: true },
+  { name: 'exact decoded boundary', data: Buffer.concat([Buffer.from('aa'), Buffer.alloc(2730, 0xff)]), text: 'aa' + replacement.repeat(2730), truncated: false },
+  { name: 'one byte over decoded boundary', data: Buffer.concat([Buffer.from('aaa'), Buffer.alloc(2730, 0xff)]), text: 'aaa' + replacement.repeat(2729), truncated: true },
+  { name: 'incomplete UTF-8 at EOF', data: Buffer.from([0xe4, 0xb8]), text: replacement, truncated: false },
+]) test(`shell output ${sample.name}: both streams, receipt, close/reopen without replay`, async () => {
+  const f = shellScenario('printf once >> count.txt; cat bytes.bin; cat bytes.bin >&2');
+  writeFileSync(join(f.cwd, 'bytes.bin'), sample.data);
+  try {
+    const done = f.launch(); await f.approval(); await done;
+    const out = outcome(f)!;
+    assert.deepEqual(parseShellOutcome(out), out);
+    assert.equal(out.stdout, sample.text); assert.equal(out.stderr, sample.text);
+    assert.equal(out.truncated, sample.truncated); assert.equal(out.exitCode, 0); assert.equal(out.signal, null);
+    assert.equal(out.sideEffects, 'possible'); assert.equal(f.core.snapshot(f.thread).runs[0]!.state, 'completed');
+    // Consumer still rejects forged/oversized display data; cleanup validation is not relaxed.
+    assert.throws(() => parseShellOutcome({ ...out, stdout: 'a'.repeat(SHELL_OUTPUT_MAX_BYTES + 1) }), /shell_output_limit/);
+    const lease = join(f.root, 'state/leases', readdirSync(join(f.root, 'state/leases'))[0]!);
+    const receipt = JSON.parse(readFileSync(join(lease, 'shell.json'), 'utf8')) as { groupGone: boolean; pid: number; outcome: unknown };
+    assert.equal(receipt.groupGone, true); assert.deepEqual(parseShellOutcome(receipt.outcome), out);
+    assert.throws(() => process.kill(-receipt.pid, 0));
+    const mtime = statSync(join(f.cwd, 'count.txt'), { bigint: true }).mtimeNs;
+    await f.supervisor.close(); f.reopen(); f.supervisor.recover(); f.supervisor.recover();
+    assert.deepEqual(outcome(f), out); assert.equal(f.core.snapshot(f.thread).runs[0]!.state, 'completed');
+    assert.equal(f.core.workerLaunches().length, 1); assert.equal(readFileSync(join(f.cwd, 'count.txt'), 'utf8'), 'once');
+    assert.equal(statSync(join(f.cwd, 'count.txt'), { bigint: true }).mtimeNs, mtime);
+  } finally { await f.dispose(); }
+});
+test('shell UTF-8 split writes preserve complete characters on both streams', async () => {
+  const f = shellScenario("printf '\\344'; printf '\\360\\237' >&2; sleep 0.05; printf '\\270\\255'; printf '\\230\\200' >&2");
+  try { const done = f.launch(); await f.approval(); await done; const out = parseShellOutcome(outcome(f)); assert.equal(out.stdout, '中'); assert.equal(out.stderr, '😀'); assert.equal(out.truncated, false); assert.equal(f.core.snapshot(f.thread).runs[0]!.state, 'completed'); } finally { await f.dispose(); }
+});
 test('shell cannot read/create host DB or resource/receipt paths and has no provider environment', async () => {
   const f=shellScenario('placeholder');
   const quote=(s:string)=>"'"+s.replaceAll("'","'\\''")+"'";
@@ -62,7 +101,7 @@ test('shell cannot read/create host DB or resource/receipt paths and has no prov
   try { const done=f.supervisor.startNext(f.plan,{path:join(repository,'packages/pi-adapter/shell-demo-worker.ts'),args:[JSON.stringify({command,timeout:5})]})!;await f.approval();await done;assert.equal(outcome(f)?.exitCode,0);assert.match(outcome(f)!.stdout,/sqlite denied/);assert.equal(existsSync(join(f.root,'host','new.sqlite')),false);assert.equal(existsSync(join(f.root,'host','tmp')),false); } finally { if(priorKey===undefined)delete process.env.OPENAI_API_KEY;else process.env.OPENAI_API_KEY=priorKey; await f.dispose(); }
 });
 
-for (const mode of ['host-kill','result-lost'] as const) test(`shell ${mode}: reopen real database; guardian survives host death, never replay`, async () => {
+for (const mode of ['host-kill','result-lost','result-lost-invalid'] as const) test(`shell ${mode}: reopen real database; guardian survives host death, never replay`, async () => {
   const dir=realpathSync(mkdtempSync(join(tmpdir(),'shell-host-'))); const manifest=join(dir,'manifest.json');
   const child=spawn(process.execPath,[join(repository,'apps/agent-server/tests/shell-host-fixture.ts'),manifest,mode],{env:sterileEnvironment(dir),stdio:'ignore'});
   let exited=false; child.once('exit',()=>{exited=true;});
@@ -79,7 +118,8 @@ for (const mode of ['host-kill','result-lost'] as const) test(`shell ${mode}: re
     core=new ProductCore(record.database,[{id:'workspace',path:record.cwd}]);const supervisor=new WorkerSupervisor(core,{stateDirectory:join(root,'state'),databaseDirectory:join(root,'host'),resources:record.resources});
     if(mode==='host-kill') { assert.throws(()=>supervisor.recover(),/shell_side_effect_unresolved/);assert.equal(core.snapshot(record.thread).runs[0]!.state,'unknown');const before=statSync(join(record.cwd,'heartbeat'),{bigint:true}).mtimeNs;await delay(100);assert.equal(statSync(join(record.cwd,'heartbeat'),{bigint:true}).mtimeNs,before); }
     else {const target=join(record.cwd,'count.txt');const before=statSync(target,{bigint:true}).mtimeNs;supervisor.recover();supervisor.recover();assert.equal(core.snapshot(record.thread).operations[0]!.state,'succeeded');assert.equal(core.snapshot(record.thread).runs[0]!.state,'failed');assert.equal(readFileSync(target,'utf8'),'once');assert.equal(statSync(target,{bigint:true}).mtimeNs,before);}
-    assert.equal(core.workerLaunches().length,1);
+    if (mode === 'result-lost-invalid') { const out = parseShellOutcome(core.snapshot(record.thread).operations[0]!.shell!.outcome); assert.equal(out.stdout, replacement.repeat(2730)); assert.equal(out.stderr, replacement.repeat(2730)); assert.equal(out.truncated, true); assert.equal(out.exitCode, 0); }
+    await supervisor.close(); assert.equal(core.workerLaunches().length,1);
   } finally {if(!exited){child.kill('SIGKILL');await until(()=>exited,'fixture exit');}core?.close();if(root)rmSync(root,{recursive:true,force:true});rmSync(dir,{recursive:true,force:true});}
 });
 

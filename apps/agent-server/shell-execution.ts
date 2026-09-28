@@ -2,7 +2,7 @@
 import { spawn, type ChildProcess } from 'node:child_process';
 import { writeFileSync, renameSync } from 'node:fs';
 import { StringDecoder } from 'node:string_decoder';
-import type { ShellIntent, ShellOutcome } from '../../packages/app-contracts/shell.ts';
+import { SHELL_OUTPUT_MAX_BYTES, type ShellIntent, type ShellOutcome } from '../../packages/app-contracts/shell.ts';
 export interface ShellLaunch { intent: ShellIntent; profile: string; cwd: string; env: Record<string,string>; receipt: string }
 export interface ShellReceipt { instanceId: string; runtimeBindingId: string; nonce: string; operationId: string | null; pid: number | null; groupGone: boolean; outcome: ShellOutcome }
 const gone = (pid?: number) => { if (!pid) return true; try { process.kill(-pid, 0); return false; } catch (e) { return e instanceof Error && 'code' in e && e.code === 'ESRCH'; } };
@@ -38,7 +38,7 @@ export class ShellExecution {
         // Shell exit alone is insufficient: terminate remaining ordinary same-group children.
         void this.clearGroup().then(async () => {
           child.stdout?.destroy(); child.stderr?.destroy();
-          this.stdout += this.decoders.stdout.end(); this.stderr += this.decoders.stderr.end();
+          this.finishOutput('stdout'); this.finishOutput('stderr');
           this.save(); this.notify(); resolve();
         }).catch(reject);
       };
@@ -49,6 +49,18 @@ export class ShellExecution {
     });
     void this.finished.catch(() => {});
     this.timer = setTimeout(() => { this.outcome.timedOut = true; void this.stop().catch(() => {}); }, Math.min(this.spec.intent.timeoutMs, deadline - Date.now()));
+  }
+  private finishOutput(name: 'stdout' | 'stderr'): void {
+    const decoded = this[name] + this.decoders[name].end();
+    // Invalid/trailing bytes become U+FFFD and can expand beyond the raw 4000-byte budget.
+    // Keep a code-point-aligned prefix under the same encoded limit as the receipt consumer.
+    let bytes = 0; let prefix = '';
+    for (const character of decoded) {
+      const size = Buffer.byteLength(character, 'utf8');
+      if (bytes + size > SHELL_OUTPUT_MAX_BYTES) { this.outcome.truncated = true; break; }
+      bytes += size; prefix += character;
+    }
+    this[name] = prefix;
   }
   private clearing?: Promise<void>;
   private clearGroup(): Promise<void> {
