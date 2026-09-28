@@ -103,3 +103,7 @@ P04/P05/P06/P07/P13 的固定源码链接是复查入口，不声称逐字核验
 代码提交 `61ad838ea601ef22f114a44ea533d3aff91517f0` 继续复用 Pi 0.87.0 根公开 SessionManager/Runtime、Session 方法及 write 工厂，无新增 Pi 入口或 deep-import。[输入摘要](../validation/b-inputs.json) 重新核对两个缓存官方 tarball 的 SRI、15 个文件/19 份安装副本字节；[报告](../validation/b-2026-09-22.md) 区分 4 项真实 SDK 接入与 1 项合成未知事件投影。
 
 产品 SQLite 使用现有 Node 24.21.0 的公开 node:sqlite，实际 SQLite 3.53.4。通过 Context7 定位文档并取得 [精确版官方文档](https://nodejs.org/download/release/v24.21.0/docs/api/sqlite.html) 的字节摘要；Stability 1.2（Release candidate）与替代方案登记在 [最小契约](b-minimal-contract.md)。已复现 Node 文件权限不拦截 DatabaseSync，B 测试以 macOS OS 文件规则补充并保留读写拒绝断言，见 [边界](../validation/b-boundaries.md)。这不是生产/打包运行时认证或上游安全签收。
+
+## M1 公开 HTTP 入口（2026-09-28）
+
+Pi 0.87.0 的发行声明公开 ProviderRequestOptions.fetch（FetchFunction 类型，HTTP 而非 WebSocket）与 ModelRuntime.registerNativeProvider/setRuntimeApiKey 类方法。实际原生 Anthropic 适配器通过同一 IPC 处理明确合成 SSE/错误，路径为 `/v1/messages?beta=true`；见 [M1 实测](../validation/m1-2026-09-28.md)。fauxProvider/fauxAssistantMessage 根运行时导出仅用于离线测试，不是模型服务 fixture。sandbox-runtime 只阅读候选文档，未采用/安装/实测；不存在这项发行完成声明。

@@ -35,7 +35,10 @@
       ],
       "upstreamSymbolsOrPaths": [
         "createAgentSession",
-        "AgentSession"
+        "AgentSession",
+        "AgentSession.prompt",
+        "AgentSession.subscribe",
+        "AgentSession.abort"
       ],
       "reuse": "工具循环、原生重试/压缩保持上游",
       "productDelta": "packages/pi-adapter/worker-runtime.ts采用公开SDK；apps/agent-server/worker-supervisor.ts负责进程监督和产品Run结算",
@@ -81,7 +84,9 @@
           "EV-REVIEW-B-IPC-MAC-20260923",
           "EV-C-SDK-20260923",
           "EV-C-MAC-20260923",
-          "EV-C-REGRESSION-20260923"
+          "EV-C-REGRESSION-20260923",
+          "EV-M1-SDK-20260928",
+          "EV-M1-MAC-20260928"
         ]
       }
     },
@@ -152,7 +157,9 @@
           "EV-REVIEW-B-IPC-MAC-20260923",
           "EV-C-SDK-20260923",
           "EV-C-MAC-20260923",
-          "EV-C-REGRESSION-20260923"
+          "EV-C-REGRESSION-20260923",
+          "EV-M1-SDK-20260928",
+          "EV-M1-MAC-20260928"
         ]
       }
     },
@@ -165,10 +172,13 @@
       ],
       "upstreamSymbolsOrPaths": [
         "ModelRuntime",
-        "CredentialStore"
+        "CredentialStore",
+        "ModelRuntime.registerNativeProvider",
+        "ModelRuntime.setRuntimeApiKey",
+        "ProviderRequestOptions.fetch"
       ],
       "reuse": "Provider、目录、登录/刷新复用",
-      "productDelta": "系统凭据与桌面交互",
+      "productDelta": "M1 产品非秘密授权配置与原生凭据选择；Pi 内存 store + 原生 HTTP fetch seam；fauxProvider/fauxAssistantMessage 仅测试；系统 Keychain/OAuth 未完成",
       "acceptanceGate": "secret 不进Renderer/日志/子进程env",
       "implementationState": "in_progress",
       "adoption": {
@@ -224,6 +234,18 @@
               {
                 "name": "OAuthCredential",
                 "kind": "type"
+              },
+              {
+                "name": "FetchFunction",
+                "kind": "type"
+              },
+              {
+                "name": "fauxProvider",
+                "kind": "runtime"
+              },
+              {
+                "name": "fauxAssistantMessage",
+                "kind": "runtime"
               }
             ],
             "selectedVersion": "0.87.0"
@@ -241,7 +263,9 @@
           "EV-A4-AUTH-20260922",
           "EV-A4-MAC-ISOLATION-20260922",
           "EV-A4-REGRESSION-20260922",
-          "EV-REVIEW-A4-ACCOUNT-20260923"
+          "EV-REVIEW-A4-ACCOUNT-20260923",
+          "EV-M1-SDK-20260928",
+          "EV-M1-MAC-20260928"
         ]
       }
     },
@@ -282,7 +306,9 @@
           "EV-A0-CLOSEOUT-RELEASE-20260922",
           "EV-A0-CLOSEOUT-TYPES-20260922",
           "EV-A1-CLOSEOUT-SDK-20260922",
-          "EV-A4-AUTH-20260922"
+          "EV-A4-AUTH-20260922",
+          "EV-M1-SDK-20260928",
+          "EV-M1-MAC-20260928"
         ]
       }
     },
@@ -925,7 +951,9 @@
           "EV-D2S-V4-20260928",
           "EV-D2S-S01-REVIEW-20260928",
           "EV-D2S-S01-MAC-20260928",
-          "EV-D2S-S01-REGRESSION-20260928"
+          "EV-D2S-S01-REGRESSION-20260928",
+          "EV-M1-SDK-20260928",
+          "EV-M1-MAC-20260928"
         ]
       }
     },
@@ -1113,7 +1141,9 @@
           "EV-D2S-V4-20260928",
           "EV-D2S-S01-REVIEW-20260928",
           "EV-D2S-S01-MAC-20260928",
-          "EV-D2S-S01-REGRESSION-20260928"
+          "EV-D2S-S01-REGRESSION-20260928",
+          "EV-M1-SDK-20260928",
+          "EV-M1-MAC-20260928"
         ]
       }
     }
@@ -1970,6 +2000,66 @@
         "darwin"
       ],
       "locator": "docs/validation/review-d2s-2026-09-28.md"
+    },
+    {
+      "id": "EV-M1-SDK-20260928",
+      "kind": "sdk",
+      "result": "passed",
+      "scope": "Pi 0.87.0 actual prompt/no-tools/native reopen/stream bounds/cancel; native Anthropic parsing over IPC uses explicitly SYNTHETIC HTTP, 12 tests; no real model.",
+      "commit": "0cdc0b80a73428614093d24a945ad516e2d10d4c",
+      "recordedAt": "2026-09-28T12:34:04.844769+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/m1-2026-09-28.md"
+    },
+    {
+      "id": "EV-M1-MAC-20260928",
+      "kind": "platform",
+      "result": "passed",
+      "scope": "macOS 27 arm64: actual Electron 24 shutdown scenarios, model UI/config/native-dialog parameter substitution, sterile host/Worker and fixed OS SQLite/TCP denial; loopback transport/redirect only, no Windows or external TLS.",
+      "commit": "53613cc0a9d48469ab1a531601154c333b4fac27",
+      "recordedAt": "2026-09-28T12:34:04.844769+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/m1-2026-09-28.md"
+    },
+    {
+      "id": "EV-M1-MOCK-20260928",
+      "kind": "mock",
+      "result": "passed",
+      "scope": "Actual Mac desktop allow/deny/cancel/crash, real Markdown and existing recovery/UI regressions; all messages/provider/error fixtures explicitly SYNTHETIC, not real model fixtures.",
+      "commit": "53613cc0a9d48469ab1a531601154c333b4fac27",
+      "recordedAt": "2026-09-28T12:34:04.844769+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/m1-2026-09-28.md"
+    },
+    {
+      "id": "EV-M1-REGRESSION-20260928",
+      "kind": "static",
+      "result": "passed",
+      "scope": "29 commands passed: strict types/patch, A1-A4, ProductCore/SDK/Worker/Shell/desktop and repository checks; individual runtime scope in report. No reinstall/new-clone evidence in this run.",
+      "commit": "53613cc0a9d48469ab1a531601154c333b4fac27",
+      "recordedAt": "2026-09-28T12:34:04.844769+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/m1-2026-09-28.md"
+    },
+    {
+      "id": "EV-M1-REVIEW-20260928",
+      "kind": "review",
+      "result": "passed",
+      "scope": "M1 public fetch adoption, configuration/credential separation and existing M0-UI/M0-SDK requirements assessed individually against historical release and current SDK/Mac evidence; M0-Pi remains blocked.",
+      "commit": "53613cc0a9d48469ab1a531601154c333b4fac27",
+      "recordedAt": "2026-09-28T12:34:04.844769+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/m1-2026-09-28.md"
     }
   ]
 }

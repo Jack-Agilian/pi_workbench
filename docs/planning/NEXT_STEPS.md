@@ -2,13 +2,13 @@
 
 状态：A0–A4 限定无模型探针、B 最小产品核心、B-IPC 真实子进程接缝、C 最小无模型桌面、D1 Mac 退出闭环及 D2-S 非交互 Shell 已限定验证；D 整体仍进行中。决策依据：[SSOT](../ssot/README.md)，最新范围见 [D2-S 报告](../validation/d2-shell-2026-09-28.md)。工作项见 [backlog.json](backlog.json)。尚未创建 GitHub Issues。
 
-## 当前唯一开发项：M1 真实无工具会话
+## 当前唯一事项：M1-B 获授权真实无工具会话验收
 
 用户已采纳 [真实模型优先路线](REAL_MODEL_NEXT_STEPS.md)。D2-S 与 S01 修正已快进集成 develop（`22cf2889f5b1812028ed3cbbeab0b271c0c613dc`），推送后独立读回一致。M1 在此基线上复用 Pi AgentSession/ModelRuntime/凭据入口，连接现有产品 Run、Worker、正文流和原生恢复，不重建 Harness。
 
-M1-A：独立配置入口、实际零工具 Session、模型结果结算、有界流式展示、取消/上下文/重开与离线测试。M1-B：指定 Provider/模型、批准的数据和调用/费用预算、受控出口就绪后，进行最小真实服务验收；用户将稍后自行配置，当前不调用真实模型。配置缺失不妨碍 M1-A 实施。
+M1-A 已完成限定离线范围，见 [M1 报告](../validation/m1-2026-09-28.md) 与 [配置说明](../MODEL_CONFIGURATION.md)。当前唯一待推进项为 M1-B：用户稍后填写 Provider/精确模型、批准的数据和调用/费用预算，并通过本机入口提供凭据后，才做最小真实服务验收。当前没有此授权，真实模型调用 0；不再新增平行探针或启动 M2。
 
-完成 M1 后停止并审核，下一阶段才是 M2 有限文件工具 Agent。PTY（D2-T/D2-X）、Windows、市场与 OAuth 后置，不是首次 Mac 真实会话的前置。D2-S 的边界和回归保留，尚未验证项不因此完成。三个 M0 Gate 另按既有验收逐项核对。
+完成 M1 后停止并审核，下一阶段才是 M2 有限文件工具 Agent。PTY（D2-T/D2-X）、Windows、市场与 OAuth 后置，不是首次 Mac 真实会话的前置。D2-S 的边界和回归保留，尚未验证项不因此完成。M0-UI / M0-SDK 已按既有条件逐项核对为 passed；M0-Pi 因真实模型及工具任务证据缺失而 blocked，不能由 M1-A 或无工具 M1-B 自动完成。
 
 下方为历史阶段与能力分解；当前顺序只以上栏为准。
 

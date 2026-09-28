@@ -89,3 +89,5 @@ C 的 [审核修正](../validation/review-c-2026-09-24.md) 将原始基线的失
 D1 的 [退出记录](../validation/d-exit-2026-09-24.md) 将实际 Electron 正常退出、SIGKILL、真实收据与对账、固定后代及合成故障分别说明。Mac 中文目录不是 Windows 证据，正常代码 0 不是任意后代清理证明；D1 通过不完成整个 D、BOOT-05/终端或 M0 Gate。
 
 D2-S 的 [Shell 记录](../validation/d2-shell-2026-09-28.md) 将完整回归实现 SHA 与仅补 v4 迁移测试 SHA 分开登记。命令退出、组清理、外部副作用、成果和 bounded 输出各自核验，CLI crash 驱动退出 0 不等于产品 Run 成功；D2-S 不自动完成交互终端、Windows 或 M0 Gate。
+
+M1 的 [离线报告](../validation/m1-2026-09-28.md) 区分完整回归实现 SHA 与仅新增长流测试 SHA。合成 Provider/SSE 只登记 sdk/mock，不登记 model；实际 loopback/OS 限制不冒充外部 TLS。M0-UI/M0-SDK 按原条件逐项核对通过，M0-Pi 因真实模型/工具任务证据缺失 blocked；MODEL-01 的限定 done 不推进全部认证、权限或 SDK 大工作项。

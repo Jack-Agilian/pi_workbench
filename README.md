@@ -4,7 +4,7 @@
 
 基于 Pi 的跨平台桌面 Agent 工作台，面向代码任务与通用知识工作。
 
-**当前阶段：A0–A4 零模型探针及 B 最小产品核心通过限定测试；真实 Worker/IPC 与桌面应用尚未实现。** 当前证据见 [B 报告](docs/validation/b-2026-09-22.md) 与 [最小契约](docs/ssot/b-minimal-contract.md)，前序见 [A4](docs/validation/a4-2026-09-22.md)、[A3](docs/validation/a3-2026-09-22.md)、[A2](docs/validation/a2-2026-09-22.md) 与 [A0/A1 收尾](docs/validation/a0-a1-closeout-2026-09-22.md)。
+**当前阶段：A0–A4、真实 Worker/IPC、Mac 桌面/退出及受限 Shell 已限定验证，M1-A 无工具会话离线增量已完成。** 当前证据见 [M1 报告](docs/validation/m1-2026-09-28.md)；[模型配置入口](docs/MODEL_CONFIGURATION.md) 可稍后填写。M0-UI/M0-SDK 按既有条件通过；真实模型调用仍为 0，唯一下一项是获授权的 M1-B，M0-Pi、其他平台与生产发行尚未完成。
 
 ## 从这里开始
 
@@ -15,9 +15,9 @@
 | [环境初始化与检查](docs/DEVELOPMENT.md) | macOS/Linux/Windows 入口、离线模式、验证、发布 |
 | [导入记录](docs/IMPORT.md) | 来源摘要、迁移方式、历史与本次验证的区别 |
 | [下一阶段开发](docs/planning/NEXT_STEPS.md) | 从文档进入可运行 MVP 的工作顺序 |
-| [Backlog JSON](docs/planning/backlog.json) | 28 个待办的结构化数据，尚未创建 GitHub Issues |
+| [Backlog JSON](docs/planning/backlog.json) | 保留原始 ID、可持续扩展的任务与验收状态，尚未创建 GitHub Issues |
 
-启动资料放在 `docs/`；可复用检查和隔离启动器位于 `scripts/`，Pi 适配与产品 DTO 位于 `packages/`，最小产品核心位于 `apps/agent-server/`。文档来自重新上传的 `Pi_Workbench_Startup_Pack_v0.1.zip`，**不是之前 66 文件仓库或另一套 Pi Desktop 文档的完整恢复**。
+启动资料放在 `docs/`；可复用检查和隔离启动器位于 `scripts/`，Pi 适配与产品 DTO 位于 `packages/`，产品宿主位于 `apps/agent-server/`，桌面位于 `apps/desktop/`。文档来自重新上传的 `Pi_Workbench_Startup_Pack_v0.1.zip`，**不是之前 66 文件仓库或另一套 Pi Desktop 文档的完整恢复**。
 
 ## 快速检查
 

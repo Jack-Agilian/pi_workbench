@@ -301,3 +301,7 @@ npm run demo:product-shell -- crash
 ```
 
 CLI 演示将审计/profile 留在 `.artifacts/shell-demos/`；crash 演示故意保留 unknown/blocked，不自动重发或宣称正常关闭。测试禁真实账户/模型，使用受管临时目录。实际 SHA、故障范围、每项命令与失败修正见 [D2-S 报告](validation/d2-shell-2026-09-28.md)。Shell 完成输出为有界快照，不是交互终端；D2-T/Windows/生产发行未完成。
+
+## M1 配置与离线会话
+
+非秘密配置与本机凭据入口见 [模型配置](MODEL_CONFIGURATION.md)，接入范围见 [M1 契约](ssot/m1-model-contract.md)。新增 `model:config`、`desktop:model`、`test:model-integration-offline`、`test:model-network`、`test:model-config`、`test:desktop-model`；保持原 bootstrap/默认演示行为及唯一 npm 锁。真实服务未验收，当前只允许明确批准的配置和本机凭据，不读取全局 Pi auth。

@@ -1,0 +1,384 @@
+{
+  "baseline": "22cf2889f5b1812028ed3cbbeab0b271c0c613dc",
+  "branch": "codex/m1-model-session",
+  "testedCommit": "53613cc0a9d48469ab1a531601154c333b4fac27",
+  "additionalTestCommit": "0cdc0b80a73428614093d24a945ad516e2d10d4c",
+  "recordedAt": "2026-09-28T12:34:04.844769+00:00",
+  "environment": {
+    "platform": "darwin",
+    "macOS": "27.0",
+    "machineArch": "arm64",
+    "nodeArch": "arm64",
+    "rosetta": 0,
+    "node": "24.21.0",
+    "npm": "11.19.0",
+    "python": "3.14.7",
+    "pi": "0.87.0",
+    "electron": "44.4.5"
+  },
+  "realModelCalls": 0,
+  "results": [
+    {
+      "command": [
+        "npm",
+        "run",
+        "check:environment"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T12:27:51.389493+00:00",
+      "finishedAt": "2026-09-28T12:27:51.597743+00:00",
+      "sha256": "e5bf052638bae533d3e2a8ba27b584b7115930409dcdbe7cebae96a7b862096c"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T12:27:51.597974+00:00",
+      "finishedAt": "2026-09-28T12:27:53.251203+00:00",
+      "sha256": "ca27905bae0ff05202f06b1202f21718c69c2a76a72c41f79c5c9dd4c1c13f7b"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-types"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T12:27:53.251428+00:00",
+      "finishedAt": "2026-09-28T12:27:55.788589+00:00",
+      "sha256": "e1ab89f600b3368c5ce8fe1b86c8a9f2fdf65a38070a8c268f176c036ddab014",
+      "tests": 10
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-probe"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T12:27:55.788868+00:00",
+      "finishedAt": "2026-09-28T12:27:56.644920+00:00",
+      "sha256": "209edd7b08cd8c311021571831ab95c3eea4bbbaa3c28a16d821a44231b609e1",
+      "tests": 15
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-tools"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T12:27:56.645133+00:00",
+      "finishedAt": "2026-09-28T12:27:57.563848+00:00",
+      "sha256": "1515f16ad1f2fc9bf4c8f81d1cbd21bace0cdc1e0ae22bdb612762f7dac361d7",
+      "tests": 19
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-shell"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T12:27:57.564061+00:00",
+      "finishedAt": "2026-09-28T12:27:58.634516+00:00",
+      "sha256": "88bf2b6761364cae367588c665901add6e2eed88b06e841734b8b64b06166b7d",
+      "tests": 4
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-resources"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T12:27:58.634784+00:00",
+      "finishedAt": "2026-09-28T12:27:59.591686+00:00",
+      "sha256": "7edd607c98bc3b1b4ca7003e9b697fed6bdff01324f82ea11936e0d5e56cc013",
+      "tests": 12
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-packages"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T12:27:59.591918+00:00",
+      "finishedAt": "2026-09-28T12:28:02.825527+00:00",
+      "sha256": "a6db7a6a45414c87b4e066b21cf98fab8d4319dbc1f69cb40925f607b4d54310",
+      "tests": 8
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-auth"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T12:28:02.825744+00:00",
+      "finishedAt": "2026-09-28T12:28:03.728947+00:00",
+      "sha256": "709f3d291616014fe77859cab1fb185ad6bc644b364ffb16b6e57557d37de2ca",
+      "tests": 18
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:product-core"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T12:28:03.729234+00:00",
+      "finishedAt": "2026-09-28T12:28:04.410975+00:00",
+      "sha256": "6b8626f2c928909938384d57682b8acf1131f6d1c507904f65aec1687a8fe6a8",
+      "tests": 20
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:product-sdk"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T12:28:04.411253+00:00",
+      "finishedAt": "2026-09-28T12:28:05.318498+00:00",
+      "sha256": "3ae6fb5748a3d21a507a6ba7f45db12bc7af94e11677125ddf8f52f83696ad67",
+      "tests": 5
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:product-worker"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T12:28:05.318723+00:00",
+      "finishedAt": "2026-09-28T12:28:35.484778+00:00",
+      "sha256": "3d7014979c9a53e8733b351869656126d3924b6e765a35f808c8114b82196a3c",
+      "tests": 51
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:product-shell"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T12:28:35.485068+00:00",
+      "finishedAt": "2026-09-28T12:28:52.265853+00:00",
+      "sha256": "abf65341f6bea510fd018c5d4b74469d6b3c96f74462d81c7f9040615717c196",
+      "tests": 28
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:desktop"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T12:28:52.266134+00:00",
+      "finishedAt": "2026-09-28T12:29:03.200624+00:00",
+      "sha256": "fc690b49d6286f35c3c38cbbe94accdbf7d836c665461ae442c040e680ba4f32",
+      "tests": 17
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:model-integration-offline"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T12:29:03.200856+00:00",
+      "finishedAt": "2026-09-28T12:29:10.608718+00:00",
+      "sha256": "caeaeea1df6515188a9e9f239d6349906ac4ad015ed5a4e73808927a9c05e4e6",
+      "tests": 11
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:model-network"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T12:29:10.609133+00:00",
+      "finishedAt": "2026-09-28T12:29:11.236794+00:00",
+      "sha256": "ba5472059f8ce897c12d82cbbc1f46ef480af64adb537831fc033e2c3c1bcbb5"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:model-config"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T12:29:11.237040+00:00",
+      "finishedAt": "2026-09-28T12:29:15.139844+00:00",
+      "sha256": "0ad9642b8a3fda24d5e272f0a4ff167652d39f69bbf330494ec5df6dc037fa21"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:desktop-model"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T12:29:15.140178+00:00",
+      "finishedAt": "2026-09-28T12:29:19.149291+00:00",
+      "sha256": "8fbf83b307d1c7011a7f81449537362510d2951cf4c2f2985585ec7224788624"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:desktop-ui"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T12:29:19.149696+00:00",
+      "finishedAt": "2026-09-28T12:29:31.198383+00:00",
+      "sha256": "cd68b636e6a56007d35034a1c84177a0269c67177e78b47287c2393e70742b07"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:desktop-shell"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T12:29:31.198717+00:00",
+      "finishedAt": "2026-09-28T12:29:35.929775+00:00",
+      "sha256": "538b7045d50c8a3fc379b2f6ecf258a1aba9d51ac717e44395288b7b0c740738"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:desktop-shutdown"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T12:29:35.930110+00:00",
+      "finishedAt": "2026-09-28T12:30:18.490596+00:00",
+      "sha256": "c656412630ec8934c704d7e49900c370b4511c442b64d89f747290c7520d477a"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "demo:product-shell",
+        "--",
+        "allow"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T12:30:18.491000+00:00",
+      "finishedAt": "2026-09-28T12:30:19.563699+00:00",
+      "sha256": "b33f1d48e62ef393726680d9287fd8d06327b23a8b4ffc8136e7f05312b002fc"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "demo:product-shell",
+        "--",
+        "deny"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T12:30:19.563991+00:00",
+      "finishedAt": "2026-09-28T12:30:20.630215+00:00",
+      "sha256": "abac5aa569cd3192830180603692ddf043b6675b7f29f9d6bc03034c739bd991"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "demo:product-shell",
+        "--",
+        "cancel"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T12:30:20.630534+00:00",
+      "finishedAt": "2026-09-28T12:30:21.710545+00:00",
+      "sha256": "d2129ec4d8d687db927698e027df6c147985a13c17cac8fb948c214607c5fa3d"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "demo:product-shell",
+        "--",
+        "crash"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T12:30:21.710845+00:00",
+      "finishedAt": "2026-09-28T12:30:22.777647+00:00",
+      "sha256": "ab45fe5870b1f59730e9fa2fa5d42978b079771fc7d08deb0a2ef6aafaa0a571"
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/check-ssot.py"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T12:30:50.307708+00:00",
+      "finishedAt": "2026-09-28T12:30:50.397845+00:00",
+      "sha256": "f99acb00a2b996405ead2960eca36732b5a01aed39c0249176621954f01f4d80"
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/test-tools.py"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T12:30:50.398100+00:00",
+      "finishedAt": "2026-09-28T12:30:50.480883+00:00",
+      "sha256": "01481f26c9044f35409fb09cb6e845c9e4941f0883f727125dfc94048448e9b7"
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/check-docs.py",
+        "--structural-only"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T12:30:50.481122+00:00",
+      "finishedAt": "2026-09-28T12:30:50.564217+00:00",
+      "sha256": "9cb8f90b2e699c1a9d9fc868130bf5a261202807f8e0bbf85cc1ba9f0fdc5fe4"
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/check-docs.py",
+        "--typecheck"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T12:30:50.564466+00:00",
+      "finishedAt": "2026-09-28T12:30:50.929744+00:00",
+      "sha256": "52c3132c2c9929e193a66051e16f7122331521b28ae0ccc0b0b6db3d1d39ba4e"
+    }
+  ],
+  "additionalResults": [
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:model-integration-offline"
+      ],
+      "testedCommit": "0cdc0b80a73428614093d24a945ad516e2d10d4c",
+      "exitCode": 0,
+      "tests": 12,
+      "sha256": "5c31a28dba17c8fb64376f2f07ab45ba48633c69590fafc3f674bcd817017dc6"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "testedCommit": "0cdc0b80a73428614093d24a945ad516e2d10d4c",
+      "exitCode": 0,
+      "sha256": "ca27905bae0ff05202f06b1202f21718c69c2a76a72c41f79c5c9dd4c1c13f7b"
+    }
+  ],
+  "scope": "Actual Pi SDK with explicit SYNTHETIC faux/native HTTP fixtures; native Electron and OS processes; loopback-only HTTP transport. No external Provider, account, TLS or billing verification. Full 29-command regression is at implementation commit; later commit adds only the long-stream test."
+}

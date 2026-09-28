@@ -94,3 +94,7 @@ D1 及复审已按授权集成 develop（`3d307e9`）。[D2-S 报告](../validat
 ## M1 路线采纳（2026-09-28）
 
 D2-S/S01 已集成 develop（`22cf288`）。此前 D2-T 为下一项的阶段表述保留为历史；当前唯一开发项已调整为 M1 无工具会话，详情见 [NEXT_STEPS](../planning/NEXT_STEPS.md) 与 [术语](glossary.md)。用户将稍后配置服务与预算，当前未授权真实模型调用。
+
+## M1-A 离线完成（2026-09-28）
+
+[报告](../validation/m1-2026-09-28.md) · [配置入口](../MODEL_CONFIGURATION.md) · [接入契约](m1-model-contract.md)。现有链路已支持真实 Pi 无工具 prompt、原生上下文、有界流、取消/恢复和配置；所有 Provider 响应仍是明确合成输入，真实模型调用 0。M0-UI/M0-SDK 按原条件逐项核对为 passed，M0-Pi blocked，不由测试数量自动晋级。MODEL-01 限定 done，唯一待推进为 M1-B 用户配置与授权后的真实服务验收，M2/PTY 不启动。

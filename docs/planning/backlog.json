@@ -376,7 +376,9 @@
             "EV-REVIEW-B-IPC-SDK-20260923",
             "EV-REVIEW-B-IPC-MAC-20260923",
             "EV-C-SDK-20260923",
-            "EV-C-MAC-20260923"
+            "EV-C-MAC-20260923",
+            "EV-M1-SDK-20260928",
+            "EV-M1-MAC-20260928"
           ]
         },
         {
@@ -410,7 +412,9 @@
             "EV-B-IPC-SDK-20260923",
             "EV-B-IPC-MAC-20260923",
             "EV-REVIEW-B-IPC-SDK-20260923",
-            "EV-REVIEW-B-IPC-MAC-20260923"
+            "EV-REVIEW-B-IPC-MAC-20260923",
+            "EV-M1-SDK-20260928",
+            "EV-M1-MAC-20260928"
           ]
         },
         {
@@ -425,7 +429,9 @@
             "EV-B-IPC-SDK-20260923",
             "EV-B-IPC-MAC-20260923",
             "EV-REVIEW-B-IPC-SDK-20260923",
-            "EV-REVIEW-B-IPC-MAC-20260923"
+            "EV-REVIEW-B-IPC-MAC-20260923",
+            "EV-M1-SDK-20260928",
+            "EV-M1-MAC-20260928"
           ]
         }
       ],
@@ -484,7 +490,9 @@
             "EV-D2S-V4-20260928",
             "EV-D2S-S01-REVIEW-20260928",
             "EV-D2S-S01-MAC-20260928",
-            "EV-D2S-S01-REGRESSION-20260928"
+            "EV-D2S-S01-REGRESSION-20260928",
+            "EV-M1-SDK-20260928",
+            "EV-M1-MAC-20260928"
           ]
         },
         {
@@ -527,7 +535,9 @@
           "evidenceRefs": [
             "EV-B-IPC-MAC-20260923",
             "EV-B-IPC-SDK-20260923",
-            "EV-REVIEW-B-IPC-MAC-20260923"
+            "EV-REVIEW-B-IPC-MAC-20260923",
+            "EV-M1-SDK-20260928",
+            "EV-M1-MAC-20260928"
           ]
         },
         {
@@ -539,7 +549,9 @@
             "stale-approval-denial"
           ],
           "evidenceRefs": [
-            "EV-REVIEW-B-IPC-MAC-20260923"
+            "EV-REVIEW-B-IPC-MAC-20260923",
+            "EV-M1-SDK-20260928",
+            "EV-M1-MAC-20260928"
           ]
         }
       ],
@@ -803,7 +815,9 @@
           ],
           "evidenceRefs": [
             "EV-A4-INPUTS-20260922",
-            "EV-A4-AUTH-20260922"
+            "EV-A4-AUTH-20260922",
+            "EV-M1-SDK-20260928",
+            "EV-M1-MAC-20260928"
           ]
         },
         {
@@ -878,7 +892,9 @@
             "EV-D1-REVIEW-20260924",
             "EV-D1-MAC-20260924",
             "EV-D1-SYNTHETIC-20260924",
-            "EV-D1-REGRESSION-20260924"
+            "EV-D1-REGRESSION-20260924",
+            "EV-M1-SDK-20260928",
+            "EV-M1-MAC-20260928"
           ]
         }
       ],
@@ -930,7 +946,9 @@
             "EV-D1-REVIEW-20260924",
             "EV-D1-MAC-20260924",
             "EV-D1-SYNTHETIC-20260924",
-            "EV-D1-REGRESSION-20260924"
+            "EV-D1-REGRESSION-20260924",
+            "EV-M1-SDK-20260928",
+            "EV-M1-MAC-20260928"
           ]
         }
       ],
@@ -1534,7 +1552,7 @@
       "id": "MODEL-01",
       "priority": "P0",
       "ownerRole": "Tech Lead",
-      "state": "in_progress",
+      "state": "done",
       "githubIssueNumber": null,
       "dependencies": [],
       "sourceDependencyText": "2026-09-28用户采纳真实模型优先，限定已有能力之上的增量；不替代原完整任务",
@@ -1545,7 +1563,7 @@
         "product-coordination",
         "desktop-ui"
       ],
-      "implementationStatus": "in_progress",
+      "implementationStatus": "implemented",
       "githubIssueUrl": null,
       "issueVerificationStatus": "not_checked",
       "issueEvidence": [],
@@ -1561,7 +1579,10 @@
           "plannedChecks": [
             "m1-a-zero-tools"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-M1-SDK-20260928",
+            "EV-M1-MAC-20260928"
+          ]
         },
         {
           "id": "MODEL-01-A02",
@@ -1569,7 +1590,10 @@
           "plannedChecks": [
             "m1-a-stream-final"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-M1-SDK-20260928",
+            "EV-M1-MAC-20260928"
+          ]
         },
         {
           "id": "MODEL-01-A03",
@@ -1577,7 +1601,10 @@
           "plannedChecks": [
             "m1-a-context-resume"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-M1-SDK-20260928",
+            "EV-M1-MAC-20260928"
+          ]
         },
         {
           "id": "MODEL-01-A04",
@@ -1585,7 +1612,10 @@
           "plannedChecks": [
             "m1-a-cancel-close"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-M1-SDK-20260928",
+            "EV-M1-MAC-20260928"
+          ]
         },
         {
           "id": "MODEL-01-A05",
@@ -1593,16 +1623,19 @@
           "plannedChecks": [
             "m1-a-configuration"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-M1-SDK-20260928",
+            "EV-M1-MAC-20260928"
+          ]
         }
       ],
-      "statusReason": "限定增量，尚无本次验收证据；不依赖PTY/Windows完成。"
+      "statusReason": "限定 M1-A 离线范围完成，公开 Anthropic Messages 接口只用合成响应；外部服务验收属于 MODEL-02。"
     },
     {
       "id": "MODEL-02",
       "priority": "P0",
       "ownerRole": "Tech Lead",
-      "state": "proposed",
+      "state": "blocked",
       "githubIssueNumber": null,
       "dependencies": [
         "MODEL-01"
@@ -1634,7 +1667,7 @@
           "evidenceRefs": []
         }
       ],
-      "statusReason": "限定增量，尚无本次验收证据；不依赖PTY/Windows完成。"
+      "statusReason": "等待用户填写 Provider/精确模型/允许数据/请求与费用授权及本机凭据；当前仅有未批准的空模板，真实模型调用 0。M1-B 无工具验收也不替代 M0-Pi 的工具审批/恢复条件。"
     },
     {
       "id": "MODEL-03",
@@ -1681,7 +1714,7 @@
   "milestones": [
     {
       "id": "M0-UI",
-      "state": "pending",
+      "state": "passed",
       "requiredEvidenceKinds": [
         "mock"
       ],
@@ -1695,25 +1728,35 @@
         "EV-C-FIX-MAC-20260924",
         "EV-C-FIX-MOCK-20260924",
         "EV-D1-MAC-20260924",
-        "EV-D1-SYNTHETIC-20260924"
+        "EV-D1-SYNTHETIC-20260924",
+        "EV-M1-MOCK-20260928",
+        "EV-M1-MAC-20260928",
+        "EV-M1-REVIEW-20260928"
       ],
-      "acceptance": "Mac Mock桌面任务、审批/取消/恢复及真实Markdown文件；不冒充Pi或模型"
+      "acceptance": "Mac Mock桌面任务、审批/取消/恢复及真实Markdown文件；不冒充Pi或模型",
+      "statusReason": "按既有 Mac Mock 桌面、审批/取消/恢复和真实 Markdown 条件逐项核对，见 M1 报告；不包含人工 IME、Windows 或真实模型。"
     },
     {
       "id": "M0-SDK",
-      "state": "pending",
+      "state": "passed",
       "requiredEvidenceKinds": [
         "release",
         "sdk"
       ],
       "requiredPlatforms": [],
       "prerequisites": [],
-      "evidenceRefs": [],
-      "acceptance": "真实发行包、Session、本地工具、受控资源与宿主接缝；可无模型"
+      "evidenceRefs": [
+        "EV-A0-CLOSEOUT-RELEASE-20260922",
+        "EV-M1-SDK-20260928",
+        "EV-M1-MAC-20260928",
+        "EV-M1-REVIEW-20260928"
+      ],
+      "acceptance": "真实发行包、Session、本地工具、受控资源与宿主接缝；可无模型",
+      "statusReason": "沿用相同锁定发行包的历史字节核验证据，当前重跑 Session/资源/工具/宿主边界；不以模型、PTY、Windows 作为隐含前置。"
     },
     {
       "id": "M0-Pi",
-      "state": "pending",
+      "state": "blocked",
       "requiredEvidenceKinds": [
         "model",
         "platform"
@@ -1726,7 +1769,8 @@
         "M0-SDK"
       ],
       "evidenceRefs": [],
-      "acceptance": "授权真实模型任务及审批/取消/恢复Mac证据；不推导未测平台/沙箱"
+      "acceptance": "授权真实模型任务及审批/取消/恢复Mac证据；不推导未测平台/沙箱",
+      "statusReason": "未授权及未进行真实模型验收；后续 M1-B 无工具会话仍不足以满足本 Gate 的工具审批、取消及恢复条件。"
     }
   ]
 }

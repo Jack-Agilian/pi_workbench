@@ -138,3 +138,7 @@ P0 的 CORE-03 必须保证同 Workspace 至多一个活动写 Run；M0 可先�
 零 Operation 允许完成，但必须验证真实模型结果和清理，不能以单个结束事件或 prompt 返回替代。恢复不自动重复网络请求；错误与费用未知不冒充未知文件改动。M2 才将单操作计划扩展为运行中逐 Operation 授权和顺序工具结果，继续复用 Pi 循环；本轮不实现。
 
 非秘密配置文件和本机密钥入口分离。模型出口需独立强制边界，Shell 仍禁网；不以代理环境变量作为 OS 证明。网络后端按实际 transport/文件/进程证据选择，不强制引入候选框架。缺配置、授权或出口证据时真实调用保持阻断。
+
+## M1 无工具会话的限定扩展
+
+[接入契约](m1-model-contract.md) 与 [实测](../validation/m1-2026-09-28.md)：沿用 Pi 公开 ProviderRequestOptions.fetch 扩展点，把单次批准 HTTP 通过已有 IPC 委托宿主，Worker/Shell 仍禁网。Renderer 只有无参数原生凭据选择动作，无 key/路径回传；预算预留与最终结算归 App Server。正常 stop/length 不单独等于产品完成。schema v6 / IPC v5 不改变全局单写和同 Provider 单账户；真实服务未验证。
