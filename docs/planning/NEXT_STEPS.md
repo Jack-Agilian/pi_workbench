@@ -8,7 +8,9 @@ D1 及复审已按用户授权快进合入 develop（`3d307e9`），推送后独
 
 下一轮推进 D2-T：核验 xterm.js/node-pty 的精确发行、许可及实际 Node ABI，再接单个用户显式授权的交互 TerminalSession；其输入权限与 Agent 非交互 Bash 分开。端到端消费确认、resize、Ctrl-C、断连和终端特有进程组仍待实施，D2-S 的有界完成输出快照不冒充终端流控。D2-X 的实际 Bash 退出检查已纳入 D1 矩阵；PTY 和 Windows 部分仍须后续独立验证。
 
-本轮停在 D2-S，D2-S 功能分支尚未合并 develop。Windows 环境未确认，不自动安装虚拟机，也不把 Mac 中文路径结果作为 Windows 证据。UI 完整历史、自由工作区、市场、真实模型及生产发行留在 backlog，三个 M0 Gate 仍 pending。以下 A0–D1 记录为历史，以本栏为唯一当前顺序。
+D2-S 的 [S01 复审修正](../validation/review-d2s-2026-09-28.md) 已验证非法 UTF-8 输出预算与真实故障恢复；没有改变唯一下一开发项。审核提出的 M1/M2 优先建议尚未成为主线，真实模型仍需另行授权。
+
+本轮停在 D2-S 复审，D2-S 功能分支尚未合并 develop。Windows 环境未确认，不自动安装虚拟机，也不把 Mac 中文路径结果作为 Windows 证据。UI 完整历史、自由工作区、市场、真实模型及生产发行留在 backlog，三个 M0 Gate 仍 pending。以下 A0–D1 记录为历史，以本栏为唯一当前顺序。
 
 ## 1. 下一增量不是再造平台
 

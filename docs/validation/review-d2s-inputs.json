@@ -1,0 +1,774 @@
+{
+  "baseline": "61b01086e924f3c7a0ec10a3b7586d69d76e6717",
+  "develop": "3d307e90b690d68e0a4b4a153bb5637fba0c1981",
+  "branch": "codex/d2-shell",
+  "testedCommit": "128dad6cba40f3cf6ed909dc0f7bed74ddc5de1f",
+  "recordedAt": "2026-09-28T09:44:35.111997+00:00",
+  "reviewInput": {
+    "name": "review_61b0108.md",
+    "bytes": 7435,
+    "sha256": "3c1ca79bb6d53da22d855e942fddf791eaaeb8f115db7986e5a7799ab1a15cba",
+    "attachmentsProvided": false
+  },
+  "environment": {
+    "platform": "darwin",
+    "macOS": "27.0",
+    "machineArch": "arm64",
+    "nodeArch": "arm64",
+    "rosetta": 0,
+    "node": "24.21.0",
+    "npm": "11.19.0",
+    "python": "3.14.7",
+    "pi": "0.87.0",
+    "electron": "44.4.5"
+  },
+  "baselineReproduction": {
+    "testedCommit": "61b01086e924f3c7a0ec10a3b7586d69d76e6717",
+    "method": "Original ShellExecution/shellLaunch/parseShellOutcome with actual Mac sandbox-exec and fixed synthetic Bash in isolated temporary directories; no spawn substitution or full Pi product lifecycle. Three expected parser failures are defects, not product passes.",
+    "command": "env -i PATH=/usr/bin:/bin <project-node> --import ./scripts/probe-no-network.mjs .artifacts/review-d2s-20260928/baseline.mjs",
+    "exitCode": 0,
+    "logSha256": "119d7217c7dd867090a04603f1666575dbb19dba13b9c559c1a1d862820366b9",
+    "harnessSha256": "cc05026fb8c163d1e0fbb78107ef5ab91d879b1dec365bb6e8929d7ae2d47635",
+    "platform": "darwin",
+    "arch": "arm64",
+    "node": "v24.21.0",
+    "results": [
+      {
+        "name": "ascii",
+        "count": 4000,
+        "channel": "stdout",
+        "encodedBytes": 4000,
+        "error": null,
+        "groupGone": true,
+        "exitCode": 0
+      },
+      {
+        "name": "invalid-below",
+        "count": 2600,
+        "channel": "stdout",
+        "encodedBytes": 7800,
+        "error": null,
+        "groupGone": true,
+        "exitCode": 0
+      },
+      {
+        "name": "invalid-3000",
+        "count": 3000,
+        "channel": "stdout",
+        "encodedBytes": 9000,
+        "error": "shell_output_limit",
+        "groupGone": true,
+        "exitCode": 0
+      },
+      {
+        "name": "invalid-4000",
+        "count": 4000,
+        "channel": "stderr",
+        "encodedBytes": 12000,
+        "error": "shell_output_limit",
+        "groupGone": true,
+        "exitCode": 0
+      },
+      {
+        "name": "invalid-5000",
+        "count": 5000,
+        "channel": "stdout",
+        "encodedBytes": 12000,
+        "error": "shell_output_limit",
+        "groupGone": true,
+        "exitCode": 0
+      }
+    ]
+  },
+  "results": [
+    {
+      "command": [
+        "npm",
+        "run",
+        "check:environment"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T09:40:27.003913+00:00",
+      "finishedAt": "2026-09-28T09:40:27.200591+00:00",
+      "sha256": "e5bf052638bae533d3e2a8ba27b584b7115930409dcdbe7cebae96a7b862096c"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T09:40:27.200921+00:00",
+      "finishedAt": "2026-09-28T09:40:29.027754+00:00",
+      "sha256": "ca27905bae0ff05202f06b1202f21718c69c2a76a72c41f79c5c9dd4c1c13f7b"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-types"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T09:40:29.028077+00:00",
+      "finishedAt": "2026-09-28T09:40:31.615833+00:00",
+      "sha256": "10d93dde872618a5c93fbe7b8dbb8a1174e9b83e079a1e45fff974d6e87a8c4c",
+      "tests": 10
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-probe"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T09:40:31.616158+00:00",
+      "finishedAt": "2026-09-28T09:40:32.485426+00:00",
+      "sha256": "76dbd684866058b78a2b92d4051dc75d4d701cb164d7d12029713596f5b003ea",
+      "tests": 15
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-tools"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T09:40:32.485721+00:00",
+      "finishedAt": "2026-09-28T09:40:33.427607+00:00",
+      "sha256": "493d7f45598a57c30b3223a23685dee1ab75b1a897c9f14ca48a994d193f0628",
+      "tests": 19
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-shell"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T09:40:33.427906+00:00",
+      "finishedAt": "2026-09-28T09:40:34.510448+00:00",
+      "sha256": "7e9a996e229faa81ced9a79d3e67c5259396adfe58485b9359f9450f8d41678a",
+      "tests": 4
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-resources"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T09:40:34.510827+00:00",
+      "finishedAt": "2026-09-28T09:40:35.474990+00:00",
+      "sha256": "124888a965d867ff65ecf0952577d22a1e23b976e87fe4f43b979d79e9219578",
+      "tests": 12
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-packages"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T09:40:35.475307+00:00",
+      "finishedAt": "2026-09-28T09:40:39.030132+00:00",
+      "sha256": "37b0afa2b46bf0e771cd83259d8cd595f389ad0a57c38c34e7ae37e56f08808a",
+      "tests": 8
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-auth"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T09:40:39.030647+00:00",
+      "finishedAt": "2026-09-28T09:40:39.988467+00:00",
+      "sha256": "35e7f06d77a64fe1868804397da1f9b42878ec872eeee93d73cc60208cbc4b0b",
+      "tests": 18
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:product-core"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T09:40:39.988815+00:00",
+      "finishedAt": "2026-09-28T09:40:40.683480+00:00",
+      "sha256": "6ef3f2525a2e48adc07b3823a790d971daa742046347fdffaefdf35ab4f4319a",
+      "tests": 20
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:product-sdk"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T09:40:40.683798+00:00",
+      "finishedAt": "2026-09-28T09:40:41.617434+00:00",
+      "sha256": "7ed4a8494d0e96ba938ce74fe45934a51bec02f47652dd7be0fb748a43def3b4",
+      "tests": 5
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:product-worker"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T09:40:41.617747+00:00",
+      "finishedAt": "2026-09-28T09:41:12.885240+00:00",
+      "sha256": "2bbb06f0ff87205c91eaacbbf47003742e1f4e5a00f7e090460eff1d1b5c495e",
+      "tests": 50
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:product-shell"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T09:41:12.885580+00:00",
+      "finishedAt": "2026-09-28T09:41:30.440336+00:00",
+      "sha256": "60c147881bb85db01d3262141939956302c2e6fa0138aa5032b978a4fcc1d17f",
+      "tests": 28
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:desktop"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T09:41:30.440743+00:00",
+      "finishedAt": "2026-09-28T09:41:40.913133+00:00",
+      "sha256": "98505ea2d832e79c2380760d82fdd576374ef3d39099208cac4079250e3a164c",
+      "tests": 15
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:desktop-ui"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T09:41:40.913592+00:00",
+      "finishedAt": "2026-09-28T09:41:57.033953+00:00",
+      "sha256": "8aa699dfd92d35094a01c036564a08e57a8a16359f3fbd53a91581a0c60e3f4e"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:desktop-shell"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T09:41:57.034375+00:00",
+      "finishedAt": "2026-09-28T09:42:01.698912+00:00",
+      "sha256": "538b7045d50c8a3fc379b2f6ecf258a1aba9d51ac717e44395288b7b0c740738"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:desktop-shutdown"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T09:42:01.699429+00:00",
+      "finishedAt": "2026-09-28T09:42:34.922974+00:00",
+      "sha256": "d1ec5b7882bc8ab2de23a49e9b652a48c9dc21d52b3f1a1706ce01552e2257c8"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "demo:product-shell",
+        "--",
+        "allow"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T09:42:34.924084+00:00",
+      "finishedAt": "2026-09-28T09:42:36.048730+00:00",
+      "sha256": "b80185cecc6b9e83e187c08867313a818a14a4e273be3a3eced8d12e59d302df"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "demo:product-shell",
+        "--",
+        "deny"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T09:42:36.049187+00:00",
+      "finishedAt": "2026-09-28T09:42:37.113082+00:00",
+      "sha256": "5a7c20852c119d3413e502a6af7b52c77557659c3763abd33870f1a009881fd5"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "demo:product-shell",
+        "--",
+        "cancel"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T09:42:37.113698+00:00",
+      "finishedAt": "2026-09-28T09:42:38.188846+00:00",
+      "sha256": "63b4241fa127b59c5869457f57ebd0e816141f8ec5c67b8ff3ac95ef44f858cd"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "demo:product-shell",
+        "--",
+        "crash"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T09:42:38.189196+00:00",
+      "finishedAt": "2026-09-28T09:42:39.256104+00:00",
+      "sha256": "3d6c53cee76de1ee4aa1f3798c2f67d76236d69b4232d20e6ef7bb4bca7d6dbc"
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/check-ssot.py"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T09:42:39.256507+00:00",
+      "finishedAt": "2026-09-28T09:42:39.366304+00:00",
+      "sha256": "ba44761f6001b4794218d2face5100ec3a90e323c2d4126f329d4e3b18146377",
+      "tests": 60
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/test-tools.py"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T09:42:39.366654+00:00",
+      "finishedAt": "2026-09-28T09:42:39.427681+00:00",
+      "sha256": "c7aee9500b2bb75ffe3977438ce4e7e3786f2c37d5ac0d00b16e5e99f0a2c7cd",
+      "tests": 15
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/check-docs.py",
+        "--structural-only"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T09:42:39.428007+00:00",
+      "finishedAt": "2026-09-28T09:42:39.515128+00:00",
+      "sha256": "ff13124990e0d299826977bef63377b47205e9128b7ec8d2f4a375dec1bc8ea3"
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/check-docs.py",
+        "--typecheck"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-28T09:42:39.515447+00:00",
+      "finishedAt": "2026-09-28T09:42:39.883406+00:00",
+      "sha256": "b51e0cc97f702f686a6f658f62ebf34fd9772d30e12a5fce43aa3f4aee3382fe"
+    }
+  ],
+  "precommitChecks": [
+    {
+      "command": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "exitCode": 0,
+      "sha256": "ca27905bae0ff05202f06b1202f21718c69c2a76a72c41f79c5c9dd4c1c13f7b",
+      "scope": "baseline plus exact implementation/test diff later committed as testedCommit"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:product-shell"
+      ],
+      "exitCode": 0,
+      "sha256": "c0d79c7bb5ef65e85fd45a9f227c06e696085eb139abcabbcaec3e71fd09ed10",
+      "scope": "baseline plus exact implementation/test diff later committed as testedCommit"
+    }
+  ],
+  "codeFiles": [
+    {
+      "path": "apps/agent-server/shell-execution.ts",
+      "sha256": "10bf92defe60ca3a3c58f3d802f2561fbb1e137403b064488e69d2946961ce7d",
+      "gitBlob": "c3c0cef4ed84c91eb4407f5b69e81d5749ddf049"
+    },
+    {
+      "path": "apps/agent-server/tests/shell-host-fixture.ts",
+      "sha256": "9dd3e7858f41ba974f9337e6565412e79dc094e5e5b195ec1f7b81b11fe6d42a",
+      "gitBlob": "26d12c3bd4bc3b7d8dd6f155f63d02a25147e84b"
+    },
+    {
+      "path": "apps/agent-server/tests/shell.test.ts",
+      "sha256": "81858329b6cca27fa73fd66e8eeef5f299bbaf7f91a325b4489cce66b0e630a8",
+      "gitBlob": "e0fa4f00489d9096564b136f7b56734ae65c484d"
+    },
+    {
+      "path": "packages/app-contracts/shell.ts",
+      "sha256": "85b11f39a38cea1fb51320554153b2a236b28d5eebc84d26ae682586ad26cacd",
+      "gitBlob": "23bc2afa2c97b18785e5c984c6f08ef1c0142cbd"
+    }
+  ],
+  "notRun": [
+    "bootstrap/repeated initialization",
+    "fresh clone",
+    "release download",
+    "Windows/Linux application",
+    "interactive PTY",
+    "manual UI/IME",
+    "arbitrary setsid descendants",
+    "real provider/model/account",
+    "old malformed receipt migration"
+  ],
+  "realModelCalls": 0,
+  "documentationChecks": {
+    "scope": "testedCommit plus final documentation/SSOT changes",
+    "results": [
+      {
+        "command": [
+          ".venv/bin/python",
+          "scripts/check-ssot.py"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-28T09:45:02.515026+00:00",
+        "finishedAt": "2026-09-28T09:45:02.604187+00:00",
+        "sha256": "4a70e319a8e6a1fedc4fad694a5c793c5bb9d4f185cef29de71da6c6758299b9"
+      },
+      {
+        "command": [
+          ".venv/bin/python",
+          "scripts/test-tools.py"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-28T09:45:02.604377+00:00",
+        "finishedAt": "2026-09-28T09:45:02.665174+00:00",
+        "sha256": "01481f26c9044f35409fb09cb6e845c9e4941f0883f727125dfc94048448e9b7"
+      },
+      {
+        "command": [
+          ".venv/bin/python",
+          "scripts/check-docs.py",
+          "--structural-only"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-28T09:45:02.665295+00:00",
+        "finishedAt": "2026-09-28T09:45:02.743843+00:00",
+        "sha256": "ae68154433a1861be415ff95ef5d6d7c10cc12f5b5908f9488f92144a6621953"
+      },
+      {
+        "command": [
+          ".venv/bin/python",
+          "scripts/check-docs.py",
+          "--typecheck"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-28T09:45:02.743952+00:00",
+        "finishedAt": "2026-09-28T09:45:03.087929+00:00",
+        "sha256": "925f3298de05aa9ac0c66786c844cb62ad6d95942759d78fffdc31dfb51c3b7b"
+      }
+    ]
+  },
+  "desktopShutdown": {
+    "desktopShutdown": "passed",
+    "platform": "darwin",
+    "arch": "arm64",
+    "node": "24.21.0",
+    "synthetic": true,
+    "realModelCalls": 0,
+    "results": [
+      {
+        "scenario": "idle",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "willQuit": true,
+        "warning": false,
+        "states": [],
+        "hostCount": 1,
+        "capturedProcesses": 1,
+        "receipts": 0
+      },
+      {
+        "scenario": "starting",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "willQuit": true,
+        "warning": false,
+        "states": [
+          "cancelled",
+          "cancelled"
+        ],
+        "hostCount": 1,
+        "capturedProcesses": 2,
+        "receipts": 1
+      },
+      {
+        "scenario": "approval",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "willQuit": true,
+        "warning": false,
+        "states": [
+          "cancelled",
+          "cancelled"
+        ],
+        "hostCount": 1,
+        "capturedProcesses": 3,
+        "receipts": 1
+      },
+      {
+        "scenario": "executing",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "willQuit": true,
+        "warning": false,
+        "states": [
+          "cancelled",
+          "cancelled"
+        ],
+        "hostCount": 1,
+        "capturedProcesses": 3,
+        "receipts": 1
+      },
+      {
+        "scenario": "cancelling",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "willQuit": true,
+        "warning": false,
+        "states": [
+          "cancelled"
+        ],
+        "hostCount": 1,
+        "capturedProcesses": 2,
+        "receipts": 1
+      },
+      {
+        "scenario": "completed",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "willQuit": true,
+        "warning": false,
+        "states": [
+          "completed"
+        ],
+        "hostCount": 1,
+        "capturedProcesses": 1,
+        "receipts": 1
+      },
+      {
+        "scenario": "sigterm",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "willQuit": true,
+        "warning": false,
+        "states": [
+          "cancelled",
+          "cancelled"
+        ],
+        "hostCount": 1,
+        "capturedProcesses": 3,
+        "receipts": 1
+      },
+      {
+        "scenario": "sigint",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "willQuit": true,
+        "warning": false,
+        "states": [
+          "cancelled",
+          "cancelled"
+        ],
+        "hostCount": 1,
+        "capturedProcesses": 3,
+        "receipts": 1
+      },
+      {
+        "scenario": "sigkill",
+        "exit": {
+          "code": null,
+          "signal": "SIGKILL"
+        },
+        "willQuit": false,
+        "warning": false,
+        "states": [
+          "cancelled",
+          "cancelled"
+        ],
+        "hostCount": 1,
+        "capturedProcesses": 3,
+        "receipts": 1
+      },
+      {
+        "scenario": "missing-proof",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "willQuit": true,
+        "warning": true,
+        "states": [
+          "cancelled",
+          "cancelled"
+        ],
+        "hostCount": 2,
+        "capturedProcesses": 4,
+        "receipts": 1
+      },
+      {
+        "scenario": "unresolved",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "willQuit": true,
+        "warning": true,
+        "states": [
+          "cancelled",
+          "cancelled"
+        ],
+        "hostCount": 2,
+        "capturedProcesses": 4,
+        "receipts": 1
+      },
+      {
+        "scenario": "recovery-close-race",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "willQuit": true,
+        "warning": true,
+        "states": [
+          "cancelled",
+          "cancelled"
+        ],
+        "hostCount": 3,
+        "capturedProcesses": 5,
+        "receipts": 1
+      },
+      {
+        "scenario": "shell-running",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "willQuit": true,
+        "warning": false,
+        "states": [
+          "cancelled",
+          "cancelled"
+        ],
+        "hostCount": 1,
+        "capturedProcesses": 5,
+        "receipts": 1
+      },
+      {
+        "scenario": "shell-cancelling",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "willQuit": true,
+        "warning": false,
+        "states": [
+          "cancelled"
+        ],
+        "hostCount": 1,
+        "capturedProcesses": 2,
+        "receipts": 1
+      },
+      {
+        "scenario": "shell-completed",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "willQuit": true,
+        "warning": false,
+        "states": [
+          "completed"
+        ],
+        "hostCount": 1,
+        "capturedProcesses": 1,
+        "receipts": 1
+      },
+      {
+        "scenario": "shell-sigterm",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "willQuit": true,
+        "warning": false,
+        "states": [
+          "cancelled",
+          "cancelled"
+        ],
+        "hostCount": 1,
+        "capturedProcesses": 5,
+        "receipts": 1
+      },
+      {
+        "scenario": "shell-sigkill",
+        "exit": {
+          "code": null,
+          "signal": "SIGKILL"
+        },
+        "willQuit": false,
+        "warning": false,
+        "states": [
+          "cancelled",
+          "cancelled"
+        ],
+        "hostCount": 1,
+        "capturedProcesses": 5,
+        "receipts": 1
+      },
+      {
+        "scenario": "shell-missing-proof",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "willQuit": true,
+        "warning": true,
+        "states": [
+          "cancelled",
+          "cancelled"
+        ],
+        "hostCount": 2,
+        "capturedProcesses": 6,
+        "receipts": 1
+      }
+    ]
+  }
+}

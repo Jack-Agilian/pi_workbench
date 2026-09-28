@@ -86,3 +86,7 @@ C 及修正随后已按用户授权集成 develop（`6bde632`），D 分支从�
 ## D2-S 非交互 Bash：2026-09-28
 
 D1 及复审已按授权集成 develop（`3d307e9`）。[D2-S 报告](../validation/d2-shell-2026-09-28.md) · [契约与复用原因](d-platform-contract.md)：Pi Bash 通过公开 Operations 委托既有 guardian 的宿主批准执行，独立 Shell 组、审批、取消、收据及结果丢失恢复分别验证。SQL v5/IPC v4 只扩展必要产品投影/消息；没有新依赖或真实模型。D2-S 分支待审，下一开发项为 D2-T 单用户终端；Windows/完整 D 和 M0 Gate 未完成。
+
+## D2-S 审核修正：2026-09-28
+
+[S01 复审与证据](../validation/review-d2s-2026-09-28.md) 在原提交实际 Mac 后端复现非法 UTF-8 导致有效命令收据被拒绝；修正解码后字节预算，原收据校验和权限不放宽。修正 SHA 上 Shell 28、Worker 50、Electron Shell 三场景/退出 18 及前序回归通过。未合并分支，唯一下一开发项仍 D2-T，M0 Gate 保持 pending。

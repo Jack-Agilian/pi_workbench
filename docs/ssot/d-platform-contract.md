@@ -47,7 +47,7 @@ D1 结束时的下一增量规划为 D2：在同一产品审批、Operation、IP
 - Guardian 在 spawn 前已拥有本次执行对象；Bash `detached: true` 形成独立组，Worker 不增加 child_process/addon 权限。正常结束清理 Bash 同组后代；超时、取消、Worker/宿主断开统一停止 Bash 和 Worker。原 cleanup 收据只有两组清理均成功才允许 groupGone。新增宿主保护目录中的 Shell 收据含精确身份、Operation、PID/组、退出码/信号、超时与有界输出。Worker 的 done/result 不能伪造这些事实。
 - Shell 固定 `/bin/bash --noprofile --norc`，白名单环境与每 lease 独立 HOME；只允许工作区/自身 HOME 写入，拒绝网络、产品库、收据和资源目录访问。Mac arm64/固定 Node 是限定已测平台，其他平台失败关闭。HOME 不从工作区跟随链接创建。该 OS 配置不等于任意恶意命令沙箱，不承诺绕开组的 setsid/系统服务或 guardian 本身 SIGKILL 后的清理。
 - SQL schema v5 在既有 Operation 下增加 Shell 意图/结果投影；Pi 仍拥有原生消息历史。IPC v4 增加闭合 shell-exec/shell-result，不接收 Worker 自报 hostClean。旧版本连接拒绝；v1–v4 数据库向前迁移，回退旧二进制不受支持。
-- 完成时 stdout/stderr 各收集前 4000 字节并解码，剩余输出持续排空但不入队，显示超限标志；一次发送有界结果快照。聊天/UI 只显示纯文本，既有已知模式脱敏不是任意秘密过滤器，真正隔离依靠空凭据/禁网/OS 目录限制。D2-S 不提供实时终端流或全量日志；Pi 自身的结果处理继续复用，传输截断单独明确标记，不伪称保留全部字节或 stdout/stderr 的交错顺序。
+- 完成时 stdout/stderr 各收集前 4000 原始字节并解码；非法/不完整 UTF-8 用 U+FFFD 替换，解码后每路按共享 8192 UTF-8 字节预算保留完整码点前缀。剩余输出持续排空但不入队；原始或编码后预算截断均显示原超限标志（见 [S01 复审](../validation/review-d2s-2026-09-28.md)）；一次发送有界结果快照。聊天/UI 只显示纯文本，既有已知模式脱敏不是任意秘密过滤器，真正隔离依靠空凭据/禁网/OS 目录限制。D2-S 不提供实时终端流或全量日志；Pi 自身的结果处理继续复用，传输截断单独明确标记，不伪称保留全部字节或 stdout/stderr 的交错顺序。
 - 命令自然成功可无 Artifact；非零退出、取消、超时都不推导文件已回滚。已经启动的命令结果标为 sideEffects=possible。崩溃时有效自然退出收据只用来对账原 Operation，不重新执行；异常信号中断而未持久取消/超时的操作仍 unknown/blocked。没有可验证收据则不释放全局名额。本轮不实现通用 Shell 外部副作用解决器。
 
 演示入口仅由 trusted --demo 组合选择两个固定命令；输入 `/demo-shell` 或 `/demo-shell-wait` 选择演示，其他文本继续原 Markdown 路径，不将用户文本解释为 Shell。CLI 四场景也是同一 DesktopHost/产品命令链路的明确合成驱动，不是新 CLI 产品。执行证据见 [D2-S 报告](../validation/d2-shell-2026-09-28.md)；下一项 D2-T，终端及 Windows 仍未实现/验证。

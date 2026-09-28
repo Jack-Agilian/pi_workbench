@@ -54,3 +54,5 @@ D1 阶段：[Mac 退出验证](validation/d-exit-2026-09-24.md) · [平台契约
 
 
 最新 D2-S：[非交互 Shell 产品链路](validation/d2-shell-2026-09-28.md) · [执行/恢复边界](ssot/d-platform-contract.md)。D1 已合入 develop，限定 Shell 增量独立待审；下一步只推进 D2-T，交互终端与 Windows 不由此宣称完成。
+
+D2-S 最新修正：[S01 输出/收据契约复审](validation/review-d2s-2026-09-28.md) · [输入摘要](validation/review-d2s-inputs.json)。原提交反例和修正代码实测分开记录，下一开发项保持 D2-T。

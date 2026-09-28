@@ -567,7 +567,7 @@
         "PowerShellOperations"
       ],
       "reuse": "保留Shell语义和工具结果",
-      "productDelta": "限定Mac非交互Bash接产品审批/Operation/IPC；公开Operations委托原guardian监督独立Shell组、空凭据/禁网OS限制、有界完成输出和持久收据，不复用文件摘要推导命令副作用",
+      "productDelta": "限定Mac非交互Bash接产品审批/Operation/IPC；公开Operations委托原guardian监督独立Shell组、空凭据/禁网OS限制、有界完成输出和持久收据，不复用文件摘要推导命令副作用；S01统一解码后输出预算，非法字节替换/安全截断不阻断有效清理收据",
       "acceptanceGate": "保留定义/增量/取消；绑定操作、中文路径和受管理进程停止核验；残留可见",
       "implementationState": "in_progress",
       "adoption": {
@@ -603,7 +603,10 @@
           "EV-D2S-SDK-20260928",
           "EV-D2S-MAC-20260928",
           "EV-D2S-REGRESSION-20260928",
-          "EV-D2S-V4-20260928"
+          "EV-D2S-V4-20260928",
+          "EV-D2S-S01-REVIEW-20260928",
+          "EV-D2S-S01-MAC-20260928",
+          "EV-D2S-S01-REGRESSION-20260928"
         ]
       }
     },
@@ -919,7 +922,10 @@
           "EV-D2S-SDK-20260928",
           "EV-D2S-MAC-20260928",
           "EV-D2S-REGRESSION-20260928",
-          "EV-D2S-V4-20260928"
+          "EV-D2S-V4-20260928",
+          "EV-D2S-S01-REVIEW-20260928",
+          "EV-D2S-S01-MAC-20260928",
+          "EV-D2S-S01-REGRESSION-20260928"
         ]
       }
     },
@@ -1104,7 +1110,10 @@
           "EV-D2S-SDK-20260928",
           "EV-D2S-MAC-20260928",
           "EV-D2S-REGRESSION-20260928",
-          "EV-D2S-V4-20260928"
+          "EV-D2S-V4-20260928",
+          "EV-D2S-S01-REVIEW-20260928",
+          "EV-D2S-S01-MAC-20260928",
+          "EV-D2S-S01-REGRESSION-20260928"
         ]
       }
     }
@@ -1913,6 +1922,54 @@
         "darwin"
       ],
       "locator": "docs/validation/d2-shell-2026-09-28.md"
+    },
+    {
+      "id": "EV-D2S-S01-BASELINE-20260928",
+      "kind": "platform",
+      "result": "failed",
+      "scope": "原61b0108在Mac实际ShellExecution中复现三条非法UTF-8导致shell_output_limit，退出码0且组已停止；五项局部输入非完整Pi产品测试。",
+      "commit": "61b01086e924f3c7a0ec10a3b7586d69d76e6717",
+      "recordedAt": "2026-09-28T09:44:35.111997+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/review-d2s-2026-09-28.md"
+    },
+    {
+      "id": "EV-D2S-S01-REVIEW-20260928",
+      "kind": "review",
+      "result": "passed",
+      "scope": "复核S01并统一生产者/消费者8192编码字节预算，保持4000原始字节上限、严格收据/清理校验和Pi复用；无协议/依赖/权限扩张。",
+      "commit": "128dad6cba40f3cf6ed909dc0f7bed74ddc5de1f",
+      "recordedAt": "2026-09-28T09:44:35.111997+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/review-d2s-2026-09-28.md"
+    },
+    {
+      "id": "EV-D2S-S01-MAC-20260928",
+      "kind": "platform",
+      "result": "passed",
+      "scope": "Mac实际批准/Pi Bash/guardian/SQLite链路Shell28通过；新增双路非法/边界/分时UTF-8及宿主结果丢失后仅对账不重写。Electron Shell3/退出18；非PTY/Windows/任意后代证明。",
+      "commit": "128dad6cba40f3cf6ed909dc0f7bed74ddc5de1f",
+      "recordedAt": "2026-09-28T09:44:35.111997+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/review-d2s-2026-09-28.md"
+    },
+    {
+      "id": "EV-D2S-S01-REGRESSION-20260928",
+      "kind": "static",
+      "result": "passed",
+      "scope": "修正SHA上25命令通过：原A1-A4/Core20/SDK5/Worker50/Shell28/桌面15、实际UI/退出、四CLI、SSOT60/脚本15/文档5及7。未重跑初始化/新克隆/发行下载。",
+      "commit": "128dad6cba40f3cf6ed909dc0f7bed74ddc5de1f",
+      "recordedAt": "2026-09-28T09:44:35.111997+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/review-d2s-2026-09-28.md"
     }
   ]
 }
