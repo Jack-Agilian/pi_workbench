@@ -768,3 +768,64 @@ details p {
 
 .model-run { box-shadow: none; border-left: none; border-right: none; border-radius: 0; background: transparent; }
 .model-run .run-label { opacity: .8; font-size: 11px; }
+
+/* Task-first layout: retain the approval rail at every supported desktop size. */
+.topbar { height:44px; flex-shrink:0; padding:0 22px; }
+.thread-heading { padding:14px 22px; flex-shrink:0; }
+.thread-heading > div { min-width:0; }
+.thread-heading h1 { font-size:22px; margin-bottom:4px; }
+.thread-heading .eyebrow { display:none; }
+.thread-heading p { color:#66736b; font-size:12px; }
+.sidebar { width:208px; padding:20px 14px 16px; }
+.brand { margin-bottom:24px; }
+.timeline { padding:18px 22px; min-width:0; min-height:0; }
+.message p { font-size:13px; line-height:1.75; }
+.message small,.run-label,.state { font-size:11px; }
+.run-label { margin-bottom:16px; }
+.stop { min-height:32px; min-width:54px; font-size:12px; padding:4px 10px; }
+.composer { margin:0 18px 14px; padding:10px 12px 8px; flex-shrink:0; }
+.composer textarea { min-height:52px; max-height:140px; }
+.composer-footer > span { font-size:11px; color:#647463; }
+.composer-footer button { min-height:34px; font-size:12px; }
+.suggestions { flex-direction:row; flex-wrap:wrap; margin:8px 18px 12px; }
+.suggestions button { padding:6px 10px; }
+.inspector { padding:16px 14px; min-width:0; min-height:0; }
+.inspector-title { margin-bottom:14px; }
+.inspector-title > span { color:#67755f; font-size:11px; }
+.approval { padding:12px; }
+.approval h3 { font-size:13px; margin-bottom:8px; }
+.approval-label { font-size:11px; margin-bottom:8px; }
+.approval .target { font-size:12px; color:#4f6644; margin-bottom:8px; }
+.approval dl { font-size:11px; gap:5px; margin:10px 0; }
+.approval dt { color:#687561; }
+.approval dd { color:#42543c; }
+.approval details { font-size:11px; color:#607455; margin-bottom:10px; }
+.approval pre { white-space:pre-wrap; overflow-wrap:anywhere; max-height:160px; overflow:auto; }
+.approval-actions { position:sticky; bottom:0; background:#fff; padding-top:6px; }
+.approval-actions button { min-height:34px; font-size:12px; }
+.tool-card { margin-top:8px; }
+.tool-card strong,.tool-status { font-size:12px; }
+.tool-card div span { font-size:11px; color:#65765a; }
+.artifact-empty { padding:14px 0; }
+.inspector-foot { font-size:11px; color:#6d7c62; margin-top:16px; }
+@media(max-width:1120px) {
+  .sidebar { width:180px; padding:18px 12px; }
+  .thread-heading { padding:12px 18px; }
+  .timeline { padding:16px; }
+  .tool-card { margin-left:0; }
+  .composer { margin:0 14px 12px; }
+}
+@media(max-width:900px) {
+  .sidebar { width:154px; padding:18px 10px; }
+  .brand { gap:7px; font-size:13px; }
+  .brand small { display:none; }
+  .brand-mark { width:30px; line-height:32px; font-size:24px; flex-shrink:0; }
+  .content-grid { display:grid; grid-template-columns:minmax(0,1fr) 260px; overflow:hidden; }
+  .conversation { min-height:0; min-width:0; }
+  .timeline { min-height:0; padding:14px; }
+  .inspector { border-top:0; border-left:1px solid #e4e9e4; overflow:auto; padding:12px 10px; }
+  .thread-heading { padding:10px 16px; }
+  .composer { margin:0 10px 10px; }
+}
+/* Long commands remain inspectable without moving the approval buttons off screen. */
+.approval .target { max-height:96px; overflow:auto; }

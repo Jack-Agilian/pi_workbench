@@ -1,3 +1,4 @@
+import { captureLayout } from './layout-capture.ts';
 // Real Electron/Host/Pi tools, explicitly SYNTHETIC model driver. No accounts/network.
 import assert from 'node:assert/strict';
 import type { BrowserWindow } from 'electron';
@@ -16,6 +17,12 @@ export async function runFileModelSmoke(window:BrowserWindow,host:HostClient){
  for(const tool of ['write','read','edit']){
   await wait(()=>js<boolean>(`Array.from(document.querySelectorAll('.approval dd')).some(e=>e.textContent==='Pi ${tool}')`),tool);
   assert.equal(await js<boolean>("document.querySelector('.approval').textContent.includes('工具结果将发送给本次模型')"),true);
+  if(tool==='write') {
+    await captureLayout(window,'file-approval');
+    await js("document.querySelectorAll('.approval details').forEach(e=>{e.open=true})");
+    await captureLayout(window,'file-approval-expanded');
+    await js("document.querySelectorAll('.approval details').forEach(e=>{e.open=false})");
+  }
   await click('.approval .primary');
   await wait(async()=>{const s=await host.request({type:'thread',threadId}) as DesktopThread;return s.operations.some(o=>o.tool===tool&&o.state==='succeeded');},tool+' settled');
  }
