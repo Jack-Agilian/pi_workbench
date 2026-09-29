@@ -1,7 +1,7 @@
 import test from 'node:test';
 import { DatabaseSync } from 'node:sqlite';
 import assert from 'node:assert/strict';
-import { mkdirSync,mkdtempSync,writeFileSync,readFileSync,rmSync } from 'node:fs';
+import { mkdirSync,mkdtempSync,writeFileSync,readFileSync,rmSync,unlinkSync,existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createHash } from 'node:crypto';
@@ -29,11 +29,18 @@ test('resume CLI isolated profile: exact requests/Session binding, immutable pla
   const audit=auditModelProfile(profile,config,0.1);assert.equal(audit.used,2);assert.equal(audit.threadId,thread);assert.equal(audit.firstRunId,first);
   const original=join(profile,`live-validation-${marker}.json`);writeFileSync(original,JSON.stringify({provider:config.provider,model:config.model,hostClosed:true,stages:[{stage:'first',state:'completed',replyMatches:true}]}));
   const originalBytes=readFileSync(original);
-  const cli=(args,status)=>{const r=spawnSync(process.execPath,['--import',join(repository,'scripts/probe-no-network.mjs'),join(repository,'scripts/validate-model-resume.mjs'),...args],{env:sterileEnvironment(root),cwd:root,encoding:'utf8',timeout:20000});assert.equal(r.status,status,r.stdout+r.stderr);};
+  const cli=(args,status)=>{const r=spawnSync(process.execPath,['--import',join(repository,'scripts/probe-no-network.mjs'),join(repository,'scripts/validate-model-resume.mjs'),...args],{env:sterileEnvironment(root),cwd:root,encoding:'utf8',timeout:20000});assert.equal(r.status,status,r.stdout+r.stderr);return r.stdout+r.stderr;};
   cli(['prepare','synthetic-attempt'],0);const plan=join(profile,'live-resume-synthetic-attempt.plan.json');const bytes=readFileSync(plan);
   cli(['prepare','synthetic-attempt'],1);assert.deepEqual(readFileSync(plan),bytes);
-  const result=join(profile,'live-resume-synthetic-attempt.result.json');writeFileSync(result,'{"syntheticExistingAttempt":true}');
-  cli(['execute-approved','synthetic-attempt'],1);assert.equal(readFileSync(result,'utf8'),'{"syntheticExistingAttempt":true}');assert.deepEqual(readFileSync(original),originalBytes);
+  const result=join(profile,'live-resume-synthetic-attempt.result.json');
+  const lock=join(profile,'live-validation.lock');writeFileSync(lock,'SYNTHETIC interrupted validator');
+  assert.match(cli(['execute-approved','synthetic-attempt'],1),/resume_validation_locked/);
+  assert.equal(readFileSync(lock,'utf8'),'SYNTHETIC interrupted validator');assert.equal(existsSync(result),false);
+  assert.equal(core.modelAdmission(config,0.1).used,2);assert.equal(core.workerLaunches().length,0);
+  unlinkSync(lock); // Test fixture only: the product never removes an unowned lock.
+  writeFileSync(result,'{"syntheticExistingAttempt":true}');
+  assert.match(cli(['execute-approved','synthetic-attempt'],1),/resume_attempt_already_started/);
+  assert.equal(readFileSync(result,'utf8'),'{"syntheticExistingAttempt":true}');assert.deepEqual(readFileSync(original),originalBytes);
   assert.equal(core.modelAdmission(config,0.1).used,2);
   assert.throws(()=>auditModelProfile(profile,{...config,authorizationId:'wrong'},0.1),/missing/);
  }finally{core.close();rmSync(root,{recursive:true,force:true});}

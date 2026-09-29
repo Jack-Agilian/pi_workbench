@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { ModelHttp } from '../model-http.ts';
 import { modelFetch } from '../../../packages/pi-adapter/model-fetch.ts';
+import type { WireBody } from '../../../packages/app-contracts/worker-ipc.ts';
 const url='https://synthetic.invalid/stream';
 function bridge(fetch:typeof globalThis.fetch,idle=120){
  const host=new ModelHttp(url,()=>{},fetch,idle);
@@ -34,4 +35,31 @@ test('empty chunks cannot keep an otherwise idle HTTP body alive',async()=>{
  let timer:ReturnType<typeof setInterval>|undefined;
  const b=bridge(async()=>new Response(new ReadableStream<Uint8Array>({start(c){timer=setInterval(()=>c.enqueue(new Uint8Array()),5);},cancel(){clearInterval(timer);}})),40);
  try{const r=await b.worker.fetch(url,{method:'POST',body:'{}'});await assert.rejects(r.text(),/transport_failed/);}finally{clearInterval(timer);await b.close();}
+});
+
+for(const winner of ['timeout','close'] as const)test(`late response headers after ${winner} are cancelled without publishing to the closed request`,async()=>{
+ let deliver!:(response:Response)=>void;let signal:AbortSignal|undefined;let reservations=0;let cancelled=false;
+ const replies:WireBody[]=[];
+ let replied!:()=>void;const responseObserved=new Promise<void>(resolve=>{replied=resolve;});
+ const host=new ModelHttp(url,()=>{reservations++;},async(_url,options)=>{signal=options!.signal!;return new Promise<Response>(resolve=>{deliver=resolve;});},40);
+ host.receive({type:'model-http',url,method:'POST',headers:{},body:'{}'},async body=>{replies.push(body);replied();});
+ if(winner==='timeout')await responseObserved;
+ const closing=host.close();assert.equal(host.close(),closing);assert.equal(signal!.aborted,true);
+ // Deliberately uncooperative synthetic fetch resolves after abort, as a race input.
+ deliver(new Response(new ReadableStream<Uint8Array>({cancel(){cancelled=true;}})));
+ await closing;await new Promise<void>(resolve=>setImmediate(resolve));
+ assert.equal(cancelled,true);assert.equal(reservations,1);
+ assert.deepEqual(replies.map(r=>r.type),winner==='timeout'?['model-http-error']:[]);
+});
+
+test('completed stream does not become a timeout after the former idle deadline',async()=>{
+ let signal:AbortSignal|undefined;let reservations=0;const replies:WireBody[]=[];
+ const host=new ModelHttp(url,()=>{reservations++;},async(_url,options)=>{signal=options!.signal!;return new Response('SYNTHETIC completed');},40);
+ const worker=modelFetch(async(body,id)=>host.receive(body,async reply=>{replies.push(reply);worker.receive(id,reply);}));
+ try{
+  const response=await worker.fetch(url,{method:'POST',body:'{}'});assert.equal(await response.text(),'SYNTHETIC completed');
+  const count=replies.length;await new Promise<void>(resolve=>setTimeout(resolve,80));
+  assert.equal(replies.length,count);assert.equal(signal!.aborted,false);assert.equal(reservations,1);
+  assert.equal(replies.at(-1)?.type,'model-http-chunk');assert.ok(replies.every(r=>r.type!=='model-http-error'));
+ }finally{worker.close();await host.close();}
 });
