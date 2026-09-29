@@ -71,7 +71,7 @@ export class WorkerSupervisor {
     else sha256(plan.parametersDigest);
     if (plan.tool === 'bash') { parseShellIntent(plan.shell); if (plan.target !== '.' || parametersDigest({ command: plan.shell.command, timeout: plan.shell.timeoutMs / 1000 }) !== plan.parametersDigest) throw new Error('shell_parameters_mismatch'); }
     else if (plan.tool !== 'none') { sha256(plan.expectedContentDigest); if (plan.fileVersion !== null) sha256(plan.fileVersion); }
-    if (!['write','edit','bash','none'].includes(plan.tool) || plan.deadline <= Date.now() || plan.deadline > Date.now() + 120_000) throw new Error('invalid_execution_plan');
+    if (!['write','edit','bash','none'].includes(plan.tool) || plan.deadline <= Date.now() || plan.deadline > Date.now() + (plan.tool === 'none' ? 86_405_000 : 120_000)) throw new Error('invalid_execution_plan');
     let journal: Journal | undefined; let child: ChildProcess | undefined;
     let binding: Dispatch | undefined;
     try { binding = this.core.dispatchNext(dispatch => {
@@ -98,8 +98,8 @@ export class WorkerSupervisor {
       active.http=new ModelHttp(access.requestUrl, (bytes,body)=>{
         if(bytes>24000)throw new Error('model_input_limit');
         validateModelPayload(plan.model, access.requestUrl, body);
-        this.core.reserveModelRequest(active.journal.binding,access.configuration.authorizationId,parametersDigest(access.configuration),access.configuration.maxRequests,access.reserveCostUsd,access.configuration.maxEstimatedCostUsd);
-      },access.fetch);
+        this.core.reserveConfiguredModelRequest(active.journal.binding,access.configuration,access.reserveCostUsd);
+      },access.fetch,access.configuration.httpIdleTimeoutMs ?? access.configuration.timeoutMs);
     }
     guardian.on('message', raw => { try { this.receive(active, raw); } catch { this.stop(active); } });
     guardian.on('error', () => this.stop(active));

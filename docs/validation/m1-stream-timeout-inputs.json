@@ -1,0 +1,152 @@
+{
+  "baseline": "bb90b75c09806d4303f312330ff38f40b79e15e3",
+  "platform": {
+    "os": "macOS 27.0",
+    "arch": "arm64",
+    "node": "24.21.0",
+    "pi": "0.87.1"
+  },
+  "testedCommit": "ba9b8ea3c04b1e9242c38d9e8ca52a9ffc967a4b",
+  "results": [
+    {
+      "command": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T03:56:13.635298+00:00",
+      "finishedAt": "2026-09-29T03:56:15.327926+00:00",
+      "sha256": "22df5d47848ff6e1f3c0926a3aa3f05da31fb2c76601187b826c3ad4d7870689"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:model-integration-offline"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T03:56:15.328259+00:00",
+      "finishedAt": "2026-09-29T03:56:43.264370+00:00",
+      "sha256": "081db0412b3a20fa4552c8188d17b343285fe8ea71499d0e21642d05ec04e0cc"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:model-resume"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T03:56:43.264823+00:00",
+      "finishedAt": "2026-09-29T03:56:44.633691+00:00",
+      "sha256": "8966787c515825cfdd02c93a54a5c4c6797c65f6791dc2b3de844493deb4d972"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:model-network"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T03:56:44.634008+00:00",
+      "finishedAt": "2026-09-29T03:56:45.238579+00:00",
+      "sha256": "ba5472059f8ce897c12d82cbbc1f46ef480af64adb537831fc033e2c3c1bcbb5"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:model-config"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T03:56:45.238894+00:00",
+      "finishedAt": "2026-09-29T03:56:53.522318+00:00",
+      "sha256": "0cbb2b20da067fe2ba8d1b7d0cf446375daee7ee1d1ee15fcfd8da945f1e27eb"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:product-worker"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T03:56:53.522620+00:00",
+      "finishedAt": "2026-09-29T03:57:24.028169+00:00",
+      "sha256": "eeda830533965e7f83d3e2506e350f390f263cd14b325e3b85cee714b34d18bb"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:desktop"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T03:57:24.028461+00:00",
+      "finishedAt": "2026-09-29T03:57:36.592541+00:00",
+      "sha256": "0cdbd4d3b3572d55243241fe2353e13787b892b36a92031e7f06c5875326ad6c"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:desktop-model"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T03:57:36.592850+00:00",
+      "finishedAt": "2026-09-29T03:57:40.902519+00:00",
+      "sha256": "8fbf83b307d1c7011a7f81449537362510d2951cf4c2f2985585ec7224788624"
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/check-ssot.py"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T03:57:40.902952+00:00",
+      "finishedAt": "2026-09-29T03:57:41.017498+00:00",
+      "sha256": "337922e9b236fe7bfeaf8ae87681151ee887229452d87415467b380cb8b2cf07"
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/test-tools.py"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T03:57:41.017836+00:00",
+      "finishedAt": "2026-09-29T03:57:41.078494+00:00",
+      "sha256": "47060195453f3c91118ef1d9c94c5d8f1726e608fe870bc724672a1b6c299b1f"
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/check-docs.py",
+        "--structural-only"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T03:57:41.078793+00:00",
+      "finishedAt": "2026-09-29T03:57:41.168546+00:00",
+      "sha256": "e1df9d06743d6f619bafa2413718d99a96a18dfda0cc1f54658ba70f39bd80c7"
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/check-docs.py",
+        "--typecheck"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T03:57:41.168790+00:00",
+      "finishedAt": "2026-09-29T03:57:41.531904+00:00",
+      "sha256": "ee61356fbaa7a772814025998de558c9fc444d65454d9259663d262fc83314c8"
+    }
+  ],
+  "realModelRequests": 0,
+  "realCredentialsRead": false,
+  "applicationConfigurationChanged": false,
+  "scope": "Scaled-duration synthetic streams and actual offline Pi SDK/Worker, not a 10-minute external model test.",
+  "tests": {
+    "modelIntegration": 39,
+    "modelResume": 11,
+    "productWorker": 51,
+    "desktop": 19
+  }
+}

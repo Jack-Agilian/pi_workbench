@@ -39,7 +39,10 @@
     "test:desktop-model": "node scripts/launch-desktop.mjs --model-offline --model-smoke-test",
     "test:model-network": "node scripts/test-model-network.mjs",
     "test:model-config": "node scripts/test-model-config.mjs",
-    "validate:model-live": "node scripts/validate-model-live.mjs"
+    "validate:model-live": "node scripts/validate-model-live.mjs",
+    "model:policy": "node scripts/model-policy.mjs",
+    "validate:model-resume": "node scripts/validate-model-resume.mjs",
+    "test:model-resume": "node scripts/check-environment.mjs --versions-only && node --import ./scripts/probe-no-network.mjs --test apps/agent-server/tests/model-policy.test.ts scripts/model-resume-stages.test.mjs scripts/model-resume-cli.test.mjs"
   },
   "dependencies": {
     "@earendil-works/pi-ai": "0.87.1",

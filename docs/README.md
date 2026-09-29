@@ -72,3 +72,14 @@ D2-S/S01 已集成 develop（`22cf288`）。此前 D2-T 为下一项的阶段表
 ## Pi 0.87.1 与 M1 首次真实调用（2026-09-29）
 
 [最新报告](validation/pi-0871-m1-live-2026-09-29.md)：升级精确发行包、两轮初始化和29种回归命令通过。真实 gpt-6-luna 首条成功；重开继续触及30秒期限，清理后failed，未自动重发，活跃取消未执行。MODEL-02 进入 in_progress；唯一当前项是统一计划后的 M1-B 收尾，未完成完整M1或M0-Pi、未进入M2。前面的等待授权/零真实调用表述仅为历史阶段。
+
+## develop 复审与 M1-B 续验（2026-09-29）
+
+[最新修订证据](validation/review-develop-m1-2026-09-29.md)：R01/R02/R03与现状文档已修正；原授权保留且累计4/4，真实原会话恢复与活跃取消通过。MODEL-02 限定 done；此前“恢复/取消待验收”为历史阶段。该次交付止于M1，当前推进顺序见 NEXT_STEPS。M0-Pi仍blocked。
+
+长流语义补充：[单个LLM请求的空闲与总期限修正](validation/m1-stream-timeout-2026-09-29.md)，12条针对性回归通过，新增真实调用0。历史5分钟值曾同时约束总期限；新模板独立配置两者，旧授权不自动修改。
+
+
+## M1 收口与30分钟决策确认（2026-09-29）
+
+[逐项核对](validation/m1-closeout-2026-09-29.md) 统一已实现的预算修订、原会话续验、HTTP时间边界及安全展示证据；采用清单补齐 agent-session、native-history、pi-settings、product-coordination、desktop-ui 的相关引用。用户已确认单个LLM总上限30分钟、独立空闲上限5分钟，旧配置和4/4消费不变。接下来按 [唯一计划](planning/NEXT_STEPS.md) 推进M2离线增量；本次未新增真实调用，不晋级M0-Pi。

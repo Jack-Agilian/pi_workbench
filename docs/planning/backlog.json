@@ -1596,7 +1596,8 @@
             "EV-M1-SDK-20260928",
             "EV-M1-MAC-20260928",
             "EV-M1-OPENAI-SDK-20260929",
-            "EV-M1-OPENAI-MAC-20260929"
+            "EV-M1-OPENAI-MAC-20260929",
+            "EV-M1-STREAM-IDLE-20260929"
           ]
         },
         {
@@ -1609,7 +1610,9 @@
             "EV-M1-SDK-20260928",
             "EV-M1-MAC-20260928",
             "EV-M1-OPENAI-SDK-20260929",
-            "EV-M1-OPENAI-MAC-20260929"
+            "EV-M1-OPENAI-MAC-20260929",
+            "EV-M1-POLICY-REGRESSION-20260929",
+            "EV-M1-CLOSEOUT-20260929"
           ]
         },
         {
@@ -1622,7 +1625,9 @@
             "EV-M1-SDK-20260928",
             "EV-M1-MAC-20260928",
             "EV-M1-OPENAI-SDK-20260929",
-            "EV-M1-OPENAI-MAC-20260929"
+            "EV-M1-OPENAI-MAC-20260929",
+            "EV-M1-STREAM-IDLE-20260929",
+            "EV-M1-CLOSEOUT-20260929"
           ]
         },
         {
@@ -1635,7 +1640,9 @@
             "EV-M1-SDK-20260928",
             "EV-M1-MAC-20260928",
             "EV-M1-OPENAI-SDK-20260929",
-            "EV-M1-OPENAI-MAC-20260929"
+            "EV-M1-OPENAI-MAC-20260929",
+            "EV-M1-STREAM-IDLE-20260929",
+            "EV-M1-POLICY-REGRESSION-20260929"
           ]
         }
       ],
@@ -1645,7 +1652,7 @@
       "id": "MODEL-02",
       "priority": "P0",
       "ownerRole": "Tech Lead",
-      "state": "in_progress",
+      "state": "done",
       "githubIssueNumber": null,
       "dependencies": [
         "MODEL-01"
@@ -1658,7 +1665,7 @@
         "product-coordination",
         "desktop-ui"
       ],
-      "implementationStatus": "in_progress",
+      "implementationStatus": "implemented",
       "githubIssueUrl": null,
       "issueVerificationStatus": "not_checked",
       "issueEvidence": [],
@@ -1676,12 +1683,12 @@
           ],
           "evidenceRefs": [
             "EV-M1-FIRST-MODEL-20260929",
-            "EV-M1-RESUME-TIMEOUT-20260929",
-            "EV-M1-LIVE-MAC-20260929"
+            "EV-M1-RESUME-MODEL-20260929",
+            "EV-M1-RESUME-MAC-20260929"
           ]
         }
       ],
-      "statusReason": "获用户授权已执行两次真实 gpt-6-luna 请求：首条成功，宿主重开后的第二条触及30秒期限，清理后failed。未重发；剩余恢复/活跃取消验收待统一计划，非完整M1通过。"
+      "statusReason": "限定无工具M1-B已完成首次文本、原Thread/Session重开恢复和观察流后的活跃取消；原授权累计4/4且无重试，取消/历史超时实际计费未知。30分钟单LLM总上限已获确认，收口集成后进入M2离线实施；M0-Pi不晋级。"
     },
     {
       "id": "MODEL-03",
@@ -1693,7 +1700,7 @@
         "MODEL-02"
       ],
       "sourceDependencyText": "2026-09-28用户采纳真实模型优先，限定已有能力之上的增量；不替代原完整任务",
-      "workAndAcceptance": "M2：原生循环多次顺序文件操作及逐操作授权/恢复",
+      "workAndAcceptance": "M2：Pi原生循环内多次LLM请求逐次计预算；read/write/edit零到多个顺序Operation逐次授权、结算和恢复；桌面安全投影；集中离线后另行授权真实验收",
       "reuseRefs": [
         "models-auth",
         "agent-session",
@@ -1712,14 +1719,51 @@
       "acceptanceCriteria": [
         {
           "id": "MODEL-03-A01",
-          "requirement": "原生循环多次顺序文件操作及逐操作授权/恢复",
+          "requirement": "同Run多次LLM请求复用Pi原生循环，每次宿主绑定/预算预留，旧请求账本无损迁移",
           "plannedChecks": [
-            "m2-file-agent"
+            "m2-multi-request-budget",
+            "m2-model-ledger-migration"
+          ],
+          "evidenceRefs": []
+        },
+        {
+          "id": "MODEL-03-A02",
+          "requirement": "批准workspace内公开read/write/edit零到多个顺序操作，每次参数/版本/资源/身份核验及审批领取",
+          "plannedChecks": [
+            "m2-zero-single-multi-tools",
+            "m2-per-operation-approval"
+          ],
+          "evidenceRefs": []
+        },
+        {
+          "id": "MODEL-03-A03",
+          "requirement": "逐Operation结果独立于Run结局，前成功后失败及未确认副作用恢复不自动重发",
+          "plannedChecks": [
+            "m2-operation-result-isolation",
+            "m2-write-result-loss-recovery"
+          ],
+          "evidenceRefs": []
+        },
+        {
+          "id": "MODEL-03-A04",
+          "requirement": "等待审批、活跃流/工具取消、真实进程退出/重开与安全桌面多操作展示",
+          "plannedChecks": [
+            "m2-cancel-recovery",
+            "m2-desktop-safe-projection",
+            "m2-time-boundaries"
+          ],
+          "evidenceRefs": []
+        },
+        {
+          "id": "MODEL-03-A05",
+          "requirement": "获新明确授权后真实模型自主有限文件任务与审批/取消/恢复、请求用量记录",
+          "plannedChecks": [
+            "m2-live-file-agent"
           ],
           "evidenceRefs": []
         }
       ],
-      "statusReason": "限定增量，尚无本次验收证据；不依赖PTY/Windows完成。"
+      "statusReason": "尚未实施运行代码。M1时间策略已确认，先完成收口与统一基线，再按NEXT_STEPS的M2-A/B/C推进；原授权4/4已耗尽，真实验收须新明确预算。"
     }
   ],
   "decisionSource": "../ssot/README.md",
@@ -1784,7 +1828,7 @@
       ],
       "evidenceRefs": [],
       "acceptance": "授权真实模型任务及审批/取消/恢复Mac证据；不推导未测平台/沙箱",
-      "statusReason": "M1首条真实无工具请求已成功，但会话恢复请求超时、活跃取消未验收；真实工具审批/取消/恢复条件仍缺失。M0-Pi保持blocked。"
+      "statusReason": "限定M1无工具真实文本/原会话恢复/活跃取消已验证；尚无真实模型工具审批任务闭环，不能由M1或测试数量自动完成M0-Pi。"
     }
   ]
 }

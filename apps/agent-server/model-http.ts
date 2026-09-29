@@ -5,15 +5,28 @@ export class ModelHttp {
   private request?: Promise<void>; private reader?: ReadableStreamDefaultReader<Uint8Array>;
   private stopped = false; private reading = false; private total = 0; private remainder: Uint8Array = new Uint8Array();
   private closeResult?: Promise<void>;
+  private readonly idleTimeoutMs: number;
   private readonly url: string; private readonly reserve: (bytes:number, body:string)=>void; private readonly fetch: typeof globalThis.fetch;
-  constructor(url: string, reserve:(bytes:number, body:string)=>void, fetch = globalThis.fetch) { this.url=url;this.reserve=reserve;this.fetch=fetch; }
+  constructor(url: string, reserve:(bytes:number, body:string)=>void, fetch = globalThis.fetch, idleTimeoutMs = 300000) {
+    if(!Number.isSafeInteger(idleTimeoutMs)||idleTimeoutMs<1||idleTimeoutMs>86400000)throw new Error('model_http_idle_limit');
+    this.url=url;this.reserve=reserve;this.fetch=fetch;this.idleTimeoutMs=idleTimeoutMs;
+  }
+  /** Time only pending network I/O, not elapsed generation or downstream backpressure. */
+  private async waiting<T>(work:Promise<T>):Promise<T> {
+    let timer:ReturnType<typeof setTimeout>|undefined;
+    try{return await Promise.race([work,new Promise<never>((_resolve,reject)=>{
+      timer=setTimeout(()=>{reject(new Error('model_http_idle_timeout'));this.controller.abort();void this.reader?.cancel().catch(()=>{});},this.idleTimeoutMs);
+    })]);}finally{if(timer)clearTimeout(timer);}
+  }
   receive(body:WireBody,reply:(body:WireBody)=>Promise<void>): void {
     if(this.stopped)throw new Error('model_http_closed');
     if(body.type==='model-http') {
       if(this.request || body.url!==this.url || body.method!=='POST' || /[\r\n]/.test(body.url) || Object.keys(body.headers).some(k=>['host','cookie','proxy-authorization'].includes(k.toLowerCase())))throw new Error('model_http_not_approved');
       try { this.reserve(Buffer.byteLength(body.body),body.body); } catch { this.stopped=true;this.request=reply({type:'model-http-error'});return; }
       this.request=(async()=>{
-        const response=await this.fetch(this.url,{method:'POST',headers:body.headers,body:body.body,redirect:'error',signal:this.controller.signal});
+        const response=await this.waiting(this.fetch(this.url,{method:'POST',headers:body.headers,body:body.body,redirect:'error',signal:this.controller.signal}).then(async response=>{
+          if(this.controller.signal.aborted){await response.body?.cancel();throw new Error('model_http_closed');}return response;
+        }));
         if(this.stopped){await response.body?.cancel();return;}
         if(!response.body)throw new Error('model_http_no_body');
         if (!response.ok) {
@@ -30,7 +43,10 @@ export class ModelHttp {
     this.reading=true;
     const read=(async()=>{
       let data=this.remainder;let end=false;
-      if(!data.byteLength){const next=await this.reader!.read();data=next.value??new Uint8Array();end=next.done;}
+      if(!data.byteLength){const next=await this.waiting((async()=>{
+        // Empty application chunks do not manufacture progress or reset the idle clock.
+        for(;;){const value=await this.reader!.read();if(value.done||value.value.byteLength)return value;}
+      })());data=next.value??new Uint8Array();end=next.done;}
       if(this.stopped)return;
       if(this.total+data.byteLength>1_048_576)throw new Error('model_http_response_limit');this.total+=Math.min(data.byteLength,16384);
       this.remainder=data.slice(16384);

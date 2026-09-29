@@ -1,6 +1,6 @@
 # 开发环境、检查与发布
 
-当前实现决策以 [复用优先 SSOT](ssot/README.md) 为准。修改当前文档或 Backlog 后运行 `python scripts/check-ssot.py`；该检查只验证文档/JSON一致性，不安装或测试 Pi。
+当前实现决策以 [复用优先 SSOT](ssot/README.md) 为准。下文 A0–D 按阶段记录入口和当时范围；最新状态以 [NEXT_STEPS](planning/NEXT_STEPS.md) 与 [M1收口](validation/m1-closeout-2026-09-29.md) 为准，不将历史“未实现/待验收”作为当前总状态。修改当前文档或 Backlog 后运行 `python scripts/check-ssot.py`；该检查只验证文档/JSON一致性，不安装或测试 Pi。
 
 ## 1. 当前初始化范围
 
@@ -304,4 +304,8 @@ CLI 演示将审计/profile 留在 `.artifacts/shell-demos/`；crash 演示故�
 
 ## M1 配置与离线会话
 
-非秘密配置与本机凭据入口见 [模型配置](MODEL_CONFIGURATION.md)，接入范围见 [M1 契约](ssot/m1-model-contract.md)。新增 `model:config`、`desktop:model`、`test:model-integration-offline`、`test:model-network`、`test:model-config`、`test:desktop-model`；保持原 bootstrap/默认演示行为及唯一 npm 锁。真实服务未验收，当前只允许明确批准的配置和本机凭据，不读取全局 Pi auth。
+非秘密配置与本机凭据入口见 [模型配置](MODEL_CONFIGURATION.md)，接入范围见 [M1 契约](ssot/m1-model-contract.md)。新增 `model:config`、`desktop:model`、`test:model-integration-offline`、`test:model-network`、`test:model-config`、`test:desktop-model`；保持原 bootstrap/默认演示行为及唯一 npm 锁。真实无工具首次回复、原会话恢复和活跃取消已限定验收；真实工具任务仍未验收。只允许明确批准的配置和本机凭据，不读取全局 Pi auth；旧授权4/4耗尽。
+
+M1 续验修订的离线回归：`npm run test:model-resume`（合成 SQLite/客户端与隔离配置，不使用账户）。显式策略修订与真实续验入口见 [配置说明](MODEL_CONFIGURATION.md)。
+
+时间默认值已获用户确认：单LLM总上限30分钟、独立网络空闲5分钟；前期实现与采用引用的同步核对见 [M1收口](validation/m1-closeout-2026-09-29.md)。不自动迁移本机旧授权配置。

@@ -91,3 +91,5 @@ D1 的 [退出记录](../validation/d-exit-2026-09-24.md) 将实际 Electron 正
 D2-S 的 [Shell 记录](../validation/d2-shell-2026-09-28.md) 将完整回归实现 SHA 与仅补 v4 迁移测试 SHA 分开登记。命令退出、组清理、外部副作用、成果和 bounded 输出各自核验，CLI crash 驱动退出 0 不等于产品 Run 成功；D2-S 不自动完成交互终端、Windows 或 M0 Gate。
 
 M1 的 [离线报告](../validation/m1-2026-09-28.md) 区分完整回归实现 SHA 与仅新增长流测试 SHA。合成 Provider/SSE 只登记 sdk/mock，不登记 model；实际 loopback/OS 限制不冒充外部 TLS。M0-UI/M0-SDK 按原条件逐项核对通过，M0-Pi 因真实模型/工具任务证据缺失 blocked；MODEL-01 的限定 done 不推进全部认证、权限或 SDK 大工作项。
+
+M1 的[收口核对](../validation/m1-closeout-2026-09-29.md)将历史实现事实与本次文档补齐分开：能力的采用说明、验收条件与 evidenceRefs 同步，既有证据沿用原被测 SHA；新增代码/测试另记实际提交。用户确认30分钟产品默认值是决策，不是新的模型或平台实测。历史失败、4/4累计消费、旧配置与未完成 Gate 不因同步文档消失。
