@@ -175,10 +175,11 @@
         "CredentialStore",
         "ModelRuntime.registerNativeProvider",
         "ModelRuntime.setRuntimeApiKey",
-        "ProviderRequestOptions.fetch"
+        "ProviderRequestOptions.fetch",
+        "ModelRuntime.registerProvider"
       ],
       "reuse": "Provider、目录、登录/刷新复用",
-      "productDelta": "M1 产品非秘密授权配置与原生凭据选择；Pi 内存 store + 原生 HTTP fetch seam；fauxProvider/fauxAssistantMessage 仅测试；系统 Keychain/OAuth 未完成",
+      "productDelta": "M1 OpenAI Responses/Chat Completions 与原有 Anthropic；Pi 原生 Provider/公开 registerProvider 元数据接入；应用专用 auth.json 字面量 key 读取和临时原生文件选择；系统 Keychain/OAuth 未完成",
       "acceptanceGate": "secret 不进Renderer/日志/子进程env",
       "implementationState": "in_progress",
       "adoption": {
@@ -265,7 +266,9 @@
           "EV-A4-REGRESSION-20260922",
           "EV-REVIEW-A4-ACCOUNT-20260923",
           "EV-M1-SDK-20260928",
-          "EV-M1-MAC-20260928"
+          "EV-M1-MAC-20260928",
+          "EV-M1-OPENAI-SDK-20260929",
+          "EV-M1-OPENAI-MAC-20260929"
         ]
       }
     },
@@ -2060,6 +2063,42 @@
         "darwin"
       ],
       "locator": "docs/validation/m1-2026-09-28.md"
+    },
+    {
+      "id": "EV-M1-OPENAI-SDK-20260929",
+      "kind": "sdk",
+      "result": "passed",
+      "scope": "Pi 0.87.0 native OpenAI Responses and Chat Completions through actual restricted Worker/IPC: synthetic success, native context reopen, 401 redaction, active cancellation, admission and header validation. 25 model tests; no real Provider calls.",
+      "commit": "fee5da1c08771e607831b754c86b84a310ceb34a",
+      "recordedAt": "2026-09-29T01:32:10.627972+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/m1-openai-2026-09-29.md"
+    },
+    {
+      "id": "EV-M1-OPENAI-MAC-20260929",
+      "kind": "platform",
+      "result": "passed",
+      "scope": "macOS 27 arm64: app-owned literal auth.json startup/reconnect via actual App Server and Electron; private-file rejection and temporary key fallback. 19 desktop tests and configuration smoke, no real credentials, no Windows/Keychain/OAuth.",
+      "commit": "fee5da1c08771e607831b754c86b84a310ceb34a",
+      "recordedAt": "2026-09-29T01:32:10.627972+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/m1-openai-2026-09-29.md"
+    },
+    {
+      "id": "EV-M1-OPENAI-REGRESSION-20260929",
+      "kind": "static",
+      "result": "passed",
+      "scope": "29 distinct commands finally passed on code fee5da1 with documentation-only follow-up. Initial missing evidence locator caused three doc failures; all four repository checks rerun after completing documents. Runtime scope and raw digests in report; no reinstall/bootstrap/new-clone claim.",
+      "commit": "fee5da1c08771e607831b754c86b84a310ceb34a",
+      "recordedAt": "2026-09-29T01:34:11.142861+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/m1-openai-2026-09-29.md"
     }
   ]
 }

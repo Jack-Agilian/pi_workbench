@@ -107,3 +107,9 @@ P04/P05/P06/P07/P13 的固定源码链接是复查入口，不声称逐字核验
 ## M1 公开 HTTP 入口（2026-09-28）
 
 Pi 0.87.0 的发行声明公开 ProviderRequestOptions.fetch（FetchFunction 类型，HTTP 而非 WebSocket）与 ModelRuntime.registerNativeProvider/setRuntimeApiKey 类方法。实际原生 Anthropic 适配器通过同一 IPC 处理明确合成 SSE/错误，路径为 `/v1/messages?beta=true`；见 [M1 实测](../validation/m1-2026-09-28.md)。fauxProvider/fauxAssistantMessage 根运行时导出仅用于离线测试，不是模型服务 fixture。sandbox-runtime 只阅读候选文档，未采用/安装/实测；不存在这项发行完成声明。
+
+## M1 OpenAI 与 auth.json（2026-09-29）
+
+沿用 Pi 0.87.0，公开 ModelRuntime.registerProvider 是类方法，只注册批准的 Base URL/模型/价格及兼容元数据，不是新的包根函数或 Provider 实现。原生 openai-responses/openai-completions 委托现有 fetch seam，实际 Worker/IPC 验证见 [增量报告](../validation/m1-openai-2026-09-29.md)。无新依赖、上游运行时补丁或 experimental import。
+
+Context7 用于定位官方文档，最终核对安装包 docs/providers.md 的 auth.json/api_key/0600 与 SDK 声明。应用薄读取层只取专用 auth.json 的字面量 key，再调用公开 setRuntimeApiKey；不启用 Pi 的命令、环境变量或全局凭据发现。OpenAI 官方 streaming/reasoning 文档用于核对 API 与 token 字段；该阅读不构成真实服务验证。

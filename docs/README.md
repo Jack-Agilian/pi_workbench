@@ -64,3 +64,7 @@ D2-S/S01 已集成 develop（`22cf288`）。此前 D2-T 为下一项的阶段表
 ## M1-A 离线完成（2026-09-28）
 
 [报告](validation/m1-2026-09-28.md) · [配置入口](MODEL_CONFIGURATION.md) · [接入契约](ssot/m1-model-contract.md)。现有链路已支持真实 Pi 无工具 prompt、原生上下文、有界流、取消/恢复和配置；所有 Provider 响应仍是明确合成输入，真实模型调用 0。M0-UI/M0-SDK 按原条件逐项核对为 passed，M0-Pi blocked，不由测试数量自动晋级。MODEL-01 限定 done，唯一待推进为 M1-B 用户配置与授权后的真实服务验收，M2/PTY 不启动。
+
+## M1 OpenAI 与持久凭据（2026-09-29）
+
+[增量证据](validation/m1-openai-2026-09-29.md)：真实 Pi 原生 Responses/Chat Completions 已通过合成响应接缝，应用专用 auth.json 在启动/重连时读取。没有真实服务/账户调用，唯一下一项仍为 M1-B 获授权验收；MODEL-01 只追加限定证据，其余 Gate 状态不变。

@@ -6,7 +6,7 @@
 
 用户已采纳 [真实模型优先路线](REAL_MODEL_NEXT_STEPS.md)。D2-S 与 S01 修正已快进集成 develop（`22cf2889f5b1812028ed3cbbeab0b271c0c613dc`），推送后独立读回一致。M1 在此基线上复用 Pi AgentSession/ModelRuntime/凭据入口，连接现有产品 Run、Worker、正文流和原生恢复，不重建 Harness。
 
-M1-A 已完成限定离线范围，见 [M1 报告](../validation/m1-2026-09-28.md) 与 [配置说明](../MODEL_CONFIGURATION.md)。当前唯一待推进项为 M1-B：用户稍后填写 Provider/精确模型、批准的数据和调用/费用预算，并通过本机入口提供凭据后，才做最小真实服务验收。当前没有此授权，真实模型调用 0；不再新增平行探针或启动 M2。
+M1-A 已完成限定离线范围，见 [M1 报告](../validation/m1-2026-09-28.md) 与 [配置说明](../MODEL_CONFIGURATION.md)。当前唯一待推进项为 M1-B：用户稍后填写 Provider/精确模型、批准的数据和调用/费用预算，并通过本机入口提供凭据后，才做最小真实服务验收。2026-09-29 已按用户要求补 OpenAI 官方/兼容接口及应用专用 auth.json 持久凭据，见 [增量证据](../validation/m1-openai-2026-09-29.md)。仍待填写并授权真实调用，真实模型调用 0；不再新增平行探针或启动 M2。
 
 完成 M1 后停止并审核，下一阶段才是 M2 有限文件工具 Agent。PTY（D2-T/D2-X）、Windows、市场与 OAuth 后置，不是首次 Mac 真实会话的前置。D2-S 的边界和回归保留，尚未验证项不因此完成。M0-UI / M0-SDK 已按既有条件逐项核对为 passed；M0-Pi 因真实模型及工具任务证据缺失而 blocked，不能由 M1-A 或无工具 M1-B 自动完成。
 

@@ -1581,7 +1581,9 @@
           ],
           "evidenceRefs": [
             "EV-M1-SDK-20260928",
-            "EV-M1-MAC-20260928"
+            "EV-M1-MAC-20260928",
+            "EV-M1-OPENAI-SDK-20260929",
+            "EV-M1-OPENAI-MAC-20260929"
           ]
         },
         {
@@ -1592,7 +1594,9 @@
           ],
           "evidenceRefs": [
             "EV-M1-SDK-20260928",
-            "EV-M1-MAC-20260928"
+            "EV-M1-MAC-20260928",
+            "EV-M1-OPENAI-SDK-20260929",
+            "EV-M1-OPENAI-MAC-20260929"
           ]
         },
         {
@@ -1603,7 +1607,9 @@
           ],
           "evidenceRefs": [
             "EV-M1-SDK-20260928",
-            "EV-M1-MAC-20260928"
+            "EV-M1-MAC-20260928",
+            "EV-M1-OPENAI-SDK-20260929",
+            "EV-M1-OPENAI-MAC-20260929"
           ]
         },
         {
@@ -1614,7 +1620,9 @@
           ],
           "evidenceRefs": [
             "EV-M1-SDK-20260928",
-            "EV-M1-MAC-20260928"
+            "EV-M1-MAC-20260928",
+            "EV-M1-OPENAI-SDK-20260929",
+            "EV-M1-OPENAI-MAC-20260929"
           ]
         },
         {
@@ -1625,11 +1633,13 @@
           ],
           "evidenceRefs": [
             "EV-M1-SDK-20260928",
-            "EV-M1-MAC-20260928"
+            "EV-M1-MAC-20260928",
+            "EV-M1-OPENAI-SDK-20260929",
+            "EV-M1-OPENAI-MAC-20260929"
           ]
         }
       ],
-      "statusReason": "限定 M1-A 离线范围完成，公开 Anthropic Messages 接口只用合成响应；外部服务验收属于 MODEL-02。"
+      "statusReason": "限定 M1-A 离线范围完成；Anthropic/OpenAI Responses/Chat Completions 仅合成响应，应用专用 auth.json 持久 key 已验证。真实服务验收属于 MODEL-02。"
     },
     {
       "id": "MODEL-02",
@@ -1667,7 +1677,7 @@
           "evidenceRefs": []
         }
       ],
-      "statusReason": "等待用户填写 Provider/精确模型/允许数据/请求与费用授权及本机凭据；当前仅有未批准的空模板，真实模型调用 0。M1-B 无工具验收也不替代 M0-Pi 的工具审批/恢复条件。"
+      "statusReason": "用户确认需要 OpenAI 接口与持久 API key；入口已离线验证，仍待填写精确模型/endpoint/数据/请求与费用授权和本机凭据。真实模型调用 0，不替代 M0-Pi 工具审批/恢复条件。"
     },
     {
       "id": "MODEL-03",
@@ -1710,7 +1720,7 @@
   ],
   "decisionSource": "../ssot/README.md",
   "historicalSource": "../startup/docs/08-delivery-and-references.md",
-  "updatedOn": "2026-09-28",
+  "updatedOn": "2026-09-29",
   "milestones": [
     {
       "id": "M0-UI",
