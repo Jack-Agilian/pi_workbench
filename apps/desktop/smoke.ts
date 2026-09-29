@@ -8,12 +8,19 @@ import type { DesktopHome, DesktopThread } from '../../packages/app-contracts/de
 import type { Command } from '../../packages/app-contracts/index.ts';
 export async function runSmoke(window: BrowserWindow, host: HostClient, profile: string) {
   const wc = window.webContents;
-  const js = <T>(source: string): Promise<T> => wc.executeJavaScript(source, true);
+  const js = async <T>(source: string): Promise<T> => {
+    try { return await wc.executeJavaScript(source, true); }
+    catch (error) { throw new Error(`desktop_smoke_script_failed:${source.slice(0, 220)}`, { cause: error }); }
+  };
   const wait = async (predicate: () => Promise<boolean>, name: string) => {
     const until = Date.now() + 20000;
     while (!await predicate()) { if (Date.now() > until) throw new Error(`ui_timeout:${name}`); await new Promise<void>(r => setTimeout(r, 60)); }
   };
   const click = async (text: string) => {
+    console.log(`desktopSmoke click: ${text}`);
+    // A rendered shell after reload does not mean async controls are hydrated yet.
+    // Wait for readiness, then click exactly once; never retry a submitted action.
+    await wait(() => js<boolean>(`(() => { const b = [...document.querySelectorAll('button')].find(b => (b.textContent.trim() === ${JSON.stringify(text)} || b.getAttribute('aria-label') === ${JSON.stringify(text)})); return Boolean(b && !b.disabled); })()`), `button_ready:${text}`);
     await js(`(() => { const b = [...document.querySelectorAll('button')].find(b => (b.textContent.trim() === ${JSON.stringify(text)} || b.getAttribute('aria-label') === ${JSON.stringify(text)})); if (!b || b.disabled) throw new Error('button_unavailable'); b.click(); })()`);
   };
   const fill = async (selector: string, value: string) => {
