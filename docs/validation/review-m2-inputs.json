@@ -1,0 +1,417 @@
+{
+  "baseline": "acedcd18fad35a368df1a9d1d5ffe6e3526bb113",
+  "originalCode": "08102d18684affcd7f47e28dc5be8c99dbb013d3",
+  "fixCode": "549acf81dba68cd922ca43b3119df0cc9d7da997",
+  "testHarnessCode": "10545d7477a3b2ec1caae6bcf01f3ab43b84323e",
+  "recordedAt": "2026-09-29T07:13:49.461693+00:00",
+  "platform": {
+    "os": "darwin",
+    "architecture": "arm64",
+    "macOS": "27.0",
+    "node": "24.21.0",
+    "npm": "11.19.0",
+    "pi": "0.87.1",
+    "electron": "44.4.5"
+  },
+  "realModelCalls": 0,
+  "readUserCredentials": false,
+  "baseOriginalChecks": {
+    "typecheck": "passed",
+    "M2Tests": 30,
+    "M2Passed": 30
+  },
+  "negativeBaseline": {
+    "addedTests": 4,
+    "failedAsExpected": 4,
+    "scope": "Original M2 runtime with added regression tests; no runtime source changes, actual Pi/Worker with SYNTHETIC Provider."
+  },
+  "firstBatch": {
+    "codeCommit": "549acf81dba68cd922ca43b3119df0cc9d7da997",
+    "platform": "darwin-arm64",
+    "realModelCalls": 0,
+    "commands": [
+      {
+        "command": [
+          "npm",
+          "run",
+          "typecheck"
+        ],
+        "codeCommit": "549acf81dba68cd922ca43b3119df0cc9d7da997",
+        "startedAt": "2026-09-29T07:05:24.913501+00:00",
+        "log": ".artifacts/review-m2/final/01-typecheck.log",
+        "exitCode": 0,
+        "durationSeconds": 1.951,
+        "logSha256": "22df5d47848ff6e1f3c0926a3aa3f05da31fb2c76601187b826c3ad4d7870689"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:pi-types"
+        ],
+        "codeCommit": "549acf81dba68cd922ca43b3119df0cc9d7da997",
+        "startedAt": "2026-09-29T07:05:26.865363+00:00",
+        "log": ".artifacts/review-m2/final/02-test-pi-types.log",
+        "exitCode": 0,
+        "durationSeconds": 2.573,
+        "logSha256": "7f317bc7e050fd4ad51e05193b5d9422cb34178a229eda61316ab658eb9dc426"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:pi-tools"
+        ],
+        "codeCommit": "549acf81dba68cd922ca43b3119df0cc9d7da997",
+        "startedAt": "2026-09-29T07:05:29.438468+00:00",
+        "log": ".artifacts/review-m2/final/03-test-pi-tools.log",
+        "exitCode": 0,
+        "durationSeconds": 0.951,
+        "logSha256": "2966e4f5c8973dd4268f2b7cf076dcc8e295eafe508b72974f592c247ed37200"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:product-core"
+        ],
+        "codeCommit": "549acf81dba68cd922ca43b3119df0cc9d7da997",
+        "startedAt": "2026-09-29T07:05:30.390075+00:00",
+        "log": ".artifacts/review-m2/final/04-test-product-core.log",
+        "exitCode": 0,
+        "durationSeconds": 0.726,
+        "logSha256": "e6e27bb249454919ca5d92ba1a7ca0db2dd2177d67fd2eda91bddf4f35465e71"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:product-sdk"
+        ],
+        "codeCommit": "549acf81dba68cd922ca43b3119df0cc9d7da997",
+        "startedAt": "2026-09-29T07:05:31.116357+00:00",
+        "log": ".artifacts/review-m2/final/05-test-product-sdk.log",
+        "exitCode": 0,
+        "durationSeconds": 0.949,
+        "logSha256": "a397ccf194007dbd47d12f1c3ede22c0e3825899b042b78768a5a99e546e2543"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:product-worker"
+        ],
+        "codeCommit": "549acf81dba68cd922ca43b3119df0cc9d7da997",
+        "startedAt": "2026-09-29T07:05:32.065761+00:00",
+        "log": ".artifacts/review-m2/final/06-test-product-worker.log",
+        "exitCode": 0,
+        "durationSeconds": 30.945,
+        "logSha256": "7f405c734e70a8f8a0baa6e7cf4b1de5a51ca7b5ae6ac82b8d06d5810a6e12d0"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:product-shell"
+        ],
+        "codeCommit": "549acf81dba68cd922ca43b3119df0cc9d7da997",
+        "startedAt": "2026-09-29T07:06:03.010960+00:00",
+        "log": ".artifacts/review-m2/final/07-test-product-shell.log",
+        "exitCode": 0,
+        "durationSeconds": 17.258,
+        "logSha256": "d9edbe1c56375031b2319e0575368cb721049ec7c103f434713d5325ad85fad6"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:model-integration-offline"
+        ],
+        "codeCommit": "549acf81dba68cd922ca43b3119df0cc9d7da997",
+        "startedAt": "2026-09-29T07:06:20.269004+00:00",
+        "log": ".artifacts/review-m2/final/08-test-model-integration-offline.log",
+        "exitCode": 0,
+        "durationSeconds": 27.765,
+        "logSha256": "71691b6c53fe7a1f338a26ecea468f93a6752b4fe1654e5e37f3396b49cc6293"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:model-resume"
+        ],
+        "codeCommit": "549acf81dba68cd922ca43b3119df0cc9d7da997",
+        "startedAt": "2026-09-29T07:06:48.034066+00:00",
+        "log": ".artifacts/review-m2/final/09-test-model-resume.log",
+        "exitCode": 0,
+        "durationSeconds": 1.832,
+        "logSha256": "dd852aa4e01785672dab062323ed3f2cbba81254be2450097d727ffe8e36090e"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:model-network"
+        ],
+        "codeCommit": "549acf81dba68cd922ca43b3119df0cc9d7da997",
+        "startedAt": "2026-09-29T07:06:49.866892+00:00",
+        "log": ".artifacts/review-m2/final/10-test-model-network.log",
+        "exitCode": 0,
+        "durationSeconds": 0.628,
+        "logSha256": "ba5472059f8ce897c12d82cbbc1f46ef480af64adb537831fc033e2c3c1bcbb5"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:model-config"
+        ],
+        "codeCommit": "549acf81dba68cd922ca43b3119df0cc9d7da997",
+        "startedAt": "2026-09-29T07:06:50.494712+00:00",
+        "log": ".artifacts/review-m2/final/11-test-model-config.log",
+        "exitCode": 0,
+        "durationSeconds": 13.566,
+        "logSha256": "0cbb2b20da067fe2ba8d1b7d0cf446375daee7ee1d1ee15fcfd8da945f1e27eb"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:product-file-agent"
+        ],
+        "codeCommit": "549acf81dba68cd922ca43b3119df0cc9d7da997",
+        "startedAt": "2026-09-29T07:07:04.060643+00:00",
+        "log": ".artifacts/review-m2/final/12-test-product-file-agent.log",
+        "exitCode": 0,
+        "durationSeconds": 24.047,
+        "logSha256": "ca14f26caac9c8ea4d3f8ba382a8bba25746897163f0ee42e8525d760c2cf5e6"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:desktop"
+        ],
+        "codeCommit": "549acf81dba68cd922ca43b3119df0cc9d7da997",
+        "startedAt": "2026-09-29T07:07:28.107845+00:00",
+        "log": ".artifacts/review-m2/final/13-test-desktop.log",
+        "exitCode": 0,
+        "durationSeconds": 12.731,
+        "logSha256": "4b6774deeff9831c50e17a68ed53f20f808618e267b2dfb8f92acc47abc911fd"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:desktop-file-agent"
+        ],
+        "codeCommit": "549acf81dba68cd922ca43b3119df0cc9d7da997",
+        "startedAt": "2026-09-29T07:07:40.839541+00:00",
+        "log": ".artifacts/review-m2/final/14-test-desktop-file-agent.log",
+        "exitCode": 0,
+        "durationSeconds": 3.696,
+        "logSha256": "82a2423038b90c43cb8adde1c2f49074b4e10fdcce48ed94482286cc5aec010f"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:desktop-model"
+        ],
+        "codeCommit": "549acf81dba68cd922ca43b3119df0cc9d7da997",
+        "startedAt": "2026-09-29T07:07:44.536188+00:00",
+        "log": ".artifacts/review-m2/final/15-test-desktop-model.log",
+        "exitCode": 0,
+        "durationSeconds": 6.271,
+        "logSha256": "8fbf83b307d1c7011a7f81449537362510d2951cf4c2f2985585ec7224788624"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:desktop-ui"
+        ],
+        "codeCommit": "549acf81dba68cd922ca43b3119df0cc9d7da997",
+        "startedAt": "2026-09-29T07:07:50.807281+00:00",
+        "log": ".artifacts/review-m2/final/16-test-desktop-ui.log",
+        "exitCode": 1,
+        "durationSeconds": 9.44,
+        "logSha256": "42ef8b701255895f600d9daf95fb301139d2868f0b83191a581f7212acce8851"
+      }
+    ]
+  },
+  "followup": {
+    "codeCommit": "10545d7477a3b2ec1caae6bcf01f3ab43b84323e",
+    "platform": "darwin-arm64",
+    "realModelCalls": 0,
+    "commands": [
+      {
+        "command": [
+          "npm",
+          "run",
+          "typecheck"
+        ],
+        "codeCommit": "10545d7477a3b2ec1caae6bcf01f3ab43b84323e",
+        "startedAt": "2026-09-29T07:10:08.208003+00:00",
+        "log": ".artifacts/review-m2/followup/01-typecheck.log",
+        "exitCode": 0,
+        "durationSeconds": 1.872,
+        "logSha256": "22df5d47848ff6e1f3c0926a3aa3f05da31fb2c76601187b826c3ad4d7870689"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:product-file-agent"
+        ],
+        "codeCommit": "10545d7477a3b2ec1caae6bcf01f3ab43b84323e",
+        "startedAt": "2026-09-29T07:10:10.080844+00:00",
+        "log": ".artifacts/review-m2/followup/02-test-product-file-agent.log",
+        "exitCode": 0,
+        "durationSeconds": 23.814,
+        "logSha256": "7a41accddc1b4cbb88fb9535e26876ed12fff6e0ca1fb450ca944e09a0c8a51b"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:desktop-file-agent"
+        ],
+        "codeCommit": "10545d7477a3b2ec1caae6bcf01f3ab43b84323e",
+        "startedAt": "2026-09-29T07:10:33.894801+00:00",
+        "log": ".artifacts/review-m2/followup/03-test-desktop-file-agent.log",
+        "exitCode": 0,
+        "durationSeconds": 3.698,
+        "logSha256": "7c7997842b752009e5039aa8ce7aea58dbeb5e943947008b5725c88ef5565f1d"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:desktop-ui"
+        ],
+        "codeCommit": "10545d7477a3b2ec1caae6bcf01f3ab43b84323e",
+        "startedAt": "2026-09-29T07:10:37.593655+00:00",
+        "log": ".artifacts/review-m2/followup/04-test-desktop-ui.log",
+        "exitCode": 0,
+        "durationSeconds": 16.846,
+        "logSha256": "aa961d5cecaed855bca20c886e53af7a130a2fc4209d7fecae450aa64071aa8e"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:desktop-ui"
+        ],
+        "codeCommit": "10545d7477a3b2ec1caae6bcf01f3ab43b84323e",
+        "startedAt": "2026-09-29T07:10:54.439879+00:00",
+        "log": ".artifacts/review-m2/followup/05-test-desktop-ui.log",
+        "exitCode": 0,
+        "durationSeconds": 16.013,
+        "logSha256": "4e6d618e3ad39541a1612632c8d0a6ba7d23e03ca45da7b02ef6ab9bd82d27aa"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:desktop-shutdown"
+        ],
+        "codeCommit": "10545d7477a3b2ec1caae6bcf01f3ab43b84323e",
+        "startedAt": "2026-09-29T07:11:10.453138+00:00",
+        "log": ".artifacts/review-m2/followup/06-test-desktop-shutdown.log",
+        "exitCode": 0,
+        "durationSeconds": 44.955,
+        "logSha256": "c656412630ec8934c704d7e49900c370b4511c442b64d89f747290c7520d477a"
+      }
+    ]
+  },
+  "diagnosticSmoke": {
+    "exitCode": 0,
+    "scope": "Test diagnostics added to 549acf8, no product runtime difference; not proof of unique cause of first smoke failure."
+  },
+  "sourceSha256": {
+    "apps/agent-server/artifact.ts": "007ec15679f881c51d0ebae6531a495be1d768e34ee511c5ddf0dea381515f0b",
+    "apps/agent-server/worker-supervisor.ts": "d0809212b0da9dd141c8da8daf5e4bcf7f44eacdff804efafa1201d3933fdc7e",
+    "apps/desktop/renderer.tsx": "29d5714048c4d995f03c278a51aae0fed8f848bb865b908421a1335201b9e056"
+  },
+  "logChecksums": {
+    "originalTypecheck": {
+      "sha256": "22df5d47848ff6e1f3c0926a3aa3f05da31fb2c76601187b826c3ad4d7870689",
+      "bytes": 221,
+      "source": "baseline-typecheck.log"
+    },
+    "originalM2": {
+      "sha256": "41ec5883e96b23d5180e62867e59943addd7f4ef83dd9f4114f632116e425eec",
+      "bytes": 3166,
+      "source": "baseline-file-agent.log"
+    },
+    "newBaselineFailures": {
+      "sha256": "4d149f5c443769e899ac6ffb664b135d919629743a5272a4fe5f906f49ab7551",
+      "bytes": 4173,
+      "source": "baseline-new-regressions.log"
+    },
+    "diagnosticSmoke": {
+      "sha256": "38653ef36c6a46067138aa7a8fc21a0fa54686690a303f1f685fcc7983dd381a",
+      "bytes": 2021,
+      "source": "desktop-ui-diagnostic.log"
+    }
+  },
+  "limits": [
+    "No real M2 model calls or new budget authorization",
+    "No manual IME or screen-reader acceptance",
+    "No Windows/Linux or production installer validation",
+    "No general malicious-code sandbox claim"
+  ],
+  "documentationChecks": [
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/check-ssot.py"
+      ],
+      "exitCode": 0,
+      "codeCommit": "10545d7477a3b2ec1caae6bcf01f3ab43b84323e",
+      "scope": "Code commit plus present documentation-only differences",
+      "recordedAt": "2026-09-29T07:14:52.511462+00:00",
+      "log": ".artifacts/review-m2/docs-1.log",
+      "logSha256": "2749bfddb4b74fa0ac35b8efc092c18a7d2d19cd089a9e60f90dda64d53cb84d"
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/test-tools.py"
+      ],
+      "exitCode": 0,
+      "codeCommit": "10545d7477a3b2ec1caae6bcf01f3ab43b84323e",
+      "scope": "Code commit plus present documentation-only differences",
+      "recordedAt": "2026-09-29T07:14:52.572277+00:00",
+      "log": ".artifacts/review-m2/docs-2.log",
+      "logSha256": "6ef8491ad200eaab54664ac1731ae02e6cdf5581b0a117c2c6ba7ee58504e111"
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/check-docs.py",
+        "--structural-only"
+      ],
+      "exitCode": 0,
+      "codeCommit": "10545d7477a3b2ec1caae6bcf01f3ab43b84323e",
+      "scope": "Code commit plus present documentation-only differences",
+      "recordedAt": "2026-09-29T07:14:52.655680+00:00",
+      "log": ".artifacts/review-m2/docs-3.log",
+      "logSha256": "28022459ca45046bf11bb5d46e04ab15db4a14d45e32b4ec791bed59afa89581"
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/check-docs.py",
+        "--typecheck"
+      ],
+      "exitCode": 0,
+      "codeCommit": "10545d7477a3b2ec1caae6bcf01f3ab43b84323e",
+      "scope": "Code commit plus present documentation-only differences",
+      "recordedAt": "2026-09-29T07:14:53.001183+00:00",
+      "log": ".artifacts/review-m2/docs-4.log",
+      "logSha256": "1266f22426fcde85995f78e6afc60cd2098facd611d1cae7610ffb577430726e"
+    }
+  ]
+}

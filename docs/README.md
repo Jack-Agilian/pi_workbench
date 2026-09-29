@@ -85,3 +85,5 @@ D2-S/S01 已集成 develop（`22cf288`）。此前 D2-T 为下一项的阶段表
 [逐项核对](validation/m1-closeout-2026-09-29.md) 统一已实现的预算修订、原会话续验、HTTP时间边界及安全展示证据；采用清单补齐 agent-session、native-history、pi-settings、product-coordination、desktop-ui 的相关引用。用户已确认单个LLM总上限30分钟、独立空闲上限5分钟，旧配置和4/4消费不变。接下来按 [唯一计划](planning/NEXT_STEPS.md) 推进M2离线增量；本次未新增真实调用，不晋级M0-Pi。
 
 M1已集成develop，M2功能分支基于最新 `148022b05250cfda824725778e9a056d00cd6830`。[M2离线报告](validation/m2-file-agent-2026-09-29.md) 记录多请求预算、逐操作授权/结果、真实进程恢复和桌面展示；实际SDK/文件/SQLite/进程，模型均为SYNTHETIC。MODEL-03推进in_progress，A05真实工具验收仍缺证据；唯一当前项是M2-C验收计划与新授权准备。原4/4授权耗尽，本轮真实调用0；M0-Pi仍blocked。前文各“当前/下一步”仅保留当时阶段范围。
+
+M2 最新复审：[修正与实机证据](validation/review-m2-2026-09-29.md) · [M2-C 待批准方案](planning/M2_C_ACCEPTANCE_PLAN.md)。

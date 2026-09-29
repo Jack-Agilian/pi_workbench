@@ -1740,7 +1740,9 @@
           ],
           "evidenceRefs": [
             "EV-M2-SDK-20260929",
-            "EV-M2-MAC-20260929"
+            "EV-M2-MAC-20260929",
+            "EV-M2-REVIEW-SDK-20260929",
+            "EV-M2-REVIEW-MAC-20260929"
           ]
         },
         {
@@ -1752,7 +1754,9 @@
           ],
           "evidenceRefs": [
             "EV-M2-SDK-20260929",
-            "EV-M2-MAC-20260929"
+            "EV-M2-MAC-20260929",
+            "EV-M2-REVIEW-SDK-20260929",
+            "EV-M2-REVIEW-MAC-20260929"
           ]
         },
         {
@@ -1766,7 +1770,9 @@
           "evidenceRefs": [
             "EV-M2-SDK-20260929",
             "EV-M2-MAC-20260929",
-            "EV-M2-MOCK-20260929"
+            "EV-M2-MOCK-20260929",
+            "EV-M2-REVIEW-SDK-20260929",
+            "EV-M2-REVIEW-MAC-20260929"
           ]
         },
         {
@@ -1778,7 +1784,7 @@
           "evidenceRefs": []
         }
       ],
-      "statusReason": "M2-A/B有限Markdown Agent、多请求账本、逐操作审批/结果及Mac实际进程/桌面链路已离线验证；A05真实模型工具任务尚未验收，当前唯一事项M2-C新计划与授权准备。原4/4耗尽，本轮0次真实调用；不完成M0-Pi。"
+      "statusReason": "M2-A/B有限Markdown Agent、多请求账本、逐操作审批/结果及Mac实际进程/桌面链路已离线验证；A05真实模型工具任务尚未验收，当前唯一事项M2-C新计划与授权准备。原4/4耗尽，本轮0次真实调用；不完成M0-Pi。 远程Mac复审两处正确性修正及四条新增回归通过；独立审核分支待集成，真实M2驱动与新授权按验收方案继续，A05未完成。"
     }
   ],
   "decisionSource": "../ssot/README.md",

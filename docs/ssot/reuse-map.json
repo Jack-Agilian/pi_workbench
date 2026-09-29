@@ -2375,6 +2375,42 @@
         "darwin"
       ],
       "locator": "docs/validation/m2-file-agent-2026-09-29.md"
+    },
+    {
+      "id": "EV-M2-REVIEW-BASELINE-20260929",
+      "kind": "review",
+      "result": "failed",
+      "scope": "Original acedcd1 runtime plus four new tests on actual Mac: BOM read/edit mismatch and interrupted read recovery blocked by oversized/invalid UTF-8 external file. These are expected defect reproductions, not product successes.",
+      "commit": "acedcd18fad35a368df1a9d1d5ffe6e3526bb113",
+      "recordedAt": "2026-09-29T07:14:08.792228+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/review-m2-2026-09-29.md"
+    },
+    {
+      "id": "EV-M2-REVIEW-SDK-20260929",
+      "kind": "sdk",
+      "result": "passed",
+      "scope": "Actual Pi 0.87.1, macOS 27 arm64, Node 24.21.0: 34 file Agent tests including four new regressions; synthetic Provider only, actual files/SQLite/Worker/guardian. No real model or new authorization.",
+      "commit": "10545d7477a3b2ec1caae6bcf01f3ab43b84323e",
+      "recordedAt": "2026-09-29T07:14:08.792228+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/review-m2-inputs.json"
+    },
+    {
+      "id": "EV-M2-REVIEW-MAC-20260929",
+      "kind": "platform",
+      "result": "passed",
+      "scope": "Actual Electron limited file-mode approvals and corrected heading, two consecutive desktop UI smoke runs, 24 real shutdown scenarios. First prior batch smoke failure retained and diagnosed; no assertion that all first attempts passed. No manual IME, Windows or production sandbox validation.",
+      "commit": "10545d7477a3b2ec1caae6bcf01f3ab43b84323e",
+      "recordedAt": "2026-09-29T07:14:08.792228+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/review-m2-2026-09-29.md"
     }
   ]
 }
