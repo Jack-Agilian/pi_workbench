@@ -49,7 +49,7 @@ async function open(p = paths(), persisted = false, extra: {
 }
 
 test('release-imports: root runtime exports and type-only names are distinct', () => {
-  assert.equal(pi.VERSION, '0.87.0');
+  assert.equal(pi.VERSION, '0.87.1');
   for (const name of ['createAgentSession', 'SessionManager', 'AgentSession', 'AgentSessionRuntime',
     'createAgentSessionRuntime', 'createExtensionRuntime', 'SettingsManager', 'ModelRuntime']) {
     assert.equal(typeof Reflect.get(pi, name), 'function', name);

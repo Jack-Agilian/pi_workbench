@@ -14,7 +14,7 @@ function fixture(t) {
   const root = realpathSync(mkdtempSync(join(tmpdir(), 'pi-type-patch-')));
   t.after(() => rmSync(root, { recursive: true, force: true }));
   mkdirSync(join(root, 'patches'));
-  for (const path of [manifest.patchFile, 'patches/pi-ai-0.87.0-json-types.json']) {
+  for (const path of [manifest.patchFile, 'patches/pi-ai-0.87.1-json-types.json']) {
     copyFileSync(join(repo, path), join(root, path));
   }
   const packages = {};
@@ -70,7 +70,7 @@ test('partial patch rejects before writing other files', t => {
 
 test('installed version drift rejects before writing', t => {
   const root = fixture(t);
-  json(join(root, manifest.packageRoots[1], 'package.json'), { name: manifest.package, version: '0.87.1' });
+  json(join(root, manifest.packageRoots[1], 'package.json'), { name: manifest.package, version: '0.87.2' });
   assert.throws(() => applyTypePatch(root), /Installed package version drift/);
   assert.equal(firstHash(root), manifest.files[0].beforeSha256);
 });

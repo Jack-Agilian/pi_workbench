@@ -20,7 +20,7 @@ def main() -> int:
     args = parser.parse_args()
     manifest = json.loads((ROOT / 'package.json').read_text())
     lock = json.loads((ROOT / 'package-lock.json').read_text())
-    patch = json.loads((ROOT / 'patches/pi-ai-0.87.0-json-types.json').read_text())
+    patch = json.loads((ROOT / 'patches/pi-ai-0.87.1-json-types.json').read_text())
     assert hashlib.sha256((ROOT / patch['patchFile']).read_bytes()).hexdigest() == patch['patchSha256']
     patched_files = {item['path']: item for item in patch['files']}
     assert len(patched_files) == 41
@@ -98,7 +98,7 @@ def main() -> int:
         }
         if name == patch['package']:
             record['localDeclarationPatch'] = {
-                'manifest': 'patches/pi-ai-0.87.0-json-types.json',
+                'manifest': 'patches/pi-ai-0.87.1-json-types.json',
                 'patchSha256': patch['patchSha256'],
                 'scope': '41 declaration-only type imports per copy; runtime JS and model JSON match registry bytes',
             }

@@ -10,11 +10,11 @@ const defaultRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const sha256 = data => createHash('sha256').update(data).digest('hex');
 
 export function readTypePatch(root = defaultRoot) {
-  const manifest = JSON.parse(readFileSync(resolve(root, 'patches/pi-ai-0.87.0-json-types.json'), 'utf8'));
+  const manifest = JSON.parse(readFileSync(resolve(root, 'patches/pi-ai-0.87.1-json-types.json'), 'utf8'));
   assert.equal(manifest.schemaVersion, 1);
   assert.equal(manifest.package, '@earendil-works/pi-ai');
-  assert.equal(manifest.version, '0.87.0', 'Review a new ADR before changing the patch version');
-  assert.equal(manifest.patchFile, 'patches/pi-ai-0.87.0-json-types.patch');
+  assert.equal(manifest.version, '0.87.1', 'Review a new ADR before changing the patch version');
+  assert.equal(manifest.patchFile, 'patches/pi-ai-0.87.1-json-types.patch');
   assert.equal(sha256(readFileSync(resolve(root, manifest.patchFile))), manifest.patchSha256, 'Patch digest changed');
   assert.equal(manifest.files.length, 41);
   assert.equal(new Set(manifest.files.map(file => file.path)).size, manifest.files.length);
@@ -73,5 +73,5 @@ export function applyTypePatch(root = defaultRoot, checkOnly = false) {
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const states = applyTypePatch(defaultRoot, process.argv.includes('--check'));
-  console.log(`Verified declaration-only patch in ${states.length} Pi 0.87.0 copies (41 files each).`);
+  console.log(`Verified declaration-only patch in ${states.length} Pi 0.87.1 copies (41 files each).`);
 }

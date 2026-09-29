@@ -1,6 +1,6 @@
 # M1 无工具会话与配置边界
 
-更新：2026-09-29。M1-A 是现有 ProductCore/Worker 的限定增量；M1-B 尚待用户配置与真实服务授权。当前仅 macOS arm64 / Node 24.21.0 / Pi 0.87.0，不增加依赖。此文补充 integration-contracts 的模型出口，不改变其所有权。
+更新：2026-09-29。M1-A 是现有 ProductCore/Worker 的限定增量；M1-B 尚待用户配置与真实服务授权。当前仅 macOS arm64 / Node 24.21.0 / Pi 0.87.1，不增加依赖。此文补充 integration-contracts 的模型出口，不改变其所有权。
 
 ## 采用决定与公开入口
 
@@ -8,7 +8,7 @@
 
 Pi ProviderRequestOptions.fetch 是公开的 HTTP 传输注入点，不覆盖 WebSocket。保留原生 Provider.streamSimple，固定 SSE、maxTokens、timeoutMs、maxRetries=0；原生 stream 旁路拒绝。会话 retry、compaction、cache warming 关闭；tools/customTools 为空且 noTools='all'，调用前再次核实无活动工具。没有重写模型协议、SSE 解析、Agent Loop 或 Session 树。
 
-在线准入限定为 Anthropic Messages、官方 OpenAI Responses、显式声明的 OpenAI 兼容 Responses/Chat Completions。官方 endpoint 等于 Pi 固定目录 baseUrl；兼容配置仅通过公开 ModelRuntime.registerProvider 注册模型元数据（文本输入、上下文、价格、token 字段），SSE/序列化仍由原生 Provider 完成。宿主只允许该配置的单一 HTTPS/443 URL，不自动探测、重试或切换。2026-09-28 初版仅 Anthropic，OpenAI 是后续离线验证增量，不代表真实服务通过。其他 API、OAuth/订阅仍未准入。配置不提供任意头、代码或 entry。
+在线准入限定为 Anthropic Messages、官方 OpenAI Responses、显式声明的 OpenAI 兼容 Responses/Chat Completions。OpenAI 目录模型可通过公开 ModelRuntime.registerProvider 仅覆盖批准的 baseUrl，保留目录能力/价格；未知模型的兼容配置通过同一公开方法注册模型元数据（文本输入、上下文、价格、token 字段），SSE/序列化仍由原生 Provider 完成。宿主只允许该配置的单一 HTTPS/443 URL，不自动探测、重试或切换。2026-09-28 初版仅 Anthropic，OpenAI 是后续离线验证增量，不代表真实服务通过。其他 API、OAuth/订阅仍未准入。配置不提供任意头、代码或 entry。
 
 ## ADR-M1-01：宿主委托 HTTP，保留 Worker 禁网
 

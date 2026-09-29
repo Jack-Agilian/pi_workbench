@@ -9,9 +9,9 @@ import { describeModel, validateModelPayload } from '../../../packages/pi-adapte
 import { parseModelConfiguration, type ModelSelection, type OpenAIConnection } from '../../../packages/app-contracts/model.ts';
 const entry={path:join(repository,'packages/pi-adapter/model-worker.ts')};
 const key='SYNTHETIC_OPENAI_KEY_NOT_REAL';
-function selection(api:'official'|'responses'|'chat-completions',field?:OpenAIConnection['tokenLimitField']):ModelSelection{
- return {mode:'live',provider:'openai',model:api==='official'?'gpt-4o-mini':'SYNTHETIC-custom-model',endpoint:api==='official'?'https://api.openai.com/v1':'https://synthetic.example.invalid/custom/v1',maxOutputTokens:64,timeoutMs:5000,
- ...(api==='official'?{}:{openai:{api,contextWindow:8192,inputUsdPerMillion:0.2,outputUsdPerMillion:0.4,...(field?{tokenLimitField:field}:{})}})};
+function selection(api:'official'|'catalog-override'|'responses'|'chat-completions',field?:OpenAIConnection['tokenLimitField']):ModelSelection{
+ return {mode:'live',provider:'openai',model:api==='official'?'gpt-4o-mini':api==='catalog-override'?'gpt-6-luna':'SYNTHETIC-custom-model',endpoint:api==='official'?'https://api.openai.com/v1':'https://synthetic.example.invalid/custom/v1',maxOutputTokens:64,timeoutMs:5000,
+ ...(api==='official'||api==='catalog-override'?{}:{openai:{api,contextWindow:8192,inputUsdPerMillion:0.2,outputUsdPerMillion:0.4,...(field?{tokenLimitField:field}:{})}})};
 }
 function response(api:'responses'|'chat-completions',id:string){
  const text='SYNTHETIC OpenAI native reply';
@@ -28,7 +28,7 @@ function response(api:'responses'|'chat-completions',id:string){
  {type:'response.completed',response:{id,status:'completed',output:[item],usage:{input_tokens:8,output_tokens:7,total_tokens:15,input_tokens_details:{cached_tokens:0},output_tokens_details:{reasoning_tokens:0}}}}
  ].map(e=>`event: ${e.type}\ndata: ${JSON.stringify(e)}\n\n`).join('');
 }
-for(const mode of ['official','responses','chat-completions','chat-modern'] as const)for(const error of [false,true])test(`OpenAI native ${mode} ${error?'401 redaction':'stream and native reopen'} through actual Worker/IPC`,async()=>{
+for(const mode of ['official','catalog-override','responses','chat-completions','chat-modern'] as const)for(const error of [false,true])test(`OpenAI native ${mode} ${error?'401 redaction':'stream and native reopen'} through actual Worker/IPC`,async()=>{
  const s=selection(mode==='chat-modern'?'chat-completions':mode,mode==='chat-modern'?'max_completion_tokens':undefined);
  const configuration=parseModelConfiguration({version:1,authorizationId:'synthetic-openai',approved:true,dataScope:'synthetic_non_sensitive',provider:s.provider,model:s.model,endpoint:s.endpoint,maxRequests:2,maxOutputTokens:s.maxOutputTokens,timeoutMs:s.timeoutMs,maxEstimatedCostUsd:1,...(s.openai?{openai:s.openai}:{})});
  const catalog=await describeModel(s.provider,s.model,s.maxOutputTokens,s);const f=createScenario();let calls=0;
@@ -76,4 +76,15 @@ test('HTTP header tokens accept native session_id but reject separators and newl
 test('catalog rejects unadmitted providers and output caps below native Responses minimum',async()=>{
  await assert.rejects(describeModel('openai','gpt-4o-mini',15),/responses_min_output_tokens/);
  await assert.rejects(describeModel('unapproved','model',64),/provider_not_admitted/);
+});
+
+import { ModelRuntime } from '@earendil-works/pi-coding-agent';
+import { InMemoryCredentialStore, InMemoryModelsStore } from '@earendil-works/pi-ai';
+import { configureOpenAI } from '../../../packages/pi-adapter/model-catalog.ts';
+test('Pi 0.87.1 bundled GPT-6 Luna survives public endpoint override with capabilities and cost intact',async()=>{
+ const runtime=await ModelRuntime.create({credentials:new InMemoryCredentialStore(),modelsStore:new InMemoryModelsStore(),modelsPath:null,allowModelNetwork:false,refreshOnCreate:false});
+ const before=runtime.getModel('openai','gpt-6-luna');assert.ok(before);assert.equal(before.api,'openai-responses');assert.equal(before.reasoning,true);
+ const s=selection('catalog-override');configureOpenAI(runtime,s);const after=runtime.getModel('openai','gpt-6-luna');assert.ok(after);
+ assert.deepEqual({...after,baseUrl:before.baseUrl},before);assert.equal(after.baseUrl,s.endpoint);
+ const info=await describeModel('openai','gpt-6-luna',64,s);assert.equal(info.requestUrl,s.endpoint+'/responses');assert.match(info.priceSource,/0\.87\.1 bundled/);
 });

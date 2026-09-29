@@ -38,11 +38,12 @@
     "desktop:model": "node scripts/launch-desktop.mjs --model",
     "test:desktop-model": "node scripts/launch-desktop.mjs --model-offline --model-smoke-test",
     "test:model-network": "node scripts/test-model-network.mjs",
-    "test:model-config": "node scripts/test-model-config.mjs"
+    "test:model-config": "node scripts/test-model-config.mjs",
+    "validate:model-live": "node scripts/validate-model-live.mjs"
   },
   "dependencies": {
-    "@earendil-works/pi-ai": "0.87.0",
-    "@earendil-works/pi-coding-agent": "0.87.0",
+    "@earendil-works/pi-ai": "0.87.1",
+    "@earendil-works/pi-coding-agent": "0.87.1",
     "react": "19.3.0",
     "react-dom": "19.3.0"
   },

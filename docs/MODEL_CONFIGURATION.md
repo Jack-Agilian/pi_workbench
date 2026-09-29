@@ -2,7 +2,7 @@
 
 工作台使用两个文件：`model.json` 保存模型、接口与本次发送授权；`auth.json` 保存 API key。默认目录是 `~/Library/Application Support/Pi Workbench/`，不读取或修改全局 `~/.pi/agent`。
 
-Pi 本身也将 key 保存在 `~/.pi/agent/auth.json`，文件初建权限为 0600（仅本人读写）；自定义模型配置放在 `models.json`。见 [Pi 官方凭据说明](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/providers.md)。本仓库核对的是安装的 Pi 0.87.0 文档与公开 SDK。工作台采用其 `api_key` 凭据记录格式，但 `model.json` 是产品授权格式，不能直接当 Pi 的 `models.json` 使用。
+Pi 本身也将 key 保存在 `~/.pi/agent/auth.json`，文件初建权限为 0600（仅本人读写）；自定义模型配置放在 `models.json`。见 [Pi 官方凭据说明](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/providers.md)。本仓库核对的是安装的 Pi 0.87.1 文档与公开 SDK。工作台采用其 `api_key` 凭据记录格式，但 `model.json` 是产品授权格式，不能直接当 Pi 的 `models.json` 使用。
 
 当前支持官方 OpenAI Responses、经用户批准的 OpenAI 兼容 Responses/Chat Completions，以及原有 Anthropic Messages。均已做真实 Pi/Worker 的合成响应测试，尚未做真实服务验收。限定 macOS arm64；没有新增 SDK 或重写 Provider。
 
@@ -41,7 +41,7 @@ key 是明文保存，权限必须为 0600；不要放入聊天、Git、`model.j
 | authorizationId | 本次授权身份；重开不重置，不应为了绕过限额修改 |
 | openai | 可选兼容接口声明，见下方；官方发行目录模型一般不需要 |
 
-官方模式不填 `openai`，模型与 endpoint 必须匹配固定 Pi 发行目录。其他 endpoint/自定义模型必须显式填写 `openai`，例如：
+已在 Pi 0.87.1 目录中的 OpenAI 模型（含 gpt-6-luna）不必填写 `openai`；配置的 endpoint 可通过 Pi 公开 baseUrl 覆盖入口使用，能力与价格仍来自 Pi 目录。只有目录之外的自定义模型或需要改变协议时，才填写 `openai`，例如：
 
 ```json
 "openai": {
@@ -85,3 +85,7 @@ npm run test:desktop
 覆盖真实 SDK/进程的合成 SSE、固定本机 HTTP/OS 禁网、配置和持久凭据、真实 Electron 会话操作。凭据测试使用合成 key、临时目录和宿主禁网；程序化原生 dialog 测试不冒充人工验收。
 
 完整边界见 [M1 契约](ssot/m1-model-contract.md)。填配置不等于 Codex 已获准执行真实调用；M1-B 仍需明确账户、数据、请求预算及费用授权后单独记录证据。
+
+## 显式真实验收
+
+关闭其他工作台窗口后，确认本机配置已授权，可运行 `npm run validate:model-live -- --execute-approved`。该入口会发送至多三条合成文本到真实服务：短文本、宿主重连后原生上下文继续、观察流式正文后取消。它使用正常 model-profile 产品库的累计预算，不另建数据库绕过限额。一次授权只自动执行一轮；重复运行须先检查持久验收报告，不自动重试失败。此命令不属于自动测试套件，裸运行不会读取凭据或发请求。

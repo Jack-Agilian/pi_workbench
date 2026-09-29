@@ -107,7 +107,7 @@ M0-UI、M0-SDK、M0-Pi 分别在 `backlog.json.milestones` 记录；未取得相
 
 ## 9. A0/A1 应用探针（显式模式）
 
-精确运行时：Node **24.21.0** LTS，随官方二进制附带 npm **11.19.0**。两个 Pi 直接依赖均为 **0.87.0**；TypeScript **7.0.2**、Node 类型 **24.13.6**、用于满足可选类型引用的 MCP SDK **1.30.0**。根 `.node-version`、package.json 与唯一 package-lock.json 约束版本；不依赖全局 Pi，不使用 latest 标签安装。项目 `.npmrc` 始终禁用 lifecycle scripts，显式 npm run 仍执行指定脚本。
+精确运行时：Node **24.21.0** LTS，随官方二进制附带 npm **11.19.0**。两个 Pi 直接依赖均为 **0.87.1**；TypeScript **7.0.2**、Node 类型 **24.13.6**、用于满足可选类型引用的 MCP SDK **1.30.0**。根 `.node-version`、package.json 与唯一 package-lock.json 约束版本；不依赖全局 Pi，不使用 latest 标签安装。项目 `.npmrc` 始终禁用 lifecycle scripts，显式 npm run 仍执行指定脚本。
 
 ```bash
 # 默认文档环境不变
@@ -128,7 +128,7 @@ npm run test:pi-types
 npm run test:pi-probe
 ```
 
-Pi 0.87.0 原始声明的严格检查失败复现及候选见 [ADR-A0](ssot/adr-a0-pi-types.md)。应用初始化在禁用 lifecycle scripts 的 npm ci 后，显式用 Git apply 应用固定的 41 文件声明补丁（两个副本）。补丁只改 JSON 类型导入；strict、NodeNext 和完整声明检查保留。`npm run typecheck` 只核验补丁，不修改依赖；`npm run test:pi-types` 验证重复应用、异常拒绝，以及正确/错误 SDK 入参的编译结果。
+Pi 0.87.0 原始声明的失败复现见 [ADR-A0](ssot/adr-a0-pi-types.md)，0.87.1 的相同字节缺陷和补丁延续见 [升级 ADR](ssot/adr-pi-0871.md)。应用初始化在禁用 lifecycle scripts 的 npm ci 后，显式用 Git apply 应用固定的 41 文件声明补丁（两个副本）。补丁只改 JSON 类型导入；strict、NodeNext 和完整声明检查保留。`npm run typecheck` 只核验补丁，不修改依赖；`npm run test:pi-types` 验证重复应用、异常拒绝，以及正确/错误 SDK 入参的编译结果。
 
 若手动运行安装命令，须显式补一步；不用 postinstall 自动执行：
 
