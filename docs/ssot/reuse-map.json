@@ -9,17 +9,16 @@
     "manifestVersion": "0.86.1",
     "nodeRequirement": ">=22.19.0",
     "releaseTarballVerified": true,
-    "npmVersionPinned": "0.87.0",
+    "npmVersionPinned": "0.87.1",
     "releaseArtifact": {
       "package": "@earendil-works/pi-coding-agent",
-      "version": "0.87.0",
-      "tarballUrl": "https://registry.npmjs.org/@earendil-works/pi-coding-agent/-/pi-coding-agent-0.87.0.tgz",
-      "integrity": "sha512-S9JJVGHya/h0e0M+zwPTB6RkPe7PmLLqfBUTssFYW5mxAti6oZEILn4jvaUImENRC3U9RwXAB6H4gw8xj2J0GQ==",
+      "version": "0.87.1",
+      "tarballUrl": "https://registry.npmjs.org/@earendil-works/pi-coding-agent/-/pi-coding-agent-0.87.1.tgz",
+      "integrity": "sha512-m8ArJUtVcQMSe1lLE/Ei7vX/JV7O39sWmWBsXV2NOU70F0qCp8GubA24pT3LnwTmM6LL2xV80/h6sQg85n69ew==",
       "nodeVersion": "24.21.0",
       "lockfilePath": "package-lock.json",
       "evidenceRefs": [
-        "EV-A0-RELEASE-20260922",
-        "EV-A0-CLOSEOUT-RELEASE-20260922"
+        "EV-PI0871-RELEASE-20260929"
       ]
     }
   },
@@ -64,7 +63,7 @@
                 "kind": "type"
               }
             ],
-            "selectedVersion": "0.87.0"
+            "selectedVersion": "0.87.1"
           }
         ],
         "selectedSourceCommit": null,
@@ -86,7 +85,9 @@
           "EV-C-MAC-20260923",
           "EV-C-REGRESSION-20260923",
           "EV-M1-SDK-20260928",
-          "EV-M1-MAC-20260928"
+          "EV-M1-MAC-20260928",
+          "EV-PI0871-RELEASE-20260929",
+          "EV-PI0871-SDK-20260929"
         ]
       }
     },
@@ -137,7 +138,7 @@
                 "kind": "type"
               }
             ],
-            "selectedVersion": "0.87.0"
+            "selectedVersion": "0.87.1"
           }
         ],
         "selectedSourceCommit": null,
@@ -159,7 +160,9 @@
           "EV-C-MAC-20260923",
           "EV-C-REGRESSION-20260923",
           "EV-M1-SDK-20260928",
-          "EV-M1-MAC-20260928"
+          "EV-M1-MAC-20260928",
+          "EV-PI0871-RELEASE-20260929",
+          "EV-PI0871-SDK-20260929"
         ]
       }
     },
@@ -179,7 +182,7 @@
         "ModelRuntime.registerProvider"
       ],
       "reuse": "Provider、目录、登录/刷新复用",
-      "productDelta": "M1 OpenAI Responses/Chat Completions 与原有 Anthropic；Pi 原生 Provider/公开 registerProvider 元数据接入；应用专用 auth.json 字面量 key 读取和临时原生文件选择；系统 Keychain/OAuth 未完成",
+      "productDelta": "M1 OpenAI Responses/Chat Completions 与原有 Anthropic；Pi 原生 Provider/公开 registerProvider 元数据接入；应用专用 auth.json 字面量 key 读取和临时原生文件选择；系统 Keychain/OAuth 未完成；0.87.1目录模型只覆盖批准baseUrl，真实首条请求已通过，重开继续超时/取消未验收",
       "acceptanceGate": "secret 不进Renderer/日志/子进程env",
       "implementationState": "in_progress",
       "adoption": {
@@ -198,7 +201,7 @@
                 "kind": "runtime"
               }
             ],
-            "selectedVersion": "0.87.0"
+            "selectedVersion": "0.87.1"
           },
           {
             "package": "@earendil-works/pi-ai",
@@ -249,7 +252,7 @@
                 "kind": "runtime"
               }
             ],
-            "selectedVersion": "0.87.0"
+            "selectedVersion": "0.87.1"
           }
         ],
         "selectedSourceCommit": null,
@@ -268,7 +271,11 @@
           "EV-M1-SDK-20260928",
           "EV-M1-MAC-20260928",
           "EV-M1-OPENAI-SDK-20260929",
-          "EV-M1-OPENAI-MAC-20260929"
+          "EV-M1-OPENAI-MAC-20260929",
+          "EV-PI0871-RELEASE-20260929",
+          "EV-PI0871-SDK-20260929",
+          "EV-M1-FIRST-MODEL-20260929",
+          "EV-M1-LIVE-MAC-20260929"
         ]
       }
     },
@@ -298,7 +305,7 @@
                 "kind": "runtime"
               }
             ],
-            "selectedVersion": "0.87.0"
+            "selectedVersion": "0.87.1"
           }
         ],
         "selectedSourceCommit": null,
@@ -311,7 +318,9 @@
           "EV-A1-CLOSEOUT-SDK-20260922",
           "EV-A4-AUTH-20260922",
           "EV-M1-SDK-20260928",
-          "EV-M1-MAC-20260928"
+          "EV-M1-MAC-20260928",
+          "EV-PI0871-RELEASE-20260929",
+          "EV-PI0871-SDK-20260929"
         ]
       }
     },
@@ -351,7 +360,7 @@
                 "kind": "runtime"
               }
             ],
-            "selectedVersion": "0.87.0"
+            "selectedVersion": "0.87.1"
           }
         ],
         "selectedSourceCommit": null,
@@ -359,7 +368,9 @@
         "testEvidence": [
           "EV-A3-INPUTS-20260922",
           "EV-A3-RESOURCES-20260922",
-          "EV-REVIEW-A4-PATHS-20260923"
+          "EV-REVIEW-A4-PATHS-20260923",
+          "EV-PI0871-RELEASE-20260929",
+          "EV-PI0871-SDK-20260929"
         ]
       }
     },
@@ -399,7 +410,7 @@
                 "kind": "runtime"
               }
             ],
-            "selectedVersion": "0.87.0"
+            "selectedVersion": "0.87.1"
           }
         ],
         "selectedSourceCommit": null,
@@ -414,7 +425,9 @@
           "EV-A3-RESOURCES-20260922",
           "EV-REVIEW-A4-PATHS-20260923",
           "EV-B-IPC-SDK-20260923",
-          "EV-B-IPC-MAC-20260923"
+          "EV-B-IPC-MAC-20260923",
+          "EV-PI0871-RELEASE-20260929",
+          "EV-PI0871-SDK-20260929"
         ]
       }
     },
@@ -451,7 +464,7 @@
                 "kind": "type"
               }
             ],
-            "selectedVersion": "0.87.0"
+            "selectedVersion": "0.87.1"
           }
         ],
         "selectedSourceCommit": null,
@@ -459,7 +472,9 @@
         "testEvidence": [
           "EV-A3-INPUTS-20260922",
           "EV-A3-PACKAGES-20260922",
-          "EV-A3-MAC-INSTALL-20260922"
+          "EV-A3-MAC-INSTALL-20260922",
+          "EV-PI0871-RELEASE-20260929",
+          "EV-PI0871-SDK-20260929"
         ]
       }
     },
@@ -502,14 +517,16 @@
                 "kind": "type"
               }
             ],
-            "selectedVersion": "0.87.0"
+            "selectedVersion": "0.87.1"
           }
         ],
         "selectedSourceCommit": null,
         "verificationStatus": "verified",
         "testEvidence": [
           "EV-A2-INPUTS-20260922",
-          "EV-A2-SDK-20260922"
+          "EV-A2-SDK-20260922",
+          "EV-PI0871-RELEASE-20260929",
+          "EV-PI0871-SDK-20260929"
         ]
       }
     },
@@ -556,7 +573,7 @@
                 "kind": "type"
               }
             ],
-            "selectedVersion": "0.87.0"
+            "selectedVersion": "0.87.1"
           },
           {
             "package": "@earendil-works/pi-ai",
@@ -567,7 +584,7 @@
                 "kind": "runtime"
               }
             ],
-            "selectedVersion": "0.87.0"
+            "selectedVersion": "0.87.1"
           }
         ],
         "selectedSourceCommit": null,
@@ -576,7 +593,9 @@
           "EV-A2-INPUTS-20260922",
           "EV-A2-SDK-20260922",
           "EV-B-IPC-SDK-20260923",
-          "EV-B-IPC-MAC-20260923"
+          "EV-B-IPC-MAC-20260923",
+          "EV-PI0871-RELEASE-20260929",
+          "EV-PI0871-SDK-20260929"
         ]
       }
     },
@@ -619,7 +638,7 @@
                 "kind": "type"
               }
             ],
-            "selectedVersion": "0.87.0"
+            "selectedVersion": "0.87.1"
           }
         ],
         "selectedSourceCommit": null,
@@ -635,7 +654,9 @@
           "EV-D2S-V4-20260928",
           "EV-D2S-S01-REVIEW-20260928",
           "EV-D2S-S01-MAC-20260928",
-          "EV-D2S-S01-REGRESSION-20260928"
+          "EV-D2S-S01-REGRESSION-20260928",
+          "EV-PI0871-RELEASE-20260929",
+          "EV-PI0871-SDK-20260929"
         ]
       }
     },
@@ -2099,6 +2120,78 @@
         "darwin"
       ],
       "locator": "docs/validation/m1-openai-2026-09-29.md"
+    },
+    {
+      "id": "EV-PI0871-RELEASE-20260929",
+      "kind": "release",
+      "result": "passed",
+      "scope": "Exact Pi 0.87.1 registry/tarball/lock SRI, all changed Pi lock entries and 3955 installed files across 11 direct package archives checked; declaration-only 41-file patch retained in both AI copies; registry signatures not independently verified.",
+      "commit": "475ad23e5151ff3bfbe63d3abca13bebc255b1d1",
+      "recordedAt": "2026-09-29T02:22:10.339109+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/pi-0871-m1-live-2026-09-29.md"
+    },
+    {
+      "id": "EV-PI0871-SDK-20260929",
+      "kind": "sdk",
+      "result": "passed",
+      "scope": "Actual Pi 0.87.1 public exports, A1-A4, core/SDK/Worker/Shell and 28 synthetic model integration tests. Bundled GPT-6 Luna retains reasoning/cost/context under public baseUrl override. Synthetic fixtures are not real model evidence.",
+      "commit": "475ad23e5151ff3bfbe63d3abca13bebc255b1d1",
+      "recordedAt": "2026-09-29T02:22:10.339109+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/pi-0871-m1-live-2026-09-29.md"
+    },
+    {
+      "id": "EV-PI0871-REGRESSION-20260929",
+      "kind": "static",
+      "result": "passed",
+      "scope": "29 regression commands passed at 475ad23. Two offline bootstraps on the same implementation before commit and verified cached Electron restoration. No new-clone or Windows evidence.",
+      "commit": "475ad23e5151ff3bfbe63d3abca13bebc255b1d1",
+      "recordedAt": "2026-09-29T02:22:10.339109+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/pi-0871-m1-live-2026-09-29.md"
+    },
+    {
+      "id": "EV-M1-FIRST-MODEL-20260929",
+      "kind": "model",
+      "result": "passed",
+      "scope": "First real gpt-6-luna request through approved URL and actual Host/Worker/Pi returned exact M1-LIVE-OK, streamed and completed with zero Operations in 25.424 seconds; SDK usage estimate only, not billing or full M1 proof.",
+      "commit": "475ad23e5151ff3bfbe63d3abca13bebc255b1d1",
+      "recordedAt": "2026-09-29T02:22:10.339109+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/pi-0871-m1-live-2026-09-29.md"
+    },
+    {
+      "id": "EV-M1-RESUME-TIMEOUT-20260929",
+      "kind": "model",
+      "result": "failed",
+      "scope": "Actual host restart succeeded but second real model request reached configured 30000 ms deadline without observed assistant content/usage. Unknown became failed after real cleanup; no retry, live cancellation untested.",
+      "commit": "475ad23e5151ff3bfbe63d3abca13bebc255b1d1",
+      "recordedAt": "2026-09-29T02:22:10.339109+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/pi-0871-m1-live-2026-09-29.md"
+    },
+    {
+      "id": "EV-M1-LIVE-MAC-20260929",
+      "kind": "platform",
+      "result": "passed",
+      "scope": "Mac live Host/Worker cleanup receipts show exited/groupGone for both attempted requests; actual DB readback completed+failed, native history persisted, profile 8-file secret scan no key matches. Does not prove live resume or active cancellation.",
+      "commit": "475ad23e5151ff3bfbe63d3abca13bebc255b1d1",
+      "recordedAt": "2026-09-29T02:22:10.339109+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/pi-0871-m1-live-2026-09-29.md"
     }
   ]
 }

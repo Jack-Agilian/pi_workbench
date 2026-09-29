@@ -2,13 +2,15 @@
 
 状态：A0–A4 限定无模型探针、B 最小产品核心、B-IPC 真实子进程接缝、C 最小无模型桌面、D1 Mac 退出闭环及 D2-S 非交互 Shell 已限定验证；D 整体仍进行中。决策依据：[SSOT](../ssot/README.md)，最新范围见 [D2-S 报告](../validation/d2-shell-2026-09-28.md)。工作项见 [backlog.json](backlog.json)。尚未创建 GitHub Issues。
 
-## 当前唯一事项：M1-B 获授权真实无工具会话验收
+## 当前唯一事项：M1-B 真实会话验收收尾
 
-用户已采纳 [真实模型优先路线](REAL_MODEL_NEXT_STEPS.md)。D2-S 与 S01 修正已快进集成 develop（`22cf2889f5b1812028ed3cbbeab0b271c0c613dc`），推送后独立读回一致。M1 在此基线上复用 Pi AgentSession/ModelRuntime/凭据入口，连接现有产品 Run、Worker、正文流和原生恢复，不重建 Harness。
+D2-S/S01 已集成 develop（`22cf2889f5b1812028ed3cbbeab0b271c0c613dc`）；M1 在 codex/m1-model-session 分支推进。Pi 已精确升级 0.87.1，优先使用内置 GPT-6 Luna 元数据和公开 baseUrl 覆盖；[升级与真实证据](../validation/pi-0871-m1-live-2026-09-29.md) 记录实际被测 SHA、29 项命令、两轮初始化及真实请求结果。
 
-M1-A 已完成限定离线范围，见 [M1 报告](../validation/m1-2026-09-28.md) 与 [配置说明](../MODEL_CONFIGURATION.md)。当前唯一待推进项为 M1-B：用户稍后填写 Provider/精确模型、批准的数据和调用/费用预算，并通过本机入口提供凭据后，才做最小真实服务验收。2026-09-29 已按用户要求补 OpenAI 官方/兼容接口及应用专用 auth.json 持久凭据，见 [增量证据](../validation/m1-openai-2026-09-29.md)。仍待填写并授权真实调用，真实模型调用 0；不再新增平行探针或启动 M2。
+用户已批准真实访问。首条短文本成功；宿主重开后的第二条触及当前 30 秒期限，清理/对账后 failed，没有自动重发。真实尝试已用 2/4，原账本保留；完整会话恢复与活跃取消仍未通过，MODEL-02 为 in_progress。配置与手动入口见 [模型配置](../MODEL_CONFIGURATION.md)。不研究或管理用户 API URL 背后的服务。
 
-完成 M1 后停止并审核，下一阶段才是 M2 有限文件工具 Agent。PTY（D2-T/D2-X）、Windows、市场与 OAuth 后置，不是首次 Mac 真实会话的前置。D2-S 的边界和回归保留，尚未验证项不因此完成。M0-UI / M0-SDK 已按既有条件逐项核对为 passed；M0-Pi 因真实模型及工具任务证据缺失而 blocked，不能由 M1-A 或无工具 M1-B 自动完成。
+下一增量先统一确定等待期限、已用额度与授权策略摘要的处理，再集中完成恢复和活跃取消验收。当前授权尚余最多两次请求；禁止改配置后抹账或自动换授权身份绕过限额。开发与验证按可审查增量规划：先定范围/验收标准、集中实现、必要定向检查、增量稳定后统一回归，避免每个小修改都全量重跑或追加真实试探请求。
+
+完成 M1 后停止并审核，之后才进入 M2 有限文件工具。PTY、Windows、市场和 OAuth 后置。M0-UI/M0-SDK passed 不变；M0-Pi 因完整真实工具审批/取消/恢复证据缺失而 blocked，首次无工具成功不自动晋级。本轮未合并 develop，也未启动 M2。
 
 下方为历史阶段与能力分解；当前顺序只以上栏为准。
 

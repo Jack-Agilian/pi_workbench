@@ -113,3 +113,7 @@ Pi 0.87.0 的发行声明公开 ProviderRequestOptions.fetch（FetchFunction 类
 沿用 Pi 0.87.0，公开 ModelRuntime.registerProvider 是类方法，只注册批准的 Base URL/模型/价格及兼容元数据，不是新的包根函数或 Provider 实现。原生 openai-responses/openai-completions 委托现有 fetch seam，实际 Worker/IPC 验证见 [增量报告](../validation/m1-openai-2026-09-29.md)。无新依赖、上游运行时补丁或 experimental import。
 
 Context7 用于定位官方文档，最终核对安装包 docs/providers.md 的 auth.json/api_key/0600 与 SDK 声明。应用薄读取层只取专用 auth.json 的字面量 key，再调用公开 setRuntimeApiKey；不启用 Pi 的命令、环境变量或全局凭据发现。OpenAI 官方 streaming/reasoning 文档用于核对 API 与 token 字段；该阅读不构成真实服务验证。
+
+## Pi 0.87.1 升级（2026-09-29）
+
+[精确发行与字节记录](../validation/pi-0871-release.json) · [实际 SHA 与回归/真实范围](../validation/pi-0871-m1-live-2026-09-29.md)。registry 0.87.1 与官方发布均已核对，GPT-6 Luna 由已发布模型目录提供；公开 ModelRuntime.registerProvider 只覆盖批准的 baseUrl，保留原生能力。41 项相同声明缺陷延续最小补丁，见 [ADR](adr-pi-0871.md)，无运行时改写/deep-import。历史 0.87.0 实测不改写；新 adopted 版本和证据已登记。真实模型首条成功与恢复超时分别记录，不推导完整模型 Gate 通过。

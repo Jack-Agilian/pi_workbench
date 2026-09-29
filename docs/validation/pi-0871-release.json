@@ -1,0 +1,691 @@
+{
+  "testedCommit": "475ad23e5151ff3bfbe63d3abca13bebc255b1d1",
+  "downloadedAndVerified": [
+    {
+      "package": "@earendil-works/pi-ai",
+      "version": "0.87.1",
+      "metadataUrl": "https://registry.npmjs.org/%40earendil-works%2Fpi-ai/0.87.1",
+      "tarballUrl": "https://registry.npmjs.org/@earendil-works/pi-ai/-/pi-ai-0.87.1.tgz",
+      "integrity": "sha512-X/3PfQBnnoeVdO9Cv8zHghUMglzlgNZYGNzoPnbRoGnHl3Rw3TlA2UKSUB7BRHUOxMryHXYa8dnjWZlbRheDZA==",
+      "bytes": 838330,
+      "sha256": "35b4432f27cc2665f86beebb9af6a39b1251970883c3044bd8be4f4e8c731ca0",
+      "installedCopies": [
+        {
+          "path": "node_modules/@earendil-works/pi-ai",
+          "filesChecked": 772,
+          "declarationsPatched": 41
+        },
+        {
+          "path": "node_modules/@earendil-works/pi-coding-agent/node_modules/@earendil-works/pi-ai",
+          "filesChecked": 772,
+          "declarationsPatched": 41
+        }
+      ],
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "import": "./dist/index.js"
+        },
+        "./api/*": {
+          "types": "./dist/api/*.d.ts",
+          "import": "./dist/api/*.js"
+        },
+        "./oauth": {
+          "types": "./dist/oauth.d.ts",
+          "import": "./dist/oauth.js"
+        },
+        "./compat": {
+          "types": "./dist/compat.d.ts",
+          "import": "./dist/compat.js"
+        },
+        "./utils/*": {
+          "types": "./dist/utils/*.d.ts",
+          "import": "./dist/utils/*.js"
+        },
+        "./bun-oauth": {
+          "types": "./dist/bun-oauth.d.ts",
+          "import": "./dist/bun-oauth.js"
+        },
+        "./providers/*": {
+          "types": "./dist/providers/*.d.ts",
+          "import": "./dist/providers/*.js"
+        },
+        "./bedrock-provider": {
+          "types": "./dist/bedrock-provider.d.ts",
+          "import": "./dist/bedrock-provider.js"
+        }
+      },
+      "engines": {
+        "node": ">=22.19.0"
+      },
+      "scope": "HTTPS registry/lock/download SRI and installed package files; registry signatures not independently verified",
+      "localDeclarationPatch": {
+        "manifest": "patches/pi-ai-0.87.1-json-types.json",
+        "patchSha256": "57c11da43fd28c77389c4561b08cadca3706d8181cdd5c11e3eaf6d1bccf266e",
+        "scope": "41 declaration-only type imports per copy; runtime JS and model JSON match registry bytes"
+      }
+    },
+    {
+      "package": "@earendil-works/pi-coding-agent",
+      "version": "0.87.1",
+      "metadataUrl": "https://registry.npmjs.org/%40earendil-works%2Fpi-coding-agent/0.87.1",
+      "tarballUrl": "https://registry.npmjs.org/@earendil-works/pi-coding-agent/-/pi-coding-agent-0.87.1.tgz",
+      "integrity": "sha512-m8ArJUtVcQMSe1lLE/Ei7vX/JV7O39sWmWBsXV2NOU70F0qCp8GubA24pT3LnwTmM6LL2xV80/h6sQg85n69ew==",
+      "bytes": 7329151,
+      "sha256": "1423ee3c61e7c96464e1cbf3c8dc24d3056cb3410995c3671a98c3ecc527540f",
+      "installedCopies": [
+        {
+          "path": "node_modules/@earendil-works/pi-coding-agent",
+          "filesChecked": 1108,
+          "declarationsPatched": 0
+        }
+      ],
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "import": "./dist/index.js"
+        },
+        "./client": {
+          "source": "./src/client/index.ts"
+        },
+        "./rpc-entry": {
+          "import": "./dist/bundle/rpc-entry.js"
+        },
+        "./experimental/plugin": {
+          "source": "./src/experimental/plugin.ts"
+        }
+      },
+      "engines": {
+        "node": ">=22.19.0"
+      },
+      "scope": "HTTPS registry/lock/download SRI and installed package files; registry signatures not independently verified"
+    },
+    {
+      "package": "react",
+      "version": "19.3.0",
+      "metadataUrl": "https://registry.npmjs.org/react/19.3.0",
+      "tarballUrl": "https://registry.npmjs.org/react/-/react-19.3.0.tgz",
+      "integrity": "sha512-E8LUcbtBWt20bbl2YoHfx4ZDBdxVTfOKtCZn9cDSJ4l6/nuoApcpIBcj47t2wZoVX8g2ZHuMHbiShgCR1T5Sog==",
+      "bytes": 26394,
+      "sha256": "5a4024110c49476e1538a70fd65b9e59d038fcc280b78eb933c24e10453afbf9",
+      "installedCopies": [
+        {
+          "path": "node_modules/react",
+          "filesChecked": 27,
+          "declarationsPatched": 0
+        }
+      ],
+      "exports": {
+        ".": {
+          "default": "./index.js",
+          "react-server": "./react.react-server.js"
+        },
+        "./jsx-runtime": {
+          "default": "./jsx-runtime.js",
+          "react-server": "./jsx-runtime.react-server.js"
+        },
+        "./package.json": "./package.json",
+        "./jsx-dev-runtime": {
+          "default": "./jsx-dev-runtime.js",
+          "react-server": "./jsx-dev-runtime.react-server.js"
+        },
+        "./compiler-runtime": {
+          "default": "./compiler-runtime.js",
+          "react-server": "./compiler-runtime.js"
+        }
+      },
+      "engines": {
+        "node": ">=0.10.0"
+      },
+      "scope": "HTTPS registry/lock/download SRI and installed package files; registry signatures not independently verified"
+    },
+    {
+      "package": "react-dom",
+      "version": "19.3.0",
+      "metadataUrl": "https://registry.npmjs.org/react-dom/19.3.0",
+      "tarballUrl": "https://registry.npmjs.org/react-dom/-/react-dom-19.3.0.tgz",
+      "integrity": "sha512-JDk8dgif51OjFoDE70+OT9ICyYr+69HlmihNwp1+Nsfbna3t5sIiCa9ZJktDmQ4/1b/rn26hIAR2uYXDMr5r0Q==",
+      "bytes": 1409226,
+      "sha256": "dbeffb1e6cdbbbba07f799da4635333d0e20c210a32278dded85441ec4cb6a17",
+      "installedCopies": [
+        {
+          "path": "node_modules/react-dom",
+          "filesChecked": 43,
+          "declarationsPatched": 0
+        }
+      ],
+      "exports": {
+        ".": {
+          "default": "./index.js",
+          "react-server": "./react-dom.react-server.js"
+        },
+        "./client": {
+          "default": "./client.js",
+          "react-server": "./client.react-server.js"
+        },
+        "./server": {
+          "bun": "./server.bun.js",
+          "deno": "./server.node.js",
+          "node": "./server.node.js",
+          "worker": "./server.browser.js",
+          "browser": "./server.browser.js",
+          "default": "./server.node.js",
+          "workerd": "./server.edge.js",
+          "edge-light": "./server.edge.js",
+          "react-server": "./server.react-server.js"
+        },
+        "./static": {
+          "deno": "./static.browser.js",
+          "node": "./static.node.js",
+          "worker": "./static.browser.js",
+          "browser": "./static.browser.js",
+          "default": "./static.node.js",
+          "workerd": "./static.edge.js",
+          "edge-light": "./static.edge.js",
+          "react-server": "./static.react-server.js"
+        },
+        "./profiling": {
+          "default": "./profiling.js",
+          "react-server": "./profiling.react-server.js"
+        },
+        "./server.bun": {
+          "default": "./server.bun.js",
+          "react-server": "./server.react-server.js"
+        },
+        "./test-utils": "./test-utils.js",
+        "./server.edge": {
+          "default": "./server.edge.js",
+          "react-server": "./server.react-server.js"
+        },
+        "./server.node": {
+          "default": "./server.node.js",
+          "react-server": "./server.react-server.js"
+        },
+        "./static.edge": {
+          "default": "./static.edge.js",
+          "react-server": "./static.react-server.js"
+        },
+        "./static.node": {
+          "default": "./static.node.js",
+          "react-server": "./static.react-server.js"
+        },
+        "./package.json": "./package.json",
+        "./server.browser": {
+          "default": "./server.browser.js",
+          "react-server": "./server.react-server.js"
+        },
+        "./static.browser": {
+          "default": "./static.browser.js",
+          "react-server": "./static.react-server.js"
+        }
+      },
+      "engines": null,
+      "scope": "HTTPS registry/lock/download SRI and installed package files; registry signatures not independently verified"
+    },
+    {
+      "package": "@modelcontextprotocol/sdk",
+      "version": "1.30.0",
+      "metadataUrl": "https://registry.npmjs.org/%40modelcontextprotocol%2Fsdk/1.30.0",
+      "tarballUrl": "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.30.0.tgz",
+      "integrity": "sha512-xKd8OIzlqNzcqcNumGAa6g+PW2kjD5vrpcKOnfldAUPP3j7lnqMPwlTXQm8gF+UwH72z0lqaRbjr9hqGz0eITA==",
+      "bytes": 582844,
+      "sha256": "2cac3f3e38fec2815ed9efafa2947faf8c6957310684f99703f3d180f3e9af1a",
+      "installedCopies": [
+        {
+          "path": "node_modules/@modelcontextprotocol/sdk",
+          "filesChecked": 693,
+          "declarationsPatched": 0
+        }
+      ],
+      "exports": {
+        ".": {
+          "types": "./dist/esm/index.d.ts",
+          "import": "./dist/esm/index.js",
+          "require": "./dist/cjs/index.js"
+        },
+        "./*": {
+          "types": "./dist/esm/*.d.ts",
+          "import": "./dist/esm/*",
+          "require": "./dist/cjs/*"
+        },
+        "./client": {
+          "types": "./dist/esm/client/index.d.ts",
+          "import": "./dist/esm/client/index.js",
+          "require": "./dist/cjs/client/index.js"
+        },
+        "./server": {
+          "types": "./dist/esm/server/index.d.ts",
+          "import": "./dist/esm/server/index.js",
+          "require": "./dist/cjs/server/index.js"
+        },
+        "./validation": {
+          "types": "./dist/esm/validation/index.d.ts",
+          "import": "./dist/esm/validation/index.js",
+          "require": "./dist/cjs/validation/index.js"
+        },
+        "./experimental": {
+          "types": "./dist/esm/experimental/index.d.ts",
+          "import": "./dist/esm/experimental/index.js",
+          "require": "./dist/cjs/experimental/index.js"
+        },
+        "./validation/ajv": {
+          "types": "./dist/esm/validation/ajv-provider.d.ts",
+          "import": "./dist/esm/validation/ajv-provider.js",
+          "require": "./dist/cjs/validation/ajv-provider.js"
+        },
+        "./experimental/tasks": {
+          "types": "./dist/esm/experimental/tasks/index.d.ts",
+          "import": "./dist/esm/experimental/tasks/index.js",
+          "require": "./dist/cjs/experimental/tasks/index.js"
+        },
+        "./validation/cfworker": {
+          "types": "./dist/esm/validation/cfworker-provider.d.ts",
+          "import": "./dist/esm/validation/cfworker-provider.js",
+          "require": "./dist/cjs/validation/cfworker-provider.js"
+        }
+      },
+      "engines": {
+        "node": ">=18"
+      },
+      "scope": "HTTPS registry/lock/download SRI and installed package files; registry signatures not independently verified"
+    },
+    {
+      "package": "@types/node",
+      "version": "24.13.6",
+      "metadataUrl": "https://registry.npmjs.org/%40types%2Fnode/24.13.6",
+      "tarballUrl": "https://registry.npmjs.org/@types/node/-/node-24.13.6.tgz",
+      "integrity": "sha512-SGrw/h3KPFshy3OE6ZL53LMBG5vGQQ8/gIpiqz/kRZhPJ7HgwCEs8LBuNtWLa8dvGZVpSF7+Bf+c11HUrCb/yg==",
+      "bytes": 461826,
+      "sha256": "755b5147491e323c24541830f8eba438c1d1ef8931de725fc613b5439708464a",
+      "installedCopies": [
+        {
+          "path": "node_modules/@types/node",
+          "filesChecked": 75,
+          "declarationsPatched": 0
+        }
+      ],
+      "exports": null,
+      "engines": null,
+      "scope": "HTTPS registry/lock/download SRI and installed package files; registry signatures not independently verified"
+    },
+    {
+      "package": "@types/react",
+      "version": "19.3.0",
+      "metadataUrl": "https://registry.npmjs.org/%40types%2Freact/19.3.0",
+      "tarballUrl": "https://registry.npmjs.org/@types/react/-/react-19.3.0.tgz",
+      "integrity": "sha512-N0rFCuH9YoxG9/m61l9MfpJKfmLOVU0em7ipIz6TRgSSkvReLB9vL85GB+yr8Bs5leqpvg96JSwF4ZS1s4viQg==",
+      "bytes": 77822,
+      "sha256": "ffa77ffdbdc82e5f67a0fd74d750990375a7dfd8685ec7f10a27c0db128f7766",
+      "installedCopies": [
+        {
+          "path": "node_modules/@types/react",
+          "filesChecked": 16,
+          "declarationsPatched": 0
+        }
+      ],
+      "exports": {
+        ".": {
+          "types": {
+            "default": "./index.d.ts"
+          },
+          "types@<=5.0": {
+            "default": "./ts5.0/index.d.ts"
+          }
+        },
+        "./canary": {
+          "types": {
+            "default": "./canary.d.ts"
+          },
+          "types@<=5.0": {
+            "default": "./ts5.0/canary.d.ts"
+          }
+        },
+        "./jsx-runtime": {
+          "types": {
+            "default": "./jsx-runtime.d.ts"
+          },
+          "types@<=5.0": {
+            "default": "./ts5.0/jsx-runtime.d.ts"
+          }
+        },
+        "./experimental": {
+          "types": {
+            "default": "./experimental.d.ts"
+          },
+          "types@<=5.0": {
+            "default": "./ts5.0/experimental.d.ts"
+          }
+        },
+        "./package.json": "./package.json",
+        "./jsx-dev-runtime": {
+          "types": {
+            "default": "./jsx-dev-runtime.d.ts"
+          },
+          "types@<=5.0": {
+            "default": "./ts5.0/jsx-dev-runtime.d.ts"
+          }
+        },
+        "./compiler-runtime": {
+          "types": {
+            "default": "./compiler-runtime.d.ts"
+          }
+        }
+      },
+      "engines": null,
+      "scope": "HTTPS registry/lock/download SRI and installed package files; registry signatures not independently verified"
+    },
+    {
+      "package": "@types/react-dom",
+      "version": "19.3.0",
+      "metadataUrl": "https://registry.npmjs.org/%40types%2Freact-dom/19.3.0",
+      "tarballUrl": "https://registry.npmjs.org/@types/react-dom/-/react-dom-19.3.0.tgz",
+      "integrity": "sha512-ZI7bU42mZXXKHn/qNLEw2IrbiINU7X5+vfgdixBHkCNpYWXjKgfQ/P+uyGb5CjOLB9UcnTeg3rylQtV2hym44Q==",
+      "bytes": 8185,
+      "sha256": "0782e1cd4af4a6a030843235a48e55dc690c36f9428b0b672dc53350806dcf21",
+      "installedCopies": [
+        {
+          "path": "node_modules/@types/react-dom",
+          "filesChecked": 17,
+          "declarationsPatched": 0
+        }
+      ],
+      "exports": {
+        ".": {
+          "types": {
+            "default": "./index.d.ts"
+          }
+        },
+        "./canary": {
+          "types": {
+            "default": "./canary.d.ts"
+          }
+        },
+        "./client": {
+          "types": {
+            "default": "./client.d.ts"
+          }
+        },
+        "./server": {
+          "types": {
+            "default": "./server.d.ts"
+          }
+        },
+        "./static": {
+          "types": {
+            "default": "./static.d.ts"
+          }
+        },
+        "./server.bun": {
+          "types": {
+            "default": "./server.bun.d.ts"
+          }
+        },
+        "./test-utils": {
+          "types": {
+            "default": "./test-utils/index.d.ts"
+          }
+        },
+        "./server.edge": {
+          "types": {
+            "default": "./server.edge.d.ts"
+          }
+        },
+        "./server.node": {
+          "types": {
+            "default": "./server.node.d.ts"
+          }
+        },
+        "./static.edge": {
+          "types": {
+            "default": "./static.edge.d.ts"
+          }
+        },
+        "./static.node": {
+          "types": {
+            "default": "./static.node.d.ts"
+          }
+        },
+        "./experimental": {
+          "types": {
+            "default": "./experimental.d.ts"
+          }
+        },
+        "./package.json": "./package.json",
+        "./server.browser": {
+          "types": {
+            "default": "./server.browser.d.ts"
+          }
+        },
+        "./static.browser": {
+          "types": {
+            "default": "./static.browser.d.ts"
+          }
+        }
+      },
+      "engines": null,
+      "scope": "HTTPS registry/lock/download SRI and installed package files; registry signatures not independently verified"
+    },
+    {
+      "package": "electron",
+      "version": "44.4.5",
+      "metadataUrl": "https://registry.npmjs.org/electron/44.4.5",
+      "tarballUrl": "https://registry.npmjs.org/electron/-/electron-44.4.5.tgz",
+      "integrity": "sha512-SjgoaeYsSWZfJzubgQU7juvuXMTvn6/e1gAHdGFA/yuMbpF+I+skYqIJ6DdXBXHeWbkbpNpmwZCTpiivtlWZSw==",
+      "bytes": 198479,
+      "sha256": "712c161f94c755d94b4a1eefa2e97e76fca4f284bf6294b958bb82af3ae3e5e1",
+      "installedCopies": [
+        {
+          "path": "node_modules/electron",
+          "filesChecked": 9,
+          "declarationsPatched": 0
+        }
+      ],
+      "exports": null,
+      "engines": {
+        "node": ">= 22.12.0"
+      },
+      "scope": "HTTPS registry/lock/download SRI and installed package files; registry signatures not independently verified"
+    },
+    {
+      "package": "esbuild",
+      "version": "0.28.2",
+      "metadataUrl": "https://registry.npmjs.org/esbuild/0.28.2",
+      "tarballUrl": "https://registry.npmjs.org/esbuild/-/esbuild-0.28.2.tgz",
+      "integrity": "sha512-HKVLS8dvII+xoKW9kmqxbRKrnWEXfJJr/FZhhJmiqIB0e053QNYFqOBouTMO/k5sID4MvCiUCvv8b9M4h32wIA==",
+      "bytes": 34207,
+      "sha256": "e045f94c235c7adc50e77ba2a579c7bec41b496b6b47c3a7845f7c1e19959a88",
+      "installedCopies": [
+        {
+          "path": "node_modules/esbuild",
+          "filesChecked": 7,
+          "declarationsPatched": 0
+        }
+      ],
+      "exports": null,
+      "engines": {
+        "node": ">=18"
+      },
+      "scope": "HTTPS registry/lock/download SRI and installed package files; registry signatures not independently verified"
+    },
+    {
+      "package": "typescript",
+      "version": "7.0.2",
+      "metadataUrl": "https://registry.npmjs.org/typescript/7.0.2",
+      "tarballUrl": "https://registry.npmjs.org/typescript/-/typescript-7.0.2.tgz",
+      "integrity": "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA==",
+      "bytes": 365612,
+      "sha256": "da2513f4b95176d6dde8b51aab7afe8a927656c9d277369793f77f7e59371c08",
+      "installedCopies": [
+        {
+          "path": "node_modules/typescript",
+          "filesChecked": 416,
+          "declarationsPatched": 0
+        }
+      ],
+      "exports": {
+        ".": "./lib/version.cjs",
+        "./unstable/fs": "./dist/api/fs.js",
+        "./package.json": "./package.json",
+        "./unstable/ast": "./dist/ast/index.js",
+        "./unstable/sync": "./dist/api/sync/api.js",
+        "./unstable/async": "./dist/api/async/api.js",
+        "./unstable/proto": "./dist/api/proto.js",
+        "./unstable/ast/is": "./dist/ast/is.js",
+        "./unstable/ast/clone": "./dist/ast/clone.js",
+        "./unstable/ast/utils": "./dist/ast/utils.js",
+        "./unstable/ast/factory": "./dist/ast/factory.generated.js",
+        "./unstable/ast/scanner": "./dist/ast/scanner.js",
+        "./unstable/ast/visitor": "./dist/ast/visitor.js"
+      },
+      "engines": {
+        "node": ">=16.20.0"
+      },
+      "scope": "HTTPS registry/lock/download SRI and installed package files; registry signatures not independently verified"
+    }
+  ],
+  "changedPiLockEntries": [
+    {
+      "package": "@earendil-works/pi-ai",
+      "version": "0.87.1",
+      "metadataUrl": "https://registry.npmjs.org/%40earendil-works%2Fpi-ai/0.87.1",
+      "tarballUrl": "https://registry.npmjs.org/@earendil-works/pi-ai/-/pi-ai-0.87.1.tgz",
+      "integrity": "sha512-X/3PfQBnnoeVdO9Cv8zHghUMglzlgNZYGNzoPnbRoGnHl3Rw3TlA2UKSUB7BRHUOxMryHXYa8dnjWZlbRheDZA==",
+      "sha256": "35b4432f27cc2665f86beebb9af6a39b1251970883c3044bd8be4f4e8c731ca0",
+      "bytes": 838330,
+      "lockPath": "node_modules/@earendil-works/pi-ai",
+      "filledMissingIntegrity": false
+    },
+    {
+      "package": "@earendil-works/pi-coding-agent",
+      "version": "0.87.1",
+      "metadataUrl": "https://registry.npmjs.org/%40earendil-works%2Fpi-coding-agent/0.87.1",
+      "tarballUrl": "https://registry.npmjs.org/@earendil-works/pi-coding-agent/-/pi-coding-agent-0.87.1.tgz",
+      "integrity": "sha512-m8ArJUtVcQMSe1lLE/Ei7vX/JV7O39sWmWBsXV2NOU70F0qCp8GubA24pT3LnwTmM6LL2xV80/h6sQg85n69ew==",
+      "sha256": "1423ee3c61e7c96464e1cbf3c8dc24d3056cb3410995c3671a98c3ecc527540f",
+      "bytes": 7329151,
+      "lockPath": "node_modules/@earendil-works/pi-coding-agent",
+      "filledMissingIntegrity": false
+    },
+    {
+      "package": "@earendil-works/chord",
+      "version": "0.87.1",
+      "metadataUrl": "https://registry.npmjs.org/%40earendil-works%2Fchord/0.87.1",
+      "tarballUrl": "https://registry.npmjs.org/@earendil-works/chord/-/chord-0.87.1.tgz",
+      "integrity": "sha512-bg7IkJGFcEaMqqYgOGUiq5Ky9RghpRfrlZ8I/v/1b4bBZ02A7t3E+6uhPRbadwWb/kWsnVFbZsqOKRN4a3LLCg==",
+      "sha256": "4d1b2911c858dc5b7f858af6626e63e057b355d50ce90b472239e9192ce749f4",
+      "bytes": 236677,
+      "lockPath": "node_modules/@earendil-works/pi-coding-agent/node_modules/@earendil-works/chord",
+      "filledMissingIntegrity": true
+    },
+    {
+      "package": "@earendil-works/pi-agent-core",
+      "version": "0.87.1",
+      "metadataUrl": "https://registry.npmjs.org/%40earendil-works%2Fpi-agent-core/0.87.1",
+      "tarballUrl": "https://registry.npmjs.org/@earendil-works/pi-agent-core/-/pi-agent-core-0.87.1.tgz",
+      "integrity": "sha512-Zev3B0HK7YS5A4EZQ2XnEqiJuirx6QBiltJ+LpmjV5a/+2IU0cfKtIfnkNkORK707XOvKBY2WRtk7cAwHpbh2Q==",
+      "sha256": "646267cfa782ae4efcbb936728373e73568f1e16b8520d244f8c1d91088c12c4",
+      "bytes": 994229,
+      "lockPath": "node_modules/@earendil-works/pi-coding-agent/node_modules/@earendil-works/pi-agent-core",
+      "filledMissingIntegrity": true
+    },
+    {
+      "package": "@earendil-works/pi-ai",
+      "version": "0.87.1",
+      "metadataUrl": "https://registry.npmjs.org/%40earendil-works%2Fpi-ai/0.87.1",
+      "tarballUrl": "https://registry.npmjs.org/@earendil-works/pi-ai/-/pi-ai-0.87.1.tgz",
+      "integrity": "sha512-X/3PfQBnnoeVdO9Cv8zHghUMglzlgNZYGNzoPnbRoGnHl3Rw3TlA2UKSUB7BRHUOxMryHXYa8dnjWZlbRheDZA==",
+      "sha256": "35b4432f27cc2665f86beebb9af6a39b1251970883c3044bd8be4f4e8c731ca0",
+      "bytes": 838330,
+      "lockPath": "node_modules/@earendil-works/pi-coding-agent/node_modules/@earendil-works/pi-ai",
+      "filledMissingIntegrity": true
+    },
+    {
+      "package": "@earendil-works/pi-telemetry",
+      "version": "0.87.1",
+      "metadataUrl": "https://registry.npmjs.org/%40earendil-works%2Fpi-telemetry/0.87.1",
+      "tarballUrl": "https://registry.npmjs.org/@earendil-works/pi-telemetry/-/pi-telemetry-0.87.1.tgz",
+      "integrity": "sha512-MC6TRQH5lgMXpcN+Vku2WMI2T8BsiUPzMQHGo81uqFZD3/9O79WWJAysEDGuzduP6R4tvtgwMLwmqIxynM10JQ==",
+      "sha256": "7bef6bde5f21f12f1b39c21fff4594db35e99166c9864b11abb789f9afc5daf4",
+      "bytes": 27323,
+      "lockPath": "node_modules/@earendil-works/pi-coding-agent/node_modules/@earendil-works/pi-telemetry",
+      "filledMissingIntegrity": true
+    },
+    {
+      "package": "@earendil-works/pi-tui",
+      "version": "0.87.1",
+      "metadataUrl": "https://registry.npmjs.org/%40earendil-works%2Fpi-tui/0.87.1",
+      "tarballUrl": "https://registry.npmjs.org/@earendil-works/pi-tui/-/pi-tui-0.87.1.tgz",
+      "integrity": "sha512-YEH2vRyOeiO7hhN6j6AE6YwKSq2Kz2f3XR8bj1TbR+aGE/JsnY1hLPMI2pvaZfRM1n9Y00tejxFQ4zbzvF7nkQ==",
+      "sha256": "6723150c4996003efa39e034c7f0f5975fc2abe7c1244c67e9a5e92703afbe38",
+      "bytes": 593797,
+      "lockPath": "node_modules/@earendil-works/pi-coding-agent/node_modules/@earendil-works/pi-tui",
+      "filledMissingIntegrity": true
+    },
+    {
+      "package": "@earendil-works/pi-telemetry",
+      "version": "0.87.1",
+      "metadataUrl": "https://registry.npmjs.org/%40earendil-works%2Fpi-telemetry/0.87.1",
+      "tarballUrl": "https://registry.npmjs.org/@earendil-works/pi-telemetry/-/pi-telemetry-0.87.1.tgz",
+      "integrity": "sha512-MC6TRQH5lgMXpcN+Vku2WMI2T8BsiUPzMQHGo81uqFZD3/9O79WWJAysEDGuzduP6R4tvtgwMLwmqIxynM10JQ==",
+      "sha256": "7bef6bde5f21f12f1b39c21fff4594db35e99166c9864b11abb789f9afc5daf4",
+      "bytes": 27323,
+      "lockPath": "node_modules/@earendil-works/pi-telemetry",
+      "filledMissingIntegrity": false
+    }
+  ],
+  "committedByteAudit": {
+    "testedCommit": "475ad23e5151ff3bfbe63d3abca13bebc255b1d1",
+    "cachedArchives": 11,
+    "copies": [
+      {
+        "path": "node_modules/@earendil-works/pi-ai",
+        "verifiedFiles": 772
+      },
+      {
+        "path": "node_modules/@earendil-works/pi-coding-agent/node_modules/@earendil-works/pi-ai",
+        "verifiedFiles": 772
+      },
+      {
+        "path": "node_modules/@earendil-works/pi-coding-agent",
+        "verifiedFiles": 1108
+      },
+      {
+        "path": "node_modules/react",
+        "verifiedFiles": 27
+      },
+      {
+        "path": "node_modules/react-dom",
+        "verifiedFiles": 43
+      },
+      {
+        "path": "node_modules/@modelcontextprotocol/sdk",
+        "verifiedFiles": 693
+      },
+      {
+        "path": "node_modules/@types/node",
+        "verifiedFiles": 75
+      },
+      {
+        "path": "node_modules/@types/react",
+        "verifiedFiles": 16
+      },
+      {
+        "path": "node_modules/@types/react-dom",
+        "verifiedFiles": 17
+      },
+      {
+        "path": "node_modules/electron",
+        "verifiedFiles": 9
+      },
+      {
+        "path": "node_modules/esbuild",
+        "verifiedFiles": 7
+      },
+      {
+        "path": "node_modules/typescript",
+        "verifiedFiles": 416
+      }
+    ],
+    "allPassed": true
+  }
+}

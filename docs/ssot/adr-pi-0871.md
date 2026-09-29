@@ -4,7 +4,7 @@
 
 ## 决定与来源
 
-采用 registry 已发布的两个直接依赖 @earendil-works/pi-ai 和 @earendil-works/pi-coding-agent 精确 0.87.1。官方 [v0.87.1 发行说明](https://github.com/earendil-works/pi/releases/tag/v0.87.1) 明确加入 OpenAI API key / Codex 下 GPT-6 Luna/Sol 支持。Node engines 仍 >=22.19.0，现有 24.21.0 LTS 满足；不升级 Node/npm/Electron/React，不更新远端 Sub2API。
+采用 registry 已发布的两个直接依赖 @earendil-works/pi-ai 和 @earendil-works/pi-coding-agent 精确 0.87.1。官方 [v0.87.1 发行说明](https://github.com/earendil-works/pi/releases/tag/v0.87.1) 明确加入 OpenAI API key / Codex 下 GPT-6 Luna/Sol 支持。Node engines 仍 >=22.19.0，现有 24.21.0 LTS 满足；不升级 Node/npm/Electron/React，不修改用户 API 服务。
 
 未知兼容模型继续使用原有公开 registerProvider 配置。对于已在 Pi 目录中的 OpenAI 模型，使用公开 registerProvider 仅覆盖用户批准的 baseUrl，保留原生模型能力/价格/上下文元数据。所有模型请求仍固定经过宿主 IPC HTTP、单 URL、零工具、请求/费用预留，不能凭新模型加入绕过授权。
 

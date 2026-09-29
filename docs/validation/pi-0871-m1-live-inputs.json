@@ -1,0 +1,519 @@
+{
+  "baseline": "b707d7ade6feadd1afd1236fd237dd8b9cc030a2",
+  "branch": "codex/m1-model-session",
+  "testedCommit": "475ad23e5151ff3bfbe63d3abca13bebc255b1d1",
+  "recordedAt": "2026-09-29T02:20:39.803627+00:00",
+  "environment": {
+    "platform": "darwin",
+    "macOS": "27.0",
+    "machineArch": "arm64",
+    "nodeArch": "arm64",
+    "rosetta": 0,
+    "node": "24.21.0",
+    "npm": "11.19.0",
+    "python": "3.14.7",
+    "pi": "0.87.1",
+    "electron": "44.4.5"
+  },
+  "results": [
+    {
+      "command": [
+        "npm",
+        "run",
+        "check:environment"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T02:12:47.633454+00:00",
+      "finishedAt": "2026-09-29T02:12:47.926222+00:00",
+      "sha256": "e5bf052638bae533d3e2a8ba27b584b7115930409dcdbe7cebae96a7b862096c"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T02:12:47.926540+00:00",
+      "finishedAt": "2026-09-29T02:12:49.667993+00:00",
+      "sha256": "22df5d47848ff6e1f3c0926a3aa3f05da31fb2c76601187b826c3ad4d7870689"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-types"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T02:12:49.668257+00:00",
+      "finishedAt": "2026-09-29T02:12:52.456377+00:00",
+      "sha256": "aa527bfde4ba6cfd77541a5d79d4758f54031a529f9ebb235d43cff62837f61c",
+      "tests": 10
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-probe"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T02:12:52.456623+00:00",
+      "finishedAt": "2026-09-29T02:12:53.396403+00:00",
+      "sha256": "eb6bd1f580b1f420ee4d25917d53693b8dfd6af9f7da97c78aa87e4bbbb19cd3",
+      "tests": 15
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-tools"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T02:12:53.396662+00:00",
+      "finishedAt": "2026-09-29T02:12:54.394035+00:00",
+      "sha256": "c65d82da21434b156f316aa13dac6564aa8f6bf2ad6f9c9e688eeba813936f56",
+      "tests": 19
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-shell"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T02:12:54.394298+00:00",
+      "finishedAt": "2026-09-29T02:12:55.546484+00:00",
+      "sha256": "e1e18eb8ae50ee99b5e3c845f9ad16b951267a33e19aa3c740c0f42f4b9e3813",
+      "tests": 4
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-resources"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T02:12:55.547305+00:00",
+      "finishedAt": "2026-09-29T02:12:56.655809+00:00",
+      "sha256": "747807a2622254a6e9df14a3aad95a715594b4c3228ee61d22730fb1c940a6d2",
+      "tests": 12
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-packages"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T02:12:56.656188+00:00",
+      "finishedAt": "2026-09-29T02:13:00.238240+00:00",
+      "sha256": "768a0e675b5cbe0150724b2b347efe5ae991686b77d19531595492d28b79c64e",
+      "tests": 8
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-auth"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T02:13:00.238488+00:00",
+      "finishedAt": "2026-09-29T02:13:01.188207+00:00",
+      "sha256": "39d6365247e48d0602acac1ca89b82799ce0bf97caf27bba36249672f7f506f1",
+      "tests": 18
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:product-core"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T02:13:01.188492+00:00",
+      "finishedAt": "2026-09-29T02:13:01.918554+00:00",
+      "sha256": "765456a706b32af6ac0f954291cbc838b5b99fa53711785b9dc7051598551347",
+      "tests": 20
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:product-sdk"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T02:13:01.918833+00:00",
+      "finishedAt": "2026-09-29T02:13:02.923045+00:00",
+      "sha256": "a63b64c628137ee6deee27968010c62372a7ad9f5a48e57edc3fa8aba6615112",
+      "tests": 5
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:product-worker"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T02:13:02.923302+00:00",
+      "finishedAt": "2026-09-29T02:13:35.353383+00:00",
+      "sha256": "19274a7b9d8a6b01ad3c5a655013fa3794383c3650b5f977978fb26e30ee6f8b",
+      "tests": 51
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:product-shell"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T02:13:35.353693+00:00",
+      "finishedAt": "2026-09-29T02:13:53.750791+00:00",
+      "sha256": "81436f9bece789c70d4a033a15446f9347276ef5159fed8b928aa2075ad0a45a",
+      "tests": 28
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:desktop"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T02:13:53.751109+00:00",
+      "finishedAt": "2026-09-29T02:14:07.040160+00:00",
+      "sha256": "e91225db35556d0e15968a3950750f412de33b63d71acf2819f9d67e070e9113",
+      "tests": 19
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:model-integration-offline"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T02:14:07.040438+00:00",
+      "finishedAt": "2026-09-29T02:14:34.201916+00:00",
+      "sha256": "03889ce3e22287ad34f5baf024cf855afe7f474065b417225711d4a66e607805",
+      "tests": 28
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:model-network"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T02:14:34.202489+00:00",
+      "finishedAt": "2026-09-29T02:14:34.926253+00:00",
+      "sha256": "ba5472059f8ce897c12d82cbbc1f46ef480af64adb537831fc033e2c3c1bcbb5"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:model-config"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T02:14:34.926531+00:00",
+      "finishedAt": "2026-09-29T02:14:44.960882+00:00",
+      "sha256": "0cbb2b20da067fe2ba8d1b7d0cf446375daee7ee1d1ee15fcfd8da945f1e27eb"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:desktop-model"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T02:14:44.961151+00:00",
+      "finishedAt": "2026-09-29T02:14:49.769365+00:00",
+      "sha256": "8fbf83b307d1c7011a7f81449537362510d2951cf4c2f2985585ec7224788624"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:desktop-ui"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T02:14:49.769713+00:00",
+      "finishedAt": "2026-09-29T02:15:02.887297+00:00",
+      "sha256": "da279e69e3f010d25ee00760f2e00945b40a1ea14e78cb652c03f0455471ef27"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:desktop-shell"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T02:15:02.887760+00:00",
+      "finishedAt": "2026-09-29T02:15:08.962901+00:00",
+      "sha256": "538b7045d50c8a3fc379b2f6ecf258a1aba9d51ac717e44395288b7b0c740738"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:desktop-shutdown"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T02:15:08.963324+00:00",
+      "finishedAt": "2026-09-29T02:16:31.739434+00:00",
+      "sha256": "22cee5299c5956bfcd652bf644a2f744e242b3ec32a60025c80e33a2653b87cf"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "demo:product-shell",
+        "--",
+        "allow"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T02:16:31.739832+00:00",
+      "finishedAt": "2026-09-29T02:16:33.257483+00:00",
+      "sha256": "77b1296683e593e6bb20bb11d6753b399162f04e25ff92d6e92853bedf83f91a"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "demo:product-shell",
+        "--",
+        "deny"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T02:16:33.257873+00:00",
+      "finishedAt": "2026-09-29T02:16:34.673349+00:00",
+      "sha256": "5e54ecbb999df4dbe668e55198b9f56175480732564fbefcb17936ff83c9c703"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "demo:product-shell",
+        "--",
+        "cancel"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T02:16:34.673723+00:00",
+      "finishedAt": "2026-09-29T02:16:36.096171+00:00",
+      "sha256": "5f780a8051557cb9b8f1b94f72e8b3f7a742d81e45b11b48dba955c3f01ffab2"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "demo:product-shell",
+        "--",
+        "crash"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T02:16:36.096618+00:00",
+      "finishedAt": "2026-09-29T02:16:37.623415+00:00",
+      "sha256": "237244a452678f268d2bc50176c0012a7a3cb667de8efec4cb5fd1720bb3691d"
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/check-ssot.py"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T02:16:37.623791+00:00",
+      "finishedAt": "2026-09-29T02:16:37.808848+00:00",
+      "sha256": "074fb9140f57d2f19d919ee8a013d022f39c586a7f84ef7bee15bf600141cb36"
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/test-tools.py"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T02:16:37.809191+00:00",
+      "finishedAt": "2026-09-29T02:16:37.934349+00:00",
+      "sha256": "568787c7adfb8b6f2f5a3fca97074f8f8e45951409403a6cdcefe6eecc967ea7"
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/check-docs.py",
+        "--structural-only"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T02:16:37.934685+00:00",
+      "finishedAt": "2026-09-29T02:16:38.062563+00:00",
+      "sha256": "4ad9268ff77baa0190d1a939736eb4b554cee04743fb5b14d0c16ab1d6f45961"
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/check-docs.py",
+        "--typecheck"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T02:16:38.062905+00:00",
+      "finishedAt": "2026-09-29T02:16:38.570806+00:00",
+      "sha256": "4763bdce2d42d4b298316a93116c1c437abe9dd2deb200a6871edce040d390ec"
+    }
+  ],
+  "additionalCommands": [
+    {
+      "command": "npm install --save-exact --ignore-scripts @earendil-works/pi-ai@0.87.1 @earendil-works/pi-coding-agent@0.87.1",
+      "exitCode": 0,
+      "logSha256": "377071b6afcfcc14e9a9ffb8e8010a8b3980173b8e8ea9b71785a3563e40a8cb"
+    },
+    {
+      "command": "npm run patch:pi-types (initial)",
+      "exitCode": 1,
+      "logSha256": "f633cd3c0b4c9c7f9880e4b7e0bfdc19b9265f68f00d8c85749213ef29b00efe"
+    },
+    {
+      "command": "bootstrap.sh --app --offline (first)",
+      "exitCode": 0,
+      "logSha256": "88e6e9b008051eb7869613b9fe21ab306d5614c1207827ad01e56370adad8c34"
+    },
+    {
+      "command": "bootstrap.sh --app --offline (second)",
+      "exitCode": 0,
+      "logSha256": "58dbec00a2ab4e4bd7f9821a952b98322a2141d38f5b5d103b15e06f034ccbd7"
+    },
+    {
+      "command": "npm run prepare:desktop -- --offline",
+      "exitCode": 0,
+      "logSha256": "9f56e66db05ca94dc6df8ee58a58c2e4c3b094cd1b055592f25c9f3967c894b1"
+    },
+    {
+      "command": ".venv/bin/python scripts/verify-pi-release.py --output-dir .artifacts/m1-access-20260929/release-audit",
+      "exitCode": 0,
+      "logSha256": "c50e416d1dfe4528f0b6a5f42ceb31cec218ec51b98c2e06c54213703b2765e0"
+    },
+    {
+      "command": "npm run validate:model-live",
+      "exitCode": 1,
+      "logSha256": "56bfe930f2623d1e39b11a39ad1be753f1f73d2d43a5f256d67ce6e4c3e1dc79"
+    },
+    {
+      "command": "npm run validate:model-live -- --execute-approved",
+      "exitCode": 1,
+      "logSha256": "c63632fcc7b630f5ca409d37cc4a38b8b338d27af8db0da807f3fe30e15f3be2"
+    }
+  ],
+  "realModelRequests": 2,
+  "liveValidation": {
+    "startedAt": "2026-09-29T02:15:57.096Z",
+    "provider": "openai",
+    "model": "gpt-6-luna",
+    "priceSource": "Pi 0.87.1 bundled catalog; estimate, not a provider billing guarantee",
+    "reservePerRequestUsd": 0.034256,
+    "limits": {
+      "requests": 4,
+      "estimatedUsd": 1,
+      "outputTokens": 512
+    },
+    "stages": [
+      {
+        "stage": "first",
+        "state": "completed",
+        "observedStream": true,
+        "cancelSent": false,
+        "milliseconds": 25424,
+        "outcome": {
+          "reason": "stop",
+          "inputTokens": 4468,
+          "outputTokens": 10,
+          "estimatedCostUsd": 0.0001062,
+          "synthetic": false
+        },
+        "zeroOperations": true,
+        "replyMatches": true
+      },
+      {
+        "stage": "resume",
+        "state": "unknown",
+        "observedStream": false,
+        "cancelSent": false,
+        "milliseconds": 30119,
+        "outcome": null,
+        "zeroOperations": true,
+        "replyMatches": false
+      }
+    ],
+    "completed": false,
+    "reconnected": true,
+    "failure": "validation_failed_inspect_stage_and_native_audit",
+    "hostClosed": true,
+    "finishedAt": "2026-09-29T02:16:54.526Z"
+  },
+  "postCloseAudit": {
+    "runs": {
+      "completed": 1,
+      "failed": 1
+    },
+    "reservedRequests": 2,
+    "reservedUsd": 0.068512,
+    "cleanupReceipts": 2,
+    "allWorkersExited": true,
+    "allGroupsGone": true,
+    "nativePersisted": true,
+    "credentialScanFiles": 8,
+    "credentialMatches": 0
+  },
+  "limitations": [
+    "First response succeeded; resumed request reached configured 30 second deadline.",
+    "No active cancellation live request executed; complete M1-B not passed.",
+    "SDK cost estimates are not verified provider billing.",
+    "Only approved synthetic inputs and fixed Mac process scope; no Windows/Keychain/OAuth."
+  ],
+  "documentationChecks": [
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/check-ssot.py"
+      ],
+      "exitCode": 1,
+      "startedAt": "2026-09-29T02:22:39.270966+00:00",
+      "finishedAt": "2026-09-29T02:22:39.373975+00:00",
+      "sha256": "9cbea64dc455c6a8ce2c538f4322bf57d6efe797e2793d2ab255f1106fef09c9"
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/test-tools.py"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T02:22:39.374173+00:00",
+      "finishedAt": "2026-09-29T02:22:39.446651+00:00",
+      "sha256": "47060195453f3c91118ef1d9c94c5d8f1726e608fe870bc724672a1b6c299b1f"
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/check-docs.py",
+        "--structural-only"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T02:22:39.446822+00:00",
+      "finishedAt": "2026-09-29T02:22:39.533276+00:00",
+      "sha256": "6f3ba6ae9c760d47f7978f47ffb62d740fc0e571b650adc4e40fae32d8cc56a6"
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/check-docs.py",
+        "--typecheck"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T02:22:39.533393+00:00",
+      "finishedAt": "2026-09-29T02:22:39.902986+00:00",
+      "sha256": "bd16c52041b3323d7f7ca8b52f82f3f62fb84962b8c4e623b251e8b45620212c"
+    }
+  ],
+  "ssotEvidenceCorrection": {
+    "command": [
+      ".venv/bin/python",
+      "scripts/check-ssot.py"
+    ],
+    "exitCode": 0,
+    "sha256": "2749bfddb4b74fa0ac35b8efc092c18a7d2d19cd089a9e60f90dda64d53cb84d",
+    "scope": "Remove failed resume evidence from verified capability proof; retain in registry and in_progress MODEL-02."
+  }
+}
