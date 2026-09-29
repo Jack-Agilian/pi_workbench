@@ -55,7 +55,7 @@ key 是明文保存，权限必须为 0600；不要放入聊天、Git、`model.j
 }
 ```
 
-上述数字仅演示字段，不是任一服务商的真实价格。初始化兼容模板的数值为 0，必须按服务商资料填写才能通过检查；价格要求正数，可填写保守上界。新式 Chat Completions 服务可能要求 `max_completion_tokens`；Responses 使用 `api: "responses"` 并删除 `tokenLimitField`。不自动尝试其他接口或切换模型。仅文本、零工具，不开放自定义请求头、任意参数或可执行代码。
+上述数字仅演示字段，不是任一服务商的真实价格。初始化兼容模板的数值为 0，必须按服务商资料填写才能通过检查；价格要求正数，可填写保守上界。新式 Chat Completions 服务可能要求 `max_completion_tokens`；Responses 使用 `api: "responses"` 并删除 `tokenLimitField`。不自动尝试其他接口或切换模型。缺省仅文本、零工具；M2文件模式须显式批准，见文末。不开放自定义请求头、任意参数或可执行代码。
 
 ```bash
 npm run model:config -- check
@@ -72,7 +72,7 @@ Renderer 只收到就绪状态，不接收 key、路径或 Pi 对象。宿主通
 
 原有“选择凭据”仍可临时加载仓库外、权限 0600 的纯文本 `.key` 文件。此操作不修改 `auth.json`；重连后会重新读持久配置，临时 key 不保留。文件路径不能由页面指定。
 
-`approved=false`、配置无效或无有效凭据时不能发送。启用后按“新建会话 → 发送合成文本 → 同一会话继续 → 停止”验证；原生上下文由 Pi 保存，每次发送一次执行，没有文件或 Shell 工具。停止不承诺撤销服务商费用。
+`approved=false`、配置无效或无有效凭据时不能发送。启用后按“新建会话 → 发送合成文本 → 同一会话继续 → 停止”验证；原生上下文由 Pi 保存，每次发送一次Run；未启用fileTools时没有文件或Shell工具。停止不承诺撤销服务商费用。
 
 ## 离线检查
 
@@ -125,3 +125,21 @@ timeoutMs 是另一个独立限制：从单次请求开始等待到最终生成�
 
 
 续验入口在读取凭据/启动宿主前检查已开始的 attempt 与现有锁：`resume_attempt_already_started` 要求查看原结果及产品账本；`resume_validation_locked` 表示另一个或中断的驱动器占用该 profile。不要删结果、自动抢锁或重发请求。先核实原驱动器和宿主是否仍运行；若已退出，用正常宿主恢复对账并保留原失败/中断记录，再决定后续明确授权。自动化不提供强制解锁/自动续跑。
+
+## M2 文件工具配置（先离线，真实验收待新授权）
+
+可选字段 `fileTools` 是宿主授权策略，缺省仍零工具。它不是Renderer参数，也不是Pi的自由配置。确认新的文件/数据/调用预算后才能在model.json显式加入，例如：
+
+```json
+"fileTools": {
+  "maxOperations": 8,
+  "maxModelRequests": 4,
+  "operationTimeoutMs": 300000
+}
+```
+
+maxOperations是每Run最多1–16个宿主文件操作，maxModelRequests是每Run最多1–20次模型请求；顶层maxRequests/费用仍按整个授权跨Run累计。operationTimeoutMs范围100–3600000ms，包含逐操作人工等待及执行，审批页显示截止。模型请求总期限每次独立计时，等待审批不消耗HTTP空闲期限；Run外围期限按各阶段的批准上限推导，详见 [契约](ssot/m2-file-agent-contract.md)。
+
+文件范围仅宿主批准workspace中的相对规范 `.md`，有效UTF-8、无NUL、最多16000字节；read也必须审批。批准绑定目标、参数、原版本、资源lock、Run身份及期限。文件正文/工具结果可能进入后续模型请求，因此仍只允许合成无敏感材料。Bash、任意Provider工具、图片及未知扩展均未启用。HTTP输入24000字节上限仍保留，达到上限即阻断。
+
+不能通过旧授权的timeout修订添加fileTools或提高工具限额，也不能重置旧4/4消费。先完成 [新真实验收计划](planning/NEXT_STEPS.md) 的明确授权；本轮没有修改本机真实配置/凭据，没有新增真实调用。M1的validate:model-live/resume脚本不是M2验收驱动；M2自动检查只运行test:product-file-agent和test:desktop-file-agent。交互演示运行demo:file-agent，始终明确标记SYNTHETIC。

@@ -1,0 +1,349 @@
+{
+  "testedCodeCommit": "08102d18684affcd7f47e28dc5be8c99dbb013d3",
+  "baseline": "148022b05250cfda824725778e9a056d00cd6830",
+  "branch": "codex/m2-file-agent",
+  "recordedAt": "2026-09-29T06:40:30.878081+00:00",
+  "platform": {
+    "os": "macOS 27.0",
+    "build": "26A428",
+    "machineArchitecture": "arm64",
+    "nodeProcessArchitecture": "arm64",
+    "rosetta": false,
+    "node": "24.21.0",
+    "npm": "11.19.0",
+    "pi": "0.87.1",
+    "electron": "44.4.5"
+  },
+  "newRealModelRequests": 0,
+  "dependencyLockChanged": false,
+  "lockSha256": "bb0bca5ba2828a2e19e020ad44341c11f01fa0664b419422548cbd53d34fdb87",
+  "dependencyInstallation": "none; existing offline package fixture cache used",
+  "codeTreeCleanAtStart": true,
+  "documentationDelta": "docs, AGENTS and evidence edited after code commit; runtime files unchanged throughout consolidated checks",
+  "results": [
+    {
+      "command": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T06:34:19.882531+00:00",
+      "finishedAt": "2026-09-29T06:34:21.818847+00:00",
+      "sha256": "22df5d47848ff6e1f3c0926a3aa3f05da31fb2c76601187b826c3ad4d7870689",
+      "log": ".artifacts/m2-file-agent-20260929/01-typecheck.log"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-types"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T06:34:21.819266+00:00",
+      "finishedAt": "2026-09-29T06:34:24.591371+00:00",
+      "sha256": "cf6f6b61ad9358faeca86e14ac5b19ae4b5cd2a5974e00869b9242207f2add5c",
+      "log": ".artifacts/m2-file-agent-20260929/02-test-pi-types.log"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-probe"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T06:34:24.591749+00:00",
+      "finishedAt": "2026-09-29T06:34:25.533768+00:00",
+      "sha256": "4b7b5b08f357ded9519da43ac2e89b5eb24a9defd9abe8aeb516eea1a8895de9",
+      "log": ".artifacts/m2-file-agent-20260929/03-test-pi-probe.log"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-tools"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T06:34:25.534667+00:00",
+      "finishedAt": "2026-09-29T06:34:26.583667+00:00",
+      "sha256": "b1238d83a86c16f01d021361791c82a94a3c59ca17a17253c9bd0c585cc972bd",
+      "log": ".artifacts/m2-file-agent-20260929/04-test-pi-tools.log"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-shell"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T06:34:26.584061+00:00",
+      "finishedAt": "2026-09-29T06:34:27.795087+00:00",
+      "sha256": "91ede518f697907a480c89ae7b46a94ad188bd2cd6b24877aa30186e02652c29",
+      "log": ".artifacts/m2-file-agent-20260929/05-test-pi-shell.log"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-resources"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T06:34:27.795533+00:00",
+      "finishedAt": "2026-09-29T06:34:28.843919+00:00",
+      "sha256": "096ccae941ac5bd7453eda59f9be6de38ddfcc6e1923097914091a34dfc2fb61",
+      "log": ".artifacts/m2-file-agent-20260929/06-test-pi-resources.log"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-auth"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T06:34:28.844283+00:00",
+      "finishedAt": "2026-09-29T06:34:29.839966+00:00",
+      "sha256": "db13b169b41a3bd227082cf463d16c8b2a8bd3e363e5c28d6d117191b6012f8e",
+      "log": ".artifacts/m2-file-agent-20260929/07-test-pi-auth.log"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:pi-packages"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T06:34:29.840531+00:00",
+      "finishedAt": "2026-09-29T06:34:33.564602+00:00",
+      "sha256": "d503661bc24d77da7ae0722d089146526d7a88740d2cb89171d664ecb4380a4b",
+      "log": ".artifacts/m2-file-agent-20260929/08-test-pi-packages.log"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:product-core"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T06:34:33.565060+00:00",
+      "finishedAt": "2026-09-29T06:34:34.293684+00:00",
+      "sha256": "a985a27c3de8dc3338c4b3b93a13d12eae10bc575ed10d01d6e543cf23082d63",
+      "log": ".artifacts/m2-file-agent-20260929/09-test-product-core.log"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:product-sdk"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T06:34:34.294046+00:00",
+      "finishedAt": "2026-09-29T06:34:35.295298+00:00",
+      "sha256": "78c4c24b39b70c88bfda23a4ce6ec8acf05050c3d23af53bb13189c50ed01787",
+      "log": ".artifacts/m2-file-agent-20260929/10-test-product-sdk.log"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:product-worker"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T06:34:35.295713+00:00",
+      "finishedAt": "2026-09-29T06:35:08.335777+00:00",
+      "sha256": "86f3b65dc36271c54cc7124767a1ed9adc141a08f4889ea50dc9e6c584f57912",
+      "log": ".artifacts/m2-file-agent-20260929/11-test-product-worker.log"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:product-shell"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T06:35:08.336216+00:00",
+      "finishedAt": "2026-09-29T06:35:26.835002+00:00",
+      "sha256": "7473a092974433115a03cf4d2335401079d0cd4930ecf7c15fefca5c81133e0d",
+      "log": ".artifacts/m2-file-agent-20260929/12-test-product-shell.log"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:model-integration-offline"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T06:35:26.835479+00:00",
+      "finishedAt": "2026-09-29T06:35:55.223540+00:00",
+      "sha256": "d3a7978083ca001f0218b721880e0a742cc4aff373d731be77b355be4d9a67db",
+      "log": ".artifacts/m2-file-agent-20260929/13-test-model-integration-offline.log"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:model-resume"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T06:35:55.224339+00:00",
+      "finishedAt": "2026-09-29T06:35:57.240099+00:00",
+      "sha256": "95214b8f94bd78fa8eef4e706f18196aac855c03388a6e409696cc33170d3a99",
+      "log": ".artifacts/m2-file-agent-20260929/14-test-model-resume.log"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:model-network"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T06:35:57.240502+00:00",
+      "finishedAt": "2026-09-29T06:35:57.911761+00:00",
+      "sha256": "ba5472059f8ce897c12d82cbbc1f46ef480af64adb537831fc033e2c3c1bcbb5",
+      "log": ".artifacts/m2-file-agent-20260929/15-test-model-network.log"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:model-config"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T06:35:57.912119+00:00",
+      "finishedAt": "2026-09-29T06:36:06.680840+00:00",
+      "sha256": "0cbb2b20da067fe2ba8d1b7d0cf446375daee7ee1d1ee15fcfd8da945f1e27eb",
+      "log": ".artifacts/m2-file-agent-20260929/16-test-model-config.log"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:product-file-agent"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T06:36:06.681204+00:00",
+      "finishedAt": "2026-09-29T06:36:29.223295+00:00",
+      "sha256": "551f9b509c76d153679ed79c23590fe05cc5f7da6101d82906a9e44183a3b21e",
+      "log": ".artifacts/m2-file-agent-20260929/17-test-product-file-agent.log"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:desktop"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T06:36:29.223811+00:00",
+      "finishedAt": "2026-09-29T06:36:42.566739+00:00",
+      "sha256": "221fe1bbd96891f5fb14b0563396d93971428cf63b2227ff02181396615894f2",
+      "log": ".artifacts/m2-file-agent-20260929/18-test-desktop.log"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:desktop-ui"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T06:36:42.567171+00:00",
+      "finishedAt": "2026-09-29T06:36:59.715375+00:00",
+      "sha256": "496fe3869af240c5b59d023eef6790ca99c3073e70ebc255b6c57baf45292319",
+      "log": ".artifacts/m2-file-agent-20260929/19-test-desktop-ui.log"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:desktop-shell"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T06:36:59.715950+00:00",
+      "finishedAt": "2026-09-29T06:37:06.806612+00:00",
+      "sha256": "538b7045d50c8a3fc379b2f6ecf258a1aba9d51ac717e44395288b7b0c740738",
+      "log": ".artifacts/m2-file-agent-20260929/20-test-desktop-shell.log"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:desktop-model"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T06:37:06.807130+00:00",
+      "finishedAt": "2026-09-29T06:37:12.781409+00:00",
+      "sha256": "8fbf83b307d1c7011a7f81449537362510d2951cf4c2f2985585ec7224788624",
+      "log": ".artifacts/m2-file-agent-20260929/21-test-desktop-model.log"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:desktop-file-agent"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T06:37:12.781993+00:00",
+      "finishedAt": "2026-09-29T06:37:19.239236+00:00",
+      "sha256": "7c7997842b752009e5039aa8ce7aea58dbeb5e943947008b5725c88ef5565f1d",
+      "log": ".artifacts/m2-file-agent-20260929/22-test-desktop-file-agent.log"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test:desktop-shutdown"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T06:37:19.239836+00:00",
+      "finishedAt": "2026-09-29T06:38:06.678181+00:00",
+      "sha256": "8a8c462069e6c1cbe8f1a6e30aa30549255e2fa0677ea09cc72ad0d900c825c4",
+      "log": ".artifacts/m2-file-agent-20260929/23-test-desktop-shutdown.log"
+    }
+  ],
+  "documentationChecks": [
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/check-ssot.py"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T06:40:56.688070+00:00",
+      "finishedAt": "2026-09-29T06:40:56.821040+00:00",
+      "sha256": "337922e9b236fe7bfeaf8ae87681151ee887229452d87415467b380cb8b2cf07",
+      "log": ".artifacts/m2-file-agent-20260929/docs-1.log"
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/test-tools.py"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T06:40:56.821617+00:00",
+      "finishedAt": "2026-09-29T06:40:57.008122+00:00",
+      "sha256": "47060195453f3c91118ef1d9c94c5d8f1726e608fe870bc724672a1b6c299b1f",
+      "log": ".artifacts/m2-file-agent-20260929/docs-2.log"
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/check-docs.py",
+        "--structural-only"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T06:40:57.008371+00:00",
+      "finishedAt": "2026-09-29T06:40:57.139283+00:00",
+      "sha256": "ad64147fb07376ae49d9834ecc6d3413758f4a583628dedb17bd5ac31b8a7aca",
+      "log": ".artifacts/m2-file-agent-20260929/docs-3.log"
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/check-docs.py",
+        "--typecheck"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-09-29T06:40:57.139500+00:00",
+      "finishedAt": "2026-09-29T06:40:57.546869+00:00",
+      "sha256": "2ceb1f40d9acd40b069bf8e56115e86a09132652a74c371dc40e300fca8fa6c3",
+      "log": ".artifacts/m2-file-agent-20260929/docs-4.log"
+    }
+  ]
+}

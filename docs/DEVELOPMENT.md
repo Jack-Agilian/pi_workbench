@@ -1,6 +1,6 @@
 # 开发环境、检查与发布
 
-当前实现决策以 [复用优先 SSOT](ssot/README.md) 为准。下文 A0–D 按阶段记录入口和当时范围；最新状态以 [NEXT_STEPS](planning/NEXT_STEPS.md) 与 [M1收口](validation/m1-closeout-2026-09-29.md) 为准，不将历史“未实现/待验收”作为当前总状态。修改当前文档或 Backlog 后运行 `python scripts/check-ssot.py`；该检查只验证文档/JSON一致性，不安装或测试 Pi。
+当前实现决策以 [复用优先 SSOT](ssot/README.md) 为准。下文 A0–D 按阶段记录入口和当时范围；最新状态以 [NEXT_STEPS](planning/NEXT_STEPS.md) 与 [M2离线报告](validation/m2-file-agent-2026-09-29.md) 为准，不将历史“未实现/待验收”作为当前总状态。修改当前文档或 Backlog 后运行 `python scripts/check-ssot.py`；该检查只验证文档/JSON一致性，不安装或测试 Pi。
 
 ## 1. 当前初始化范围
 
@@ -308,4 +308,19 @@ CLI 演示将审计/profile 留在 `.artifacts/shell-demos/`；crash 演示故�
 
 M1 续验修订的离线回归：`npm run test:model-resume`（合成 SQLite/客户端与隔离配置，不使用账户）。显式策略修订与真实续验入口见 [配置说明](MODEL_CONFIGURATION.md)。
 
-时间默认值已获用户确认：单LLM总上限30分钟、独立网络空闲5分钟；前期实现与采用引用的同步核对见 [M1收口](validation/m1-closeout-2026-09-29.md)。不自动迁移本机旧授权配置。
+时间默认值已获用户确认：单LLM总上限30分钟、独立网络空闲5分钟；前期实现与采用引用的同步核对见 [M2离线报告](validation/m2-file-agent-2026-09-29.md)。不自动迁移本机旧授权配置。
+
+## M2 有限文件 Agent（离线已验证）
+
+沿用本项目Node/Pi/Electron和唯一锁，无新依赖/安装脚本。运行：
+
+```bash
+npm run typecheck
+npm run test:product-file-agent
+npm run test:desktop-file-agent
+npm run demo:file-agent
+```
+
+前两套新测试分别覆盖实际SDK/受限Worker/宿主HTTP接缝的合成OpenAI响应，以及实际Electron/Host/Pi工具的fauxProvider桌面演示；都不访问真实服务。显式 `--model-files-offline` 是本机开发组合入口，Renderer无法选择worker代码或合成故障。演示profile与model-profile分离，自动测试使用临时目录及隔离环境。
+
+正常模型配置只有显式fileTools才注册read/write/edit；SQL v8迁移保留旧预算，IPC v6增加逐工具结算与逐HTTP关闭确认。有限文件/计时/恢复范围和当前未测项见 [契约](ssot/m2-file-agent-contract.md)、[报告](validation/m2-file-agent-2026-09-29.md)。本轮未运行新的初始化/新克隆，也未改变历史声明补丁；不要把历史初始化证据改成当前SHA实测。

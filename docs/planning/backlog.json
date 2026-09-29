@@ -1694,7 +1694,7 @@
       "id": "MODEL-03",
       "priority": "P0",
       "ownerRole": "Tech Lead",
-      "state": "proposed",
+      "state": "in_progress",
       "githubIssueNumber": null,
       "dependencies": [
         "MODEL-02"
@@ -1705,9 +1705,11 @@
         "models-auth",
         "agent-session",
         "product-coordination",
-        "desktop-ui"
+        "desktop-ui",
+        "read-search",
+        "edit-write"
       ],
-      "implementationStatus": "not_implemented",
+      "implementationStatus": "in_progress",
       "githubIssueUrl": null,
       "issueVerificationStatus": "not_checked",
       "issueEvidence": [],
@@ -1724,7 +1726,10 @@
             "m2-multi-request-budget",
             "m2-model-ledger-migration"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-M2-SDK-20260929",
+            "EV-M2-MAC-20260929"
+          ]
         },
         {
           "id": "MODEL-03-A02",
@@ -1733,7 +1738,10 @@
             "m2-zero-single-multi-tools",
             "m2-per-operation-approval"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-M2-SDK-20260929",
+            "EV-M2-MAC-20260929"
+          ]
         },
         {
           "id": "MODEL-03-A03",
@@ -1742,7 +1750,10 @@
             "m2-operation-result-isolation",
             "m2-write-result-loss-recovery"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-M2-SDK-20260929",
+            "EV-M2-MAC-20260929"
+          ]
         },
         {
           "id": "MODEL-03-A04",
@@ -1752,7 +1763,11 @@
             "m2-desktop-safe-projection",
             "m2-time-boundaries"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-M2-SDK-20260929",
+            "EV-M2-MAC-20260929",
+            "EV-M2-MOCK-20260929"
+          ]
         },
         {
           "id": "MODEL-03-A05",
@@ -1763,7 +1778,7 @@
           "evidenceRefs": []
         }
       ],
-      "statusReason": "M1已收口集成develop，30分钟策略已确认；M2最小契约已整理但运行代码尚未实施，按NEXT_STEPS的M2-A/B/C集中推进。原授权4/4已耗尽，真实验收须新明确预算。"
+      "statusReason": "M2-A/B有限Markdown Agent、多请求账本、逐操作审批/结果及Mac实际进程/桌面链路已离线验证；A05真实模型工具任务尚未验收，当前唯一事项M2-C新计划与授权准备。原4/4耗尽，本轮0次真实调用；不完成M0-Pi。"
     }
   ],
   "decisionSource": "../ssot/README.md",
