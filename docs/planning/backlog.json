@@ -1635,7 +1635,8 @@
             "EV-M1-SDK-20260928",
             "EV-M1-MAC-20260928",
             "EV-M1-OPENAI-SDK-20260929",
-            "EV-M1-OPENAI-MAC-20260929"
+            "EV-M1-OPENAI-MAC-20260929",
+            "EV-M1-STREAM-IDLE-20260929"
           ]
         }
       ],

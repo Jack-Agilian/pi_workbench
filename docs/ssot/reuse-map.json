@@ -182,7 +182,7 @@
         "ModelRuntime.registerProvider"
       ],
       "reuse": "Provider、目录、登录/刷新复用",
-      "productDelta": "M1 OpenAI Responses/Chat Completions 与原有 Anthropic；Pi 原生 Provider/公开 registerProvider 元数据接入；应用专用 auth.json 字面量 key 读取和临时原生文件选择；系统 Keychain/OAuth 未完成；0.87.1目录模型只覆盖批准baseUrl，真实首条、原会话恢复及活跃取消已限定验证；追加规范化策略/旧账本兼容和显式timeout修订，真实授权累计4/4，取消实际计费未知",
+      "productDelta": "M1 OpenAI Responses/Chat Completions 与原有 Anthropic；Pi 原生 Provider/公开 registerProvider 元数据接入；应用专用 auth.json 字面量 key 读取和临时原生文件选择；系统 Keychain/OAuth 未完成；0.87.1目录模型只覆盖批准baseUrl，真实首条、原会话恢复及活跃取消已限定验证；追加规范化策略/旧账本兼容和显式timeout修订，真实授权累计4/4，取消实际计费未知；httpIdleTimeoutMs空闲期限与timeoutMs单请求总期限独立，长流使用缩时合成回归",
       "acceptanceGate": "secret 不进Renderer/日志/子进程env",
       "implementationState": "in_progress",
       "adoption": {
@@ -278,7 +278,8 @@
           "EV-M1-LIVE-MAC-20260929",
           "EV-M1-POLICY-REGRESSION-20260929",
           "EV-M1-RESUME-MODEL-20260929",
-          "EV-M1-RESUME-MAC-20260929"
+          "EV-M1-RESUME-MAC-20260929",
+          "EV-M1-STREAM-IDLE-20260929"
         ]
       }
     },
@@ -2255,6 +2256,18 @@
         "darwin"
       ],
       "locator": "docs/validation/review-develop-m1-2026-09-29.md"
+    },
+    {
+      "id": "EV-M1-STREAM-IDLE-20260929",
+      "kind": "sdk",
+      "result": "passed",
+      "scope": "12 focused regression commands passed on Mac. Scaled single HTTP stream stays alive beyond idle while bytes arrive; stalled headers/body and empty chunks time out; existing hard-deadline/cleanup tests remain passed. Real Pi/Worker uses synthetic SSE. No new model calls or 10-minute wall-clock/provider proof.",
+      "commit": "ba9b8ea3c04b1e9242c38d9e8ca52a9ffc967a4b",
+      "recordedAt": "2026-09-29T03:59:18.715482+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/m1-stream-timeout-2026-09-29.md"
     }
   ]
 }
