@@ -117,3 +117,5 @@ D2-S/S01 已集成 develop（`22cf288`）。此前 D2-T 为下一项的阶段表
 ## M1 收口与30分钟决策确认（2026-09-29）
 
 [逐项核对](../validation/m1-closeout-2026-09-29.md) 统一已实现的预算修订、原会话续验、HTTP时间边界及安全展示证据；采用清单补齐 agent-session、native-history、pi-settings、product-coordination、desktop-ui 的相关引用。用户已确认单个LLM总上限30分钟、独立空闲上限5分钟，旧配置和4/4消费不变。接下来按 [唯一计划](../planning/NEXT_STEPS.md) 推进M2离线增量；本次未新增真实调用，不晋级M0-Pi。
+
+M1已集成develop `27806bc61e3d9ffc3322c4c558c81bde79ad1e10`；[M2最小实施契约](m2-file-agent-contract.md)已整理，当前唯一事项为其离线实现。多请求预算、逐操作授权/结果、独立时间边界和安全展示仍待编码及验收，MODEL-03保持proposed。

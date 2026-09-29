@@ -412,5 +412,54 @@
       "sha256": "51137eea13a33cdd66baf00903441a66cd83d1d0225af2a3e6c758d37dbdc17b",
       "log": ".artifacts/m1-closeout-20260929/docs-types.log"
     }
-  ]
+  ],
+  "integration": {
+    "mergeCommit": "27806bc61e3d9ffc3322c4c558c81bde79ad1e10",
+    "treeEqualsFeature": true,
+    "subsequentDocsDelta": "M1 integration state and planned M2 contract; runtime unchanged",
+    "documentationChecks": [
+      {
+        "command": [
+          ".venv/bin/python",
+          "scripts/check-ssot.py"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T05:48:45.610369+00:00",
+        "finishedAt": "2026-09-29T05:48:45.706274+00:00",
+        "sha256": "5d71d10846cbf6731849d0ec1b374d5febcbcaa1a86d9fceecba8682ce42bcc3"
+      },
+      {
+        "command": [
+          ".venv/bin/python",
+          "scripts/test-tools.py"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T05:48:45.706481+00:00",
+        "finishedAt": "2026-09-29T05:48:45.774163+00:00",
+        "sha256": "c7aee9500b2bb75ffe3977438ce4e7e3786f2c37d5ac0d00b16e5e99f0a2c7cd"
+      },
+      {
+        "command": [
+          ".venv/bin/python",
+          "scripts/check-docs.py",
+          "--structural-only"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T05:48:45.774287+00:00",
+        "finishedAt": "2026-09-29T05:48:45.858656+00:00",
+        "sha256": "51db24312f114d754e1ae3f7a46dc78817ad3575a25a6ec4ab52415ab5d1ffd2"
+      },
+      {
+        "command": [
+          ".venv/bin/python",
+          "scripts/check-docs.py",
+          "--typecheck"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T05:48:45.858767+00:00",
+        "finishedAt": "2026-09-29T05:48:46.214890+00:00",
+        "sha256": "920a8ca91f078b030a3b69d60ccfd15b84c7f6da8a39b3f462a9a6242e0cc941"
+      }
+    ]
+  }
 }

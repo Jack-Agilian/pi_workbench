@@ -149,3 +149,5 @@ P0 的 CORE-03 必须保证同 Workspace 至多一个活动写 Run；M0 可先�
 schema v7 的 model_policy_revisions 记录同授权的显式时间修订，model_requests 的原请求数/预留不重置。配置摘要对字段顺序稳定，无法证明的旧策略保持阻断；Renderer 只收到策略待确认/预算耗尽等安全状态。恢复驱动复用原 Thread/Session 和稳定产品 requestId，已开始的 attempt 与中断锁不自动重跑。公开 SDK、原生历史和宿主唯一写库的所有权不变。
 
 用户确认单个 LLM 请求总上限默认30分钟，网络空闲默认5分钟，二者独立；Worker启动、Run编排和进程清理另计，详见 [时间契约](m1-model-contract.md)。缩时合成测试不代表30分钟真实服务实测。当前4/4授权已耗尽；M2离线开发不授权新的真实请求，M0-Pi仍blocked。采用条目与证据的逐项核对见 [收口报告](../validation/m1-closeout-2026-09-29.md)。
+
+M1已集成develop `27806bc61e3d9ffc3322c4c558c81bde79ad1e10`；[M2最小实施契约](m2-file-agent-contract.md)已整理，当前唯一事项为其离线实现。多请求预算、逐操作授权/结果、独立时间边界和安全展示仍待编码及验收，MODEL-03保持proposed。
