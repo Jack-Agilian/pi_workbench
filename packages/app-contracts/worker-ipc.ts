@@ -95,4 +95,4 @@ export function parseEnvelope(value: unknown): Envelope {
   return obj as unknown as Envelope;
 }
 
-function parseHeaders(value: unknown): void { const h = record(value); if (Object.keys(h).length > 32 || JSON.stringify(h).length > 12000) throw new Error('http_headers'); for (const [key,val] of Object.entries(h)) if (!/^[a-z0-9-]+$/i.test(key) || typeof val !== 'string' || /[\r\n\0]/.test(val)) throw new Error('http_header'); }
+function parseHeaders(value: unknown): void { const h = record(value); if (Object.keys(h).length > 32 || JSON.stringify(h).length > 12000) throw new Error('http_headers'); for (const [key,val] of Object.entries(h)) if (!/^[!#$%&'*+.^_`|~a-z0-9-]+$/i.test(key) || typeof val !== 'string' || /[\r\n\0]/.test(val)) throw new Error('http_header'); }

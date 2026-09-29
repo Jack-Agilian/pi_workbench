@@ -127,3 +127,4 @@ test('M1 oversized SYNTHETIC stream is coalesced, truncated only for display and
   const cursor=f.core.snapshot(f.thread).cursor;await f.supervisor.close();assert.equal(f.core.snapshot(f.thread).cursor,cursor);
  }finally{await f.dispose();}
 });
+import './openai.test.ts';

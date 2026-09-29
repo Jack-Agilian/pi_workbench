@@ -1,48 +1,76 @@
 # 模型配置入口
 
-M1 提供独立配置文件和桌面中的本机凭据选择入口。它遵循“设置与凭据分离、通过 Pi SDK 接入”的方式；没有一个适用于所有社区项目的统一配置格式。Pi 的 models.json 用于自定义 Provider/模型，Workbench 的 model.json 另承载本产品的发送授权和预算，不能互换，也不修改用户全局 Pi 配置。
+工作台使用两个文件：`model.json` 保存模型、接口与本次发送授权；`auth.json` 保存 API key。默认目录是 `~/Library/Application Support/Pi Workbench/`，不读取或修改全局 `~/.pi/agent`。
 
-当前接入范围：macOS arm64，Pi 0.87.0 目录中的 Anthropic Messages API。其他 API、代理、自定义 endpoint、OAuth 尚未开放；真实服务验收尚未进行。所有离线测试均无真实模型调用。
+Pi 本身也将 key 保存在 `~/.pi/agent/auth.json`，文件初建权限为 0600（仅本人读写）；自定义模型配置放在 `models.json`。见 [Pi 官方凭据说明](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/providers.md)。本仓库核对的是安装的 Pi 0.87.0 文档与公开 SDK。工作台采用其 `api_key` 凭据记录格式，但 `model.json` 是产品授权格式，不能直接当 Pi 的 `models.json` 使用。
 
-## 稍后填写
+当前支持官方 OpenAI Responses、经用户批准的 OpenAI 兼容 Responses/Chat Completions，以及原有 Anthropic Messages。均已做真实 Pi/Worker 的合成响应测试，尚未做真实服务验收。限定 macOS arm64；没有新增 SDK 或重写 Provider。
 
-在已初始化的仓库中，使用项目指定 Node/npm：
+## 初始化与填写
+
+使用项目指定 Node/npm。官方 OpenAI：
 
 ```bash
-npm run model:config -- init
+npm run model:config -- init-openai
+npm run model:config -- init-auth
 ```
 
-创建 `~/Library/Application Support/Pi Workbench/model.json`，文件权限 0600。已存在时拒绝覆盖，可直接编辑原文件。文件只填非秘密值：
+若使用第三方 OpenAI 兼容服务，第一条换成 `npm run model:config -- init-compatible`。所有 init 命令均拒绝覆盖已有文件；已有文件直接编辑。`init` 仍可创建通用占位模板。也可在命令最后指定仓库外目标路径。
+
+`auth.json` 内容如下，在本机编辑器中填入实际 key：
+
+```json
+{
+  "openai": { "type": "api_key", "key": "" }
+}
+```
+
+key 是明文保存，权限必须为 0600；不要放入聊天、Git、`model.json` 或命令参数。这里只接受字面量 key，不运行 Pi 可支持的 `!命令`，不解析环境变量，也不接受 OAuth 记录。启动和宿主重连时，批准的配置会读取其同目录 `auth.json`；修改后重启。缺失、空 key 或权限不合格时保持“需要凭据”。
+
+`model.json` 由初始化命令生成，填写以下内容：
 
 | 字段 | 含义 |
 |---|---|
-| provider / model | Pi 发行目录中的 Provider 和精确模型 ID；无默认真实模型 |
-| endpoint | 与发行目录相同的官方 base URL；check 会核对 |
+| provider / model | OpenAI 接口填 openai，model 填服务商的精确模型 ID；没有默认真实模型 |
+| endpoint | Base URL，包含服务商要求的路径，例如官方 https://api.openai.com/v1；不追加 /responses 或 /chat/completions |
 | approved | 初始 false；核对服务、数据、限额后再由你改为 true |
 | dataScope | 本阶段固定 synthetic_non_sensitive，仅发送合成无敏感材料 |
-| maxRequests | 此授权下累计最多请求数，含失败请求；禁自动重试 |
-| maxOutputTokens / timeoutMs | 单次输出上限和执行期限 |
-| maxEstimatedCostUsd | 累计预留费用估算上限，不是服务商实际账单保证 |
-| authorizationId | 本次授权的唯一身份；重开不重置，不应为了绕过限额改动 |
+| maxRequests | 此授权累计最多请求数，含失败请求；禁自动重试 |
+| maxOutputTokens / timeoutMs | 单次输出上限和期限；Responses 至少 16 tokens |
+| maxEstimatedCostUsd | 累计保守预留估算上限，不是服务商账单保证 |
+| authorizationId | 本次授权身份；重开不重置，不应为了绕过限额修改 |
+| openai | 可选兼容接口声明，见下方；官方发行目录模型一般不需要 |
 
-检查不会调用模型、加载全局凭据或刷新远端目录：
+官方模式不填 `openai`，模型与 endpoint 必须匹配固定 Pi 发行目录。其他 endpoint/自定义模型必须显式填写 `openai`，例如：
+
+```json
+"openai": {
+  "api": "chat-completions",
+  "contextWindow": 8192,
+  "inputUsdPerMillion": 0.2,
+  "outputUsdPerMillion": 0.4,
+  "tokenLimitField": "max_tokens"
+}
+```
+
+上述数字仅演示字段，不是任一服务商的真实价格。初始化兼容模板的数值为 0，必须按服务商资料填写才能通过检查；价格要求正数，可填写保守上界。新式 Chat Completions 服务可能要求 `max_completion_tokens`；Responses 使用 `api: "responses"` 并删除 `tokenLimitField`。不自动尝试其他接口或切换模型。仅文本、零工具，不开放自定义请求头、任意参数或可执行代码。
 
 ```bash
 npm run model:config -- check
 npm run desktop:model
 ```
 
-也可指定自己的非秘密配置路径：`npm run model:config -- check /absolute/path/model.json`，启动时使用 `npm run desktop:model -- --model-config=/absolute/path/model.json`。修改后重启应用读取。
+check 不发模型请求，不读取 key 或远端目录；显示单次保守预留与预算内最多可请求数。估算采用整个上下文窗口与输出上限；官方模式使用 Pi 固定目录价格，兼容模式使用用户填写的元数据，可能远高于短文本实际费用。首次真实验收仍需核对服务商当期价格和账户硬限额。
 
-check 显示当前配置的单次保守预留费用（整个模型上下文窗口和输出上限），可能远高于短文本实际费用；总预算不足一次预留时调用会在网络前被拒绝。价格来源是固定发行目录，首次真实验收还需核对服务商当期价格与账户硬预算。不要把预算字段当成自动提高限额的许可。
+自定义路径：`npm run model:config -- check /absolute/path/model.json`；启动使用 `npm run desktop:model -- --model-config=/absolute/path/model.json`，凭据仍取同目录 `auth.json`。
 
-## 本机凭据
+## 桌面与凭据边界
 
-在仓库外准备只包含 API key 的 UTF-8 `.key` 文件，例如应用专用目录中的 `provider.key`；权限必须仅当前用户可读写（0600）。用本机编辑器填入，不放进聊天、Git、model.json、命令参数或环境变量。桌面配置区点击“选择凭据并启用本次应用”，在原生文件框中选择该文件。
+Renderer 只收到就绪状态，不接收 key、路径或 Pi 对象。宿主通过已有私有通道将内存 key 交给 Pi 公开 `ModelRuntime.setRuntimeApiKey`；不会把 key 写进产品库、原生 Session 或日志。不声称内存物理擦除、Keychain 或 OAuth 已实现。
 
-页面仅收到就绪状态，不接收密钥或文件路径。应用不会把 key 写入产品数据库、原生 Session 或日志；内存凭据在宿主重连/退出后失效，原始 `.key` 文件由你管理。应用当前不提供系统 Keychain 或 OAuth。
+原有“选择凭据”仍可临时加载仓库外、权限 0600 的纯文本 `.key` 文件。此操作不修改 `auth.json`；重连后会重新读持久配置，临时 key 不保留。文件路径不能由页面指定。
 
-`approved=false`、配置无效或未选择凭据时不能发送。启用后，按“新建会话 → 发送合成文本 → 同一会话继续 → 停止”验证。会话保留 Pi 原生上下文；每次发送是一次执行，当前没有文件或 Shell 工具。停止不承诺撤销服务商已经产生的费用。
+`approved=false`、配置无效或无有效凭据时不能发送。启用后按“新建会话 → 发送合成文本 → 同一会话继续 → 停止”验证；原生上下文由 Pi 保存，每次发送一次执行，没有文件或 Shell 工具。停止不承诺撤销服务商费用。
 
 ## 离线检查
 
@@ -51,8 +79,9 @@ npm run test:model-integration-offline
 npm run test:model-network
 npm run test:model-config
 npm run test:desktop-model
+npm run test:desktop
 ```
 
-分别覆盖真实 Pi/IPC 的合成文本、固定本机 HTTP/OS 禁网、配置与原生凭据选择、真实 Electron 会话操作。配置 UI 测试使用合成 key 且强制宿主禁网；原生文件框通过参数替代测试，不冒充人工选文件验收。
+覆盖真实 SDK/进程的合成 SSE、固定本机 HTTP/OS 禁网、配置和持久凭据、真实 Electron 会话操作。凭据测试使用合成 key、临时目录和宿主禁网；程序化原生 dialog 测试不冒充人工验收。
 
-完整准入/所有权和未覆盖范围见 [M1 契约](ssot/m1-model-contract.md)。填配置不等于本次 Codex 已获准执行真实调用；M1-B 仍需明确账户、允许数据、请求预算及费用授权后单独记录证据。
+完整边界见 [M1 契约](ssot/m1-model-contract.md)。填配置不等于 Codex 已获准执行真实调用；M1-B 仍需明确账户、数据、请求预算及费用授权后单独记录证据。

@@ -274,3 +274,5 @@ test('native credential file selection rejects repository files, public modes an
  const inRepo=join(repo,'bad.key');writeFileSync(inRepo,'SYNTHETIC_ONLY',{mode:0o600});await assert.rejects(useModelCredentialFile(inRepo,repo,async()=>{accepted++;}));assert.equal(accepted,1);
  }finally{rmSync(root,{recursive:true,force:true});}
 });
+
+import './model-credentials.test.ts';

@@ -1,3 +1,4 @@
+import { configureOpenAI, supportedModelApis } from './model-catalog.ts';
 import { InMemoryCredentialStore, InMemoryModelsStore, type Provider, type FetchFunction } from '@earendil-works/pi-ai';
 import { ModelRuntime, SettingsManager } from '@earendil-works/pi-coding-agent';
 import { explicitEmptyResources } from './session-services.ts';
@@ -8,9 +9,10 @@ import type { AgentSession } from '@earendil-works/pi-coding-agent';
 export async function modelServices(options: { cwd: string; agentDir: string }, selection: ModelSelection,
   key: string, fetch: FetchFunction, syntheticProvider?: Provider) {
   const runtime = await ModelRuntime.create({ credentials: new InMemoryCredentialStore(), modelsStore: new InMemoryModelsStore(), modelsPath: null, allowModelNetwork: false, refreshOnCreate: false });
+  configureOpenAI(runtime, selection);
   if (syntheticProvider) runtime.registerNativeProvider(syntheticProvider);
   const provider = runtime.getProvider(selection.provider); const model = runtime.getModel(selection.provider, selection.model);
-  if (!provider || !model || (selection.mode === 'live' && (!['anthropic-messages'].includes(model.api) || model.baseUrl !== selection.endpoint))) throw new Error('model_not_supported');
+  if (!provider || !model || (selection.mode === 'live' && (!supportedModelApis.some(api=>api===model.api) || model.baseUrl !== selection.endpoint))) throw new Error('model_not_supported');
   let calls = 0;
   const limits = { maxTokens: selection.maxOutputTokens, maxRetries: 0, timeoutMs: selection.timeoutMs, transport: 'sse' as const, fetch, env: {} };
   runtime.registerNativeProvider({ ...provider,

@@ -1,3 +1,4 @@
+import { validateModelPayload } from '../../packages/pi-adapter/model-catalog.ts';
 import { ModelHttp } from './model-http.ts';
 import { parseModelConfiguration, parseModelSelection, type ModelSelection, type ModelConfiguration } from '../../packages/app-contracts/model.ts';
 import { parseShellIntent, parseShellOutcome, type ShellIntent, type ShellOutcome } from '../../packages/app-contracts/shell.ts';
@@ -61,7 +62,7 @@ export class WorkerSupervisor {
       if (plan.model.mode === 'live') {
         if (!modelAccess || !modelAccess.key || /[\r\n\0]/.test(modelAccess.key) || modelAccess.key.length > 8192) throw new Error('model_not_configured');
         const configuration = parseModelConfiguration(structuredClone(modelAccess.configuration));
-        if (!configuration.approved || (['provider','model','endpoint','maxOutputTokens','timeoutMs'] as const).some(k => configuration[k] !== plan.model[k])) throw new Error('model_policy_mismatch');
+        if (!configuration.approved || (['provider','model','endpoint','maxOutputTokens','timeoutMs'] as const).some(k => configuration[k] !== plan.model[k]) || JSON.stringify(configuration.openai)!==JSON.stringify(plan.model.openai)) throw new Error('model_policy_mismatch');
         const url = new URL(modelAccess.requestUrl); const endpoint = new URL(configuration.endpoint);
         if (url.origin !== endpoint.origin || url.username || url.password || url.hash || !Number.isFinite(modelAccess.reserveCostUsd) || modelAccess.reserveCostUsd < 0) throw new Error('model_access_not_admitted');
         modelAccess = Object.freeze({ ...modelAccess, configuration: Object.freeze(configuration) });
@@ -96,8 +97,7 @@ export class WorkerSupervisor {
     if(plan.tool==='none' && modelAccess){ active.modelAccess=modelAccess; const access=modelAccess;
       active.http=new ModelHttp(access.requestUrl, (bytes,body)=>{
         if(bytes>24000)throw new Error('model_input_limit');
-        const request=JSON.parse(body) as Record<string,unknown>;
-        if (!request || Array.isArray(request) || request.model !== plan.model.model || request.stream !== true || !Number.isSafeInteger(request.max_tokens) || Number(request.max_tokens)<1 || Number(request.max_tokens)>plan.model.maxOutputTokens || (request.tools !== undefined && (!Array.isArray(request.tools) || request.tools.length))) throw new Error('model_payload_not_approved');
+        validateModelPayload(plan.model, access.requestUrl, body);
         this.core.reserveModelRequest(active.journal.binding,access.configuration.authorizationId,parametersDigest(access.configuration),access.configuration.maxRequests,access.reserveCostUsd,access.configuration.maxEstimatedCostUsd);
       },access.fetch);
     }

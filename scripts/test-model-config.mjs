@@ -16,5 +16,15 @@ try{
  writeFileSync(path,JSON.stringify(config));run('model-config.mjs',['check',path]);
  // Trusted smoke mode forces host network tripwire, even for configured model mode.
  run('launch-desktop.mjs',['--model','--model-smoke-test','--model-config='+path]);
- console.log('model config: init refuses overwrite, invalid/valid check, real Electron missing config and private native credential selection passed; realModelCalls=0');
+ // Persistent Pi-shaped auth.json and both OpenAI template modes, with network denied.
+ const auth=join(root,'auth.json');run('model-config.mjs',['init-auth',auth]);
+ const empty=readFileSync(auth,'utf8');run('model-config.mjs',['init-auth',auth],1);assert.equal(readFileSync(auth,'utf8'),empty);
+ writeFileSync(auth,JSON.stringify({openai:{type:'api_key',key:'SYNTHETIC_STORED_KEY'}}));
+ const official=join(root,'official.json');run('model-config.mjs',['init-openai',official]);
+ writeFileSync(path,JSON.stringify({...config,provider:'openai',model:'gpt-4o-mini',endpoint:'https://api.openai.com/v1'}));
+ run('model-config.mjs',['check',path]);run('launch-desktop.mjs',['--model','--model-smoke-test','--model-config='+path]);
+ const compatible=join(root,'compatible.json');run('model-config.mjs',['init-compatible',compatible]);run('model-config.mjs',['check',compatible],1);
+ const template=JSON.parse(readFileSync(compatible,'utf8'));
+ writeFileSync(compatible,JSON.stringify({...template,model:'SYNTHETIC-custom',endpoint:'https://synthetic.example.invalid/v1',openai:{...template.openai,contextWindow:8192,inputUsdPerMillion:0.2,outputUsdPerMillion:0.4}}));run('model-config.mjs',['check',compatible]);
+ console.log('model config: repeat init refuses overwrite, official/compatible metadata checks, native temporary key and persistent auth.json startup/reconnect in actual Electron passed; realModelCalls=0');
 }finally{rmSync(root,{recursive:true,force:true});}

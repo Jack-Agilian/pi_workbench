@@ -1,4 +1,7 @@
-import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { repository } from './worker-launcher.ts';
+import { readConfiguredApiKey } from '../../packages/pi-adapter/model-credentials.ts';
+import { existsSync, readFileSync } from 'node:fs';
 import { parseModelConfiguration } from '../../packages/app-contracts/model.ts';
 import { describeModel } from '../../packages/pi-adapter/model-catalog.ts';
 import { DesktopHost } from './desktop-host.ts';
@@ -11,9 +14,13 @@ let model:ConstructorParameters<typeof DesktopHost>[1];
 if(process.argv[2]==='--model-offline')model={mode:'offline'};
 if(process.argv[2]==='--model'){
   model={mode:'live'};
-  try { const configuration=parseModelConfiguration(JSON.parse(readFileSync(process.argv[4]!,'utf8'))); const catalog=await describeModel(configuration.provider,configuration.model,configuration.maxOutputTokens);if(configuration.endpoint!==catalog.endpoint)throw new Error('model_endpoint_mismatch');model={mode:'live',configuration,requestUrl:catalog.requestUrl,reserveCostUsd:catalog.reserveCostUsd}; } catch { /* Show not_configured without exposing file contents/parse errors. */ }
+  try { const configuration=parseModelConfiguration(JSON.parse(readFileSync(process.argv[4]!,'utf8'))); const catalog=await describeModel(configuration.provider,configuration.model,configuration.maxOutputTokens,configuration);if(configuration.endpoint!==catalog.endpoint)throw new Error('model_endpoint_mismatch');model={mode:'live',configuration,requestUrl:catalog.requestUrl,reserveCostUsd:catalog.reserveCostUsd}; } catch { /* Show not_configured without exposing file contents/parse errors. */ }
 }
 const host = new DesktopHost(process.argv[3],model);
+if(model?.mode==='live' && model.configuration?.approved && process.argv[4]) {
+  const authPath=join(dirname(process.argv[4]),'auth.json');
+  if(existsSync(authPath))try{const key=readConfiguredApiKey(authPath,model.configuration.provider,repository);if(key)host.setModelKey(key);}catch{/* Invalid private credentials stay key_required; never echo parser data. */}
+}
 const sender = new IpcSender((message, callback) => process.send!(message, callback), 1_250_000);
 let closing: Promise<void> | undefined;
 function close() {
