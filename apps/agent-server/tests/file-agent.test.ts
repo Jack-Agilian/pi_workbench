@@ -264,3 +264,47 @@ test('M2 later model turn streams safe text alongside the already persisted firs
   assert.equal(f.core.snapshot(f.thread).runs[0]!.state,'completed');assert.equal(f.core.presentation(f.run).messages.some(m=>m.id==='streaming'),false);
  }finally{release=()=>{};await f.dispose();}
 });
+
+// Review regression: preserve actual UTF-8 bytes in host plans, including a BOM.
+for (const tool of ['read','edit'] as const) test(`M2 review BOM ${tool}: approved valid Markdown keeps byte identity`, async () => {
+ const {f,access,plan}=setup();let calls=0;
+ const original='\uFEFF# SYNTHETIC before\n';
+ writeFileSync(join(f.cwd,'report.md'),original);
+ const request:FileToolRequest=tool==='read'?read:{tool:'edit',parameters:{path:'report.md',edits:[{oldText:'before',newText:'after'}]}};
+ try {
+  const done=f.supervisor.startNext(plan,entry,{...access,fetch:async()=>{
+   calls++;return new Response(syntheticReply('chat-completions',calls,calls===1?[request]:[]),{headers:{'content-type':'text/event-stream'}});
+  }})!;
+  await approve(f,0);await done;
+  const snap=f.core.snapshot(f.thread);
+  assert.equal(snap.runs[0]!.state,'completed');
+  assert.equal(snap.operations[0]!.state,'succeeded');
+  assert.equal(calls,2);
+  assert.equal(readFileSync(join(f.cwd,'report.md'),'utf8'),tool==='read'?original:original.replace('before','after'));
+  assert.equal(snap.artifacts.length,tool==='read'?0:1);
+  f.reopen();f.supervisor.recover();assert.equal(f.core.snapshot(f.thread).runs[0]!.state,'completed');
+ } finally {await f.dispose();}
+});
+
+for (const changed of ['oversized','invalid-utf8'] as const) test(`M2 review interrupted read: ${changed} current file cannot block cleanup reconciliation`, async () => {
+ const {f,access,plan}=setup();let calls=0;
+ const fixture=join(repository,'apps/agent-server/tests/file-agent-worker.ts');
+ const path=join(f.cwd,'report.md');writeFileSync(path,'# SYNTHETIC read-only input\n');
+ try {
+  const done=f.supervisor.startNext(plan,{path:fixture,extraRead:[fixture],args:['after-write']},{...access,fetch:async()=>{
+   calls++;return new Response(syntheticReply('chat-completions',calls,[read]),{headers:{'content-type':'text/event-stream'}});
+  }})!;
+  await approve(f,0);await until(()=>existsSync(join(f.cwd,'.file-agent-stage')),'read-before-result');
+  process.kill(f.supervisor.workerPid!,'SIGKILL');await done;
+  assert.equal(f.core.snapshot(f.thread).operations[0]!.state,'unknown');
+  // Explicit external edit after actual Worker cleanup. Do not restore or replay the read.
+  const current=changed==='oversized'?Buffer.from('x'.repeat(16001)):Buffer.from([0xff,0xfe]);
+  writeFileSync(path,current);const mtime=statSync(path,{bigint:true}).mtimeNs;
+  f.reopen();f.supervisor.recover();
+  const snap=f.core.snapshot(f.thread);assert.equal(snap.runs[0]!.state,'failed');
+  assert.equal(snap.operations[0]!.state,'failed');assert.equal(snap.artifacts.length,0);
+  assert.deepEqual(readFileSync(path),current);assert.equal(statSync(path,{bigint:true}).mtimeNs,mtime);
+  f.supervisor.recover();assert.equal(f.core.snapshot(f.thread).cursor,snap.cursor);
+  assert.equal(calls,1);assert.equal(f.core.modelAdmission(access.configuration,0.01).used,1);
+ } finally {await f.dispose();}
+});

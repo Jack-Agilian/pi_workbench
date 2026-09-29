@@ -382,11 +382,16 @@ export class WorkerSupervisor {
       for (const op of this.core.snapshot(binding.threadId).operations.filter(o => o.runId === binding.runId)) {
         if(op.state==='unknown'&&plan.tool==='none'&&plan.model.fileTools){
           const file=this.core.fileOperation(op.id);if(!file)throw new Error('file_intent_missing');
-          const version=this.markdownVersion(journal.config.workspace,file.request.parameters.path);
-          if(file.request.tool==='read')this.core.reconcileOperation(op.id,'failed');
-          else if(file.expectedDigest!==null&&version===file.expectedDigest)this.core.reconcileOperation(op.id,'succeeded',version);
-          else if(version===file.fileVersion)this.core.reconcileOperation(op.id,'failed');
-          else throw new Error('file_side_effect_unresolved');
+          if(file.request.tool==='read') {
+            // Cleanup is already proven. An interrupted read has no file mutation to
+            // reconcile; today's file bytes cannot prove yesterday's read result.
+            this.core.reconcileOperation(op.id,'failed');
+          } else {
+            const version=this.markdownVersion(journal.config.workspace,file.request.parameters.path);
+            if(file.expectedDigest!==null&&version===file.expectedDigest)this.core.reconcileOperation(op.id,'succeeded',version);
+            else if(version===file.fileVersion)this.core.reconcileOperation(op.id,'failed');
+            else throw new Error('file_side_effect_unresolved');
+          }
         } else if (op.state === 'unknown' && plan.tool === 'bash') {
           const outcome = this.shellReceipt(journal, op.id);
           if (!outcome) throw new Error('shell_evidence_missing');

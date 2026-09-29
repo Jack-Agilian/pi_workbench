@@ -28,7 +28,7 @@ export function inspectMarkdown(workspace: string, path: string) {
     }
     const after = fstatSync(fd);
     if (size > limit || size !== before.size || before.mtimeMs !== after.mtimeMs || before.ctimeMs !== after.ctimeMs) throw new Error('artifact_changed_during_read');
-    const data = buffer.subarray(0, size); const text = new TextDecoder('utf-8', { fatal: true }).decode(data);
+    const data = buffer.subarray(0, size); const text = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true }).decode(data);
     if (text.includes('\0')) throw new Error('unsupported_artifact');
     return { path: rel, bytes: size, digest: createHash('sha256').update(data).digest('hex'), text };
   } finally { closeSync(fd); }
