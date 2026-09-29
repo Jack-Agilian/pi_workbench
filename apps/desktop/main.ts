@@ -11,9 +11,9 @@ const root = resolve(outputDirectory, '../..');
 // Arguments come only from the local launch script. None is an IPC/Renderer option.
 const nodeArg = process.argv.find(arg => arg.startsWith('--host-node='));
 const profileArg = process.argv.find(arg => arg.startsWith('--demo-profile='));
-const mode=process.argv.includes('--model')?'--model':process.argv.includes('--model-offline')?'--model-offline':'--demo';
+const mode=process.argv.includes('--model')?'--model':process.argv.includes('--model-offline')?'--model-offline':process.argv.includes('--model-files-offline')?'--model-files-offline':'--demo';
 const modelConfig=process.argv.find(a=>a.startsWith('--model-config='))?.slice('--model-config='.length);
-if (!['--demo','--model','--model-offline'].some(m=>process.argv.includes(m)) || !nodeArg || !profileArg) throw new Error('explicit_demo_launch_required');
+if (!['--demo','--model','--model-offline','--model-files-offline'].some(m=>process.argv.includes(m)) || !nodeArg || !profileArg) throw new Error('explicit_demo_launch_required');
 const node = realpathSync(nodeArg.slice('--host-node='.length)); const profile = resolve(profileArg.slice('--demo-profile='.length));
 if (execFileSync(node, ['-p','process.versions.node'], { env: {}, encoding: 'utf8' }).trim() !== '24.21.0') throw new Error('host_runtime_mismatch');
 mkdirSync(join(profile, 'browser'), { recursive: true, mode: 0o700 });

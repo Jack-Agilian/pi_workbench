@@ -46,6 +46,8 @@ export interface ControlledToolOptions {
   /** Explicit backend only. Tests label synthetic backends; real shell uses Pi's public factory. */
   bash: BashOperations;
   observe: (event: ToolObservation) => void;
+  settle?: (operation:ToolOperation,ok:boolean)=>Promise<void>;
+  fileLimitBytes?:number;
 }
 
 function freeze(value: unknown): void {
@@ -127,7 +129,7 @@ export function createControlledTools(options: ControlledToolOptions) {
         });
         const controller = new AbortController();
         const signal = AbortSignal.any([controller.signal, lifetime.signal, ...(inputSignal ? [inputSignal] : [])]);
-        let approval: ToolApproval | undefined;
+        let approval: ToolApproval | undefined; let succeeded=false;
         let open = true;
         let timer: ReturnType<typeof setTimeout> | undefined;
         const check = () => {
@@ -168,11 +170,17 @@ export function createControlledTools(options: ControlledToolOptions) {
           },
           readFile: async path => {
             await pathCheck(path); emit(operation, 'read'); check(); const data = await readFile(path); check();
-            readVersion = digest(data); emit(operation, 'read_completed', readVersion); return data;
+            readVersion = digest(data);
+            if(options.fileLimitBytes!==undefined){
+              if(data.byteLength>options.fileLimitBytes||new TextDecoder('utf-8',{fatal:true}).decode(data).includes('\0'))throw new Error('file_read_limit');
+              if(approval?.fileVersion!==readVersion)throw new Error('read_conflict');
+            }
+            emit(operation, 'read_completed', readVersion); return data;
           },
           mkdir: async path => { await pathCheck(path, true); emit(operation, 'mkdir'); check(); await mkdir(path, { recursive: true }); check(); },
           writeFile: async (path, content) => {
             await pathCheck(path);
+            if(options.fileLimitBytes!==undefined&&(Buffer.byteLength(content)>options.fileLimitBytes||content.includes('\0')))throw new Error('file_write_limit');
             if (!approval || approval.fileVersion === undefined) throw new Error('missing_file_precondition');
             const current = await version(path); check();
             if (current !== approval.fileVersion || (readVersion !== undefined && current !== readVersion)) {
@@ -227,11 +235,12 @@ export function createControlledTools(options: ControlledToolOptions) {
               emit(operation, 'update'); onUpdate(update);
             } : undefined, ctx);
           check();
-          return result;
+          succeeded=true;return result;
         } finally {
           open = false;
           if (timer) clearTimeout(timer);
           emit(operation, 'settled');
+          await options.settle?.(operation,succeeded);
         }
       },
     };

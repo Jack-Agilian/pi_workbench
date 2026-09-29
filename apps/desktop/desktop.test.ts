@@ -204,7 +204,7 @@ test('schema v3 forward migration preserves the pre-Assistant product intent and
     // DesktopHost.close now intentionally cancels queued work, which is not this fixture.
     f.host.core.close();
     const db = new DatabaseSync(join(f.root, 'host/product.sqlite'));
-    db.exec('DROP TABLE model_policy_revisions; DROP TABLE model_requests; DROP TABLE model_outcomes; DROP TABLE shell_display; DROP TABLE run_display; PRAGMA user_version=3;'); db.close();
+    db.exec('DROP TABLE file_operations; DROP TABLE model_policy_revisions; DROP TABLE model_requests; DROP TABLE model_outcomes; DROP TABLE shell_display; DROP TABLE run_display; PRAGMA user_version=3;'); db.close();
     const reopened = new DesktopHost(f.root);
     try {
       const restored = reopened.request({ type: 'thread', threadId: f.thread }) as DesktopThread;

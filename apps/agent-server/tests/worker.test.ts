@@ -151,7 +151,7 @@ test('native Pi reference survives Worker recycling; product subscription reconn
 test('schema v1 upgrade preserves durable queued intent and adds host launch/reference metadata', async t => {
   const f = fixture(t); f.core.close();
   // SYNTHETIC old-schema fixture: remove v2–v4 additions while the sole host connection is closed.
-  const previous = new DatabaseSync(f.database); previous.exec('DROP TABLE model_policy_revisions; DROP TABLE model_requests; DROP TABLE model_outcomes; DROP TABLE shell_display; DROP TABLE run_display; DROP TABLE worker_launches; ALTER TABLE threads DROP COLUMN native_persisted; PRAGMA user_version=1;'); previous.close();
+  const previous = new DatabaseSync(f.database); previous.exec('DROP TABLE file_operations; DROP TABLE model_policy_revisions; DROP TABLE model_requests; DROP TABLE model_outcomes; DROP TABLE shell_display; DROP TABLE run_display; DROP TABLE worker_launches; ALTER TABLE threads DROP COLUMN native_persisted; PRAGMA user_version=1;'); previous.close();
   f.reopen(); assert.equal(f.core.snapshot(f.thread).runs[0]!.id, f.run); assert.equal(f.core.workerLaunches().length, 0);
   const pending = f.start(); await f.approval(); await pending; assert.equal(f.core.snapshot(f.thread).runs[0]!.state, 'completed');
 });
@@ -173,7 +173,7 @@ test('expired approval cannot execute and requires cleanup/reconciliation before
 test('Renderer cannot inject Worker envelopes; an unrelated IPC child cannot route messages by copied identity', async t => {
   const f = fixture(t); const pending = f.start(); await until(() => f.core.snapshot(f.thread).operations.length === 1, 'approval');
   const before = f.core.snapshot(f.thread); const journal = JSON.parse(f.core.workerLaunches()[0]!.record);
-  const forged = { version: 5, instanceId: journal.spec.instanceId, runtimeBindingId: journal.binding.runtimeBindingId, requestId: 'foreign', body: { type: 'done', ok: true } };
+  const forged = { version: 6, instanceId: journal.spec.instanceId, runtimeBindingId: journal.binding.runtimeBindingId, requestId: 'foreign', body: { type: 'done', ok: true } };
   assert.throws(() => f.supervisor.command(forged), /unknown_command/);
   const foreign = spawn(process.execPath, ['-e', 'process.send(JSON.parse(process.argv[1])); process.disconnect();', JSON.stringify(forged)],
     { env: sterileEnvironment(join(f.root, 'foreign')), stdio: ['ignore','ignore','ignore','ipc'] });

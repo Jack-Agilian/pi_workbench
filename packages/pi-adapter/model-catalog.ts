@@ -1,3 +1,5 @@
+import { fileToolSchemas } from './file-planning.ts';
+import { isDeepStrictEqual } from 'node:util';
 import { ModelRuntime } from '@earendil-works/pi-coding-agent';
 import { InMemoryCredentialStore, InMemoryModelsStore } from '@earendil-works/pi-ai';
 import { parseModelSelection, type ModelSelection } from '../app-contracts/model.ts';
@@ -45,5 +47,24 @@ export function validateModelPayload(selection:ModelSelection,url:string,body:st
   const present=fields.filter(f=>Object.hasOwn(r,f));
   const path=new URL(url).pathname;
   const field=path.endsWith('/responses')?'max_output_tokens':path.endsWith('/chat/completions')?present[0]:path.endsWith('/messages')?'max_tokens':undefined;
-  if(!field||present.length!==1||present[0]!==field||(path.endsWith('/chat/completions')&&field==='max_output_tokens')||r.model!==selection.model||r.stream!==true||!Number.isSafeInteger(r[field])||Number(r[field])<1||Number(r[field])>selection.maxOutputTokens||(r.tools!==undefined&&(!Array.isArray(r.tools)||r.tools.length))||r.functions!==undefined||r.n!==undefined&&r.n!==1||r.background===true)throw new Error('model_payload_not_approved');
+  if(!field||present.length!==1||present[0]!==field||(path.endsWith('/chat/completions')&&field==='max_output_tokens')||r.model!==selection.model||r.stream!==true||!Number.isSafeInteger(r[field])||Number(r[field])<1||Number(r[field])>selection.maxOutputTokens||r.functions!==undefined||r.n!==undefined&&r.n!==1||r.background===true)throw new Error('model_payload_not_approved');
+  validateTools(r,selection);
+}
+
+function validateTools(request:Record<string,unknown>,selection:ModelSelection):void {
+ const tools=request.tools;
+ if(!selection.fileTools){if(tools!==undefined&&(!Array.isArray(tools)||tools.length))throw new Error('model_tools_not_approved');return;}
+ if(!Array.isArray(tools)||tools.length!==3||request.tool_choice!==undefined&&request.tool_choice!=='auto')throw new Error('model_tool_set');
+ const schemas=fileToolSchemas();const seen=new Set<string>();
+ const shape=(value:unknown):unknown=>{
+  if(Array.isArray(value))return value.map(shape);
+  if(value&&typeof value==='object')return Object.fromEntries(Object.entries(value).filter(([key])=>!['description','$schema'].includes(key)).map(([key,v])=>[key,shape(v)]));
+  return value;
+ };
+ for(const raw of tools){
+  if(!raw||typeof raw!=='object'||Array.isArray(raw))throw new Error('model_tool_shape');
+  const t=raw as Record<string,unknown>;const f=(t.function??t) as Record<string,unknown>;
+  if(!f||typeof f!=='object'||typeof f.name!=='string'||seen.has(f.name)||t.type!==undefined&&t.type!=='function')throw new Error('model_tool_type');
+  const schema=schemas.find(s=>s.name===f.name);if(!schema||!isDeepStrictEqual(shape(f.parameters??f.input_schema),shape(schema.parameters)))throw new Error('model_tool_schema');seen.add(f.name);
+ }
 }

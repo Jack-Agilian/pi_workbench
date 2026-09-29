@@ -1,3 +1,4 @@
+import { parseFileToolRequest } from '../app-contracts/file-tools.ts';
 import { modelFetch } from './model-fetch.ts';
 import { modelStream } from './model-stream.ts';
 import { modelServices, modelOutcome } from './model-services.ts';
@@ -20,7 +21,7 @@ import { projectMessages } from './presentation.ts';
 /** Trusted composition seam only; never serialized on product commands or IPC. */
 interface WorkerDriver {
   // Lifecycle checkpoints belong only to the trusted no-model test driver; no wire fields enable them.
-  testOnly?: { afterSessionCreated?: (close: () => Promise<void>) => Promise<void>; beforeBind?: (close: () => Promise<void>) => Promise<void> };
+  testOnly?: { afterSessionCreated?: (close: () => Promise<void>) => Promise<void>; beforeBind?: (close: () => Promise<void>) => Promise<void>; beforeFileResult?:()=>Promise<void> };
   beforeReady?(runtime: AgentSessionRuntime, close: () => Promise<void>): Promise<void>;
   afterGrant?(signal: AbortSignal): Promise<void>;
   model?: (options: {cwd:string;agentDir:string}, selection: ModelSelection, key: string, fetch: typeof globalThis.fetch) => ReturnType<typeof modelServices>;
@@ -38,17 +39,20 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
   let shellGrant: { operationId: string; parametersDigest: string } | undefined;
   let shellPending: { requestId: string; resolve(outcome: ShellOutcome): void; reject(error: Error): void } | undefined;
   const claimed = new Set<string>();
+  const fileClaims=new Map<string,string>();
+  const settlements=new Map<string,{id:string;resolve():void;reject(error:Error):void}>();
   const seen = new Set<string>();
   const references = new Map<string, { resolve(): void; reject(error: Error): void }>();
   let reservedReference: string | null = null;
   let priorEntries = new Set<string>();
-  const send = (body: WireBody, requestId = `worker-${++sequence}`) => sender.send({ version: 5, instanceId, runtimeBindingId, requestId, body } satisfies Envelope);
+  const send = (body: WireBody, requestId = `worker-${++sequence}`) => sender.send({ version: 6, instanceId, runtimeBindingId, requestId, body } satisfies Envelope);
   const publish = () => runtime && started && !closed ? send({ type: 'presentation', projection: projectMessages(runtime.session.sessionManager.getBranch().filter(entry => !priorEntries.has(entry.id))) }) : Promise.resolve();
   function close(): Promise<void> {
     if (closing) return closing;
     closed = true; transport.close(); stream?.close(); subscriptionGeneration++; unbind(); abort.abort(new Error('worker_closed')); tools?.revoke();
     shellPending?.reject(new Error('worker_closed')); shellPending = undefined;
     for (const grant of grants.values()) grant.resolve(undefined); grants.clear();
+    for(const p of settlements.values())p.reject(new Error('worker_closed'));settlements.clear();
     for (const reference of references.values()) reference.reject(new Error('worker_closed')); references.clear();
     closing = Promise.resolve().then(async () => {
       await creating?.catch(() => {}); await executing?.catch(() => {});
@@ -58,7 +62,7 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
     });
     return closing;
   }
-  const transport = modelFetch(send);
+  const transport = modelFetch(send,()=>Boolean(config?.model?.fileTools));
   let key: string | undefined;
   let stream: ReturnType<typeof modelStream> | undefined;
   const fail = () => { void close().catch(() => { sender.close(); if (process.connected) process.disconnect(); process.exitCode = 1; }); };
@@ -82,18 +86,27 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
     const resources = contentLoader({ cwd: c.workspace, agentDir: c.agentDir }); resources.select(c.resources); await resources.loader.reload();
     if (closed || resources.loaded?.id !== c.resources.id) throw new Error('resource_admission_blocked'); verifyContent(c.resources);
     tools = createControlledTools({ binding: { runId: c.binding.runId, runtimeBindingId, runtimeEpoch: 1, workspaceRef: c.workspace },
-      deadline: () => c.deadline, bash: shellBackend, observe: () => {},
+      deadline: () => c.model?.fileTools?Math.min(c.deadline,Date.now()+c.model.fileTools.operationTimeoutMs):c.deadline, bash: shellBackend, observe: () => {},
+      ...(c.model?.fileTools?{fileLimitBytes:16000,settle:async(operation:import('./controlled-tools.ts').ToolOperation,ok:boolean)=>{
+        const operationId=fileClaims.get(operation.operationId);if(!operationId)return;
+        await driver?.testOnly?.beforeFileResult?.();
+        if(closed)throw new Error('worker_closed');
+        const id=`settle-${++sequence}`;
+        const accepted=new Promise<void>((resolve,reject)=>settlements.set(id,{id:operationId,resolve,reject}));
+        try{await send({type:'file-result',operationId,ok},id);await accepted;}finally{settlements.delete(id);fileClaims.delete(operation.operationId);}
+      }}:{}),
       authorize: async operation => {
-        if (closed || !['write','edit','bash'].includes(operation.tool) || (operation.tool !== 'bash' && !operation.target)) throw new Error('tool_not_admitted');
+        if (closed || !(c.model?.fileTools?['read','write','edit']:['write','edit','bash']).includes(operation.tool) || (operation.tool !== 'bash' && !operation.target)) throw new Error('tool_not_admitted');
         verifyContent(c.resources);
         await publish();
         const requestId = `operation-${++sequence}`;
         const promise = new Promise<ToolApproval | undefined>(resolve => { grants.set(requestId, { resolve, localId: operation.operationId }); });
-        await send({ type: 'operation', toolCallId: operation.toolCallId, tool: operation.tool as 'write' | 'edit' | 'bash', parametersDigest: operation.parametersDigest,
+        if(c.model?.fileTools)await send({type:'file-operation',toolCallId:operation.toolCallId,request:parseFileToolRequest({tool:operation.tool,parameters:operation.parameters}),resourceLock:c.resources.id},requestId);
+        else await send({ type: 'operation', toolCallId: operation.toolCallId, tool: operation.tool as 'write' | 'edit' | 'bash', parametersDigest: operation.parametersDigest,
           target: operation.target ? relative(c.workspace, operation.target) : '.', resourceLock: c.resources.id }, requestId);
         try { const approval = await promise; if (approval) await driver?.afterGrant?.(abort.signal); return approval; } finally { grants.delete(requestId); }
       } });
-    const definitions = c.model ? [] : [defineTool(tools.write), defineTool(tools.edit), defineTool(tools.bash)];
+    const definitions = c.model?.fileTools ? [defineTool({...tools.read,executionMode:'sequential'}),defineTool({...tools.write,executionMode:'sequential'}),defineTool({...tools.edit,executionMode:'sequential'})] : c.model ? [] : [defineTool(tools.write), defineTool(tools.edit), defineTool(tools.bash)];
     const factory: CreateAgentSessionRuntimeFactory = async options => {
       if (closed) throw new Error('worker_closed');
       const reference = options.sessionManager.getSessionFile();
@@ -108,7 +121,7 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
       const configured = c.model && driver?.model ? await driver.model(options, c.model, key ?? '', transport.fetch) : undefined; key = undefined;
       const services = configured?.services ?? await createIsolatedServices(options); if (!c.model) services.resourceLoader = resources.loader;
       const result = await createAgentSession({ ...services, sessionManager: options.sessionManager, sessionStartEvent: options.sessionStartEvent,
-        ...(configured ? { model: configured.model } : {}), tools: c.model ? [] : ['write','edit','bash'], customTools: definitions, noTools: c.model ? 'all' : 'builtin', thinkingLevel: 'off' });
+        ...(configured ? { model: configured.model } : {}), tools: c.model?.fileTools?['read','write','edit']:c.model ? [] : ['write','edit','bash'], customTools: definitions, noTools: c.model&&!c.model.fileTools ? 'all' : 'builtin', thinkingLevel: 'off' });
       try { await driver?.testOnly?.afterSessionCreated?.(close); } catch (error) { result.session.dispose(); throw error; }
       if (closed) { result.session.dispose(); throw new Error('worker_closed'); }
       return { ...result, services, diagnostics: services.diagnostics };
@@ -137,13 +150,14 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
     const message = parseEnvelope(raw);
     if (message.instanceId !== instanceId || message.runtimeBindingId !== runtimeBindingId) throw new Error('stale_host');
     const { body, requestId } = message;
-    if (['model-http-head','model-http-chunk','model-http-error'].includes(body.type)) { if(!transport.receive(requestId,body))throw new Error('unexpected_http_response');return; }
+    if (['model-http-head','model-http-chunk','model-http-error','model-http-finished'].includes(body.type)) { if(!transport.receive(requestId,body))throw new Error('unexpected_http_response');return; }
     if (body.type === 'model-key') { if(creating || key !== undefined || !driver?.model)throw new Error('unexpected_model_key'); key=body.key;return; }
     if (seen.has(requestId)) return;
     if (seen.size >= 128) throw new Error('request_limit'); seen.add(requestId);
     if (body.type === 'cancel') { abort.abort(new Error('cancel_requested')); tools?.revoke(); transport.close(); if (config?.model) void runtime?.session.abort().catch(fail); for (const g of grants.values()) g.resolve(undefined); return; }
     if (body.type === 'close') { fail(); return; }
     if (closed) return;
+    if(body.type==='file-settled'){const p=settlements.get(requestId);if(!p||p.id!==body.operationId)throw new Error('file_settlement_mismatch');p.resolve();return;}
     if (body.type === 'shell-result') { if (shellPending?.requestId === requestId) shellPending.resolve(body.outcome); return; }
     if (body.type === 'session-reference-accepted') { references.get(requestId)?.resolve(); return; }
     if (body.type === 'init') {
@@ -156,7 +170,7 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
       if (body.type === 'grant') {
         if (abort.signal.aborted || body.expiresAt > config!.deadline || Date.now() >= body.expiresAt) { pending.resolve(undefined); return; }
         shellGrant = { operationId: body.operationId, parametersDigest: body.parametersDigest };
-        claimed.add(body.operationId); pending.resolve({ ...body, operationId: pending.localId });
+        if(config!.model?.fileTools)fileClaims.set(pending.localId,body.operationId);else claimed.add(body.operationId); pending.resolve({ ...body, operationId: pending.localId });
       } else pending.resolve(undefined); return;
     }
     if (body.type === 'start') {
@@ -164,15 +178,15 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
       if (!runtime || !config || !driver) throw new Error('worker_driver_not_configured'); started = true;
       executing = (async () => {
         priorEntries = new Set(runtime!.session.sessionManager.getBranch().map(entry => entry.id));
-        let ok = false;
+        let ok = false;const firstMessage=runtime!.session.messages.length;
         try {
           abort.signal.throwIfAborted(); verifyContent(config!.resources);
           if (config!.model) {
-            if (runtime!.session.getActiveToolNames().length) throw new Error('model_tools_enabled');
+            if (JSON.stringify(runtime!.session.getActiveToolNames().sort())!==JSON.stringify(config!.model.fileTools?['edit','read','write']:[])) throw new Error('model_tool_set_mismatch');
             stream = modelStream(runtime!.session, priorEntries, projection => send({type:'presentation',projection}));
             const unsubscribe = runtime!.session.subscribe(event => stream?.observe(event));
             try { await runtime!.session.prompt(config!.binding.input); } finally { unsubscribe(); await stream.finish(); stream.close(); }
-            const outcome = modelOutcome(runtime!.session, config!.model.mode === 'offline', abort.signal.aborted);
+            const outcome = modelOutcome(runtime!.session, config!.model.mode === 'offline', abort.signal.aborted,firstMessage);
             await send({type:'model-outcome',outcome}); ok = outcome.reason === 'stop' || outcome.reason === 'length';
           } else { await driver.execute!(runtime!, abort.signal); ok = !abort.signal.aborted; }
         }

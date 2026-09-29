@@ -1,3 +1,4 @@
+import type { FileOperationView } from './file-tools.ts';
 import type { ShellView } from './shell.ts';
 // Product-only JSON contracts. No Pi, Node or Electron types cross this boundary.
 export type RunState = 'queued' | 'starting' | 'running' | 'cancelling' | 'unknown' | 'completed' | 'failed' | 'cancelled';
@@ -10,7 +11,7 @@ export type Command =
 export interface Ack { accepted: true; id: string }
 export interface ThreadView { id: string; workspaceId: string; title: string }
 export interface RunView { id: string; threadId: string; state: RunState }
-export interface OperationView { shell?: ShellView; id: string; runId: string; toolCallId: string; tool: string; parametersDigest: string; artifactPath: string | null; deadline: number; state: OperationState }
+export interface OperationView { file?:FileOperationView; shell?: ShellView; id: string; runId: string; toolCallId: string; tool: string; parametersDigest: string; artifactPath: string | null; deadline: number; state: OperationState }
 export interface ArtifactView { id: string; runId: string; operationId: string; path: string; version: number; digest: string; bytes: number }
 export interface RuntimeObservation { kind: 'activity' | 'idle' | 'diagnostic'; eventType: string; sourceType: string | null }
 export interface ProductEvent { seq: number; runSeq: number; threadId: string; runId: string; kind: string; entityId: string; eventType: string | null; sourceType: string | null }
@@ -21,6 +22,9 @@ export interface Dispatch extends Binding { input: string; workspaceId: string; 
 export function identifier(value: unknown): string {
   if (typeof value !== 'string' || !/^[a-zA-Z0-9._:-]{1,128}$/.test(value)) throw new Error('invalid_identifier');
   return value;
+}
+export function toolCallIdentity(value:unknown):string {
+  if(typeof value!=='string'||!value||value.length>256||/[\u0000-\u001f]/.test(value))throw new Error('invalid_tool_call_id');return value;
 }
 export function sha256(value: unknown): string {
   if (typeof value !== 'string' || !/^[a-f0-9]{64}$/.test(value)) throw new Error('invalid_digest');

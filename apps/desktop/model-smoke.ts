@@ -13,6 +13,7 @@ export async function runModelSmoke(window:BrowserWindow,host:HostClient){
  const fill=(value:string)=>js(`(()=>{const t=document.querySelector('#composer');Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set.call(t,${JSON.stringify(value)});t.dispatchEvent(new Event('input',{bubbles:true}))})()`);
  await wait(()=>js<boolean>("!!document.querySelector('.new-thread')"),'mounted');
  const home=await host.request({type:'home'}) as DesktopHome;
+ if(home.mode==='model-offline'&&home.model?.limits?.fileTools){const {runFileModelSmoke}=await import('./file-model-smoke.ts');await runFileModelSmoke(window,host);return;}
  if(home.mode==='model' && home.model?.status==='ready'){
   assert.equal(await js<boolean>("'setModelKey' in window.workbench"),false);
   assert.equal(await js<boolean>("document.body.textContent.includes('SYNTHETIC_STORED_KEY')"),false);

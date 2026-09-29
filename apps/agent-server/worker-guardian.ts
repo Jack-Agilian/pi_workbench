@@ -51,6 +51,7 @@ function startWorker() {
   worker.on('disconnect', () => { void close(); });
   worker.on('spawn', () => { void parent.send({ kind: 'spawned', pid: worker!.pid }).catch(() => close()); });
   worker.on('message', raw => {
+    if (closing) return; // Revoked connection cannot forward queued requests during process cleanup.
     try { const message = parseEnvelope(raw);
       if (message.instanceId !== spec.instanceId || message.runtimeBindingId !== spec.runtimeBindingId) throw new Error('stale_worker');
       void parent.send({ kind: 'worker', message }).catch(() => close());

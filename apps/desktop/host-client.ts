@@ -15,8 +15,8 @@ export class HostClient {
   private stopped = false;
   private closeResult?: Promise<void>;
   private readonly node: string; private readonly root: string; private readonly profile: string;
-  private readonly mode: '--demo'|'--model'|'--model-offline';private readonly configuration?:string; private readonly denyModelNetwork: boolean;
-  constructor(node: string, root: string, profile: string, mode:'--demo'|'--model'|'--model-offline'='--demo', configuration?:string, denyModelNetwork=false) { this.denyModelNetwork=denyModelNetwork; this.node = node; this.root = root; this.profile = profile;this.mode=mode;this.configuration=configuration; }
+  private readonly mode: '--demo'|'--model'|'--model-offline'|'--model-files-offline';private readonly configuration?:string; private readonly denyModelNetwork: boolean;
+  constructor(node: string, root: string, profile: string, mode:'--demo'|'--model'|'--model-offline'|'--model-files-offline'='--demo', configuration?:string, denyModelNetwork=false) { this.denyModelNetwork=denyModelNetwork; this.node = node; this.root = root; this.profile = profile;this.mode=mode;this.configuration=configuration; }
   get processId() { return this.connection?.child.pid; }
   private start(): Connection {
     const home = join(this.profile, 'server-home'); const temp = join(home, 'tmp'); mkdirSync(temp, { recursive: true });

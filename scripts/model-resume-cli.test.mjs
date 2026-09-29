@@ -20,7 +20,7 @@ test('resume CLI isolated profile: exact requests/Session binding, immutable pla
   writeFileSync(join(directory,'model.json'),JSON.stringify(config));
   const thread=core.handle({type:'threads.create',requestId:`live-${marker}-thread`,workspaceId:'demo-workspace',title:'SYNTHETIC'}).id;
   const first=core.handle({type:'runs.start',requestId:`live-${marker}-first`,threadId:thread,input:'This is a synthetic, non-sensitive integration check. Remember the synthetic token cedar-47 for my next message. Reply with exactly M1-LIVE-OK and nothing else.'}).id;
-  const reserveLegacy=b=>{const fixture=new DatabaseSync(join(profile,'host/product.sqlite'));try{fixture.prepare('INSERT INTO model_requests VALUES (?,?,?,?)').run(b.runId,config.authorizationId,legacyPolicyDigest(config),0.1);}finally{fixture.close();}};
+  const reserveLegacy=b=>{const fixture=new DatabaseSync(join(profile,'host/product.sqlite'));try{fixture.prepare('INSERT INTO model_requests VALUES (?,?,?,?,?,1)').run(b.runId,config.authorizationId,legacyPolicyDigest(config),0.1,'legacy:'+b.runId);}finally{fixture.close();}};
   const b=core.dispatchNext();core.markRunning(b);reserveLegacy(b);
   // Synthetic host metadata only, not a fabricated native JSONL or SDK fixture.
   core.bindNativeSession(b,join(profile,'synthetic-native-reference'));core.settle(b,'completed',{piIdle:true,hostClean:true});

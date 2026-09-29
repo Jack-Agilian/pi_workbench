@@ -9,8 +9,9 @@ import { exact } from '../../packages/app-contracts/worker-ipc.ts';
 import { identifier } from '../../packages/app-contracts/index.ts';
 import type { DesktopReply } from '../../packages/app-contracts/desktop.ts';
 import { IpcSender } from '../../packages/pi-adapter/ipc-channel.ts';
-if (!['--demo','--model','--model-offline'].includes(process.argv[2]??'') || !process.argv[3] || !process.send) throw new Error('explicit_desktop_demo_required');
+if (!['--demo','--model','--model-offline','--model-files-offline'].includes(process.argv[2]??'') || !process.argv[3] || !process.send) throw new Error('explicit_desktop_demo_required');
 let model:ConstructorParameters<typeof DesktopHost>[1];
+if(process.argv[2]==='--model-files-offline')model={mode:'offline',fileTools:{maxOperations:8,maxModelRequests:4,operationTimeoutMs:30000}};
 if(process.argv[2]==='--model-offline')model={mode:'offline'};
 if(process.argv[2]==='--model'){
   model={mode:'live'};

@@ -1,9 +1,10 @@
+import { parseFileToolRequest, type FileToolRequest } from './file-tools.ts';
 import { parseModelSelection, parseModelOutcome, type ModelSelection, type ModelOutcome } from './model.ts';
 // Workbench protocol, not Pi SDK API. No product database or SDK types on this channel.
 import { parseShellOutcome, type ShellOutcome } from './shell.ts';
-import { identifier, sha256, type Dispatch } from './index.ts';
+import { identifier, toolCallIdentity, sha256, type Dispatch } from './index.ts';
 import { parsePresentation, type Presentation } from './presentation.ts';
-export const IPC_VERSION = 5;
+export const IPC_VERSION = 6;
 export const MAX_MESSAGE_BYTES = 65_536;
 export interface ResourceSelection { root: string; id: string; files: readonly { path: string; sha256: string }[]; expectedSkillNames: readonly string[] }
 export interface WorkerInit { binding: Dispatch; workspace: string; agentDir: string; sessions: string; resources: ResourceSelection; deadline: number; model?: ModelSelection }
@@ -13,6 +14,9 @@ export type WireBody =
   | { type: 'model-http'; url: string; method: 'POST'; headers: Record<string,string>; body: string }
   | { type: 'model-http-head'; status: number; headers: Record<string,string> }
   | { type: 'model-http-read' }
+  | { type:'model-http-finish' } | { type:'model-http-finished' }
+  | { type:'file-operation'; toolCallId:string; request:FileToolRequest; resourceLock:string }
+  | { type:'file-result'; operationId:string; ok:boolean } | { type:'file-settled'; operationId:string }
   | { type: 'model-http-chunk'; data: string; end: boolean }
   | { type: 'model-http-error' }
   | { type: 'hello'; pid: number }
@@ -32,7 +36,7 @@ export type WireBody =
   | { type: 'done'; ok: boolean }
   | { type: 'closed'; nativeRef: string | null }
   | { type: 'fault'; code: 'initialization_failed' | 'execution_failed' | 'protocol_failed' };
-export interface Envelope { version: 5; instanceId: string; runtimeBindingId: string; requestId: string; body: WireBody }
+export interface Envelope { version: 6; instanceId: string; runtimeBindingId: string; requestId: string; body: WireBody }
 export function record(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value) || ![Object.prototype, null].includes(Object.getPrototypeOf(value))) throw new Error('invalid_record');
   const fields = Object.getOwnPropertyDescriptors(value);
@@ -62,7 +66,10 @@ export function parseEnvelope(value: unknown): Envelope {
     case 'model-http': check('url','method','headers','body'); string(b.url, 2048); if (b.method !== 'POST') throw new Error('model_http_method'); string(b.body, 24000); parseHeaders(b.headers); break;
     case 'model-http-head': check('status','headers'); number(b.status); if (Number(b.status)<100 || Number(b.status)>599) throw new Error('http_status'); parseHeaders(b.headers); break;
     case 'model-http-chunk': check('data','end'); if (typeof b.data !== 'string' || b.data.length > 24000 || !/^[A-Za-z0-9+/]*={0,2}$/.test(b.data)) throw new Error('http_chunk'); boolean(b.end); break;
-    case 'model-http-read': case 'model-http-error': check(); break;
+    case 'model-http-read': case 'model-http-error': case 'model-http-finish': case 'model-http-finished': check(); break;
+    case 'file-operation': check('toolCallId','request','resourceLock'); toolCallIdentity(b.toolCallId); parseFileToolRequest(b.request); sha256(b.resourceLock); break;
+    case 'file-result': check('operationId','ok'); identifier(b.operationId); boolean(b.ok); break;
+    case 'file-settled': check('operationId'); identifier(b.operationId); break;
     case 'hello': check('pid'); number(b.pid); break;
     case 'init': {
       check('config'); const c = exact(b.config, ['binding','workspace','agentDir','sessions','resources','deadline', ...(Object.hasOwn(Object(b.config), 'model') ? ['model'] : [])]);
@@ -78,7 +85,7 @@ export function parseEnvelope(value: unknown): Envelope {
     case 'ready': check('resourceLock','nativeRef'); sha256(b.resourceLock); nullablePath(b.nativeRef); break;
     case 'session-reference': check('nativeRef'); string(b.nativeRef); break;
     case 'start': case 'cancel': case 'close': case 'deny': case 'session-reference-accepted': check(); break;
-    case 'operation': check('toolCallId','tool','parametersDigest','target','resourceLock'); identifier(b.toolCallId); if (typeof b.tool !== 'string' || !['write','edit','bash'].includes(b.tool)) throw new Error('tool_not_admitted'); sha256(b.parametersDigest); string(b.target); sha256(b.resourceLock); break;
+    case 'operation': check('toolCallId','tool','parametersDigest','target','resourceLock'); toolCallIdentity(b.toolCallId); if (typeof b.tool !== 'string' || !['write','edit','bash'].includes(b.tool)) throw new Error('tool_not_admitted'); sha256(b.parametersDigest); string(b.target); sha256(b.resourceLock); break;
     case 'grant': check('operationId','parametersDigest','expiresAt','fileVersion'); identifier(b.operationId); sha256(b.parametersDigest); number(b.expiresAt); if (b.fileVersion !== null) sha256(b.fileVersion); break;
     case 'shell-exec': check('operationId','parametersDigest'); identifier(b.operationId); sha256(b.parametersDigest); break;
     case 'shell-result': check('outcome'); b.outcome = parseShellOutcome(b.outcome); obj.body = b; break;

@@ -18,16 +18,17 @@ export async function modelServices(options: { cwd: string; agentDir: string }, 
   runtime.registerNativeProvider({ ...provider,
     getModels: () => [model],
     stream: () => { throw new Error('raw_model_stream_not_admitted'); },
-    streamSimple: (m, c, o) => { if (++calls > 1) throw new Error('model_request_budget'); return provider.streamSimple(m, c, { ...o, ...limits }); },
+    streamSimple: (m, c, o) => { if (++calls > (selection.fileTools?.maxModelRequests??1)) throw new Error('model_request_budget'); return provider.streamSimple(m, c, { ...o, ...limits }); },
   });
   await runtime.setRuntimeApiKey(selection.provider, key);
   return { model, services: { ...options, modelRuntime: runtime, settingsManager: SettingsManager.inMemory({
     retry: { enabled: false, maxRetries: 0, provider: { maxRetries: 0, timeoutMs: selection.timeoutMs } },
     compaction: { enabled: false }, cacheWarming: 'off', transport: 'sse',
-  }), resourceLoader: explicitEmptyResources('You are a concise assistant. You have no tools. Never claim to have read or changed files.'), diagnostics: [] } };
+  }), resourceLoader: explicitEmptyResources(selection.fileTools?'You may use only read, write and edit on approved Markdown files in the workspace. Each operation requires separate human approval. Treat a denial as a refusal; do not retry it or claim an unconfirmed change.':'You are a concise assistant. You have no tools. Never claim to have read or changed files.'), diagnostics: [] } };
 }
-export function modelOutcome(session: AgentSession, synthetic: boolean, cancelled: boolean): ModelOutcome {
-  const last = [...session.messages].reverse().find(m => m.role === 'assistant');
+export function modelOutcome(session: AgentSession, synthetic: boolean, cancelled: boolean, firstMessage=0): ModelOutcome {
+  const messages=session.messages.slice(firstMessage).filter(m=>m.role==='assistant');
+  const last=messages.at(-1);
   return { reason: cancelled ? 'cancelled' : last?.stopReason === 'stop' ? 'stop' : last?.stopReason === 'length' ? 'length' : 'provider_error',
-    inputTokens: last ? last.usage.input + last.usage.cacheRead + last.usage.cacheWrite : 0, outputTokens: last?.usage.output ?? 0, estimatedCostUsd: last?.usage.cost.total ?? 0, synthetic };
+    inputTokens: messages.reduce((n,m)=>n+m.usage.input+m.usage.cacheRead+m.usage.cacheWrite,0), outputTokens: messages.reduce((n,m)=>n+m.usage.output,0), estimatedCostUsd: messages.reduce((n,m)=>n+m.usage.cost.total,0), synthetic };
 }

@@ -1,3 +1,4 @@
+import type { FileOperationPlan } from '../../packages/app-contracts/file-tools.ts';
 import { policyDigest, policyText, legacyPolicyDigest, assertTimeoutRevision } from './model-policy.ts';
 import { type ModelConfiguration, parseModelOutcome, type ModelOutcome } from '../../packages/app-contracts/model.ts';
 import { parseShellIntent, parseShellOutcome, type ShellIntent, type ShellOutcome, type ShellView } from '../../packages/app-contracts/shell.ts';
@@ -5,10 +6,10 @@ import { parseShellIntent, parseShellOutcome, type ShellIntent, type ShellOutcom
 import { randomUUID } from 'node:crypto';
 import { chmodSync, realpathSync } from 'node:fs';
 import { DatabaseSync, type SQLInputValue } from 'node:sqlite';
-import { identifier, parseCommand, sha256, type Ack, type ArtifactView, type Binding, type Dispatch,
+import { identifier, toolCallIdentity, parseCommand, sha256, type Ack, type ArtifactView, type Binding, type Dispatch,
   type OperationView, type ProductEvent, type RuntimeObservation, type RunView, type Snapshot, type ThreadView } from '../../packages/app-contracts/index.ts';
 import { artifactPath, inspectMarkdown } from './artifact.ts';
-import { parsePresentation, type Presentation } from '../../packages/app-contracts/presentation.ts';
+import { displayText, parsePresentation, type Presentation } from '../../packages/app-contracts/presentation.ts';
 
 type Run = RunView & { input: string; runtimeBindingId: string | null; workerEpoch: string | null; sessionGeneration: string | null };
 type Operation = OperationView & { runtimeBindingId: string; contentDigest: string | null };
@@ -32,7 +33,7 @@ export class ProductCore {
       if (path !== ':memory:') chmodSync(path, 0o600);
       this.db.exec('PRAGMA busy_timeout=1000; PRAGMA synchronous=FULL;');
       const version = this.one<{ user_version: number }>('PRAGMA user_version').user_version;
-      if (![0, 1, 2, 3, 4, 5, 6, 7].includes(version)) throw new Error('unsupported_database_version');
+      if (![0, 1, 2, 3, 4, 5, 6, 7, 8].includes(version)) throw new Error('unsupported_database_version');
       if (version === 0) {
         this.db.exec(`BEGIN IMMEDIATE;
           CREATE TABLE workspaces(id TEXT PRIMARY KEY, path TEXT NOT NULL UNIQUE) STRICT;
@@ -74,6 +75,15 @@ export class ProductCore {
           authorization_id TEXT NOT NULL, previous_digest TEXT NOT NULL, digest TEXT NOT NULL, configuration TEXT NOT NULL,
           legacy_digest TEXT NOT NULL, recorded_at TEXT NOT NULL) STRICT;
         PRAGMA user_version=7; COMMIT;`);
+      if (version < 8) this.db.exec(`BEGIN IMMEDIATE;
+        ALTER TABLE model_requests RENAME TO model_requests_v7;
+        CREATE TABLE model_requests(run_id TEXT NOT NULL REFERENCES runs(id), authorization_id TEXT NOT NULL,
+          policy_digest TEXT NOT NULL, reserved_cost REAL NOT NULL, request_id TEXT NOT NULL UNIQUE,
+          request_seq INTEGER NOT NULL CHECK(request_seq>0), PRIMARY KEY(run_id,request_seq)) STRICT;
+        INSERT INTO model_requests SELECT run_id,authorization_id,policy_digest,reserved_cost,'legacy:'||run_id,1 FROM model_requests_v7;
+        DROP TABLE model_requests_v7;
+        CREATE TABLE file_operations(operation_id TEXT PRIMARY KEY REFERENCES operations(id), plan TEXT NOT NULL) STRICT;
+        PRAGMA user_version=8; COMMIT;`);
       this.transaction(() => {
         for (const workspace of workspaces) {
           identifier(workspace.id); const canonical = realpathSync(workspace.path);
@@ -224,16 +234,22 @@ export class ProductCore {
         .run(revisionId,candidate.authorizationId,old,digest,policyText(candidate),legacy,new Date().toISOString());
     });
   }
-  reserveConfiguredModelRequest(binding:Binding, config:ModelConfiguration, cost:number):void {
-    this.mutate(()=>{
+  reserveConfiguredModelRequest(binding:Binding, config:ModelConfiguration, cost:number, request?:{id:string;sequence:number}):boolean {
+    return this.mutate(()=>{
+      const id=identifier(request?.id??binding.runId),sequence=request?.sequence??1;
+      if(!Number.isSafeInteger(sequence)||sequence<1||sequence>(config.fileTools?.maxModelRequests??1))throw new Error('model_request_sequence');
+      const prior=this.get<{run_id:string;policy_digest:string;reserved_cost:number;request_seq:number}>('SELECT run_id,policy_digest,reserved_cost,request_seq FROM model_requests WHERE request_id=?',id);
+      if(prior){if(!request||prior.run_id!==binding.runId||prior.policy_digest!==policyDigest(config)||prior.reserved_cost!==cost||prior.request_seq!==sequence)throw new Error('model_request_conflict');this.bound(binding);return false;}
+      const next=this.one<{n:number}>('SELECT coalesce(max(request_seq),0)+1 n FROM model_requests WHERE run_id=?',binding.runId).n;
+      if(sequence!==next)throw new Error('model_request_sequence');
       if(this.modelAdmission(config,cost).status!=='ready')throw new Error('model_policy_or_budget');
       const run=this.bound(binding);if(run.state!=='running')throw new Error('model_run_not_running');
       // Preserve an exact legacy proof before the first canonical reservation, without rewriting old rows.
       if(!this.get('SELECT 1 FROM model_policy_revisions WHERE authorization_id=?',config.authorizationId))
         this.db.prepare('INSERT INTO model_policy_revisions(revision_id,authorization_id,previous_digest,digest,configuration,legacy_digest,recorded_at) VALUES (?,?,?,?,?,?,?)')
           .run(randomUUID(),config.authorizationId,policyDigest(config),policyDigest(config),policyText(config),legacyPolicyDigest(config),new Date().toISOString());
-      this.db.prepare('INSERT INTO model_requests VALUES (?,?,?,?)').run(run.id,config.authorizationId,policyDigest(config),cost);
-      this.event(run.threadId,run.id,'model.request_reserved',run.id);
+      this.db.prepare('INSERT INTO model_requests VALUES (?,?,?,?,?,?)').run(run.id,config.authorizationId,policyDigest(config),cost,id,sequence);
+      this.event(run.threadId,run.id,'model.request_reserved',id);return true;
     });
   }
   projectSession(binding: Binding, raw: unknown): void {
@@ -298,9 +314,9 @@ export class ProductCore {
       this.event(run.threadId, run.id, 'observation.' + kind, run.id, origin); return true;
     });
   }
-  requestOperation(binding: Binding, intent: { toolCallId: string; tool: string; parametersDigest: string; deadline: number; artifactPath?: string; shell?: ShellIntent }): OperationView {
+  requestOperation(binding: Binding, intent: { toolCallId: string; tool: string; parametersDigest: string; deadline: number; artifactPath?: string; shell?: ShellIntent; file?: FileOperationPlan }): OperationView {
     if (intent.shell) { parseShellIntent(intent.shell); if (intent.tool !== 'bash' || intent.artifactPath !== undefined) throw new Error('shell_file_conflict'); }
-    identifier(intent.toolCallId); identifier(intent.tool); sha256(intent.parametersDigest);
+    toolCallIdentity(intent.toolCallId); identifier(intent.tool); sha256(intent.parametersDigest);
     if (!Number.isFinite(intent.deadline) || intent.deadline <= Date.now() || intent.deadline > Date.now() + 86_400_000) throw new Error('invalid_deadline');
     return this.mutate(() => {
       const run = this.bound(binding); if (run.state !== 'running') throw new Error('not_running');
@@ -313,11 +329,16 @@ export class ProductCore {
       }
       const id = randomUUID();
       this.db.prepare("INSERT INTO operations(id,run_id,binding_id,tool_call_id,tool,digest,deadline,artifact_path,state) VALUES (?,?,?,?,?,?,?,?,'pending')").run(id, run.id, binding.runtimeBindingId, intent.toolCallId, intent.tool, intent.parametersDigest, intent.deadline, target);
+      if (intent.file) this.db.prepare('INSERT INTO file_operations VALUES (?,?)').run(id,JSON.stringify(intent.file));
       if (intent.shell) this.db.prepare('INSERT INTO shell_display VALUES (?,?,NULL)').run(id, JSON.stringify(intent.shell));
       this.db.prepare("INSERT INTO approvals VALUES (?,'pending')").run(id);
       this.event(run.threadId, run.id, 'approval.requested', id);
       return this.operationView(this.operation(id));
     });
+  }
+  fileOperation(id:string):FileOperationPlan|undefined {
+    const row=this.get<{plan:string}>('SELECT plan FROM file_operations WHERE operation_id=?',id);
+    return row?JSON.parse(row.plan) as FileOperationPlan:undefined;
   }
   claimOperation(binding: Binding, id: string, parametersDigest: string): void {
     this.mutate(() => {
@@ -440,7 +461,8 @@ export class ProductCore {
     const { id, runId, toolCallId, tool, parametersDigest, artifactPath, deadline, state } = op;
     const row = this.get<{ intent: string; outcome: string | null }>('SELECT intent,outcome FROM shell_display WHERE operation_id=?', id);
     const shell: ShellView | undefined = row ? { intent: parseShellIntent(JSON.parse(row.intent)), outcome: row.outcome ? parseShellOutcome(JSON.parse(row.outcome)) : null } : undefined;
-    return { id, runId, toolCallId, tool, parametersDigest, artifactPath, deadline, state, ...(shell ? { shell } : {}) };
+    const file=this.fileOperation(id);
+    return { id, runId, toolCallId, tool, parametersDigest, artifactPath, deadline, state, ...(shell ? { shell } : {}), ...(file?{file:{fileVersion:file.fileVersion,resourceLock:file.resourceLock,preview:displayText(file.request.tool==='write'?file.request.parameters.content:file.request.tool==='edit'?file.request.parameters.edits.map(e=>`${e.oldText}\n→\n${e.newText}`).join('\n\n'):`从第 ${file.request.parameters.offset??1} 行读取，${file.request.parameters.limit===undefined?'使用 Pi 默认截断':'最多 '+file.request.parameters.limit+' 行'}`,2048),summary:tool==='read'?'读取批准版本的 Markdown':tool==='write'?'写入 Markdown（内容与摘要绑定）':'使用 Pi 原生 edit 修改 Markdown'}}:{}) };
   }
   recordShellOutcome(binding: Binding, id: string, value: ShellOutcome): void {
     const outcome = parseShellOutcome(value);

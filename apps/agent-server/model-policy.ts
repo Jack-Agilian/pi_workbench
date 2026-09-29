@@ -6,6 +6,7 @@ export function policyText(raw: ModelConfiguration): string {
   return JSON.stringify({ schema: 'model-policy-v1', version:c.version, authorizationId:c.authorizationId,
     approved:c.approved, dataScope:c.dataScope, provider:c.provider, model:c.model, endpoint:c.endpoint,
     maxRequests:c.maxRequests, maxOutputTokens:c.maxOutputTokens, timeoutMs:c.timeoutMs, maxEstimatedCostUsd:c.maxEstimatedCostUsd,
+    ...(c.fileTools ? {fileTools:{maxOperations:c.fileTools.maxOperations,maxModelRequests:c.fileTools.maxModelRequests,operationTimeoutMs:c.fileTools.operationTimeoutMs}} : {}),
     ...(c.httpIdleTimeoutMs === undefined ? {} : {httpIdleTimeoutMs:c.httpIdleTimeoutMs}),
     ...(c.openai ? {openai:{api:c.openai.api,contextWindow:c.openai.contextWindow,inputUsdPerMillion:c.openai.inputUsdPerMillion,
       outputUsdPerMillion:c.openai.outputUsdPerMillion,...(c.openai.tokenLimitField ? {tokenLimitField:c.openai.tokenLimitField}: {})}} : {}) });

@@ -20,12 +20,12 @@ test('R01/R02 actual ProductCore: legacy 2/4, migration, explicit timeout revisi
  function reserve(legacy=false,c=config){
   const run=core.handle({type:'runs.start',requestId:`request-${++seq}`,threadId:thread,input:'SYNTHETIC'}).id;
   const binding=core.dispatchNext()!;core.markRunning(binding);
-  if(legacy){const fixture=new DatabaseSync(path);try{fixture.prepare('INSERT INTO model_requests VALUES (?,?,?,?)').run(run,c.authorizationId,legacyPolicyDigest(c),0.1);}finally{fixture.close();}}else core.reserveConfiguredModelRequest(binding,c,0.1);
+  if(legacy){const fixture=new DatabaseSync(path);try{fixture.prepare('INSERT INTO model_requests VALUES (?,?,?,?,?,1)').run(run,c.authorizationId,legacyPolicyDigest(c),0.1,'legacy:'+run);}finally{fixture.close();}}else core.reserveConfiguredModelRequest(binding,c,0.1);
   core.settle(binding,'completed',{piIdle:true,hostClean:true});return run;
  }
  try{
   reserve(true);reserve(true);core.close();
-  const old=new DatabaseSync(path);old.exec('DROP TABLE model_policy_revisions; PRAGMA user_version=6;');const before=old.prepare('SELECT * FROM model_requests ORDER BY rowid').all();old.close();
+  const old=new DatabaseSync(path);old.exec(`DROP TABLE file_operations; DROP TABLE model_policy_revisions; ALTER TABLE model_requests RENAME TO model_requests_v8; CREATE TABLE model_requests(run_id TEXT PRIMARY KEY REFERENCES runs(id),authorization_id TEXT NOT NULL,policy_digest TEXT NOT NULL,reserved_cost REAL NOT NULL) STRICT; INSERT INTO model_requests SELECT run_id,authorization_id,policy_digest,reserved_cost FROM model_requests_v8; DROP TABLE model_requests_v8; PRAGMA user_version=6;`);const before=old.prepare('SELECT run_id,authorization_id,policy_digest,reserved_cost FROM model_requests ORDER BY rowid').all();old.close();
   core=new ProductCore(path,[]);assert.equal(core.modelAdmission(reordered,0.1).status,'policy_required');
   assert.throws(()=>core.reviseModelPolicy(reordered,{...reordered,timeoutMs:90000},'bad-proof'),/unproven/);
   core.reviseModelPolicy(config,reordered,'legacy-proof');assert.equal(core.modelAdmission(reordered,0.1).status,'ready');
@@ -36,7 +36,7 @@ test('R01/R02 actual ProductCore: legacy 2/4, migration, explicit timeout revisi
   assert.deepEqual(core.modelAdmission(changed,0.1),{status:'ready',used:2,reserved:0.2});
   core.close();core=new ProductCore(path,[]);reserve(false,changed);reserve(false,changed);
   assert.equal(core.modelAdmission(changed,0.1).status,'budget_exhausted');
-  const db=new DatabaseSync(path,{readOnly:true});try{assert.deepEqual(db.prepare('SELECT * FROM model_requests ORDER BY rowid LIMIT 2').all(),before);assert.equal(db.prepare('SELECT count(*) n FROM model_requests').get()!.n,4);}finally{db.close();}
+  const db=new DatabaseSync(path,{readOnly:true});try{assert.deepEqual(db.prepare('SELECT run_id,authorization_id,policy_digest,reserved_cost FROM model_requests ORDER BY rowid LIMIT 2').all(),before);assert.equal(db.prepare('SELECT count(*) n FROM model_requests').get()!.n,4);}finally{db.close();}
  }finally{core.close();rmSync(dir,{recursive:true,force:true});}
 });
 
