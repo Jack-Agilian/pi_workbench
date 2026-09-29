@@ -87,3 +87,7 @@ D2-S/S01 已集成 develop（`22cf288`）。此前 D2-T 为下一项的阶段表
 M1已集成develop，M2功能分支基于最新 `148022b05250cfda824725778e9a056d00cd6830`。[M2离线报告](validation/m2-file-agent-2026-09-29.md) 记录多请求预算、逐操作授权/结果、真实进程恢复和桌面展示；实际SDK/文件/SQLite/进程，模型均为SYNTHETIC。MODEL-03推进in_progress，A05真实工具验收仍缺证据；唯一当前项是M2-C验收计划与新授权准备。原4/4授权耗尽，本轮真实调用0；M0-Pi仍blocked。前文各“当前/下一步”仅保留当时阶段范围。
 
 M2 最新复审：[修正与实机证据](validation/review-m2-2026-09-29.md) · [M2-C 待批准方案](planning/M2_C_ACCEPTANCE_PLAN.md)。
+
+## 主功能与前端（2026-09-29）
+
+[主功能优先及前端优化分期](planning/AGENT_MVP_UI_PLAN.md) · [真实截图审查、布局修正与Mac回归](validation/ui-layout-2026-09-29.md)。下一主功能是模型自主Bash，不是PTY或更多验收设施；本轮只落地已验证的UI改动，运行时代码待本地接手。历史阶段的“唯一下一项”不覆盖当前NEXT_STEPS顶部。

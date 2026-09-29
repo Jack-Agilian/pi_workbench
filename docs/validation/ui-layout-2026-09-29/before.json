@@ -1,0 +1,239 @@
+[
+  {
+    "viewport": {
+      "width": 1320,
+      "height": 860
+    },
+    "bodyOverflow": false,
+    "sidebar": {
+      "x": 0,
+      "y": 0,
+      "width": 226,
+      "height": 860,
+      "scrollHeight": 860,
+      "clientHeight": 860,
+      "visible": true
+    },
+    "header": {
+      "x": 226,
+      "y": 55,
+      "width": 1094,
+      "height": 138.59375,
+      "scrollHeight": 139,
+      "clientHeight": 139,
+      "visible": true
+    },
+    "timeline": {
+      "x": 226,
+      "y": 194.59375,
+      "width": 788,
+      "height": 479.6171875,
+      "scrollHeight": 480,
+      "clientHeight": 480,
+      "visible": true
+    },
+    "composer": {
+      "x": 253,
+      "y": 674.2109375,
+      "width": 734,
+      "height": 164.7890625,
+      "scrollHeight": 163,
+      "clientHeight": 163,
+      "visible": true
+    },
+    "inspector": {
+      "x": 1014,
+      "y": 194.59375,
+      "width": 306,
+      "height": 665.40625,
+      "scrollHeight": 729,
+      "clientHeight": 665,
+      "visible": true
+    },
+    "approval": {
+      "x": 1034,
+      "y": 260.390625,
+      "width": 252,
+      "height": 361.7890625,
+      "scrollHeight": 360,
+      "clientHeight": 360,
+      "visible": true
+    },
+    "approve": {
+      "x": 1195,
+      "y": 573.1796875,
+      "width": 74,
+      "height": 32,
+      "scrollHeight": 30,
+      "clientHeight": 30,
+      "visible": true
+    },
+    "stop": {
+      "x": 942,
+      "y": 219.59375,
+      "width": 40,
+      "height": 22,
+      "scrollHeight": 20,
+      "clientHeight": 20,
+      "visible": true
+    }
+  },
+  {
+    "viewport": {
+      "width": 1024,
+      "height": 720
+    },
+    "bodyOverflow": false,
+    "sidebar": {
+      "x": 0,
+      "y": 0,
+      "width": 196,
+      "height": 720,
+      "scrollHeight": 720,
+      "clientHeight": 720,
+      "visible": true
+    },
+    "header": {
+      "x": 196,
+      "y": 55,
+      "width": 828,
+      "height": 134.59375,
+      "scrollHeight": 135,
+      "clientHeight": 135,
+      "visible": true
+    },
+    "timeline": {
+      "x": 196,
+      "y": 190.59375,
+      "width": 564,
+      "height": 347.6171875,
+      "scrollHeight": 348,
+      "clientHeight": 348,
+      "visible": true
+    },
+    "composer": {
+      "x": 214,
+      "y": 538.2109375,
+      "width": 528,
+      "height": 164.7890625,
+      "scrollHeight": 163,
+      "clientHeight": 163,
+      "visible": true
+    },
+    "inspector": {
+      "x": 760,
+      "y": 190.59375,
+      "width": 264,
+      "height": 529.40625,
+      "scrollHeight": 725,
+      "clientHeight": 529,
+      "visible": true
+    },
+    "approval": {
+      "x": 775,
+      "y": 254.390625,
+      "width": 220,
+      "height": 361.7890625,
+      "scrollHeight": 360,
+      "clientHeight": 360,
+      "visible": true
+    },
+    "approve": {
+      "x": 904,
+      "y": 567.1796875,
+      "width": 74,
+      "height": 32,
+      "scrollHeight": 30,
+      "clientHeight": 30,
+      "visible": true
+    },
+    "stop": {
+      "x": 700,
+      "y": 213.59375,
+      "width": 40,
+      "height": 22,
+      "scrollHeight": 20,
+      "clientHeight": 20,
+      "visible": true
+    }
+  },
+  {
+    "viewport": {
+      "width": 820,
+      "height": 640
+    },
+    "bodyOverflow": false,
+    "sidebar": {
+      "x": 0,
+      "y": 0,
+      "width": 180,
+      "height": 640,
+      "scrollHeight": 640,
+      "clientHeight": 640,
+      "visible": true
+    },
+    "header": {
+      "x": 180,
+      "y": 55,
+      "width": 640,
+      "height": 116.1875,
+      "scrollHeight": 116,
+      "clientHeight": 116,
+      "visible": true
+    },
+    "timeline": {
+      "x": 180,
+      "y": 172.1875,
+      "width": 625,
+      "height": 298.2109375,
+      "scrollHeight": 298,
+      "clientHeight": 298,
+      "visible": true
+    },
+    "composer": {
+      "x": 198,
+      "y": 470.3984375,
+      "width": 589,
+      "height": 164.7890625,
+      "scrollHeight": 163,
+      "clientHeight": 163,
+      "visible": true
+    },
+    "inspector": {
+      "x": 180,
+      "y": 652.1875,
+      "width": 625,
+      "height": 665.0625,
+      "scrollHeight": 664,
+      "clientHeight": 664,
+      "visible": true
+    },
+    "approval": {
+      "x": 194,
+      "y": 716.984375,
+      "width": 597,
+      "height": 331.390625,
+      "scrollHeight": 329,
+      "clientHeight": 329,
+      "visible": true
+    },
+    "approve": {
+      "x": 700,
+      "y": 999.375,
+      "width": 74,
+      "height": 32,
+      "scrollHeight": 30,
+      "clientHeight": 30,
+      "visible": true
+    },
+    "stop": {
+      "x": 745,
+      "y": 195.1875,
+      "width": 40,
+      "height": 22,
+      "scrollHeight": 20,
+      "clientHeight": 20,
+      "visible": true
+    }
+  }
+]

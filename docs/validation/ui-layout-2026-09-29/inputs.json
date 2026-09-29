@@ -1,0 +1,867 @@
+{
+  "codeCommit": "731ad444f67a38911ac624aafb1651e92ea1e9a1",
+  "platform": "darwin-arm64",
+  "realModelCalls": 0,
+  "commands": [
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "seconds": 1.919,
+      "log": ".artifacts/agent-shell/regression/01-typecheck.log",
+      "sha256": "22df5d47848ff6e1f3c0926a3aa3f05da31fb2c76601187b826c3ad4d7870689"
+    },
+    {
+      "command": "npm run test:desktop",
+      "exitCode": 0,
+      "seconds": 12.843,
+      "log": ".artifacts/agent-shell/regression/02-test-desktop.log",
+      "sha256": "e81d70092c82c5a35f6f9d92bef5a4ab5a93c9c6d9d49a0f1af2b8fee9df75b5"
+    },
+    {
+      "command": "npm run test:desktop-file-agent",
+      "exitCode": 0,
+      "seconds": 5.494,
+      "log": ".artifacts/agent-shell/regression/03-test-desktop-file-agent.log",
+      "sha256": "7c7997842b752009e5039aa8ce7aea58dbeb5e943947008b5725c88ef5565f1d"
+    },
+    {
+      "command": "npm run test:desktop-model",
+      "exitCode": 0,
+      "seconds": 6.311,
+      "log": ".artifacts/agent-shell/regression/04-test-desktop-model.log",
+      "sha256": "8fbf83b307d1c7011a7f81449537362510d2951cf4c2f2985585ec7224788624"
+    },
+    {
+      "command": "npm run test:desktop-shell",
+      "exitCode": 0,
+      "seconds": 7.027,
+      "log": ".artifacts/agent-shell/regression/05-test-desktop-shell.log",
+      "sha256": "8195968e784c6f1674a6350d2273dfe1827d0c7ef7159edc7559622b8f099dbb"
+    },
+    {
+      "command": "npm run test:desktop-ui",
+      "exitCode": 0,
+      "seconds": 16.611,
+      "log": ".artifacts/agent-shell/regression/06-test-desktop-ui.log",
+      "sha256": "fc4650720bb65a9c0ed766959b7de14f2f067e7497b39bd946c32bb76aa785aa"
+    },
+    {
+      "command": "npm run test:desktop-shutdown",
+      "exitCode": 0,
+      "seconds": 46.213,
+      "log": ".artifacts/agent-shell/regression/07-test-desktop-shutdown.log",
+      "sha256": "c656412630ec8934c704d7e49900c370b4511c442b64d89f747290c7520d477a"
+    }
+  ],
+  "baseline": "011c8fcec80b0dcdd701f778852fb7d9cf7ce479",
+  "baselineScope": "Original CSS plus test-only capture instrumentation",
+  "images": [
+    {
+      "path": "docs/validation/ui-layout-2026-09-29/after-1024x720.png",
+      "sha256": "8aa9a197fb84c9ca676d44fe5a962334d4aff2c3dc3d82f66527367229c804e7",
+      "bytes": 245285
+    },
+    {
+      "path": "docs/validation/ui-layout-2026-09-29/after-1320x860.png",
+      "sha256": "e4030aa38fb3eb05ad228ddc7ac70fb5ec0f9e033a087865f581e04d2f3a9fe8",
+      "bytes": 266451
+    },
+    {
+      "path": "docs/validation/ui-layout-2026-09-29/after-820x640.png",
+      "sha256": "23a9d5bbe41ad55acf86242f34aa62dae9fe1900733d6e29c6c52305ea9f6b5b",
+      "bytes": 219559
+    },
+    {
+      "path": "docs/validation/ui-layout-2026-09-29/before-1024x720.png",
+      "sha256": "0f81d0388c90ea10b3f93b1253228b754331d8d894653b1e810437b2a96b6c74",
+      "bytes": 219442
+    },
+    {
+      "path": "docs/validation/ui-layout-2026-09-29/before-1320x860.png",
+      "sha256": "247d3dc4bc7f3fa28dedab423604db36782dc2d19ab0625643ed5d3d79aa6820",
+      "bytes": 239938
+    },
+    {
+      "path": "docs/validation/ui-layout-2026-09-29/before-820x640.png",
+      "sha256": "5ea246c2740a25d9e8da5dda62f4df193c106e8324b563da55a6555e3be0004b",
+      "bytes": 146275
+    },
+    {
+      "path": "docs/validation/ui-layout-2026-09-29/expanded-1024x720.png",
+      "sha256": "96140422261b49633258247a165751843da5be2261d0aa24c90620a23272c697",
+      "bytes": 268881
+    },
+    {
+      "path": "docs/validation/ui-layout-2026-09-29/expanded-1320x860.png",
+      "sha256": "593e4b4b07f41cc6c0cf3a7be494ec910f779c75cd2238ea3c0f7999e368a071",
+      "bytes": 289931
+    },
+    {
+      "path": "docs/validation/ui-layout-2026-09-29/expanded-820x640.png",
+      "sha256": "76153d8c3099c3626fe7bc842a271371b1f30508877ba4fff06d03393d8248f8",
+      "bytes": 248798
+    }
+  ],
+  "geometry": {
+    "before": [
+      {
+        "viewport": {
+          "width": 1320,
+          "height": 860
+        },
+        "bodyOverflow": false,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 226,
+          "height": 860,
+          "scrollHeight": 860,
+          "clientHeight": 860,
+          "visible": true
+        },
+        "header": {
+          "x": 226,
+          "y": 55,
+          "width": 1094,
+          "height": 138.59375,
+          "scrollHeight": 139,
+          "clientHeight": 139,
+          "visible": true
+        },
+        "timeline": {
+          "x": 226,
+          "y": 194.59375,
+          "width": 788,
+          "height": 479.6171875,
+          "scrollHeight": 480,
+          "clientHeight": 480,
+          "visible": true
+        },
+        "composer": {
+          "x": 253,
+          "y": 674.2109375,
+          "width": 734,
+          "height": 164.7890625,
+          "scrollHeight": 163,
+          "clientHeight": 163,
+          "visible": true
+        },
+        "inspector": {
+          "x": 1014,
+          "y": 194.59375,
+          "width": 306,
+          "height": 665.40625,
+          "scrollHeight": 729,
+          "clientHeight": 665,
+          "visible": true
+        },
+        "approval": {
+          "x": 1034,
+          "y": 260.390625,
+          "width": 252,
+          "height": 361.7890625,
+          "scrollHeight": 360,
+          "clientHeight": 360,
+          "visible": true
+        },
+        "approve": {
+          "x": 1195,
+          "y": 573.1796875,
+          "width": 74,
+          "height": 32,
+          "scrollHeight": 30,
+          "clientHeight": 30,
+          "visible": true
+        },
+        "stop": {
+          "x": 942,
+          "y": 219.59375,
+          "width": 40,
+          "height": 22,
+          "scrollHeight": 20,
+          "clientHeight": 20,
+          "visible": true
+        }
+      },
+      {
+        "viewport": {
+          "width": 1024,
+          "height": 720
+        },
+        "bodyOverflow": false,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 196,
+          "height": 720,
+          "scrollHeight": 720,
+          "clientHeight": 720,
+          "visible": true
+        },
+        "header": {
+          "x": 196,
+          "y": 55,
+          "width": 828,
+          "height": 134.59375,
+          "scrollHeight": 135,
+          "clientHeight": 135,
+          "visible": true
+        },
+        "timeline": {
+          "x": 196,
+          "y": 190.59375,
+          "width": 564,
+          "height": 347.6171875,
+          "scrollHeight": 348,
+          "clientHeight": 348,
+          "visible": true
+        },
+        "composer": {
+          "x": 214,
+          "y": 538.2109375,
+          "width": 528,
+          "height": 164.7890625,
+          "scrollHeight": 163,
+          "clientHeight": 163,
+          "visible": true
+        },
+        "inspector": {
+          "x": 760,
+          "y": 190.59375,
+          "width": 264,
+          "height": 529.40625,
+          "scrollHeight": 725,
+          "clientHeight": 529,
+          "visible": true
+        },
+        "approval": {
+          "x": 775,
+          "y": 254.390625,
+          "width": 220,
+          "height": 361.7890625,
+          "scrollHeight": 360,
+          "clientHeight": 360,
+          "visible": true
+        },
+        "approve": {
+          "x": 904,
+          "y": 567.1796875,
+          "width": 74,
+          "height": 32,
+          "scrollHeight": 30,
+          "clientHeight": 30,
+          "visible": true
+        },
+        "stop": {
+          "x": 700,
+          "y": 213.59375,
+          "width": 40,
+          "height": 22,
+          "scrollHeight": 20,
+          "clientHeight": 20,
+          "visible": true
+        }
+      },
+      {
+        "viewport": {
+          "width": 820,
+          "height": 640
+        },
+        "bodyOverflow": false,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 180,
+          "height": 640,
+          "scrollHeight": 640,
+          "clientHeight": 640,
+          "visible": true
+        },
+        "header": {
+          "x": 180,
+          "y": 55,
+          "width": 640,
+          "height": 116.1875,
+          "scrollHeight": 116,
+          "clientHeight": 116,
+          "visible": true
+        },
+        "timeline": {
+          "x": 180,
+          "y": 172.1875,
+          "width": 625,
+          "height": 298.2109375,
+          "scrollHeight": 298,
+          "clientHeight": 298,
+          "visible": true
+        },
+        "composer": {
+          "x": 198,
+          "y": 470.3984375,
+          "width": 589,
+          "height": 164.7890625,
+          "scrollHeight": 163,
+          "clientHeight": 163,
+          "visible": true
+        },
+        "inspector": {
+          "x": 180,
+          "y": 652.1875,
+          "width": 625,
+          "height": 665.0625,
+          "scrollHeight": 664,
+          "clientHeight": 664,
+          "visible": true
+        },
+        "approval": {
+          "x": 194,
+          "y": 716.984375,
+          "width": 597,
+          "height": 331.390625,
+          "scrollHeight": 329,
+          "clientHeight": 329,
+          "visible": true
+        },
+        "approve": {
+          "x": 700,
+          "y": 999.375,
+          "width": 74,
+          "height": 32,
+          "scrollHeight": 30,
+          "clientHeight": 30,
+          "visible": true
+        },
+        "stop": {
+          "x": 745,
+          "y": 195.1875,
+          "width": 40,
+          "height": 22,
+          "scrollHeight": 20,
+          "clientHeight": 20,
+          "visible": true
+        }
+      }
+    ],
+    "after": [
+      {
+        "viewport": {
+          "width": 1320,
+          "height": 860
+        },
+        "bodyOverflow": false,
+        "approvalActionable": true,
+        "stopVisible": true,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 208,
+          "height": 860,
+          "scrollHeight": 860,
+          "clientHeight": 860,
+          "visible": true
+        },
+        "header": {
+          "x": 208,
+          "y": 44,
+          "width": 1112,
+          "height": 86.390625,
+          "scrollHeight": 86,
+          "clientHeight": 86,
+          "visible": true
+        },
+        "timeline": {
+          "x": 208,
+          "y": 131.390625,
+          "width": 806,
+          "height": 579.21875,
+          "scrollHeight": 579,
+          "clientHeight": 579,
+          "visible": true
+        },
+        "composer": {
+          "x": 226,
+          "y": 710.609375,
+          "width": 770,
+          "height": 135.390625,
+          "scrollHeight": 133,
+          "clientHeight": 133,
+          "visible": true
+        },
+        "inspector": {
+          "x": 1014,
+          "y": 131.390625,
+          "width": 306,
+          "height": 728.609375,
+          "scrollHeight": 729,
+          "clientHeight": 729,
+          "visible": true
+        },
+        "approval": {
+          "x": 1029,
+          "y": 182.1875,
+          "width": 277,
+          "height": 356.53125,
+          "scrollHeight": 355,
+          "clientHeight": 355,
+          "visible": true
+        },
+        "approve": {
+          "x": 1209,
+          "y": 490.5234375,
+          "width": 84,
+          "height": 35.1953125,
+          "scrollHeight": 33,
+          "clientHeight": 33,
+          "visible": true
+        },
+        "stop": {
+          "x": 938,
+          "y": 149.390625,
+          "width": 54,
+          "height": 32,
+          "scrollHeight": 30,
+          "clientHeight": 30,
+          "visible": true
+        }
+      },
+      {
+        "viewport": {
+          "width": 1024,
+          "height": 720
+        },
+        "bodyOverflow": false,
+        "approvalActionable": true,
+        "stopVisible": true,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 180,
+          "height": 720,
+          "scrollHeight": 720,
+          "clientHeight": 720,
+          "visible": true
+        },
+        "header": {
+          "x": 180,
+          "y": 44,
+          "width": 844,
+          "height": 82.390625,
+          "scrollHeight": 82,
+          "clientHeight": 82,
+          "visible": true
+        },
+        "timeline": {
+          "x": 180,
+          "y": 127.390625,
+          "width": 580,
+          "height": 445.21875,
+          "scrollHeight": 445,
+          "clientHeight": 445,
+          "visible": true
+        },
+        "composer": {
+          "x": 194,
+          "y": 572.609375,
+          "width": 552,
+          "height": 135.390625,
+          "scrollHeight": 133,
+          "clientHeight": 133,
+          "visible": true
+        },
+        "inspector": {
+          "x": 760,
+          "y": 127.390625,
+          "width": 264,
+          "height": 592.609375,
+          "scrollHeight": 688,
+          "clientHeight": 593,
+          "visible": true
+        },
+        "approval": {
+          "x": 775,
+          "y": 178.1875,
+          "width": 220,
+          "height": 356.53125,
+          "scrollHeight": 355,
+          "clientHeight": 355,
+          "visible": true
+        },
+        "approve": {
+          "x": 898,
+          "y": 486.5234375,
+          "width": 84,
+          "height": 35.1953125,
+          "scrollHeight": 33,
+          "clientHeight": 33,
+          "visible": true
+        },
+        "stop": {
+          "x": 690,
+          "y": 143.390625,
+          "width": 54,
+          "height": 32,
+          "scrollHeight": 30,
+          "clientHeight": 30,
+          "visible": true
+        }
+      },
+      {
+        "viewport": {
+          "width": 820,
+          "height": 640
+        },
+        "bodyOverflow": false,
+        "approvalActionable": true,
+        "stopVisible": true,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 154,
+          "height": 640,
+          "scrollHeight": 640,
+          "clientHeight": 640,
+          "visible": true
+        },
+        "header": {
+          "x": 154,
+          "y": 44,
+          "width": 666,
+          "height": 78.390625,
+          "scrollHeight": 78,
+          "clientHeight": 78,
+          "visible": true
+        },
+        "timeline": {
+          "x": 154,
+          "y": 123.390625,
+          "width": 406,
+          "height": 371.21875,
+          "scrollHeight": 371,
+          "clientHeight": 371,
+          "visible": true
+        },
+        "composer": {
+          "x": 164,
+          "y": 494.609375,
+          "width": 386,
+          "height": 135.390625,
+          "scrollHeight": 133,
+          "clientHeight": 133,
+          "visible": true
+        },
+        "inspector": {
+          "x": 560,
+          "y": 123.390625,
+          "width": 260,
+          "height": 516.609375,
+          "scrollHeight": 685,
+          "clientHeight": 517,
+          "visible": true
+        },
+        "approval": {
+          "x": 571,
+          "y": 170.1875,
+          "width": 224,
+          "height": 356.53125,
+          "scrollHeight": 355,
+          "clientHeight": 355,
+          "visible": true
+        },
+        "approve": {
+          "x": 698,
+          "y": 478.5234375,
+          "width": 84,
+          "height": 35.1953125,
+          "scrollHeight": 33,
+          "clientHeight": 33,
+          "visible": true
+        },
+        "stop": {
+          "x": 492,
+          "y": 137.390625,
+          "width": 54,
+          "height": 32,
+          "scrollHeight": 30,
+          "clientHeight": 30,
+          "visible": true
+        }
+      }
+    ],
+    "expanded": [
+      {
+        "viewport": {
+          "width": 1320,
+          "height": 860
+        },
+        "bodyOverflow": false,
+        "approvalActionable": true,
+        "stopVisible": true,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 208,
+          "height": 860,
+          "scrollHeight": 860,
+          "clientHeight": 860,
+          "visible": true
+        },
+        "header": {
+          "x": 208,
+          "y": 44,
+          "width": 1112,
+          "height": 86.390625,
+          "scrollHeight": 86,
+          "clientHeight": 86,
+          "visible": true
+        },
+        "timeline": {
+          "x": 208,
+          "y": 131.390625,
+          "width": 806,
+          "height": 579.21875,
+          "scrollHeight": 579,
+          "clientHeight": 579,
+          "visible": true
+        },
+        "composer": {
+          "x": 226,
+          "y": 710.609375,
+          "width": 770,
+          "height": 135.390625,
+          "scrollHeight": 133,
+          "clientHeight": 133,
+          "visible": true
+        },
+        "inspector": {
+          "x": 1014,
+          "y": 131.390625,
+          "width": 306,
+          "height": 728.609375,
+          "scrollHeight": 800,
+          "clientHeight": 729,
+          "visible": true
+        },
+        "approval": {
+          "x": 1029,
+          "y": 182.1875,
+          "width": 262,
+          "height": 489.703125,
+          "scrollHeight": 488,
+          "clientHeight": 488,
+          "visible": true
+        },
+        "approve": {
+          "x": 1194,
+          "y": 623.6953125,
+          "width": 84,
+          "height": 35.1953125,
+          "scrollHeight": 33,
+          "clientHeight": 33,
+          "visible": true
+        },
+        "stop": {
+          "x": 938,
+          "y": 149.390625,
+          "width": 54,
+          "height": 32,
+          "scrollHeight": 30,
+          "clientHeight": 30,
+          "visible": true
+        }
+      },
+      {
+        "viewport": {
+          "width": 1024,
+          "height": 720
+        },
+        "bodyOverflow": false,
+        "approvalActionable": true,
+        "stopVisible": true,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 180,
+          "height": 720,
+          "scrollHeight": 720,
+          "clientHeight": 720,
+          "visible": true
+        },
+        "header": {
+          "x": 180,
+          "y": 44,
+          "width": 844,
+          "height": 82.390625,
+          "scrollHeight": 82,
+          "clientHeight": 82,
+          "visible": true
+        },
+        "timeline": {
+          "x": 180,
+          "y": 127.390625,
+          "width": 580,
+          "height": 445.21875,
+          "scrollHeight": 445,
+          "clientHeight": 445,
+          "visible": true
+        },
+        "composer": {
+          "x": 194,
+          "y": 572.609375,
+          "width": 552,
+          "height": 135.390625,
+          "scrollHeight": 133,
+          "clientHeight": 133,
+          "visible": true
+        },
+        "inspector": {
+          "x": 760,
+          "y": 127.390625,
+          "width": 264,
+          "height": 592.609375,
+          "scrollHeight": 821,
+          "clientHeight": 593,
+          "visible": true
+        },
+        "approval": {
+          "x": 775,
+          "y": 178.1875,
+          "width": 220,
+          "height": 489.703125,
+          "scrollHeight": 488,
+          "clientHeight": 488,
+          "visible": true
+        },
+        "approve": {
+          "x": 898,
+          "y": 619.6953125,
+          "width": 84,
+          "height": 35.1953125,
+          "scrollHeight": 33,
+          "clientHeight": 33,
+          "visible": true
+        },
+        "stop": {
+          "x": 690,
+          "y": 143.390625,
+          "width": 54,
+          "height": 32,
+          "scrollHeight": 30,
+          "clientHeight": 30,
+          "visible": true
+        }
+      },
+      {
+        "viewport": {
+          "width": 820,
+          "height": 640
+        },
+        "bodyOverflow": false,
+        "approvalActionable": true,
+        "stopVisible": true,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 154,
+          "height": 640,
+          "scrollHeight": 640,
+          "clientHeight": 640,
+          "visible": true
+        },
+        "header": {
+          "x": 154,
+          "y": 44,
+          "width": 666,
+          "height": 78.390625,
+          "scrollHeight": 78,
+          "clientHeight": 78,
+          "visible": true
+        },
+        "timeline": {
+          "x": 154,
+          "y": 123.390625,
+          "width": 406,
+          "height": 371.21875,
+          "scrollHeight": 371,
+          "clientHeight": 371,
+          "visible": true
+        },
+        "composer": {
+          "x": 164,
+          "y": 494.609375,
+          "width": 386,
+          "height": 135.390625,
+          "scrollHeight": 133,
+          "clientHeight": 133,
+          "visible": true
+        },
+        "inspector": {
+          "x": 560,
+          "y": 123.390625,
+          "width": 260,
+          "height": 516.609375,
+          "scrollHeight": 818,
+          "clientHeight": 517,
+          "visible": true
+        },
+        "approval": {
+          "x": 571,
+          "y": 170.1875,
+          "width": 224,
+          "height": 489.703125,
+          "scrollHeight": 488,
+          "clientHeight": 488,
+          "visible": true
+        },
+        "approve": {
+          "x": 698,
+          "y": 592.8046875,
+          "width": 84,
+          "height": 35.1953125,
+          "scrollHeight": 33,
+          "clientHeight": 33,
+          "visible": true
+        },
+        "stop": {
+          "x": 492,
+          "y": 137.390625,
+          "width": 54,
+          "height": 32,
+          "scrollHeight": 30,
+          "clientHeight": 30,
+          "visible": true
+        }
+      }
+    ]
+  },
+  "runtimeImplementationChanged": false,
+  "realCredentialsRead": false,
+  "scope": "UI CSS/capture and existing desktop suites; not model-driven Bash, live model or manual accessibility validation",
+  "documentationChecks": [
+    {
+      "command": ".venv/bin/python scripts/check-ssot.py",
+      "exitCode": 0,
+      "sha256": "9f5958ebcae8550eb99b0a8404e75c1da57acd14a9d4abdaa3b66738c0ff19a2"
+    },
+    {
+      "command": ".venv/bin/python scripts/test-tools.py",
+      "exitCode": 0,
+      "sha256": "47060195453f3c91118ef1d9c94c5d8f1726e608fe870bc724672a1b6c299b1f"
+    },
+    {
+      "command": ".venv/bin/python scripts/check-docs.py --structural-only",
+      "exitCode": 0,
+      "sha256": "1b38097465b6fff810b6d7225f1c87db5668b9b02c46f1607802010cd5c3ee95"
+    },
+    {
+      "command": ".venv/bin/python scripts/check-docs.py --typecheck",
+      "exitCode": 0,
+      "sha256": "0dc263d5edd18a414ca2894c999da562b8994190c5ba2a63ee4008f67b985d4c"
+    }
+  ],
+  "earlierFailure": {
+    "scope": "document initialization/check only",
+    "reason": "initial bootstrap used system Python below 3.10; own venv had no jsonschema",
+    "resolution": "reran existing bootstrap using own Python 3.14.7, then repeated all four checks",
+    "failedLog": ".artifacts/agent-shell/docs/4.log"
+  }
+}
