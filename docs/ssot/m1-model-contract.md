@@ -4,7 +4,7 @@
 
 ## 采用决定与公开入口
 
-采用 Pi 发行包根导出的 createAgentSession、ModelRuntime、SettingsManager，以及 pi-ai 的 InMemoryCredentialStore/InMemoryModelsStore。AgentSession.prompt/subscribe/abort、ModelRuntime.getProvider/getModel/registerProvider/registerNativeProvider/setRuntimeApiKey 是类方法，不冒充根导出。Provider、FetchFunction、AgentSessionEvent 仅为适配包内类型；fauxProvider 是根运行时导出，只用于明确 SYNTHETIC 的独立测试 entry。上述入口来自已安装 0.87.0 声明/实际 import，不使用 src/core deep-import、experimental source 条件、any 或 ts-ignore。
+采用 Pi 发行包根导出的 createAgentSession、ModelRuntime、SettingsManager，以及 pi-ai 的 InMemoryCredentialStore/InMemoryModelsStore。AgentSession.prompt/subscribe/abort、ModelRuntime.getProvider/getModel/registerProvider/registerNativeProvider/setRuntimeApiKey 是类方法，不冒充根导出。Provider、FetchFunction、AgentSessionEvent 仅为适配包内类型；fauxProvider 是根运行时导出，只用于明确 SYNTHETIC 的独立测试 entry。上述入口最初在 0.87.0 声明/实际 import 核对，当前采用 0.87.1 并有发行与回归证据，不使用 src/core deep-import、experimental source 条件、any 或 ts-ignore。
 
 Pi ProviderRequestOptions.fetch 是公开的 HTTP 传输注入点，不覆盖 WebSocket。保留原生 Provider.streamSimple，固定 SSE、maxTokens、timeoutMs、maxRetries=0；原生 stream 旁路拒绝。会话 retry、compaction、cache warming 关闭；tools/customTools 为空且 noTools='all'，调用前再次核实无活动工具。没有重写模型协议、SSE 解析、Agent Loop 或 Session 树。
 
@@ -40,8 +40,15 @@ M1-A 离线测试采用真实 SDK、真实进程和明确合成响应；M1-B 才
 
 模型策略使用固定字段顺序、包含嵌套 openai 的 `model-policy-v1` 摘要；工具参数摘要不变。历史 model_requests 不重写。首次规范化预留会记录配置原顺序摘要作为旧策略证明；无法用原配置证明的旧摘要保持 policy_required。宿主本地 `model:policy` 入口可追加明确的 时间字段修订（timeoutMs 与 httpIdleTimeoutMs）（同 authorizationId、服务、数据范围、请求数、输出数、费用上限均不变），记录原/新摘要、规范化配置、修订 ID 和时间。相同 ID 同内容幂等，不同内容拒绝；有 queued/active/unknown Run 时拒绝。各 revision 继续累计原请求和保守预留；失败不退款。Renderer/Worker 没有策略修订或数据库路径入口。
 
-参考当前 Pi 0.87.1 官方 settings.md，默认 httpIdleTimeoutMs 为 300000ms，retry.provider.timeoutMs 默认沿用它。本项目新模板以 httpIdleTimeoutMs=300000 控制宿主等待响应头/后续非空数据的空闲时间，持续网络进展可跨越这个时长；不解析SSE或把展示token当网络心跳。独立 timeoutMs=1800000 为单个 LLM 请求总上限，可明确配置到24小时，传给 Pi Provider 并用于宿主总截止加5秒启动余量。这一总上限是产品策略，不是Pi默认值。历史配置缺失idle字段时保留旧总期限并以旧timeoutMs作为idle兼容值，摘要不自动变化。Worker ready 最多5秒。主动取消最多等待 400ms 后进入进程停止；guardian 保留现有截止后 3 秒生命周期兜底，清理证据缺失仍 unknown/blocked。Pi 的默认 Agent 自动重试不采用，仍关闭 Agent/Provider 重试、缓存预热和自动压缩。
+参考当前 Pi 0.87.1 官方 settings.md，默认 httpIdleTimeoutMs 为 300000ms，retry.provider.timeoutMs 默认沿用它。本项目新模板以 httpIdleTimeoutMs=300000 控制宿主等待响应头/后续非空数据的空闲时间，持续网络进展可跨越这个时长；不解析SSE或把展示token当网络心跳。独立 timeoutMs=1800000 为单个 LLM 请求总上限，可明确配置到24小时，传给 Pi Provider 并用于宿主总截止加5秒启动余量。2026-09-29 用户明确确认30分钟总上限；这是产品策略，不是Pi默认值，也不是整个长期Thread或未来多调用Run的总时长。历史配置缺失idle字段时保留旧总期限并以旧timeoutMs作为idle兼容值，摘要不自动变化。Worker ready 最多5秒。主动取消最多等待 400ms 后进入进程停止；guardian 保留现有截止后 3 秒生命周期兜底，清理证据缺失仍 unknown/blocked。Pi 的默认 Agent 自动重试不采用，仍关闭 Agent/Provider 重试、缓存预热和自动压缩。
 
 home 和新 Run 接收前检查策略与预算，显示 policy_required/budget_exhausted；已有 requestId 确认重试仍由原幂等校验处理。HTTP 发送前还在同一事务重新核验并预留，预检不是资金锁。
 
 `validate:model-resume prepare <attempt-id>` 不读取凭据、不启动宿主、不调用网络，只读原报告及产品 SQLite，用固定旧 requestId 找回原 Thread、首个成功 Run、原生 Session 引用和账本，持久化最多两次的续验计划。`execute-approved` 再核对计划、策略、原报告摘要及实时余额，先独占创建追加结果再连接正常 HostClient。原 first 不再发，仅恢复与取消；新 attempt 的 requestId 稳定且不同于原确认重试。相同 attempt 即使崩溃也不会自动重发，原报告不覆盖。恢复失败即停，未观察到活跃流不宣称取消已验证。新增结果保存 Thread/Run/Session 绑定及关闭后的账本审计；准备计划不构成新的预算授权。
+
+
+## 当前收口与后续边界（2026-09-29）
+
+MODEL-01/02 在各自限定范围完成，实际代码、证据引用和残余边界见 [M1 收口核对](../validation/m1-closeout-2026-09-29.md)。4/4旧调用与所有失败记录保留；确认模板默认值不改变本机已耗尽授权，不产生新调用预算。后续唯一实施项按 [NEXT_STEPS](../planning/NEXT_STEPS.md) 进入 M2 离线增量。
+
+本契约的“一Run一次HTTP、零工具、零Operation”是已实现M1范围。M2须单列多请求/逐操作契约并完成验证后才能扩展这些门禁；不能仅删除次数限制就称为有限工具Agent已实现。

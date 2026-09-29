@@ -97,7 +97,7 @@ M0 明确同 provider 只允许一个配置账户。accountId 是产品标识，
 
 CredentialStore 桥接成功也不代表 Pi Worker 永远接触不到凭据。需要向模型 Provider 发请求的进程可能使用凭据；受信任/隔离范围必须说明。Shell 子进程不继承所有账户环境变量。Keychain/DPAPI 适配、并发登录/刷新、退出前 flush 与错误脱敏需实测，不把 Pi 的文件存储直接称作系统密钥库。
 
-A4 的 [限定实测](../validation/a4-2026-09-22.md) 已验证内存 store 与合成 Provider 的并发/取消、状态投影和环境隔离。所选版本的 CredentialSynchronizationError 表示变更已提交但本地同步失败，并可能携带原始 credential/cause；普通错误也不能证明未写入。宿主不得直接发送错误或盲目重试，应保留 committed_needs_sync/unknown 并对账。checkAuth 表示配置存在，不验证 token 有效；取消返回也不证明底层刷新已结算。系统存储/flush 及使用真实凭据的产品进程边界仍按 [A4 边界](../validation/a4-boundaries.md) 留待实施。
+A4 的 [限定实测](../validation/a4-2026-09-22.md) 已验证内存 store 与合成 Provider 的并发/取消、状态投影和环境隔离。所选版本的 CredentialSynchronizationError 表示变更已提交但本地同步失败，并可能携带原始 credential/cause；普通错误也不能证明未写入。宿主不得直接发送错误或盲目重试，应保留 committed_needs_sync/unknown 并对账。checkAuth 表示配置存在，不验证 token 有效；取消返回也不证明底层刷新已结算。系统存储/flush 仍按 [A4 边界](../validation/a4-boundaries.md) 留待实施；应用专用字面量 API key 的宿主读取、私有通道与内存 Pi 凭据已在后续 [M1 契约](m1-model-contract.md) 限定接入，不等同于 Keychain/OAuth。
 
 ## 7. 扩展 UI 与插件生态边界
 
@@ -141,4 +141,11 @@ P0 的 CORE-03 必须保证同 Workspace 至多一个活动写 Run；M0 可先�
 
 ## M1 无工具会话的限定扩展
 
-[接入契约](m1-model-contract.md) 与 [实测](../validation/m1-2026-09-28.md)：沿用 Pi 公开 ProviderRequestOptions.fetch 扩展点，把单次批准 HTTP 通过已有 IPC 委托宿主，Worker/Shell 仍禁网。Renderer 只有无参数原生凭据选择动作，无 key/路径回传；预算预留与最终结算归 App Server。正常 stop/length 不单独等于产品完成。schema v6 / IPC v5 不改变全局单写和同 Provider 单账户；真实服务未验证。
+[接入契约](m1-model-contract.md) 与 [实测](../validation/m1-2026-09-28.md)：沿用 Pi 公开 ProviderRequestOptions.fetch 扩展点，把单次批准 HTTP 通过已有 IPC 委托宿主，Worker/Shell 仍禁网。Renderer 只有无参数原生凭据选择动作，无 key/路径回传；预算预留与最终结算归 App Server。正常 stop/length 不单独等于产品完成。schema v6 / IPC v5 不改变全局单写和同 Provider 单账户；初版离线证据不代表真实服务。后续 Pi 0.87.1 的无工具首次回复、原生会话恢复与活跃取消已在 macOS 限定实测，见 [M1 续验](../validation/review-develop-m1-2026-09-29.md)。
+
+
+## M1 策略修订与长请求收口（2026-09-29）
+
+schema v7 的 model_policy_revisions 记录同授权的显式时间修订，model_requests 的原请求数/预留不重置。配置摘要对字段顺序稳定，无法证明的旧策略保持阻断；Renderer 只收到策略待确认/预算耗尽等安全状态。恢复驱动复用原 Thread/Session 和稳定产品 requestId，已开始的 attempt 与中断锁不自动重跑。公开 SDK、原生历史和宿主唯一写库的所有权不变。
+
+用户确认单个 LLM 请求总上限默认30分钟，网络空闲默认5分钟，二者独立；Worker启动、Run编排和进程清理另计，详见 [时间契约](m1-model-contract.md)。缩时合成测试不代表30分钟真实服务实测。当前4/4授权已耗尽；M2离线开发不授权新的真实请求，M0-Pi仍blocked。采用条目与证据的逐项核对见 [收口报告](../validation/m1-closeout-2026-09-29.md)。

@@ -75,6 +75,11 @@ D2-S/S01 已集成 develop（`22cf288`）。此前 D2-T 为下一项的阶段表
 
 ## develop 复审与 M1-B 续验（2026-09-29）
 
-[最新修订证据](validation/review-develop-m1-2026-09-29.md)：R01/R02/R03与现状文档已修正；原授权保留且累计4/4，真实原会话恢复与活跃取消通过。MODEL-02 限定 done，等待本轮审核；此前“恢复/取消待验收”为历史阶段。M0-Pi仍blocked，不启动M2。
+[最新修订证据](validation/review-develop-m1-2026-09-29.md)：R01/R02/R03与现状文档已修正；原授权保留且累计4/4，真实原会话恢复与活跃取消通过。MODEL-02 限定 done；此前“恢复/取消待验收”为历史阶段。该次交付止于M1，当前推进顺序见 NEXT_STEPS。M0-Pi仍blocked。
 
 长流语义补充：[单个LLM请求的空闲与总期限修正](validation/m1-stream-timeout-2026-09-29.md)，12条针对性回归通过，新增真实调用0。历史5分钟值曾同时约束总期限；新模板独立配置两者，旧授权不自动修改。
+
+
+## M1 收口与30分钟决策确认（2026-09-29）
+
+[逐项核对](validation/m1-closeout-2026-09-29.md) 统一已实现的预算修订、原会话续验、HTTP时间边界及安全展示证据；采用清单补齐 agent-session、native-history、pi-settings、product-coordination、desktop-ui 的相关引用。用户已确认单个LLM总上限30分钟、独立空闲上限5分钟，旧配置和4/4消费不变。接下来按 [唯一计划](planning/NEXT_STEPS.md) 推进M2离线增量；本次未新增真实调用，不晋级M0-Pi。

@@ -40,7 +40,7 @@
         "AgentSession.abort"
       ],
       "reuse": "工具循环、原生重试/压缩保持上游",
-      "productDelta": "packages/pi-adapter/worker-runtime.ts采用公开SDK；apps/agent-server/worker-supervisor.ts负责进程监督和产品Run结算",
+      "productDelta": "packages/pi-adapter/worker-runtime.ts采用公开SDK；apps/agent-server/worker-supervisor.ts负责进程监督和产品Run结算；M1通过公开prompt/subscribe/abort实现零工具流、原Session恢复及活跃取消；M2多工具循环尚未实施",
       "acceptanceGate": "原生 SDK 探针；运行绑定在派发时固定；同 Worker 迟到观察不归入新 Run",
       "implementationState": "in_progress",
       "adoption": {
@@ -87,7 +87,11 @@
           "EV-M1-SDK-20260928",
           "EV-M1-MAC-20260928",
           "EV-PI0871-RELEASE-20260929",
-          "EV-PI0871-SDK-20260929"
+          "EV-PI0871-SDK-20260929",
+          "EV-M1-RESUME-MODEL-20260929",
+          "EV-M1-RESUME-MAC-20260929",
+          "EV-M1-STREAM-IDLE-20260929",
+          "EV-M1-CLOSEOUT-20260929"
         ]
       }
     },
@@ -107,7 +111,7 @@
         "AgentSessionRuntime.newSession"
       ],
       "reuse": "JSONL、分支、恢复保持 Pi",
-      "productDelta": "Thread原生路径由Pi公开getSessionFile分配，宿主SQLite持久确认及落盘标记；不保存消息或第二份树",
+      "productDelta": "Thread原生路径由Pi公开getSessionFile分配，宿主SQLite持久确认及落盘标记；不保存消息或第二份树；M1续验通过稳定产品请求定位原Thread/Session，原生文件未重写，失败请求不自动重发",
       "acceptanceGate": "保存/恢复/Fork不双写；替换前三类失败点和重绑定；失效旧对象不可继续使用",
       "implementationState": "in_progress",
       "adoption": {
@@ -162,7 +166,11 @@
           "EV-M1-SDK-20260928",
           "EV-M1-MAC-20260928",
           "EV-PI0871-RELEASE-20260929",
-          "EV-PI0871-SDK-20260929"
+          "EV-PI0871-SDK-20260929",
+          "EV-M1-POLICY-REGRESSION-20260929",
+          "EV-M1-RESUME-MODEL-20260929",
+          "EV-M1-RESUME-MAC-20260929",
+          "EV-M1-CLOSEOUT-20260929"
         ]
       }
     },
@@ -182,7 +190,7 @@
         "ModelRuntime.registerProvider"
       ],
       "reuse": "Provider、目录、登录/刷新复用",
-      "productDelta": "M1 OpenAI Responses/Chat Completions 与原有 Anthropic；Pi 原生 Provider/公开 registerProvider 元数据接入；应用专用 auth.json 字面量 key 读取和临时原生文件选择；系统 Keychain/OAuth 未完成；0.87.1目录模型只覆盖批准baseUrl，真实首条、原会话恢复及活跃取消已限定验证；追加规范化策略/旧账本兼容和显式timeout修订，真实授权累计4/4，取消实际计费未知；httpIdleTimeoutMs空闲期限与timeoutMs单请求总期限独立，长流使用缩时合成回归",
+      "productDelta": "M1 OpenAI Responses/Chat Completions 与原有 Anthropic；Pi 原生 Provider/公开 registerProvider 元数据接入；应用专用 auth.json 字面量 key 读取和临时原生文件选择；系统 Keychain/OAuth 未完成；0.87.1目录模型只覆盖批准baseUrl，真实首条、原会话恢复及活跃取消已限定验证；追加规范化策略/旧账本兼容和显式timeout修订，真实授权累计4/4，取消实际计费未知；httpIdleTimeoutMs空闲期限与timeoutMs单请求总期限独立，长流使用缩时合成回归；30分钟单LLM总上限已获用户确认，原4/4耗尽授权不变",
       "acceptanceGate": "secret 不进Renderer/日志/子进程env",
       "implementationState": "in_progress",
       "adoption": {
@@ -279,7 +287,8 @@
           "EV-M1-POLICY-REGRESSION-20260929",
           "EV-M1-RESUME-MODEL-20260929",
           "EV-M1-RESUME-MAC-20260929",
-          "EV-M1-STREAM-IDLE-20260929"
+          "EV-M1-STREAM-IDLE-20260929",
+          "EV-M1-CLOSEOUT-20260929"
         ]
       }
     },
@@ -294,7 +303,7 @@
         "SettingsManager"
       ],
       "reuse": "复用 Pi 设置解析/持久",
-      "productDelta": "隔离配置路径与产品偏好",
+      "productDelta": "隔离配置路径与产品偏好；M1使用内存设置且关闭Agent/Provider重试、自动压缩与预热；产品独立5分钟HTTP空闲及用户确认的30分钟单LLM总上限，旧配置不自动迁移",
       "acceptanceGate": "无全局未知设置泄入；flush错误处理",
       "implementationState": "in_progress",
       "adoption": {
@@ -324,7 +333,9 @@
           "EV-M1-SDK-20260928",
           "EV-M1-MAC-20260928",
           "EV-PI0871-RELEASE-20260929",
-          "EV-PI0871-SDK-20260929"
+          "EV-PI0871-SDK-20260929",
+          "EV-M1-STREAM-IDLE-20260929",
+          "EV-M1-CLOSEOUT-20260929"
         ]
       }
     },
@@ -941,7 +952,7 @@
       ],
       "upstreamSymbolsOrPaths": [],
       "reuse": "复用Pi原生任务执行，不重写",
-      "productDelta": "ProductCore持久Run/Operation/Approval、v2启动日志及v3原生落盘标记；Supervisor冷恢复先失效旧epoch授权，再按清理证据结算；C沿用同一核心，v4仅增有限展示缓存；D1复用产品取消与既有恢复，在宿主关闭时结算活动/排队工作并保留审计；D2-S SQL v5增加Shell意图/结果投影，取消与命令副作用分开，崩溃只对账原Operation",
+      "productDelta": "ProductCore持久Run/Operation/Approval、v2启动日志及v3原生落盘标记；Supervisor冷恢复先失效旧epoch授权，再按清理证据结算；C沿用同一核心，v4仅增有限展示缓存；D1复用产品取消与既有恢复，在宿主关闭时结算活动/排队工作并保留审计；D2-S SQL v5增加Shell意图/结果投影，取消与命令副作用分开，崩溃只对账原Operation；M1 SQL v6请求预留/模型结果及v7显式策略修订；语义摘要/旧账本证明、预算跨重开修订保留、独立HTTP清理及无工具结算；累计4/4真实请求",
       "acceptanceGate": "幂等/绑定/取消/unknown；P0同Workspace写Run串行并覆盖等待审批与清理阶段",
       "implementationState": "in_progress",
       "adoption": {
@@ -981,7 +992,12 @@
           "EV-D2S-S01-MAC-20260928",
           "EV-D2S-S01-REGRESSION-20260928",
           "EV-M1-SDK-20260928",
-          "EV-M1-MAC-20260928"
+          "EV-M1-MAC-20260928",
+          "EV-M1-POLICY-REGRESSION-20260929",
+          "EV-M1-RESUME-MODEL-20260929",
+          "EV-M1-RESUME-MAC-20260929",
+          "EV-M1-STREAM-IDLE-20260929",
+          "EV-M1-CLOSEOUT-20260929"
         ]
       }
     },
@@ -1051,7 +1067,7 @@
         "esbuild build"
       ],
       "reuse": "Electron公开窗口/沙盒/IPC，React渲染和esbuild构建；复用既有产品与Pi Worker链路",
-      "productDelta": "闭合产品桥、Thread/Run视图、审批/取消/成果与有界纯文本投影；显式无模型驱动；关闭结果/重连接管分离，未确认命令按意图保留身份并显式重试；D1正常退出/信号统一结算，关闭失败后原窗口显式恢复，候选新宿主不迟到发布；D2-S展示固定命令审批/profile/期限及stdout/stderr有界完成快照，交互终端尚未接入",
+      "productDelta": "闭合产品桥、Thread/Run视图、审批/取消/成果与有界纯文本投影；显式无模型驱动；关闭结果/重连接管分离，未确认命令按意图保留身份并显式重试；D1正常退出/信号统一结算，关闭失败后原窗口显式恢复，候选新宿主不迟到发布；D2-S展示固定命令审批/profile/期限及stdout/stderr有界完成快照，交互终端尚未接入；M1正文流/最终快照、应用专用持久凭据加载及原生临时选择、策略待确认/预算耗尽准入和双时间限制显示；仅产品DTO",
       "acceptanceGate": "真实桌面进程/来源/CSP、Thread隔离、审批/取消/恢复；平台/模型/Gate分别验收；确认丢失/交错重试、异常关闭与受证据约束的恢复",
       "implementationState": "in_progress",
       "adoption": {
@@ -1171,7 +1187,11 @@
           "EV-D2S-S01-MAC-20260928",
           "EV-D2S-S01-REGRESSION-20260928",
           "EV-M1-SDK-20260928",
-          "EV-M1-MAC-20260928"
+          "EV-M1-MAC-20260928",
+          "EV-M1-OPENAI-MAC-20260929",
+          "EV-M1-POLICY-REGRESSION-20260929",
+          "EV-M1-STREAM-IDLE-20260929",
+          "EV-M1-CLOSEOUT-20260929"
         ]
       }
     }
@@ -2268,6 +2288,18 @@
         "darwin"
       ],
       "locator": "docs/validation/m1-stream-timeout-2026-09-29.md"
+    },
+    {
+      "id": "EV-M1-CLOSEOUT-20260929",
+      "kind": "sdk",
+      "result": "passed",
+      "scope": "Mac Node 24.21.0 Pi 0.87.1: 20 runtime regression commands passed, including actual SDK/Worker and Electron shutdown matrix. New scaled synthetic late-header/idle-completion checks and isolated resume lock/result diagnostics; 12 historical evidence references traced. No new real model request, credentials or configuration changes; docs synchronized as a documented delta.",
+      "commit": "6f357674130b890cbb89e593333a3c1b57aa1018",
+      "recordedAt": "2026-09-29T05:44:28.490723+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/m1-closeout-2026-09-29.md"
     }
   ]
 }

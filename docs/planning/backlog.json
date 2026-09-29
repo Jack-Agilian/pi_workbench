@@ -1596,7 +1596,8 @@
             "EV-M1-SDK-20260928",
             "EV-M1-MAC-20260928",
             "EV-M1-OPENAI-SDK-20260929",
-            "EV-M1-OPENAI-MAC-20260929"
+            "EV-M1-OPENAI-MAC-20260929",
+            "EV-M1-STREAM-IDLE-20260929"
           ]
         },
         {
@@ -1609,7 +1610,9 @@
             "EV-M1-SDK-20260928",
             "EV-M1-MAC-20260928",
             "EV-M1-OPENAI-SDK-20260929",
-            "EV-M1-OPENAI-MAC-20260929"
+            "EV-M1-OPENAI-MAC-20260929",
+            "EV-M1-POLICY-REGRESSION-20260929",
+            "EV-M1-CLOSEOUT-20260929"
           ]
         },
         {
@@ -1622,7 +1625,9 @@
             "EV-M1-SDK-20260928",
             "EV-M1-MAC-20260928",
             "EV-M1-OPENAI-SDK-20260929",
-            "EV-M1-OPENAI-MAC-20260929"
+            "EV-M1-OPENAI-MAC-20260929",
+            "EV-M1-STREAM-IDLE-20260929",
+            "EV-M1-CLOSEOUT-20260929"
           ]
         },
         {
@@ -1636,7 +1641,8 @@
             "EV-M1-MAC-20260928",
             "EV-M1-OPENAI-SDK-20260929",
             "EV-M1-OPENAI-MAC-20260929",
-            "EV-M1-STREAM-IDLE-20260929"
+            "EV-M1-STREAM-IDLE-20260929",
+            "EV-M1-POLICY-REGRESSION-20260929"
           ]
         }
       ],
@@ -1682,7 +1688,7 @@
           ]
         }
       ],
-      "statusReason": "限定无工具M1-B已完成首次文本、原Thread/Session重开恢复和观察流后的活跃取消；原授权累计4/4且无重试，取消/历史超时实际计费未知。待本轮审核后才进入M2；M0-Pi不晋级。"
+      "statusReason": "限定无工具M1-B已完成首次文本、原Thread/Session重开恢复和观察流后的活跃取消；原授权累计4/4且无重试，取消/历史超时实际计费未知。30分钟单LLM总上限已获确认，收口集成后进入M2离线实施；M0-Pi不晋级。"
     },
     {
       "id": "MODEL-03",
@@ -1757,7 +1763,7 @@
           "evidenceRefs": []
         }
       ],
-      "statusReason": "尚未实施。先完成M1时间策略确认/审核与授权集成，再按NEXT_STEPS的M2-A/B/C集中推进；原模型授权4/4已耗尽，真实验收需新明确预算。"
+      "statusReason": "尚未实施运行代码。M1时间策略已确认，先完成收口与统一基线，再按NEXT_STEPS的M2-A/B/C推进；原授权4/4已耗尽，真实验收须新明确预算。"
     }
   ],
   "decisionSource": "../ssot/README.md",
