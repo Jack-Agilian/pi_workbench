@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, realpathSync, rmSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, realpathSync, rmSync, renameSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { ProductCore } from '../apps/agent-server/core.ts';
@@ -44,7 +44,10 @@ test('M2 CLI prepare/inspect need no credentials; duplicate prepare and noninter
     const planFile = join(f.profile, 'file-validation-synthetic-cli.plan.json');
     const plan = JSON.parse(readFileSync(planFile, 'utf8')); assert.deepEqual(plan.blocked, []);
     const duplicate = f.run(['prepare', 'synthetic-cli']); assert.notEqual(duplicate.status, 0);
+    const configPath = join(f.home, 'Library/Application Support/Pi Workbench/model.json');
+    renameSync(configPath, configPath + '.saved');
     assert.equal(f.run(['inspect', 'synthetic-cli']).status, 0);
+    renameSync(configPath + '.saved', configPath);
     const execution = f.run(['execute-approved', 'synthetic-cli']);
     assert.notEqual(execution.status, 0); assert.match(execution.stderr, /interactive_terminal_required/);
     assert.deepEqual(readFileSync(db), before);

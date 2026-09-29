@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { createInterface } from 'node:readline/promises';
 import { stdin, stdout } from 'node:process';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, readFileSync, writeFileSync, openSync, closeSync, renameSync, unlinkSync, existsSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync, openSync, closeSync, renameSync, unlinkSync, existsSync, realpathSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { homedir } from 'node:os';
 import { randomUUID } from 'node:crypto';
@@ -21,18 +21,26 @@ assert.ok(['prepare', 'inspect', 'execute-approved'].includes(action) && attempt
   (!option || option.startsWith('--config=')), 'Usage: validate:file-agent prepare|inspect|execute-approved attempt-id [--config=/path/model.json]');
 const directory = join(homedir(), 'Library/Application Support/Pi Workbench');
 const profile = join(directory, 'model-profile'), paths = acceptancePaths(profile, attempt);
-const configPath = option ? resolve(option.slice('--config='.length)) : join(directory, 'model.json');
-const config = parseModelConfiguration(JSON.parse(readFileSync(configPath, 'utf8')));
-const resultFile = resultPath(profile, config);
+const chosenConfigPath = option ? resolve(option.slice('--config='.length)) : join(directory, 'model.json');
 if (action === 'inspect') {
+  const savedPlan = JSON.parse(readFileSync(ordinaryPath(profile, paths.plan), 'utf8'));
+  const resultFile = resultPath(profile, savedPlan);
   const report = existsSync(resultFile) ? JSON.parse(readFileSync(ordinaryPath(profile, resultFile), 'utf8')) : null;
+  if (report) assert.equal(report.attempt, attempt, 'different_attempt_for_authorization');
   console.log(JSON.stringify({ attempt, report }));
 } else {
-  const commit = execFileSync('git', ['-C', repository, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
-  assert.equal(execFileSync('git', ['-C', repository, 'status', '--porcelain'], { encoding: 'utf8' }).trim(), '', 'worktree_must_be_clean');
+  const configPath = realpathSync(chosenConfigPath);
+  const config = parseModelConfiguration(JSON.parse(readFileSync(configPath, 'utf8')));
+  const resultFile = resultPath(profile, config);
+  const codeIdentity = () => {
+    assert.equal(execFileSync('git', ['-C', repository, 'status', '--porcelain'], { encoding: 'utf8' }).trim(), '', 'worktree_must_be_clean');
+    return execFileSync('git', ['-C', repository, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+  };
+  const commit = codeIdentity();
   const catalog = await describeModel(config.provider, config.model, config.maxOutputTokens, config);
   assert.equal(catalog.endpoint, config.endpoint, 'model_endpoint_mismatch');
-  const plan = buildPlan({ profile, attempt, config, reserve: catalog.reserveCostUsd, commit });
+  const makePlan = () => ({ ...buildPlan({ profile, attempt, config, reserve: catalog.reserveCostUsd, commit: codeIdentity() }), configurationPath: configPath });
+  const plan = makePlan();
   if (action === 'prepare') {
     writeFileSync(paths.plan, JSON.stringify(plan, null, 2) + '\n', { flag: 'wx', mode: 0o600 });
     console.log(JSON.stringify({ prepared: true, attempt, blocked: plan.blocked, maxNewRequests: 8,
@@ -50,7 +58,7 @@ if (action === 'inspect') {
     const confirmation = await rl.question(`New M2 authorization ${config.authorizationId}; at most 8 requests, estimate cap $${config.maxEstimatedCostUsd}. Close other workbench windows. Type EXECUTE ${attempt}: `);
     if (confirmation !== `EXECUTE ${attempt}`) { rl.close(); throw new Error('explicit_confirmation_required'); }
     // Recheck after human delay, before acquiring the lock, reading credentials or creating files.
-    assert.deepEqual(buildPlan({ profile, attempt, config, reserve: catalog.reserveCostUsd, commit }), plan, 'plan_changed_during_confirmation');
+    assert.deepEqual(makePlan(), plan, 'plan_changed_during_confirmation');
     assert.equal(policyDigest(parseModelConfiguration(JSON.parse(readFileSync(configPath, 'utf8')))), plan.policyDigest);
     const nonce = randomUUID();
     const lockFd = openSync(paths.lock, 'wx', 0o600);
@@ -71,8 +79,11 @@ if (action === 'inspect') {
         text: async name => { await file(name); return readFileSync(join(paths.root, name), 'utf8'); },
         capture: runId => runEvidence(profile, runId),
         beforeStage: async stage => {
+          assert.equal(codeIdentity(), plan.commit, 'code_changed');
+          assert.equal(realpathSync(chosenConfigPath), plan.configurationPath, 'configuration_path_changed');
           assert.equal(policyDigest(parseModelConfiguration(JSON.parse(readFileSync(configPath, 'utf8')))), plan.policyDigest, 'configuration_changed');
           const audit = auditLedger(profile, config, catalog.reserveCostUsd);
+          assert.equal(audit.priorAuthorizationsDigest, plan.audit.priorAuthorizationsDigest, 'prior_ledger_changed');
           const planned = { normal: 4, deny: 1, cancel: 1, resume: 2 }[stage];
           assert.equal(audit.active, 0); assert.ok(audit.remainingRequests >= planned && audit.remainingReservedUsd >= catalog.reserveCostUsd * planned, 'stage_budget_insufficient');
           console.log(`Stage ${stage}; used ${audit.used}/${config.maxRequests}.`);
@@ -91,7 +102,8 @@ if (action === 'inspect') {
       try { if (client) await client.close(); result.hostClosed = true; }
       catch { result.completed = false; process.exitCode = 1; }
       if (claimed) {
-        try { result.finalAudit = auditLedger(profile, config, catalog.reserveCostUsd); }
+        try { result.finalAudit = auditLedger(profile, config, catalog.reserveCostUsd);
+          assert.equal(result.finalAudit.priorAuthorizationsDigest, plan.audit.priorAuthorizationsDigest, 'prior_ledger_changed'); }
         catch { result.completed = false; process.exitCode = 1; }
         result.finishedAt = new Date().toISOString(); await save();
       }

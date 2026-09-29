@@ -41,6 +41,7 @@ export function auditLedger(profile, config, reserve) {
     db.exec('COMMIT');
     return { version, totalRequests: all.length, used, reserved, active,
       ledgerDigest: hash(JSON.stringify({ all, revisions })),
+      priorAuthorizationsDigest: hash(JSON.stringify(all.filter(r => r.authorization_id !== config.authorizationId).map(r => [r.run_id, r.authorization_id, r.policy_digest, r.reserved_cost]))),
       remainingRequests: Math.max(0, config.maxRequests - used),
       remainingReservedUsd: Math.max(0, config.maxEstimatedCostUsd - reserved),
       fitsFullPlan: reserved + reserve * 8 <= config.maxEstimatedCostUsd };
