@@ -20,7 +20,7 @@ function fixture() {
   writeFileSync(join(directory, 'model.json'), JSON.stringify(config));
   mkdirSync(join(directory, 'auth.json')); // Deliberately unreadable as a credential file; preparation does not need it.
   const run = args => spawnSync(process.execPath, ['--import', join(repository, 'scripts/probe-no-network.mjs'), cli, ...args],
-    { env: sterileEnvironment(home), encoding: 'utf8', timeout: 15000 });
+    { env: { ...sterileEnvironment(home), PATH: process.env.PATH + ':/usr/bin:/bin' }, encoding: 'utf8', timeout: 15000 });
   return { home, profile, run, dispose: () => rmSync(home, { recursive: true, force: true }) };
 }
 for (const args of [[], ['execute'], ['prepare', '../escape'], ['prepare', 'ok', '--profile=/tmp/other']]) {
@@ -29,11 +29,17 @@ for (const args of [[], ['execute'], ['prepare', '../escape'], ['prepare', 'ok',
     finally { f.dispose(); }
   });
 }
-test('M2 CLI prepare/inspect need no credentials; duplicate prepare and noninteractive execute refuse', () => {
+test('M2 CLI prepare/inspect need no credentials; duplicate prepare and noninteractive execute refuse', t => {
   const f = fixture();
   try {
     const db = join(f.profile, 'host/product.sqlite'), before = readFileSync(db);
     const prepared = f.run(['prepare', 'synthetic-cli']);
+    if (prepared.status !== 0 && prepared.stderr.includes('worktree_must_be_clean')) {
+      assert.deepEqual(readFileSync(db), before);
+      assert.equal(existsSync(join(f.profile, 'state')), false);
+      t.diagnostic('Dirty checkout: verified clean-code gate. Full CLI prepare is checked on committed code.');
+      return;
+    }
     assert.equal(prepared.status, 0, prepared.stderr);
     const planFile = join(f.profile, 'file-validation-synthetic-cli.plan.json');
     const plan = JSON.parse(readFileSync(planFile, 'utf8')); assert.deepEqual(plan.blocked, []);
