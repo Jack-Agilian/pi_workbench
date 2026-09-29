@@ -305,3 +305,5 @@ CLI 演示将审计/profile 留在 `.artifacts/shell-demos/`；crash 演示故�
 ## M1 配置与离线会话
 
 非秘密配置与本机凭据入口见 [模型配置](MODEL_CONFIGURATION.md)，接入范围见 [M1 契约](ssot/m1-model-contract.md)。新增 `model:config`、`desktop:model`、`test:model-integration-offline`、`test:model-network`、`test:model-config`、`test:desktop-model`；保持原 bootstrap/默认演示行为及唯一 npm 锁。真实服务未验收，当前只允许明确批准的配置和本机凭据，不读取全局 Pi auth。
+
+M1 续验修订的离线回归：`npm run test:model-resume`（合成 SQLite/客户端与隔离配置，不使用账户）。显式策略修订与真实续验入口见 [配置说明](MODEL_CONFIGURATION.md)。

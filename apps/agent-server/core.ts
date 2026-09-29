@@ -1,4 +1,5 @@
-import { parseModelOutcome, type ModelOutcome } from '../../packages/app-contracts/model.ts';
+import { policyDigest, policyText, legacyPolicyDigest, assertTimeoutRevision } from './model-policy.ts';
+import { type ModelConfiguration, parseModelOutcome, type ModelOutcome } from '../../packages/app-contracts/model.ts';
 import { parseShellIntent, parseShellOutcome, type ShellIntent, type ShellOutcome, type ShellView } from '../../packages/app-contracts/shell.ts';
 // Product intents/indexes and disposable display projections; Pi owns authoritative messages and the Session tree.
 import { randomUUID } from 'node:crypto';
@@ -31,7 +32,7 @@ export class ProductCore {
       if (path !== ':memory:') chmodSync(path, 0o600);
       this.db.exec('PRAGMA busy_timeout=1000; PRAGMA synchronous=FULL;');
       const version = this.one<{ user_version: number }>('PRAGMA user_version').user_version;
-      if (![0, 1, 2, 3, 4, 5, 6].includes(version)) throw new Error('unsupported_database_version');
+      if (![0, 1, 2, 3, 4, 5, 6, 7].includes(version)) throw new Error('unsupported_database_version');
       if (version === 0) {
         this.db.exec(`BEGIN IMMEDIATE;
           CREATE TABLE workspaces(id TEXT PRIMARY KEY, path TEXT NOT NULL UNIQUE) STRICT;
@@ -68,6 +69,11 @@ export class ProductCore {
         CREATE TABLE model_outcomes(run_id TEXT PRIMARY KEY REFERENCES runs(id), outcome TEXT NOT NULL) STRICT;
         CREATE TABLE model_requests(run_id TEXT PRIMARY KEY REFERENCES runs(id), authorization_id TEXT NOT NULL, policy_digest TEXT NOT NULL, reserved_cost REAL NOT NULL) STRICT;
         PRAGMA user_version=6; COMMIT;`);
+      if (version < 7) this.db.exec(`BEGIN IMMEDIATE;
+        CREATE TABLE model_policy_revisions(seq INTEGER PRIMARY KEY AUTOINCREMENT, revision_id TEXT NOT NULL UNIQUE,
+          authorization_id TEXT NOT NULL, previous_digest TEXT NOT NULL, digest TEXT NOT NULL, configuration TEXT NOT NULL,
+          legacy_digest TEXT NOT NULL, recorded_at TEXT NOT NULL) STRICT;
+        PRAGMA user_version=7; COMMIT;`);
       this.transaction(() => {
         for (const workspace of workspaces) {
           identifier(workspace.id); const canonical = realpathSync(workspace.path);
@@ -78,6 +84,7 @@ export class ProductCore {
       });
     } catch (error) { this.db.close(); throw error; }
   }
+  hasRequest(id:string):boolean { return Boolean(this.get('SELECT 1 FROM requests WHERE id=?',identifier(id))); }
   // These row casts describe our own STRICT schema, not an external API compatibility escape.
   private get<T>(sql: string, ...values: SQLInputValue[]): T | undefined { return this.db.prepare(sql).get(...values) as T | undefined; }
   private all<T>(sql: string, ...values: SQLInputValue[]): T[] { return this.db.prepare(sql).all(...values) as T[]; }
@@ -189,13 +196,44 @@ export class ProductCore {
       this.db.prepare('INSERT INTO model_outcomes VALUES (?,?)').run(run.id,JSON.stringify(value));this.event(run.threadId,run.id,'model.'+value.reason,run.id); });
   }
   modelOutcome(runId:string):ModelOutcome|null { const row=this.get<{outcome:string}>('SELECT outcome FROM model_outcomes WHERE run_id=?',runId);return row?parseModelOutcome(JSON.parse(row.outcome)):null; }
-  reserveModelRequest(binding:Binding, authorizationId:string, policyDigest:string, maxRequests:number, cost:number, maxCost:number):void {
-    identifier(authorizationId); sha256(policyDigest);
-    if (!Number.isSafeInteger(maxRequests) || maxRequests < 1 || maxRequests > 20 || !Number.isFinite(cost) || cost < 0 || !Number.isFinite(maxCost) || maxCost <= 0 || maxCost > 10) throw new Error('model_budget_invalid');
-    this.mutate(()=>{const run=this.bound(binding);if(run.state!=='running')throw new Error('model_run_not_running');
-      const prior=this.all<{policy_digest:string;reserved_cost:number}>('SELECT policy_digest,reserved_cost FROM model_requests WHERE authorization_id=?',authorizationId);
-      if(prior.some(r=>r.policy_digest!==policyDigest)||prior.length>=maxRequests||prior.reduce((n,r)=>n+r.reserved_cost,0)+cost>maxCost)throw new Error('model_budget_exhausted');
-      this.db.prepare('INSERT INTO model_requests VALUES (?,?,?,?)').run(run.id,authorizationId,policyDigest,cost);this.event(run.threadId,run.id,'model.request_reserved',run.id);
+  /** Host-only admission; old reservations remain immutable and count across all revisions. */
+  modelAdmission(config:ModelConfiguration, cost:number): {status:'ready'|'policy_required'|'budget_exhausted';used:number;reserved:number} {
+    const digest=policyDigest(config);
+    if (!Number.isFinite(cost)||cost<0) throw new Error('model_budget_invalid');
+    const prior=this.all<{policy_digest:string;reserved_cost:number}>('SELECT policy_digest,reserved_cost FROM model_requests WHERE authorization_id=?',config.authorizationId);
+    const revisions=this.all<{digest:string;legacy_digest:string}>('SELECT digest,legacy_digest FROM model_policy_revisions WHERE authorization_id=? ORDER BY seq',config.authorizationId);
+    const latest=revisions.at(-1);
+    const known=new Set(revisions.flatMap(r=>[r.digest,r.legacy_digest]));
+    known.add(digest);known.add(legacyPolicyDigest(config));
+    const used=prior.length,reserved=prior.reduce((n,r)=>n+r.reserved_cost,0);
+    const status=latest && latest.digest!==digest || prior.some(r=>!known.has(r.policy_digest)) ? 'policy_required'
+      : used>=config.maxRequests || reserved+cost>config.maxEstimatedCostUsd ? 'budget_exhausted' : 'ready';
+    return {status,used,reserved};
+  }
+  /** Explicit local maintenance, never a Renderer/Worker command. Only timeout may change. */
+  reviseModelPolicy(previous:ModelConfiguration, candidate:ModelConfiguration, revisionId:string):void {
+    identifier(revisionId);assertTimeoutRevision(previous,candidate);
+    this.mutate(()=>{
+      const digest=policyDigest(candidate),old=policyDigest(previous),legacy=legacyPolicyDigest(previous);
+      const existing=this.get<{previous_digest:string;digest:string;legacy_digest:string}>('SELECT previous_digest,digest,legacy_digest FROM model_policy_revisions WHERE revision_id=?',revisionId);
+      if(existing){if(existing.previous_digest!==old||existing.digest!==digest||existing.legacy_digest!==legacy)throw new Error('model_revision_id_conflict');return;}
+      if(this.get("SELECT 1 FROM runs WHERE state IN ('queued','starting','running','cancelling','unknown')"))throw new Error('model_revision_busy');
+      // A complete original configuration must account for every otherwise unknown old digest.
+      if(this.modelAdmission(previous,0).status==='policy_required')throw new Error('model_previous_policy_unproven');
+      this.db.prepare('INSERT INTO model_policy_revisions(revision_id,authorization_id,previous_digest,digest,configuration,legacy_digest,recorded_at) VALUES (?,?,?,?,?,?,?)')
+        .run(revisionId,candidate.authorizationId,old,digest,policyText(candidate),legacy,new Date().toISOString());
+    });
+  }
+  reserveConfiguredModelRequest(binding:Binding, config:ModelConfiguration, cost:number):void {
+    this.mutate(()=>{
+      if(this.modelAdmission(config,cost).status!=='ready')throw new Error('model_policy_or_budget');
+      const run=this.bound(binding);if(run.state!=='running')throw new Error('model_run_not_running');
+      // Preserve an exact legacy proof before the first canonical reservation, without rewriting old rows.
+      if(!this.get('SELECT 1 FROM model_policy_revisions WHERE authorization_id=?',config.authorizationId))
+        this.db.prepare('INSERT INTO model_policy_revisions(revision_id,authorization_id,previous_digest,digest,configuration,legacy_digest,recorded_at) VALUES (?,?,?,?,?,?,?)')
+          .run(randomUUID(),config.authorizationId,policyDigest(config),policyDigest(config),policyText(config),legacyPolicyDigest(config),new Date().toISOString());
+      this.db.prepare('INSERT INTO model_requests VALUES (?,?,?,?)').run(run.id,config.authorizationId,policyDigest(config),cost);
+      this.event(run.threadId,run.id,'model.request_reserved',run.id);
     });
   }
   projectSession(binding: Binding, raw: unknown): void {

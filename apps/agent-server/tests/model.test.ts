@@ -128,3 +128,5 @@ test('M1 oversized SYNTHETIC stream is coalesced, truncated only for display and
  }finally{await f.dispose();}
 });
 import './openai.test.ts';
+
+import './model-policy.test.ts';

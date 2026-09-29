@@ -9,7 +9,7 @@ export function parseModelSelection(value: unknown): ModelSelection {
   const r = exact(value, ['mode','provider','model','endpoint','maxOutputTokens','timeoutMs',...(Object.hasOwn(Object(value),'openai')?['openai']:[])]);
   if (typeof r.mode !== 'string' || !['offline','live'].includes(r.mode)) throw new Error('model_mode');
   for (const k of ['provider','model','endpoint']) if (typeof r[k] !== 'string' || !r[k] || r[k].length > 512 || /[\u0000-\u001f]/.test(r[k])) throw new Error('model_selection');
-  for (const [k,min,max] of [['maxOutputTokens',1,4096],['timeoutMs',100,120000]] as const) if (typeof r[k] !== 'number' || !Number.isSafeInteger(r[k]) || r[k] < min || r[k] > max) throw new Error('model_limit');
+  for (const [k,min,max] of [['maxOutputTokens',1,4096],['timeoutMs',100,300000]] as const) if (typeof r[k] !== 'number' || !Number.isSafeInteger(r[k]) || r[k] < min || r[k] > max) throw new Error('model_limit');
   if (Object.hasOwn(r,'openai')) { if (r.mode !== 'live' || r.provider !== 'openai') throw new Error('openai_provider'); parseOpenAIConnection(r.openai); }
   return r as unknown as ModelSelection;
 }

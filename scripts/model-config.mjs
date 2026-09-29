@@ -10,7 +10,7 @@ if(!['init','init-openai','init-compatible','init-auth','check'].includes(action
 const path=pathArg?resolve(pathArg):join(homedir(),'Library/Application Support/Pi Workbench',action==='init-auth'?'auth.json':'model.json');
 if(action.startsWith('init')){
  mkdirSync(dirname(path),{recursive:true,mode:0o700});
- const config={version:1,authorizationId:randomUUID(),approved:false,dataScope:'synthetic_non_sensitive',provider:action==='init'?'FILL_PROVIDER':'openai',model:'FILL_MODEL_ID',endpoint:action==='init-openai'?'https://api.openai.com/v1':'https://FILL_APPROVED_ENDPOINT/v1',maxRequests:4,maxOutputTokens:512,timeoutMs:30000,maxEstimatedCostUsd:1,
+ const config={version:1,authorizationId:randomUUID(),approved:false,dataScope:'synthetic_non_sensitive',provider:action==='init'?'FILL_PROVIDER':'openai',model:'FILL_MODEL_ID',endpoint:action==='init-openai'?'https://api.openai.com/v1':'https://FILL_APPROVED_ENDPOINT/v1',maxRequests:4,maxOutputTokens:512,timeoutMs:300000,maxEstimatedCostUsd:1,
  ...(action==='init-compatible'?{openai:{api:'chat-completions',contextWindow:0,inputUsdPerMillion:0,outputUsdPerMillion:0,tokenLimitField:'max_tokens'}}:{})};
  writeFileSync(path,JSON.stringify(action==='init-auth'?{openai:{type:'api_key',key:''}}:config,null,2)+'\n',{flag:'wx',mode:0o600});
  console.log(action==='init-auth'?'Created private credential configuration (0600):':'Created non-secret configuration:',path);console.log(action==='init-auth'?'Fill the key locally; contents are never printed.':'Fill provider/model/endpoint and limits; approved=false keeps network disabled. Put keys only in sibling auth.json.');

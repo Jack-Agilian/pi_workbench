@@ -4,7 +4,7 @@
 
 Pi 本身也将 key 保存在 `~/.pi/agent/auth.json`，文件初建权限为 0600（仅本人读写）；自定义模型配置放在 `models.json`。见 [Pi 官方凭据说明](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/providers.md)。本仓库核对的是安装的 Pi 0.87.1 文档与公开 SDK。工作台采用其 `api_key` 凭据记录格式，但 `model.json` 是产品授权格式，不能直接当 Pi 的 `models.json` 使用。
 
-当前支持官方 OpenAI Responses、经用户批准的 OpenAI 兼容 Responses/Chat Completions，以及原有 Anthropic Messages。均已做真实 Pi/Worker 的合成响应测试，尚未做真实服务验收。限定 macOS arm64；没有新增 SDK 或重写 Provider。
+当前支持官方 OpenAI Responses、经用户批准的 OpenAI 兼容 Responses/Chat Completions，以及原有 Anthropic Messages。均已做真实 Pi/Worker 的合成响应测试，已完成部分真实验收（首次回复成功、恢复超时），完整验收尚未通过。限定 macOS arm64；没有新增 SDK 或重写 Provider。
 
 ## 初始化与填写
 
@@ -89,3 +89,24 @@ npm run test:desktop
 ## 显式真实验收
 
 关闭其他工作台窗口后，确认本机配置已授权，可运行 `npm run validate:model-live -- --execute-approved`。该入口会发送至多三条合成文本到真实服务：短文本、宿主重连后原生上下文继续、观察流式正文后取消。它使用正常 model-profile 产品库的累计预算，不另建数据库绕过限额。一次授权只自动执行一轮；重复运行须先检查持久验收报告，不自动重试失败。此命令不属于自动测试套件，裸运行不会读取凭据或发请求。
+
+## 原授权续验与等待期限修订
+
+先关闭其他桌面窗口和模型驱动器。保留原配置的字节顺序作为 `previous.json`，另存候选 `candidate.json`，只改 timeoutMs。Pi 0.87.1 默认 HTTP idle/Provider 等待值为 300000ms；本应用采用该默认值，但另设宿主硬截止，保持自动重试关闭。旧配置不会自动改写。
+
+```bash
+npm run model:policy -- check /path/to/previous.json /path/to/candidate.json revision-id
+# 用户明确批准 timeout 修订后；保留同一授权累计预算
+npm run model:policy -- apply-approved /path/to/previous.json /path/to/candidate.json revision-id
+```
+
+此入口只写产品策略修订记录，不覆盖 model.json。完成修订后将批准的候选配置保存为应用 model.json，重启/重连应用。若旧摘要无法由 previous.json 证明，拒绝修订；不要删除账本、换授权 ID 或修改旧请求记录。没有新增额度，不能续验的耗尽授权需另行明确处理。
+
+```bash
+# 当前配置、原报告与实际产品账本必须一致；准备阶段不读 key、不联网
+npm run validate:model-resume -- prepare attempt-id
+# 审核计划后显式执行，只补恢复和活跃取消，最多两次，失败即停
+npm run validate:model-resume -- execute-approved attempt-id
+```
+
+计划与追加结果保存在原 model-profile；原首轮报告保留。已经执行或中断的 attempt 不会重跑；不得删结果文件绕过门禁。余额不足两次则准备失败。本入口限定 macOS，仍使用应用专用 auth.json 与原 HostClient/Worker 链路。

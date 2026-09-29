@@ -44,7 +44,7 @@ export class DesktopHost {
     const threads = this.core.listThreads();
     const config = this.modelMode?.configuration;
     const model: DesktopHome['model'] = !this.modelMode ? undefined : {
-      status: this.modelMode.mode === 'offline' ? 'ready' : !config?.approved ? 'not_configured' : this.modelKey ? 'ready' : 'key_required',
+      status: this.modelMode.mode === 'offline' ? 'ready' : !config?.approved ? 'not_configured' : this.modelKey ? this.core.modelAdmission(config,this.modelMode.reserveCostUsd ?? 0).status : 'key_required',
       provider: config?.provider ?? (this.modelMode.mode === 'offline' ? 'workbench-synthetic' : ''),
       model: config?.model ?? (this.modelMode.mode === 'offline' ? 'synthetic-text' : ''),
       ...(config ? { limits: { endpoint: config.endpoint, requests: config.maxRequests, estimatedUsd: config.maxEstimatedCostUsd, outputTokens: config.maxOutputTokens } } : {}),
@@ -75,6 +75,7 @@ export class DesktopHost {
       case 'recover': this.recover(); this.pump(); return this.home();
       case 'command': {
         if(request.command.type==='runs.start' && this.modelMode?.mode==='live' && (!this.modelMode.configuration?.approved||!this.modelKey))throw new Error('model_not_configured');
+        if(request.command.type==='runs.start' && this.modelMode?.mode==='live' && this.modelMode.configuration && !this.core.hasRequest(request.command.requestId) && this.core.modelAdmission(this.modelMode.configuration,this.modelMode.reserveCostUsd ?? 0).status!=='ready')throw new Error('model_policy_or_budget');
         const ack = this.supervisor.command(request.command); this.pump(); return ack;
       }
     }
@@ -92,7 +93,7 @@ export class DesktopHost {
     const entry = join(repository, 'packages/pi-adapter/desktop-demo-worker.ts');
     try {
       const config=this.modelMode?.configuration;
-      const modelPlan:ModelExecutionPlan|undefined=this.modelMode?{tool:'none',deadline:Date.now()+(config?.timeoutMs??30000),model:{mode:this.modelMode.mode,provider:config?.provider??'workbench-synthetic',model:config?.model??'synthetic-text',endpoint:config?.endpoint??'synthetic://no-network',maxOutputTokens:config?.maxOutputTokens??1024,timeoutMs:config?.timeoutMs??30000,...(config?.openai?{openai:config.openai}:{})}}:undefined;
+      const modelPlan:ModelExecutionPlan|undefined=this.modelMode?{tool:'none',deadline:Date.now()+(config?.timeoutMs??30000)+5000,model:{mode:this.modelMode.mode,provider:config?.provider??'workbench-synthetic',model:config?.model??'synthetic-text',endpoint:config?.endpoint??'synthetic://no-network',maxOutputTokens:config?.maxOutputTokens??1024,timeoutMs:config?.timeoutMs??30000,...(config?.openai?{openai:config.openai}:{})}}:undefined;
       const access:ModelAccess|undefined=config && this.modelKey && this.modelMode?.requestUrl && this.modelMode.reserveCostUsd!==undefined?{key:this.modelKey,configuration:config,requestUrl:this.modelMode.requestUrl,reserveCostUsd:this.modelMode.reserveCostUsd}:undefined;
       const completion = modelPlan?this.supervisor.startNext(modelPlan,{path:join(repository, this.modelMode?.mode==='offline'?'packages/pi-adapter/model-test-worker.ts':'packages/pi-adapter/model-worker.ts')},access):this.supervisor.startNext(shell ? { tool: 'bash', target: '.', shell, parametersDigest: parametersDigest({ command: shell.command, timeout: shell.timeoutMs / 1000 }), deadline: Date.now() + 120_000 } : { tool: 'write', target: args.path, parametersDigest: parametersDigest(args),
         fileVersion: null, expectedContentDigest: digest(args.content), deadline: Date.now() + 120_000 },
