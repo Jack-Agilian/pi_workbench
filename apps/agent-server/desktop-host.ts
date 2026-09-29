@@ -47,7 +47,7 @@ export class DesktopHost {
       status: this.modelMode.mode === 'offline' ? 'ready' : !config?.approved ? 'not_configured' : this.modelKey ? this.core.modelAdmission(config,this.modelMode.reserveCostUsd ?? 0).status : 'key_required',
       provider: config?.provider ?? (this.modelMode.mode === 'offline' ? 'workbench-synthetic' : ''),
       model: config?.model ?? (this.modelMode.mode === 'offline' ? 'synthetic-text' : ''),
-      ...(config ? { limits: { endpoint: config.endpoint, requests: config.maxRequests, estimatedUsd: config.maxEstimatedCostUsd, outputTokens: config.maxOutputTokens } } : {}),
+      ...(config ? { limits: { endpoint: config.endpoint, requests: config.maxRequests, estimatedUsd: config.maxEstimatedCostUsd, outputTokens: config.maxOutputTokens, timeoutMs:config.timeoutMs, httpIdleTimeoutMs:config.httpIdleTimeoutMs??config.timeoutMs } } : {}),
     };
     return {
       mode: this.modelMode ? this.modelMode.mode === 'offline' ? 'model-offline' : 'model' : 'synthetic',

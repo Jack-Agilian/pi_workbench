@@ -52,8 +52,30 @@ test('policy revision refuses queued work; first canonical reservation accepts r
  }finally{core.close();rmSync(dir,{recursive:true,force:true});}
 });
 
-test('Pi documented 5-minute policy ceiling is accepted; unbounded timeout remains rejected',()=>{
+test('explicit total deadline is independent of Pi idle default; unbounded timeout remains rejected',()=>{
  assert.equal(parseModelConfiguration({...config,timeoutMs:300000}).timeoutMs,300000);
- assert.throws(()=>parseModelConfiguration({...config,timeoutMs:300001}));
+ assert.throws(()=>parseModelConfiguration({...config,timeoutMs:86400001}));
  assert.throws(()=>parseModelConfiguration({...config,timeoutMs:0}));
+});
+
+test('idle and total limits are independent policy fields; revisions preserve all non-timeout authority',()=>{
+ const long=parseModelConfiguration({...config,timeoutMs:1800000,httpIdleTimeoutMs:300000});
+ assert.equal(long.timeoutMs,1800000);assert.equal(long.httpIdleTimeoutMs,300000);
+ assert.notEqual(policyDigest(long),policyDigest({...long,httpIdleTimeoutMs:600000}));
+ assert.equal(policyDigest(long),policyDigest(parseModelConfiguration(Object.fromEntries(Object.entries(long).reverse()))));
+ assert.throws(()=>parseModelConfiguration({...long,httpIdleTimeoutMs:0}));
+ assert.throws(()=>parseModelConfiguration({...long,httpIdleTimeoutMs:86400001}));
+});
+
+test('explicit idle/total revision reuses existing authorization and retains prior reservations',()=>{
+ const dir=mkdtempSync(join(tmpdir(),'model-idle-revision-'));const core=new ProductCore(join(dir,'db'),[{id:'ws',path:dir}]);
+ try{
+  const thread=core.handle({type:'threads.create',requestId:'t',workspaceId:'ws',title:'SYNTHETIC'}).id;
+  core.handle({type:'runs.start',requestId:'r',threadId:thread,input:'SYNTHETIC'});const b=core.dispatchNext()!;core.markRunning(b);core.reserveConfiguredModelRequest(b,config,0.1);core.settle(b,'completed',{piIdle:true,hostClean:true});
+  const candidate={...config,timeoutMs:1800000,httpIdleTimeoutMs:300000};
+  assert.equal(core.modelAdmission(candidate,0.1).status,'policy_required');core.reviseModelPolicy(config,candidate,'idle-total-approved');
+  assert.deepEqual(core.modelAdmission(candidate,0.1),{status:'ready',used:1,reserved:0.1});
+  assert.throws(()=>core.reviseModelPolicy(candidate,{...candidate,maxRequests:5},'expand'),/scope/);
+  assert.equal(core.modelAdmission(config,0.1).status,'policy_required');
+ }finally{core.close();rmSync(dir,{recursive:true,force:true});}
 });

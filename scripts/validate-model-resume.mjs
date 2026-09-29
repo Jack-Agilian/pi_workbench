@@ -28,7 +28,7 @@ assert.equal(audit.active,0);assert.equal(audit.status,'ready');
 assert.ok(audit.remainingRequests>=2 && audit.remainingReservedUsd>=catalog.reserveCostUsd*2,'Two bounded new requests must fit the existing authorization');
 const planPath=join(profile,`live-resume-${attemptId}.plan.json`),resultPath=join(profile,`live-resume-${attemptId}.result.json`);
 const plan={version:1,attemptId,authorizationId:config.authorizationId,originalSha256:createHash('sha256').update(originalBytes).digest('hex'),audit,
- timeoutMs:config.timeoutMs,reservePerRequestUsd:catalog.reserveCostUsd,maxNewRequests:2,stages:['resume','cancel']};
+ timeoutMs:config.timeoutMs,httpIdleTimeoutMs:config.httpIdleTimeoutMs??config.timeoutMs,reservePerRequestUsd:catalog.reserveCostUsd,maxNewRequests:2,stages:['resume','cancel']};
 if(action==='prepare'){
  writeFileSync(planPath,JSON.stringify(plan,null,2)+'\n',{flag:'wx',mode:0o600});
  console.log(JSON.stringify({prepared:true,attemptId,used:audit.used,newRequests:2,timeoutMs:config.timeoutMs,planPath}));

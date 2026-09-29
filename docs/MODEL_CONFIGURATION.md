@@ -36,7 +36,9 @@ key 是明文保存，权限必须为 0600；不要放入聊天、Git、`model.j
 | approved | 初始 false；核对服务、数据、限额后再由你改为 true |
 | dataScope | 本阶段固定 synthetic_non_sensitive，仅发送合成无敏感材料 |
 | maxRequests | 此授权累计最多请求数，含失败请求；禁自动重试 |
-| maxOutputTokens / timeoutMs | 单次输出上限和期限；Responses 至少 16 tokens |
+| maxOutputTokens | 单次输出上限；Responses 至少 16 tokens |
+| httpIdleTimeoutMs | 等响应头或后续网络数据时的空闲上限；新模板 300000（5 分钟），持续有数据不按累计时间触发 |
+| timeoutMs | 同一个 LLM 请求的独立总上限（等待响应及生成都计入）；新模板 1800000（30 分钟），可配置到 86400000（24 小时）；这是产品限制，不是 Pi 空闲默认值 |
 | maxEstimatedCostUsd | 累计保守预留估算上限，不是服务商账单保证 |
 | authorizationId | 本次授权身份；重开不重置，不应为了绕过限额修改 |
 | openai | 可选兼容接口声明，见下方；官方发行目录模型一般不需要 |
@@ -92,7 +94,7 @@ npm run test:desktop
 
 ## 原授权续验与等待期限修订
 
-先关闭其他桌面窗口和模型驱动器。保留原配置的字节顺序作为 `previous.json`，另存候选 `candidate.json`，只改 timeoutMs。Pi 0.87.1 默认 HTTP idle/Provider 等待值为 300000ms；本应用采用该默认值，但另设宿主硬截止，保持自动重试关闭。旧配置不会自动改写。
+先关闭其他桌面窗口和模型驱动器。保留原配置的字节顺序作为 `previous.json`，另存候选 `candidate.json`，只改 timeoutMs 和/或 httpIdleTimeoutMs。Pi 0.87.1 的 HTTP 空闲默认值为 300000ms；本应用的新模板将它用于独立空闲字段，总请求上限另设为1800000ms（产品默认，可调整）。同一个请求持续输出10分钟不会仅因超过5分钟而终止。自动重试仍关闭，旧配置不会自动改写。
 
 ```bash
 npm run model:policy -- check /path/to/previous.json /path/to/candidate.json revision-id
@@ -110,3 +112,11 @@ npm run validate:model-resume -- execute-approved attempt-id
 ```
 
 计划与追加结果保存在原 model-profile；原首轮报告保留。已经执行或中断的 attempt 不会重跑；不得删结果文件绕过门禁。余额不足两次则准备失败。本入口限定 macOS，仍使用应用专用 auth.json 与原 HostClient/Worker 链路。
+
+### 单个长流式请求的时间语义
+
+httpIdleTimeoutMs 测量宿主等待响应头或下一段非空网络数据的时间。收到数据后，下一次等待重新计时；HTTP/SSE 心跳和思考事件等网络数据也属于进展，不以 UI 是否显示新 token 为准，不另写 SSE 解析器。下游背压暂停读取时不冒充网络空闲；总期限仍限制整个执行。
+
+timeoutMs 是另一个独立限制：从单次请求开始等待到最终生成都受它约束，宿主从派发计时加5秒启动余量。持续生成仍可能触及这个显式总上限；如果需要更长生成，应明确调整该字段，而不是增加空闲超时。Worker ready 5秒、取消及清理期限独立保留。
+
+历史配置没有 httpIdleTimeoutMs 时，以原 timeoutMs 作为空闲兼容值，同时保留原总上限；不静默延长已有授权。本轮此前已用完4/4的配置仍保留原值。变更任一时间字段都需明确策略修订，次数/预留继续累计，不能为长生成重置账本。

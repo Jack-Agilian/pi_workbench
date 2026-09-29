@@ -11,7 +11,7 @@ if(!['check','apply-approved'].includes(action)||!previousFile||!candidateFile||
 const previous=parseModelConfiguration(JSON.parse(readFileSync(previousFile,'utf8')));
 const candidate=parseModelConfiguration(JSON.parse(readFileSync(candidateFile,'utf8')));
 assertTimeoutRevision(previous,candidate);
-const result={revisionId,previousDigest:policyDigest(previous),candidateDigest:policyDigest(candidate),previousTimeoutMs:previous.timeoutMs,candidateTimeoutMs:candidate.timeoutMs,requests:candidate.maxRequests,budgetUsd:candidate.maxEstimatedCostUsd,applied:false};
+const result={revisionId,previousDigest:policyDigest(previous),candidateDigest:policyDigest(candidate),previousTimeoutMs:previous.timeoutMs,candidateTimeoutMs:candidate.timeoutMs,previousHttpIdleTimeoutMs:previous.httpIdleTimeoutMs??previous.timeoutMs,candidateHttpIdleTimeoutMs:candidate.httpIdleTimeoutMs??candidate.timeoutMs,requests:candidate.maxRequests,budgetUsd:candidate.maxEstimatedCostUsd,applied:false};
 if(action==='apply-approved'){
  const profile=join(homedir(),'Library/Application Support/Pi Workbench/model-profile');
  const core=new ProductCore(join(profile,'host/product.sqlite'),[]);

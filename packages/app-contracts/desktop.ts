@@ -3,7 +3,7 @@ import { identifier, parseCommand, type Ack, type Command, type ProductEvent, ty
 import { exact, record } from './worker-ipc.ts';
 import type { Presentation } from './presentation.ts';
 export interface DesktopThread extends Snapshot { modelOutcomes?: {runId:string;value:ModelOutcome|null}[]; inputs: { id: string; text: string }[]; presentations: { runId: string; value: Presentation }[] }
-export interface DesktopHome { mode: 'synthetic' | 'model-offline' | 'model'; model?: {status:'not_configured'|'key_required'|'ready'|'policy_required'|'budget_exhausted';provider:string;model:string;limits?:{endpoint:string;requests:number;estimatedUsd:number;outputTokens:number}}; threads: ThreadView[]; activeRuns: RunView[]; recovery: 'ready' | 'blocked' }
+export interface DesktopHome { mode: 'synthetic' | 'model-offline' | 'model'; model?: {status:'not_configured'|'key_required'|'ready'|'policy_required'|'budget_exhausted';provider:string;model:string;limits?:{endpoint:string;requests:number;estimatedUsd:number;outputTokens:number;timeoutMs?:number;httpIdleTimeoutMs?:number}}; threads: ThreadView[]; activeRuns: RunView[]; recovery: 'ready' | 'blocked' }
 export type Preview = { status: 'ready' | 'changed' | 'missing' | 'unavailable'; text?: string };
 export type DesktopRequest =
   | { type: 'home' } | { type: 'recover' }

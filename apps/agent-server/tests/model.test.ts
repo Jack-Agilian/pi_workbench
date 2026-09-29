@@ -24,10 +24,10 @@ for(const mode of ['normal','cancel','error'] as const)test(`M1 actual SDK no-to
 
 // SYNTHETIC HTTP response fixture through the installed native Anthropic adapter.
 // No remote endpoint or real Provider is contacted; protocol parsing stays in Pi.
-test('M1 public fetch delegates native provider over real IPC; request budget survives reopen',async()=>{
+test('M1 public fetch delegates native provider streams one request beyond idle duration over real IPC; budget survives reopen',async()=>{
  const f=createScenario();let requests=0;
  const selection={mode:'live' as const,provider:'anthropic',model:'claude-sonnet-4-5',endpoint:'https://api.anthropic.com',maxOutputTokens:64,timeoutMs:5000};
- const config={version:1 as const,authorizationId:'synthetic-authorization',approved:true,dataScope:'synthetic_non_sensitive' as const,provider:selection.provider,model:selection.model,endpoint:selection.endpoint,maxRequests:1,maxOutputTokens:64,timeoutMs:5000,maxEstimatedCostUsd:5};
+ const config={version:1 as const,authorizationId:'synthetic-authorization',approved:true,dataScope:'synthetic_non_sensitive' as const,provider:selection.provider,model:selection.model,endpoint:selection.endpoint,maxRequests:1,maxOutputTokens:64,timeoutMs:5000,httpIdleTimeoutMs:250,maxEstimatedCostUsd:5};
  const key='SYNTHETIC_ONLY_NOT_A_REAL_API_KEY';
  const fetch:typeof globalThis.fetch=async(url,options)=>{
   requests++;assert.equal(String(url),'https://api.anthropic.com/v1/messages?beta=true');assert.equal(options?.redirect,'error');
@@ -40,7 +40,8 @@ test('M1 public fetch delegates native provider over real IPC; request budget su
    {type:'message_delta',delta:{stop_reason:'end_turn',stop_sequence:null},usage:{output_tokens:7}},
    {type:'message_stop'},
   ];
-  return new Response(events.map(e=>`event: ${e.type}\ndata: ${JSON.stringify(e)}\n\n`).join(''),{headers:{'content-type':'text/event-stream'}});
+  let timer:ReturnType<typeof setInterval>;
+  return new Response(new ReadableStream<Uint8Array>({start(controller){let i=0;timer=setInterval(()=>{const e=events[i++]!;controller.enqueue(new TextEncoder().encode(`event: ${e.type}\ndata: ${JSON.stringify(e)}\n\n`));if(i===events.length){clearInterval(timer);controller.close();}},80);},cancel(){clearInterval(timer);}}),{headers:{'content-type':'text/event-stream'}});
  };
  const access={key,configuration:config,requestUrl:'https://api.anthropic.com/v1/messages?beta=true',reserveCostUsd:1,fetch};
  try{
@@ -130,3 +131,5 @@ test('M1 oversized SYNTHETIC stream is coalesced, truncated only for display and
 import './openai.test.ts';
 
 import './model-policy.test.ts';
+
+import './model-http-timeout.test.ts';
