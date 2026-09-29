@@ -1,6 +1,6 @@
 # M1 无工具会话与配置边界
 
-更新：2026-09-29。M1-A 是现有 ProductCore/Worker 的限定增量；M1-B 已获授权并完成首次真实回复，恢复请求曾超时，完整恢复与活跃取消仍待收尾，见 [真实报告](../validation/pi-0871-m1-live-2026-09-29.md)。当前仅 macOS arm64 / Node 24.21.0 / Pi 0.87.1，不增加依赖。此文补充 integration-contracts 的模型出口，不改变其所有权。
+更新：2026-09-29。M1-A 是现有 ProductCore/Worker 的限定增量；M1-B 已获授权并完成首次真实回复，恢复请求曾超时，随后通过[追加续验](../validation/review-develop-m1-2026-09-29.md)完成原会话恢复和活跃取消，见 [真实报告](../validation/pi-0871-m1-live-2026-09-29.md)。当前仅 macOS arm64 / Node 24.21.0 / Pi 0.87.1，不增加依赖。此文补充 integration-contracts 的模型出口，不改变其所有权。
 
 ## 采用决定与公开入口
 

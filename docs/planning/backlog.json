@@ -1645,7 +1645,7 @@
       "id": "MODEL-02",
       "priority": "P0",
       "ownerRole": "Tech Lead",
-      "state": "in_progress",
+      "state": "done",
       "githubIssueNumber": null,
       "dependencies": [
         "MODEL-01"
@@ -1658,7 +1658,7 @@
         "product-coordination",
         "desktop-ui"
       ],
-      "implementationStatus": "in_progress",
+      "implementationStatus": "implemented",
       "githubIssueUrl": null,
       "issueVerificationStatus": "not_checked",
       "issueEvidence": [],
@@ -1676,12 +1676,12 @@
           ],
           "evidenceRefs": [
             "EV-M1-FIRST-MODEL-20260929",
-            "EV-M1-RESUME-TIMEOUT-20260929",
-            "EV-M1-LIVE-MAC-20260929"
+            "EV-M1-RESUME-MODEL-20260929",
+            "EV-M1-RESUME-MAC-20260929"
           ]
         }
       ],
-      "statusReason": "获用户授权已执行两次真实 gpt-6-luna 请求：首条成功，宿主重开后的第二条触及30秒期限，清理后failed。未重发；剩余恢复/活跃取消验收待统一计划，非完整M1通过。"
+      "statusReason": "限定无工具M1-B已完成首次文本、原Thread/Session重开恢复和观察流后的活跃取消；原授权累计4/4且无重试，取消/历史超时实际计费未知。待本轮审核后才进入M2；M0-Pi不晋级。"
     },
     {
       "id": "MODEL-03",
@@ -1784,7 +1784,7 @@
       ],
       "evidenceRefs": [],
       "acceptance": "授权真实模型任务及审批/取消/恢复Mac证据；不推导未测平台/沙箱",
-      "statusReason": "M1首条真实无工具请求已成功，但会话恢复请求超时、活跃取消未验收；真实工具审批/取消/恢复条件仍缺失。M0-Pi保持blocked。"
+      "statusReason": "限定M1无工具真实文本/原会话恢复/活跃取消已验证；尚无真实模型工具审批任务闭环，不能由M1或测试数量自动完成M0-Pi。"
     }
   ]
 }

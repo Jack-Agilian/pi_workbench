@@ -182,7 +182,7 @@
         "ModelRuntime.registerProvider"
       ],
       "reuse": "Provider、目录、登录/刷新复用",
-      "productDelta": "M1 OpenAI Responses/Chat Completions 与原有 Anthropic；Pi 原生 Provider/公开 registerProvider 元数据接入；应用专用 auth.json 字面量 key 读取和临时原生文件选择；系统 Keychain/OAuth 未完成；0.87.1目录模型只覆盖批准baseUrl，真实首条请求已通过，重开继续超时/取消未验收",
+      "productDelta": "M1 OpenAI Responses/Chat Completions 与原有 Anthropic；Pi 原生 Provider/公开 registerProvider 元数据接入；应用专用 auth.json 字面量 key 读取和临时原生文件选择；系统 Keychain/OAuth 未完成；0.87.1目录模型只覆盖批准baseUrl，真实首条、原会话恢复及活跃取消已限定验证；追加规范化策略/旧账本兼容和显式timeout修订，真实授权累计4/4，取消实际计费未知",
       "acceptanceGate": "secret 不进Renderer/日志/子进程env",
       "implementationState": "in_progress",
       "adoption": {
@@ -275,7 +275,10 @@
           "EV-PI0871-RELEASE-20260929",
           "EV-PI0871-SDK-20260929",
           "EV-M1-FIRST-MODEL-20260929",
-          "EV-M1-LIVE-MAC-20260929"
+          "EV-M1-LIVE-MAC-20260929",
+          "EV-M1-POLICY-REGRESSION-20260929",
+          "EV-M1-RESUME-MODEL-20260929",
+          "EV-M1-RESUME-MAC-20260929"
         ]
       }
     },
@@ -2192,6 +2195,66 @@
         "darwin"
       ],
       "locator": "docs/validation/pi-0871-m1-live-2026-09-29.md"
+    },
+    {
+      "id": "EV-DEVELOP-REVIEW-20260929",
+      "kind": "review",
+      "result": "passed",
+      "commit": "35384b06a9cac085bd3a80ba6d6d43683d56f147",
+      "scope": "22 review package hashes and 8 Git blobs matched; 21 local Mac/Node assertions including R01 false-rejection reproduction. Not full-platform review.",
+      "recordedAt": "2026-09-29T03:43:22.480895+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/review-develop-m1-2026-09-29.md"
+    },
+    {
+      "id": "EV-M1-POLICY-REGRESSION-INITIAL-20260929",
+      "kind": "static",
+      "result": "failed",
+      "commit": "a6cb0f363e28cf94ba23df74c8d6eb9d46f9679f",
+      "scope": "Initial 30-command batch: 28 passed, Worker and desktop historical schema fixtures missed dropping new v7 table. Runtime and later tests separately recorded.",
+      "recordedAt": "2026-09-29T03:43:22.480895+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/review-develop-m1-2026-09-29.md"
+    },
+    {
+      "id": "EV-M1-POLICY-REGRESSION-20260929",
+      "kind": "sdk",
+      "result": "passed",
+      "commit": "31c15593a8773860dcebaad5217adf05a4dd5e05",
+      "scope": "Policy canonicalization/legacy budgets/revision and staged continuation offline tests passed; original runtime regression at a6cb0f3, test-only fixture fixes at this SHA with Worker 51 and desktop 19 passing. Not a fresh full batch at this SHA.",
+      "recordedAt": "2026-09-29T03:43:22.480895+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/review-develop-m1-2026-09-29.md"
+    },
+    {
+      "id": "EV-M1-RESUME-MODEL-20260929",
+      "kind": "model",
+      "result": "passed",
+      "commit": "31c15593a8773860dcebaad5217adf05a4dd5e05",
+      "scope": "Two authorized real requests: original Thread/native Session resume returned remembered token; observed active stream then cancellation settled cancelled. No tools or replay; total 4/4 attempts. SDK cancellation zero usage is unknown billing.",
+      "recordedAt": "2026-09-29T03:43:22.480895+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/review-develop-m1-2026-09-29.md"
+    },
+    {
+      "id": "EV-M1-RESUME-MAC-20260929",
+      "kind": "platform",
+      "result": "passed",
+      "commit": "31c15593a8773860dcebaad5217adf05a4dd5e05",
+      "scope": "Real Mac Host/Worker cleanup exited/groupGone receipts for resume and cancellation; original native reference unchanged, Pi history stop/aborted; read-only DB shows no active Run and unchanged cumulative budget authority; 37-file actual key scan zero matches.",
+      "recordedAt": "2026-09-29T03:43:22.480895+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/review-develop-m1-2026-09-29.md"
     }
   ]
 }

@@ -4,7 +4,7 @@
 
 Pi 本身也将 key 保存在 `~/.pi/agent/auth.json`，文件初建权限为 0600（仅本人读写）；自定义模型配置放在 `models.json`。见 [Pi 官方凭据说明](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/providers.md)。本仓库核对的是安装的 Pi 0.87.1 文档与公开 SDK。工作台采用其 `api_key` 凭据记录格式，但 `model.json` 是产品授权格式，不能直接当 Pi 的 `models.json` 使用。
 
-当前支持官方 OpenAI Responses、经用户批准的 OpenAI 兼容 Responses/Chat Completions，以及原有 Anthropic Messages。均已做真实 Pi/Worker 的合成响应测试，已完成部分真实验收（首次回复成功、恢复超时），完整验收尚未通过。限定 macOS arm64；没有新增 SDK 或重写 Provider。
+当前支持官方 OpenAI Responses、经用户批准的 OpenAI 兼容 Responses/Chat Completions，以及原有 Anthropic Messages。均已做真实 Pi/Worker 的合成响应测试，已限定完成真实无工具文本、原会话恢复及活跃取消；历史超时保留，真实工具任务仍未验收。限定 macOS arm64；没有新增 SDK 或重写 Provider。
 
 ## 初始化与填写
 

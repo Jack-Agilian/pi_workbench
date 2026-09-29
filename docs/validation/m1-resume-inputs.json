@@ -1,0 +1,548 @@
+{
+  "baseline": "35384b06a9cac085bd3a80ba6d6d43683d56f147",
+  "implementationCommit": "a6cb0f363e28cf94ba23df74c8d6eb9d46f9679f",
+  "testFixtureCommit": "31c15593a8773860dcebaad5217adf05a4dd5e05",
+  "platform": {
+    "os": "macOS 27.0 (26A428)",
+    "arch": "arm64",
+    "node": "24.21.0",
+    "pi": "0.87.1"
+  },
+  "fullRegression": {
+    "testedCommit": "a6cb0f363e28cf94ba23df74c8d6eb9d46f9679f",
+    "results": [
+      {
+        "command": [
+          "npm",
+          "run",
+          "check:environment"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T03:32:31.489467+00:00",
+        "finishedAt": "2026-09-29T03:32:31.692127+00:00",
+        "sha256": "e5bf052638bae533d3e2a8ba27b584b7115930409dcdbe7cebae96a7b862096c"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "typecheck"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T03:32:31.692493+00:00",
+        "finishedAt": "2026-09-29T03:32:33.460526+00:00",
+        "sha256": "22df5d47848ff6e1f3c0926a3aa3f05da31fb2c76601187b826c3ad4d7870689"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:pi-types"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T03:32:33.460863+00:00",
+        "finishedAt": "2026-09-29T03:32:36.102354+00:00",
+        "sha256": "364cc4d125f24ffb9ef815ad3a8757fc1e961fdff7746a112a937be26a3d50cf"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:pi-probe"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T03:32:36.102686+00:00",
+        "finishedAt": "2026-09-29T03:32:36.975790+00:00",
+        "sha256": "741ebe1187a7eea083ced45c301c2b2f9805dd70caa778b548a9dba13a7c9eac"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:pi-tools"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T03:32:36.976086+00:00",
+        "finishedAt": "2026-09-29T03:32:37.939759+00:00",
+        "sha256": "5be537fdd5e291e85f383fd6ea74018e072d0820b3bfdd488b7bcea254d74eb7"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:pi-shell"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T03:32:37.940071+00:00",
+        "finishedAt": "2026-09-29T03:32:39.040013+00:00",
+        "sha256": "1043109fa97f1d8c476f2c1fec0e6dca263e6321fad025ea2bd527665d75a830"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:pi-resources"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T03:32:39.040401+00:00",
+        "finishedAt": "2026-09-29T03:32:40.004640+00:00",
+        "sha256": "d6fc9b3d521f69fc5fd77936eea1a06c4e022f1ddb8774398f475746547eda65"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:pi-packages"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T03:32:40.004954+00:00",
+        "finishedAt": "2026-09-29T03:32:43.452580+00:00",
+        "sha256": "bebea603d2eeb2502dabb8229a4ff7ce0f68ebb504d3f12b690443eb7160acad"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:pi-auth"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T03:32:43.452901+00:00",
+        "finishedAt": "2026-09-29T03:32:44.359420+00:00",
+        "sha256": "1be9d32afdf8ffbb6732231774f5c9e7e79450e6277a650fa795ea2eb9fbcffb"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:product-core"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T03:32:44.359731+00:00",
+        "finishedAt": "2026-09-29T03:32:45.062139+00:00",
+        "sha256": "d1e884487ab73d97a586f996d413dbbdccd4253fbc49c3ef796cade17da5f367"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:product-sdk"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T03:32:45.062445+00:00",
+        "finishedAt": "2026-09-29T03:32:46.003584+00:00",
+        "sha256": "5301081bd760f6f6fddad41203b09368662bc5f0ea19f60454b48576a339ca61"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:product-worker"
+        ],
+        "exitCode": 1,
+        "startedAt": "2026-09-29T03:32:46.003894+00:00",
+        "finishedAt": "2026-09-29T03:33:16.635255+00:00",
+        "sha256": "0d3311d38b8e26fdc8b4e68f0697382fcff0cb7a5bb6a37e2228b1163fa18375"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:product-shell"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T03:33:16.635579+00:00",
+        "finishedAt": "2026-09-29T03:33:33.908363+00:00",
+        "sha256": "2e9f8d9997cf4129b1360b4d309151b8efaea43e0726b2162e76d55a8b11d817"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:desktop"
+        ],
+        "exitCode": 1,
+        "startedAt": "2026-09-29T03:33:33.908703+00:00",
+        "finishedAt": "2026-09-29T03:33:46.648147+00:00",
+        "sha256": "87f481a5154390b79eddf22f7152ab13402c43e21d6ed88b4206a831f3e74a13"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:model-integration-offline"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T03:33:46.648461+00:00",
+        "finishedAt": "2026-09-29T03:34:13.611992+00:00",
+        "sha256": "55da621e355e9b9ada542258590d961ea83d34dfdf351fbf6bf33185dc86e34d"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:model-network"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T03:34:13.612493+00:00",
+        "finishedAt": "2026-09-29T03:34:14.240702+00:00",
+        "sha256": "ba5472059f8ce897c12d82cbbc1f46ef480af64adb537831fc033e2c3c1bcbb5"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:model-resume"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T03:34:14.241044+00:00",
+        "finishedAt": "2026-09-29T03:34:15.640847+00:00",
+        "sha256": "18a88d9740e90377c192cf9bc57593bd19e01c9724089af168fb721d790a15d7"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:model-config"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T03:34:15.641206+00:00",
+        "finishedAt": "2026-09-29T03:34:24.377761+00:00",
+        "sha256": "0cbb2b20da067fe2ba8d1b7d0cf446375daee7ee1d1ee15fcfd8da945f1e27eb"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:desktop-model"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T03:34:24.378102+00:00",
+        "finishedAt": "2026-09-29T03:34:29.659935+00:00",
+        "sha256": "8fbf83b307d1c7011a7f81449537362510d2951cf4c2f2985585ec7224788624"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:desktop-ui"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T03:34:29.660354+00:00",
+        "finishedAt": "2026-09-29T03:34:42.146950+00:00",
+        "sha256": "3c9b143edea874408cc17541a2d8e413d21c4c539af30188dd2a3beb5b5967c2"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:desktop-shell"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T03:34:42.147410+00:00",
+        "finishedAt": "2026-09-29T03:34:47.301016+00:00",
+        "sha256": "538b7045d50c8a3fc379b2f6ecf258a1aba9d51ac717e44395288b7b0c740738"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:desktop-shutdown"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T03:34:47.301443+00:00",
+        "finishedAt": "2026-09-29T03:35:35.201444+00:00",
+        "sha256": "c656412630ec8934c704d7e49900c370b4511c442b64d89f747290c7520d477a"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "demo:product-shell",
+          "--",
+          "allow"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T03:35:35.201937+00:00",
+        "finishedAt": "2026-09-29T03:35:36.358747+00:00",
+        "sha256": "82ff1314516aa68f9fcbe9aa33e80356e6720f453b1a492cfdd7e2c1d841af55"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "demo:product-shell",
+          "--",
+          "deny"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T03:35:36.359142+00:00",
+        "finishedAt": "2026-09-29T03:35:37.475498+00:00",
+        "sha256": "106c6c6134e2c4b0f3ce74e12de64c7de9365e2511a369980877a84093d60bb8"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "demo:product-shell",
+          "--",
+          "cancel"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T03:35:37.475863+00:00",
+        "finishedAt": "2026-09-29T03:35:38.574823+00:00",
+        "sha256": "015d9f07722fde4d37628b6185e8adbf38beea6d744b9d420f05d8d45b1623ea"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "demo:product-shell",
+          "--",
+          "crash"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T03:35:38.575230+00:00",
+        "finishedAt": "2026-09-29T03:35:39.664420+00:00",
+        "sha256": "bf430f5b63f73137aee87f9ed16817b06b70050584eb5237dcee4135a659ff5e"
+      },
+      {
+        "command": [
+          ".venv/bin/python",
+          "scripts/check-ssot.py"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T03:35:39.664866+00:00",
+        "finishedAt": "2026-09-29T03:35:39.760577+00:00",
+        "sha256": "2749bfddb4b74fa0ac35b8efc092c18a7d2d19cd089a9e60f90dda64d53cb84d"
+      },
+      {
+        "command": [
+          ".venv/bin/python",
+          "scripts/test-tools.py"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T03:35:39.760876+00:00",
+        "finishedAt": "2026-09-29T03:35:39.822350+00:00",
+        "sha256": "47060195453f3c91118ef1d9c94c5d8f1726e608fe870bc724672a1b6c299b1f"
+      },
+      {
+        "command": [
+          ".venv/bin/python",
+          "scripts/check-docs.py",
+          "--structural-only"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T03:35:39.822702+00:00",
+        "finishedAt": "2026-09-29T03:35:39.905231+00:00",
+        "sha256": "855c4c1a779993a2141c6d3d9dd6f75e86dd3088da7748d9ae1cc73e55adf6f1"
+      },
+      {
+        "command": [
+          ".venv/bin/python",
+          "scripts/check-docs.py",
+          "--typecheck"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T03:35:39.905543+00:00",
+        "finishedAt": "2026-09-29T03:35:40.265669+00:00",
+        "sha256": "c882fb285277c73d2478a7d722513305a211f21ec19364d4189f822b4b16879b"
+      }
+    ]
+  },
+  "targetedFollowup": {
+    "testedCommit": "31c15593a8773860dcebaad5217adf05a4dd5e05",
+    "results": [
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:product-worker"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T03:36:17.157800+00:00",
+        "sha256": "36a6071b99650d1856239c30518310cb8c3c3a0f9a4d213297a0491a1630423e"
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "test:desktop"
+        ],
+        "exitCode": 0,
+        "startedAt": "2026-09-29T03:36:48.592074+00:00",
+        "sha256": "9fdc0064c949eccfd9bb7770b5b3763275ff001855098690ab8e0e4c52507adf"
+      }
+    ]
+  },
+  "preflight": {
+    "readOnly": true,
+    "credentialsRead": false,
+    "realRequests": 0,
+    "piDefaultHttpIdleTimeoutMs": 300000,
+    "configuredTimeoutMs": 30000,
+    "approved": true,
+    "maxRequests": 4,
+    "maxEstimatedCostUsd": 1,
+    "maxOutputTokens": 512,
+    "used": 2,
+    "reserved": 0.068512,
+    "remainingRequests": 2,
+    "status": "ready",
+    "active": 0
+  },
+  "live": {
+    "testedCommit": "31c15593a8773860dcebaad5217adf05a4dd5e05",
+    "startedAt": "2026-09-29T03:37:56.926Z",
+    "finishedAt": "2026-09-29T03:38:06.101Z",
+    "completed": true,
+    "hostClosed": true,
+    "stages": [
+      {
+        "stage": "resume",
+        "requestId": "resume-m1-pi-default-20260929-resume",
+        "state": "completed",
+        "observedStream": true,
+        "cancelSent": false,
+        "runId": "24f9b719-502f-49f6-ad59-f9e29035fe0c",
+        "replyMatches": true,
+        "zeroOperations": true,
+        "milliseconds": 5129,
+        "outcome": {
+          "reason": "stop",
+          "inputTokens": 4520,
+          "outputTokens": 20,
+          "estimatedCostUsd": 0.0001164,
+          "synthetic": false
+        },
+        "postCloseState": "completed",
+        "cleanup": {
+          "exited": true,
+          "groupGone": true
+        }
+      },
+      {
+        "stage": "cancel",
+        "requestId": "resume-m1-pi-default-20260929-cancel",
+        "state": "cancelled",
+        "observedStream": true,
+        "cancelSent": true,
+        "runId": "348e8847-d75d-40a4-a80b-3b431a5fcbd0",
+        "replyMatches": null,
+        "zeroOperations": true,
+        "milliseconds": 3621,
+        "outcome": {
+          "reason": "cancelled",
+          "inputTokens": 0,
+          "outputTokens": 0,
+          "estimatedCostUsd": 0,
+          "synthetic": false
+        },
+        "postCloseState": "cancelled",
+        "cleanup": {
+          "exited": true,
+          "groupGone": true
+        }
+      }
+    ],
+    "finalAudit": {
+      "used": 4,
+      "reserved": 0.137024,
+      "status": "budget_exhausted",
+      "active": 0,
+      "remainingRequests": 0
+    },
+    "originalThreadReused": true
+  },
+  "native": {
+    "nativeReferenceUnchanged": true,
+    "originalThreadReused": true,
+    "roles": [
+      {
+        "role": "system"
+      },
+      {
+        "role": "user"
+      },
+      {
+        "role": "assistant",
+        "stopReason": "stop"
+      },
+      {
+        "role": "user"
+      },
+      {
+        "role": "assistant",
+        "stopReason": "error"
+      },
+      {
+        "role": "user"
+      },
+      {
+        "role": "assistant",
+        "stopReason": "stop"
+      },
+      {
+        "role": "user"
+      },
+      {
+        "role": "assistant",
+        "stopReason": "aborted"
+      }
+    ],
+    "historyOwnedByPi": true
+  },
+  "secretAudit": {
+    "filesChecked": 37,
+    "credentialMatches": 0,
+    "valuesPrinted": false
+  },
+  "reviewPackage": {
+    "manifestFiles": 22,
+    "matchingSourceFiles": [
+      "apps/agent-server/model-http.ts",
+      "packages/pi-adapter/model-credentials.ts",
+      "packages/pi-adapter/model-fetch.ts",
+      "packages/app-contracts/worker-ipc.ts",
+      "packages/app-contracts/presentation.ts",
+      "packages/app-contracts/model.ts",
+      "packages/app-contracts/shell.ts",
+      "packages/app-contracts/index.ts"
+    ],
+    "reservationExcerptMatches": true
+  },
+  "limitations": [
+    "Cancel SDK zero usage is unknown billing, not free usage.",
+    "No additional provider/model/Windows/Keychain/production sandbox coverage.",
+    "No real tools in these M1 requests; M0-Pi remains blocked.",
+    "Initial full batch had two historical schema fixture failures; only affected suites repeated after test-only correction.",
+    "Full regression was not repeated on the later test-only/documentation commits."
+  ],
+  "documentationCloseout": [
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/check-ssot.py"
+      ],
+      "exitCode": 0,
+      "sha256": "337922e9b236fe7bfeaf8ae87681151ee887229452d87415467b380cb8b2cf07"
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/check-docs.py",
+        "--structural-only"
+      ],
+      "exitCode": 0,
+      "sha256": "0e41a0065676b3523ad5fb352f416c47f67869b4a0adde7383be633bdd74a617"
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "scripts/check-docs.py",
+        "--typecheck"
+      ],
+      "exitCode": 0,
+      "sha256": "01b49c178964184c707ab336c55bdb4872c7c7c89e455e2ef70cac5ca05f3a62"
+    }
+  ]
+}
