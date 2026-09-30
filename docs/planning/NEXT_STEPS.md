@@ -6,7 +6,9 @@
 
 2026-09-30：用户授权后，develop 从 `148022b05250cfda824725778e9a056d00cd6830` 快进合入 `codex/agent-shell-mvp` 的20个提交，集成代码与证据基线为 `34ed62e3fc875c56059eb19c1f02781d72c78bfc`。M2、审核修复、Agent Shell、请求次数缺省不限与Pi strict schema修正现已进入同一集成分支；[本次集成检查](../validation/develop-integration-2026-09-30.md)。
 
-下一增量按 [主功能/UI计划](AGENT_MVP_UI_PLAN.md) 的UI-P2推进，本次只完成集成，尚未实施UI-P2：
+前端分支已完成不依赖新契约的右栏、草稿/滚动和成果展示，见 [前端交接](UI_P2_FRONTEND_HANDOFF.md) 与 [本轮证据](../validation/ui-p2-frontend-2026-09-30.md)。尚未合入develop；分页与审核R01/R02仍由后端线推进，不能将前端本地浏览通过当作超大历史传输已解决。
+
+下一增量按 [主功能/UI计划](AGENT_MVP_UI_PLAN.md) 的UI-P2推进，前端局部增量已在分支实施，后续仍需完成分页接入与组合验收：
 
 1. 改善长历史浏览及右栏折叠/宽度；待审批动作始终可发现，不抢焦点、不丢草稿。
 2. 改善成果名称、来源执行与changed/missing状态展示；只索引真实成果，复用现有安全投影。
