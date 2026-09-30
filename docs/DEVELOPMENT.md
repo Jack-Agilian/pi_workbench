@@ -353,3 +353,7 @@ npm run demo:agent-shell -- --dev-profile=frontend
 开发profile保存在当前工作树 `.artifacts/desktop-profiles/<name>`，隔离SQLite、原生Session、租约和Electron用户数据。该选项只允许离线/合成模式，不能与真实模型、凭据配置或smoke选项组合；正式入口和临时测试目录行为不变。两线各自初始化node_modules/.venv/dist，可复用固定Node和已校验的只读下载缓存，不共享可变安装目录或复制真实费用库。GUI回归串行执行。
 
 `test:backend-history` 使用实际临时数据库与子进程，覆盖旧目录重新准入、分页、重连、真实成果预览、展示消息去重和双宿主隔离。合成历史/协议生产者明确标记，真实模型0；双宿主不等于两个GUI窗口人工体验。产品API与事件水位语义见 [共享契约](ssot/backend-history-contract.md)，前端接入次序见 [交接](planning/BACKEND_HISTORY_HANDOFF.md)。
+
+## Q1工具查询
+
+现有`npm run test:desktop`包含Query缓存/默认行为/取消隔离及产品批次回归，`npm run test:desktop-ui`覆盖工具错误手动重试、审批/停止与重连浏览位置。依赖固定Query5.104.0，不需要新的服务或初始化模式；原bootstrap --app --offline可重复安装，Electron仍显式prepare。详见[接入与实测](validation/ui-query-tools-2026-09-30.md)。

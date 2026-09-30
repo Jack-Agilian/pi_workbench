@@ -1,0 +1,278 @@
+{
+  "baseline": "46449024d31b0ce4601c971b90b8c036f88a27a7",
+  "commit": "5b10b19fb608159a37459592b265c6392d0d5331",
+  "branch": "codex/ui-query-tools",
+  "platform": {
+    "os": "macOS 27.0",
+    "build": "26A428",
+    "arch": "arm64",
+    "node": "24.21.0",
+    "npm": "11.19.0",
+    "electron": "44.4.5",
+    "react": "19.3.0",
+    "pi": "0.87.1"
+  },
+  "realModelCalls": 0,
+  "release": [
+    {
+      "package": "@tanstack/react-query",
+      "version": "5.104.0",
+      "tarball": "https://registry.npmjs.org/@tanstack/react-query/-/react-query-5.104.0.tgz",
+      "integrity": "sha512-e1TZmDCQnWIfiDVryIHeA6Idj+Lfx1hORLOhXS/l5wcgvtVD4yYqbTDl378sGQKIi2cSgb0TEMC9cKK8GGoJEw==",
+      "sha256": "1cd3406be8f0a3e09e3d1c3ded044f4d0e56aff3732073c8a60292fd31985175",
+      "bytes": 200969,
+      "installedFilesVerified": 410,
+      "license": "MIT",
+      "sourceCommit": "d4033eb1e5bdef3c8aa72a6cc614bcdd98b1ddca",
+      "sourcePackage": "https://raw.githubusercontent.com/TanStack/query/d4033eb1e5bdef3c8aa72a6cc614bcdd98b1ddca/packages/react-query/package.json",
+      "exports": {
+        ".": {
+          "@tanstack/custom-condition": "./src/index.ts",
+          "import": {
+            "types": "./build/modern/index.d.ts",
+            "default": "./build/modern/index.js"
+          },
+          "require": {
+            "types": "./build/modern/index.d.cts",
+            "default": "./build/modern/index.cjs"
+          }
+        },
+        "./package.json": "./package.json"
+      },
+      "lifecycleScripts": []
+    },
+    {
+      "package": "@tanstack/query-core",
+      "version": "5.104.0",
+      "tarball": "https://registry.npmjs.org/@tanstack/query-core/-/query-core-5.104.0.tgz",
+      "integrity": "sha512-JrC2r/JQlXt7khBSdUpsgxNvybzOg+aITa+ARRMlP2AFo93Y8vIqz077rp+e61mJetSZ0T6AJbwW1JHer1vrPQ==",
+      "sha256": "7e1e6d8d1aeb2d6e488d000649dad4fd443123af22cf673b871ca475b3b6277e",
+      "bytes": 582522,
+      "installedFilesVerified": 365,
+      "license": "MIT",
+      "sourceCommit": "d4033eb1e5bdef3c8aa72a6cc614bcdd98b1ddca",
+      "sourcePackage": "https://raw.githubusercontent.com/TanStack/query/d4033eb1e5bdef3c8aa72a6cc614bcdd98b1ddca/packages/query-core/package.json",
+      "exports": {
+        ".": {
+          "@tanstack/custom-condition": "./src/index.ts",
+          "import": {
+            "types": "./build/modern/index.d.ts",
+            "default": "./build/modern/index.js"
+          },
+          "require": {
+            "types": "./build/modern/index.d.cts",
+            "default": "./build/modern/index.cjs"
+          }
+        },
+        "./package.json": "./package.json"
+      },
+      "lifecycleScripts": []
+    }
+  ],
+  "commands": [
+    {
+      "command": "npm run typecheck",
+      "code": 0,
+      "seconds": 4.02,
+      "commit": "5b10b19fb608159a37459592b265c6392d0d5331",
+      "outputSha256": "22df5d47848ff6e1f3c0926a3aa3f05da31fb2c76601187b826c3ad4d7870689"
+    },
+    {
+      "command": "npm run test:desktop",
+      "code": 0,
+      "seconds": 20.38,
+      "commit": "5b10b19fb608159a37459592b265c6392d0d5331",
+      "outputSha256": "ac4e0872ca502b7f3e0e914797c0279287e33d691bcd8243ed6363f4266a866d",
+      "tests": 38
+    },
+    {
+      "command": "npm run test:backend-history",
+      "code": 0,
+      "seconds": 10.51,
+      "commit": "5b10b19fb608159a37459592b265c6392d0d5331",
+      "outputSha256": "aeec81a07de51f366d0104d8d583600578a9cdbd12f7562db3e75ebf4a7e7e81",
+      "tests": 15
+    },
+    {
+      "command": "npm run test:product-core",
+      "code": 0,
+      "seconds": 1.21,
+      "commit": "5b10b19fb608159a37459592b265c6392d0d5331",
+      "outputSha256": "1e3946aa2f92f8251dcc959fc5e7bb70b640ff5edf3f2d600263afe088fc1483",
+      "tests": 20
+    },
+    {
+      "command": "npm run test:product-sdk",
+      "code": 0,
+      "seconds": 1.66,
+      "commit": "5b10b19fb608159a37459592b265c6392d0d5331",
+      "outputSha256": "52dbeb760b02a70774a5eaba1bc1ff007a99bf744ccac1a1588dae2853365050",
+      "tests": 5
+    },
+    {
+      "command": "npm run test:pi-probe",
+      "code": 0,
+      "seconds": 1.64,
+      "commit": "5b10b19fb608159a37459592b265c6392d0d5331",
+      "outputSha256": "180ab321b842cb096697b5ecc6ce5e4d84fbcf56bdea6e7db45fee655c182389",
+      "tests": 15
+    },
+    {
+      "command": "npm run test:pi-tools",
+      "code": 0,
+      "seconds": 2.15,
+      "commit": "5b10b19fb608159a37459592b265c6392d0d5331",
+      "outputSha256": "50014b86733579b3f64faed18094ab11b4176bd5760b28c5d103c05e506285e8",
+      "tests": 19
+    },
+    {
+      "command": "npm run test:pi-shell",
+      "code": 0,
+      "seconds": 1.76,
+      "commit": "5b10b19fb608159a37459592b265c6392d0d5331",
+      "outputSha256": "b545107849b28159a41ebb3bc6ea03a6505876145a3066a59613b7b290969040",
+      "tests": 4
+    },
+    {
+      "command": "npm run test:pi-resources",
+      "code": 0,
+      "seconds": 1.68,
+      "commit": "5b10b19fb608159a37459592b265c6392d0d5331",
+      "outputSha256": "b15fbcedbfc53bf0fae08f889faabfc7cbe1e8310b77bd832bb42ccf84ca71d0",
+      "tests": 12
+    },
+    {
+      "command": "npm run test:pi-auth",
+      "code": 0,
+      "seconds": 1.67,
+      "commit": "5b10b19fb608159a37459592b265c6392d0d5331",
+      "outputSha256": "27e304c10c649fa6fec71a7982378a65b965fd01d66972746241f9e56a4e3d7c",
+      "tests": 18
+    },
+    {
+      "command": "npm run test:desktop-model",
+      "code": 0,
+      "seconds": 7.34,
+      "commit": "5b10b19fb608159a37459592b265c6392d0d5331",
+      "outputSha256": "8fbf83b307d1c7011a7f81449537362510d2951cf4c2f2985585ec7224788624"
+    },
+    {
+      "command": "npm run test:desktop-file-agent",
+      "code": 0,
+      "seconds": 7.11,
+      "commit": "5b10b19fb608159a37459592b265c6392d0d5331",
+      "outputSha256": "5256b14604bfd9bda02d693ee925f45d123af439945fd27a96fc2e1046da0703"
+    },
+    {
+      "command": "npm run test:desktop-agent-shell",
+      "code": 0,
+      "seconds": 6.59,
+      "commit": "5b10b19fb608159a37459592b265c6392d0d5331",
+      "outputSha256": "07b5268ebe7aee640b8e69be6522c1f030f8bee336e9459d6d66519952373d51"
+    },
+    {
+      "command": "npm run test:desktop-shutdown",
+      "code": 0,
+      "seconds": 69.19,
+      "commit": "5b10b19fb608159a37459592b265c6392d0d5331",
+      "outputSha256": "0ce7da27f7dceb0c27e6568621d9c7d0a64032636c57b3fe6c856f773794151b",
+      "scenarios": 24
+    },
+    {
+      "command": "npm run test:desktop-ui",
+      "code": 0,
+      "commit": "5b10b19fb608159a37459592b265c6392d0d5331",
+      "executionContext": "started on 4644902 plus implementation delta, identical code committed as 5b10b19 before completion",
+      "outputSha256": "3c7f12f9e74feea9861d674e10d539b3c1a78c85d7a92748ae225eeda56fab7f"
+    },
+    {
+      "command": ".venv/bin/python scripts/bootstrap.py --app --offline (first)",
+      "code": 0,
+      "commit": "5b10b19fb608159a37459592b265c6392d0d5331",
+      "executionContext": "code commit plus SSOT/documentation delta",
+      "outputSha256": "c4533a59a13e3a6256c1383dc040b021a0a3fd6a5acdc734a3c8ce9cbd98f03b"
+    },
+    {
+      "command": ".venv/bin/python scripts/bootstrap.py --app --offline (second)",
+      "code": 0,
+      "commit": "5b10b19fb608159a37459592b265c6392d0d5331",
+      "executionContext": "code commit plus SSOT/documentation delta",
+      "outputSha256": "c1a839fb99a6760d3a8d2273ccecb72d7382a1a6068282b0a77b573ad683614b"
+    },
+    {
+      "command": "npm run prepare:desktop -- --offline",
+      "code": 0,
+      "commit": "5b10b19fb608159a37459592b265c6392d0d5331",
+      "executionContext": "code commit plus SSOT/documentation delta",
+      "outputSha256": "9f56e66db05ca94dc6df8ee58a58c2e4c3b094cd1b055592f25c9f3967c894b1"
+    },
+    {
+      "command": "npm run typecheck (after repeated bootstrap)",
+      "code": 0,
+      "commit": "5b10b19fb608159a37459592b265c6392d0d5331",
+      "executionContext": "code commit plus SSOT/documentation delta",
+      "outputSha256": "22df5d47848ff6e1f3c0926a3aa3f05da31fb2c76601187b826c3ad4d7870689"
+    },
+    {
+      "command": "npm run build:desktop (after repeated bootstrap)",
+      "code": 0,
+      "commit": "5b10b19fb608159a37459592b265c6392d0d5331",
+      "executionContext": "code commit plus SSOT/documentation delta",
+      "outputSha256": "96374b233818c6bcc0fc591918e14f5d85b135e37c05685422b0a4c4a107478f"
+    },
+    {
+      "command": ".venv/bin/python scripts/check-ssot.py",
+      "code": 0,
+      "commit": "5b10b19fb608159a37459592b265c6392d0d5331",
+      "executionContext": "code commit plus SSOT/documentation delta",
+      "outputSha256": "2863a3435629a31d24b55bf523a6c628c787447ba877a0a2909cba51677a5cab"
+    },
+    {
+      "command": ".venv/bin/python scripts/test-tools.py",
+      "code": 0,
+      "commit": "5b10b19fb608159a37459592b265c6392d0d5331",
+      "executionContext": "code commit plus SSOT/documentation delta",
+      "outputSha256": "b5cc2436067a91e9a6b54d7e26302ae0052941f14a75dbe4d0c8eb96e3607496"
+    },
+    {
+      "command": ".venv/bin/python scripts/check-docs.py --structural-only",
+      "code": 0,
+      "commit": "5b10b19fb608159a37459592b265c6392d0d5331",
+      "executionContext": "code commit plus SSOT/documentation delta",
+      "outputSha256": "7f47205586d543e07320cae33c28b5962d62200c8e1b9eeecec2f72c4febe190"
+    },
+    {
+      "command": ".venv/bin/python scripts/check-docs.py --typecheck",
+      "code": 0,
+      "commit": "5b10b19fb608159a37459592b265c6392d0d5331",
+      "executionContext": "code commit plus SSOT/documentation delta",
+      "outputSha256": "de7fff39f8e436f3bc14651ad2be0ad3fd2c32f9bec01bb9e81551f05dab2c6e"
+    }
+  ],
+  "ipcSamples": [
+    {
+      "q1RealIpc": true,
+      "initialMs": 3.3785829999997077,
+      "reopenMs": 4.010707999999795,
+      "modelCalls": 0
+    }
+  ],
+  "limitations": [
+    "Single local IPC samples are not a performance comparison",
+    "No physical cancellation of existing IPC queries",
+    "Q2, Windows, PTY, real-model desktop manual experience and production release not verified",
+    "Historical other-worktree UI timeouts remain unlocated"
+  ],
+  "failures": [
+    {
+      "stage": "pre-commit npm install",
+      "code": "ERR_INVALID_ARG_TYPE",
+      "resolution": "same npm, package-lock-only then offline ci with scripts disabled"
+    },
+    {
+      "stage": "pre-commit first desktop-ui",
+      "code": "pagination_timeout:61 rows after reconnect",
+      "resolution": "carry row positions only to fresh Query cache, retain 61-row assertion; rerun passed"
+    }
+  ]
+}

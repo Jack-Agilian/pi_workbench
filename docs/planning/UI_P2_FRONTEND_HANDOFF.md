@@ -21,8 +21,8 @@
 
 ## 后续复用方向
 
-采用[模块参考映射](../ssot/reference-implementations.md)的指定pi-gui三文件、Query v5及有条件Virtual路线。ThreadPages只保留产品事件/水位/页链适配，不继续建设通用缓存；实际迁移替换原职责，维持2次查询、批次失败、切换及重连断言。当前未移植新组件或安装库；草稿/焦点与单一滚动控制者保留，历史UI超时仍待定位。
+采用[模块参考映射](../ssot/reference-implementations.md)的指定pi-gui三文件、Query v5及有条件Virtual路线。ThreadPages只保留产品事件/水位/页链适配，不继续建设通用缓存；实际迁移替换原职责，维持2次查询、批次失败、切换及重连断言。当前已安装Query 5.104.0用于Q1，未移植新组件；草稿/焦点与单一滚动控制者保留，历史UI超时仍待定位。
 
-## Q1现有只读查询迁移（待实施）
+## Q1现有只读查询迁移（限定完成，待复审集成）
 
-F01集成后的下一代码增量首选operationPage迁向Query v5，替换已有通用机制而非只约束新功能；historyEntry与F01回归复用。按[SSOT迁移契约](../ssot/reference-implementations.md)明确缓存身份、自动重试/重取设置、离线调度、IPC背压和整批发布。宿主重连身份尚需可信桥接缝，cancelQueries不等于终止现有IPC。一个范围只保留一个缓存所有者；Q1通过后再分批迁移历史/成果，不一次重写前端。
+F01已合入develop@4644902。Q1代码5b10b19由Query接管operationPage工具数据/异步状态，原工具LoadedRange移除，产品仅存批次发布引用。宿主queryScope与请求期望身份绑定实际连接；重连创建新缓存并按原浏览位置重新读取。仍无物理IPC取消，cancelQueries只阻止逻辑等待及下一页读取。工具错误要求手动重试，活动/审批独立。实测范围、发行与历史限制见[Q1报告](../validation/ui-query-tools-2026-09-30.md)。历史/成果迁移待Q2，现有组件与F01水位/失效规则继续复用。

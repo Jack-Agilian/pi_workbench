@@ -45,7 +45,7 @@ P04/P05/P06/P07/P13 的固定源码链接是复查入口，不声称逐字核验
 | L01 | [xterm.js](https://xtermjs.org/) | 浏览器终端组件候选；实施时精确锁版本与校验维护状态。 |
 | L02 | [node-pty README](https://github.com/microsoft/node-pty) | PTY 库候选，文档说明 macOS/Linux/Windows 与 ConPTY；未验证 Electron ABI、签名或进程清理。 |
 | L03 | [Electron 44.4.5 官方发行](https://github.com/electron/electron/releases/tag/v44.4.5) / [安全入口](https://www.electronjs.org/docs/latest/tutorial/security) / [React 19.3](https://react.dev/blog/2026/09/09/react-19-3) | C 固定发行与实际 registry/字节、公开 API 及 macOS 桌面测试见 [C 报告](../validation/c-desktop-2026-09-23.md)；其他平台、签名发布未验证。 |
-| L04 | [TanStack Query v5无限查询](https://tanstack.com/query/latest/docs/framework/react/guides/infinite-queries) | 通用查询职责的指定替换方向，未安装。官方语义已于前序复审核对；指定max-pages示例路径/blob来自审核包，源码身份与准入缺口见模块映射，不当作已验证发行。 |
+| L04 | [TanStack Query v5无限查询](https://tanstack.com/query/latest/docs/framework/react/guides/infinite-queries) | Q1工具查询已限定采用5.104.0；历史/成果仍待迁移。官方语义已于前序复审核对；指定max-pages示例路径/blob来自审核包，源码身份与准入缺口见模块映射，不当作已验证发行。 |
 | L05 | [TanStack Virtual文档](https://tanstack.com/virtual/latest/docs/introduction) | 有实测DOM/布局瓶颈后采用的方向；dynamic示例路径/blob来自审核包，本次未重测发行、源码或兼容性。 |
 | L06 | [SQLite Scrolling Window Queries](https://www.sqlite.org/rowvalue.html#scrolling_window_queries) | 沿用后端分页契约的keyset模式参考；Thread/Run归属、固定插入上界与字节限制仍为产品适配，本次没有新数据库运行证据。 |
 
@@ -143,3 +143,7 @@ Context7 用于定位官方文档，最终核对安装包 docs/providers.md 的 
 ## L04补充：现有查询迁移的默认行为（2026-09-30）
 
 本次通过Context7 `/tanstack/query` 定位React v5的[默认行为](https://tanstack.com/query/latest/docs/framework/react/guides/important-defaults)、[网络模式](https://tanstack.com/query/latest/docs/framework/react/guides/network-mode)和[取消](https://tanstack.com/query/latest/docs/framework/react/guides/query-cancellation)说明；网络模式和取消另直接核对官方页面。默认重取/重试必须显式适配本地IPC，always仅是查询调度，取消底层工作要求传输实现配合。由此补充[Q1迁移契约](reference-implementations.md)，不是已选发行或兼容验证；本次未安装包、未跑模型或产品回归。
+
+## L04发行采用补充（2026-09-30）
+
+Q1实际锁定react-query/query-core 5.104.0，官方tag对应d4033eb1e5bdef3c8aa72a6cc614bcdd98b1ddca；registry、SRI、tarball和安装字节、MIT、根exports/类型及实际ESM import均核对，见[报告和输入](../validation/ui-query-tools-2026-09-30.md)。发行公开QueryClient.query替代已deprecated的fetchQuery；没有照抄Context7中其他版本/框架的语法。两个v5/reference网页路径返回404，未据此声称网页核验成功；最终依据Context7定位和实际精确发行声明/实现。只采用工具范围，不推广为Virtual或durable验证。

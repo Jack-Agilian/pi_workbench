@@ -1,6 +1,6 @@
 # 前后端指定参考实现与采用边界
 
-2026-09-30采纳。本文是[复用优先架构](reuse-first.md)的模块级补充；当前实施顺序只由[NEXT_STEPS](../planning/NEXT_STEPS.md)决定。指定参考方向不等于已安装依赖、移植组件、验证发行或完成任务。
+2026-09-30采纳。本文是[复用优先架构](reuse-first.md)的模块级补充；当前实施顺序只由[NEXT_STEPS](../planning/NEXT_STEPS.md)决定。除下文Q1工具查询已限定采用Query 5.104.0外，其余参考方向不等于已安装、移植或完成任务；[Q1证据](../validation/ui-query-tools-2026-09-30.md)列出实际范围。
 
 ## 本项目模块与具体接缝
 
@@ -9,7 +9,7 @@
 | 本项目模块 | 参考文件／API | 借鉴或替换范围 | 保留边界与当前状态 |
 |---|---|---|---|
 | `apps/desktop/renderer.tsx`、`run-history.tsx` | pi-gui `apps/desktop/src/features/conversation/conversation-timeline.tsx` [C03] | 主要桌面应用参考：分离加载/错误展示与时间线，按工具身份保存展开状态；选择可独立适配的组件或行为 | 产品DTO、Run/Operation身份、审批/成果语义不随组件改变。尚未移植这份时间线；原Composer移植沿用C01历史来源 |
-| `apps/desktop/thread-pages.ts`及Renderer查询状态 | `@tanstack/react-query` v5：`QueryClient`、`useQuery`、`useInfiniteQuery`；TanStack/query `examples/react/infinite-query-with-max-pages/src/pages/index.tsx` [L04] | 通用查询缓存、加载/错误状态和重复读取合并的指定替换方向；实际迁移删除原同等职责，不并存两套缓存 | 产品事件到查询键的映射、Thread/Run归属、事件水位、页游标和既有IPC保留。当前F01薄适配仍运行，未安装Query；不继续扩展成通用查询框架 |
+| `apps/desktop/thread-pages.ts`及Renderer查询状态 | `@tanstack/react-query` v5：`QueryClient`、`useQuery`、`useInfiniteQuery`；TanStack/query `examples/react/infinite-query-with-max-pages/src/pages/index.tsx` [L04] | 通用查询缓存、加载/错误状态和重复读取合并的指定替换方向；实际迁移删除原同等职责，不并存两套缓存 | 产品事件到查询键的映射、Thread/Run归属、事件水位、页游标和既有IPC保留。Q1工具范围已用Query 5.104.0，历史/成果待Q2；F01产品适配保留，不继续扩展成通用查询框架 |
 | `apps/desktop/timeline-scroll.ts` | pi-gui `apps/desktop/src/features/conversation/hooks/use-timeline-viewport.ts`及`timeline-layout.ts` [C03] | 对照跟随/阅读/恢复意图、`ReadingAnchor`的rowId/offsetWithinRow、用户滚动与程序恢复区分、会话隔离及布局稳定标志 | 当前小型hook可保留，只有一个scrollTop写入者；不复制整套估高、布局和虚拟化算法；草稿与阅读位置是本地UI状态 |
 | 长历史DOM/尺寸测量（尚未接入） | TanStack/virtual `examples/react/dynamic/src/main.tsx`；React `useVirtualizer`、`getScrollElement`、`measureElement`、`getVirtualItems` [L05] | 实测DOM或布局瓶颈出现后，使用库承接通用虚拟化和尺寸测量 | 不替代服务端分页或阅读意图；不因F01直接安装，不与另一滚动控制者竞争；发布版选项需重新核对 |
 | `apps/agent-server/desktop-pages.ts`、Core的`historyEntry` | SQLite官方Scrolling Window Queries [L06]，已有SQLite读取事务 | 保留固定产品keyset查询；按ID定向读取复用已有安全投影，不增加ORM/分页服务 | 宿主独占数据库；Thread/Run归属、插入上界、响应字节限制属于产品适配，不返回任意SQL、路径或SDK对象 |
@@ -28,7 +28,7 @@ pi-gui参考提交为 `163054227d370a49d09099c61eb65798481294ac`，本次会话�
 
 这些文件依赖自身DisplayTimelineItem/TranscriptMessage及布局模块，不能直接import其应用内部路径。审核包的README/MIT说明不替代实际移植时对对应文件、依赖许可证和归属的核验；旧Composer采用提交不自动更新为此提交。本文未独立重算上述blob身份。
 
-TanStack Query示例的审核包blob为 `29fac3d44a2af68d06950a3b9bfbbf64d9383cbe`，Virtual示例为 `5e4b2b7e0cae6e47aa592770ba976f4879e23998`。包内没有给出两个示例所属完整提交，本文保留其资料身份，不将滚动main链接或blob当作已核验发行版本。正式采用须补齐固定源码/许可证、实际registry精确版本、exports/类型与接缝验证，复用唯一npm锁；本次不安装候选或修改依赖。
+TanStack Query示例的审核包blob为 `29fac3d44a2af68d06950a3b9bfbbf64d9383cbe`，Virtual示例为 `5e4b2b7e0cae6e47aa592770ba976f4879e23998`。包内没有给出两个示例所属完整提交，本文保留其资料身份，不将滚动main链接或blob当作已核验发行版本。Q1已另行核对Query 5.104.0精确发行、固定源码/许可证、registry字节和公开接缝，复用唯一npm锁，见Q1报告；没有把上述示例blob当作发行证明，Virtual仍未采用。
 
 durable继续对照P16固定 `1b347794e2a630e4359f2584f4eea388145d0ddf`；源码0.99.1/Experimental与本项目已安装Pi0.87.1分开，不把类方法和源码实现冒充已安装包根导出。
 
@@ -46,15 +46,15 @@ durable继续对照P16固定 `1b347794e2a630e4359f2584f4eea388145d0ddf`；源码
 
 | 增量 | 具体交付与删除范围 | 验收与停止条件 |
 |---|---|---|
-| Q1：现有工具只读查询迁移（下一代码增量，尚未实施） | 首选`operationPage`：复用DesktopApi、OperationPage与原组件，由Query v5承接该范围的缓存、加载/错误与重复读取协调；删除ThreadPages中该范围被接管的通用机制。产品事件批次协调与工具页游标适配保留 | 精确发行/许可/类型准入、宿主环境身份、无网络本地查询、重连迟到结果、分页/焦点/审批回归均通过；同一范围只有一个缓存所有者。列出删掉与留下的职责，不以引入依赖或行数变化代替维护收益 |
+| Q1：现有工具只读查询迁移（已限定实施，待复审集成） | 首选`operationPage`：复用DesktopApi、OperationPage与原组件，由Query v5承接该范围的缓存、加载/错误与重复读取协调；删除ThreadPages中该范围被接管的通用机制。产品事件批次协调与工具页游标适配保留 | 精确发行/许可/类型准入、宿主环境身份、无网络本地查询、重连迟到结果、分页/焦点/审批回归均通过；同一范围只有一个缓存所有者。列出删掉与留下的职责，不以引入依赖或行数变化代替维护收益 |
 | Q2：历史/成果同类通用职责（Q1验收后的后续增量） | 按查询范围分批替换；沿用historyEntry、F01失效表、头部补齐与旧页链。原组件和产品契约继续使用 | 每个范围都保持同一组一致性/查询计数回归并删除旧同等机制；不要求长期保留两套生产实现 |
 | 滚动与组件校正 | 对照C03既有行为校正小型适配与工具展开，不复制pi-gui完整driver/布局引擎 | 保留阅读意图、单一滚动控制者、草稿/焦点和审批可达；Virtual仍须实测需求触发，不借迁移制造虚拟化工作 |
 
-本轮只采纳计划，未实施Q1；具体精确版本与实施基线在开工时核对，不能把v5主版本或示例blob当锁文件。当前源码核对基线为 `2ebd795445aea8f18581119d598f116309043d35`：ThreadPages仍用LoadedRange/operations Map和串行队列，Renderer维护pageBusy/pageProblem；这些是迁移候选，不能宣称已由库承担。
+首次复审只采纳计划；后续Q1已固定5.104.0，代码5b10b19，不能把v5主版本或示例blob当锁文件。首次源码核对基线为 `2ebd795445aea8f18581119d598f116309043d35`：ThreadPages仍用LoadedRange/operations Map和串行队列，Renderer维护pageBusy/pageProblem；这是首次复审的历史状态。Q1现由OperationQueries的QueryClient拥有工具数据，ThreadPages只存发布引用；历史/成果与产品批次协调仍保留。
 
 ### Q1必须补齐的产品接缝
 
-- 查询键覆盖不含秘密的宿主/数据环境身份、连接代次、Thread/Run及查询种类；页身份进入独立页键或infinite query的pageParams，不能解析产品游标或用数据库绝对路径/凭据作键。当前DesktopApi没有公开宿主连接代次；实施需通过可信桥提供不具授权能力的不透明身份，或证明等价的按环境重建QueryClient方案，不能只用threadId/runId假定跨重连安全。
+- 查询键覆盖不含秘密的宿主/数据环境身份、连接代次、Thread/Run及查询种类；页身份进入独立页键或infinite query的pageParams，不能解析产品游标或用数据库绝对路径/凭据作键。Q1已由可信桥提供queryScope，HostClient绑定实际连接并校验期望身份；重连重建QueryClient，仅携带浏览位置。不能只用threadId/runId假定跨重连安全。
 - 一个范围只由新缓存拥有。允许Q1工具查询与尚未迁移的历史/成果范围共存；不得把同一工具页再镜像到旧operations Map作为第二份可变缓存。只读组合视图与批次发布屏障属于产品展示协调，须说明其必要性。
 - 同批实体去重，全部必要读取成功后才推进事件水位、发布完整显示；库逐查询成功不等于整批成功。保留F01正文2次查询、多页前插、300事件、失败/迟到/切换和未知事件断言；不用新库的逐项缓存更新削弱旧一致性。
 - 有界IPC并发和背压继续生效；当前HostClient最多16个pending请求，库去重不等于限制不同查询的并发。实施需核验多Run刷新不会制造请求洪峰，不扩成通用调度器，也不增加限制值掩盖问题。
@@ -69,13 +69,13 @@ durable继续对照P16固定 `1b347794e2a630e4359f2584f4eea388145d0ddf`；源码
 
 每个范围以独立可回退提交交付，报告精确版本、采用入口、删除的旧机制、保留适配和结果。不得顺带升级Pi、迁移数据库或改造UI。如果职责没有减少或一致性破坏，暂停该范围迁移、保留可用版本，记录具体差距；不因已引入库再叠第二层框架，也不重启无边界选型。
 
-此次复核通过Context7定位并阅读Query v5官方默认、网络模式与取消说明；其中取消/网络模式另直接核对官方页面。属于接口行为依据，不是新依赖兼容或运行证据；示例main的选项仍须在未来所选精确发行包中核验。后端ProductCore/WorkspaceAdmission/Guardian/固定分页继续保留，durable维持P16差距评估门槛。
+首次复核通过Context7定位并阅读Query v5官方默认、网络模式与取消说明；其中取消/网络模式另直接核对官方页面。属于接口行为依据，不是新依赖兼容或运行证据；示例main的选项仍须在未来所选精确发行包中核验。后端ProductCore/WorkspaceAdmission/Guardian/固定分页继续保留，durable维持P16差距评估门槛。
 
 ## 未关闭项与推进顺序
 
-F01/F02的限定修正与本参考方向可以一并复审集成，不将全面Query迁移或虚拟化作为前置；F01修复也不表示通用查询复用工作已完成。已有通用查询职责的Q1迁移已列为下一代码交付，不以出现新功能为触发条件；后续Q2继续分范围替换，不继续开放式列候选或扩建自有框架。若实际接缝无法满足上述边界，先记录具体差距与替代决定。
+F01/F02的限定修正与本参考方向可以一并复审集成，不将全面Query迁移或虚拟化作为前置；F01修复也不表示通用查询复用工作已完成。Q1已完成限定工具范围并待复审集成；后续Q2继续分范围替换，不继续开放式列候选或扩建自有框架。若实际接缝无法满足上述边界，先记录具体差距与替代决定。
 
-历史 `169df60` 在另一工作树的两次UI超时根因仍未定位。当前树通过及新增阶段诊断不能关闭该项；保留复现环境/阶段/退出结果的待办，不把整个审核包宣布全部关闭。当前唯一事项仍为F01/F02交付复审与develop集成准备；之后先实施Q1并完成集中离线验收，再按同一真实profile做完整人工使用检查，未关闭项继续跟踪，不能以付费调用调试刷新。
+历史 `169df60` 在另一工作树的两次UI超时根因仍未定位。当前树通过及新增阶段诊断不能关闭该项；保留复现环境/阶段/退出结果的待办，不把整个审核包宣布全部关闭。F01/F02已集成develop；当前唯一事项为Q1交付复审与develop集成准备，之后按同一真实profile做完整人工使用检查，未关闭项继续跟踪，不能以付费调用调试刷新。
 
 ## 来源与本次维护范围
 
@@ -90,3 +90,7 @@ F01/F02的限定修正与本参考方向可以一并复审集成，不将全面Q
 迁移建议复审补充：输入新增EXISTING_CODE_MIGRATION.md，本次以2ebd795为代码核对基线，仅文档/计划变化；Q1/Q2均未实施，不继承前轮运行测试为迁移通过证据。现有Context7技能流程仍适用；该架构决策不另建Skill。
 
 迁移复审文档验证：在`2ebd795445aea8f18581119d598f116309043d35`加本次文档差异上运行`.venv/bin/python scripts/check-ssot.py`（60/60）、`.venv/bin/python scripts/test-tools.py`（15/15）、`.venv/bin/python scripts/check-docs.py --structural-only`（5通过/2跳过）及`git diff --check`，均通过。原始输出在`.artifacts/existing-code-migration/`；此处为可随新克隆定位的结果摘要。未重跑产品、Electron或模型测试。
+
+## Q1已采用入口（2026-09-30）
+
+Query 5.104.0实际公开入口为根导出QueryClient；采用非deprecated的实例方法query，而不是把方法冒充根导出。工具加载/错误由QueryCache经React useSyncExternalStore订阅；工具分页不再写独立busy/error状态。不可变批次键是产品一致性屏障，成功后回收旧键，不是第二份数据缓存。历史/成果LoadedRange、产品串行批次、水位、游标和阅读锚点保留；明确删除与保留清单、失败、许可和测试见[报告](../validation/ui-query-tools-2026-09-30.md)。前面“首次/本次复审”段落记录原文档采纳范围，不覆盖本节的新实现事实。
