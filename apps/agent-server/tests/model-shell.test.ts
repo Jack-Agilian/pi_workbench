@@ -182,6 +182,9 @@ for(const mixed of [false,true])test(`R02 sixteen approved operations, mixed=${m
   for(let i=0;i<16;i++)await approveShell(f);await done;
   const snapshot=f.core.snapshot(f.thread);assert.equal(snapshot.runs[0]!.state,'completed');assert.equal(calls,17);
   assert.equal(snapshot.operations.length,16);assert.ok(snapshot.operations.every(o=>o.state==='succeeded'));
+  let page=f.core.operationPage(f.run,{limit:5});const ids=page.items.map(op=>op.id);
+  while(page.hasMore){page=f.core.operationPage(f.run,{limit:5,cursor:page.nextCursor!});ids.push(...page.items.map(op=>op.id));}
+  assert.deepEqual(ids,snapshot.operations.map(op=>op.id).reverse());assert.equal(new Set(ids).size,16);
   assert.equal(readFileSync(join(f.cwd,'sixteen.txt'),'utf8'),'x'.repeat(mixed?8:16));
  }finally{await f.dispose();}
 });

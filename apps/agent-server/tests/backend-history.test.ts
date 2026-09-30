@@ -7,7 +7,7 @@ import { DesktopHost } from '../desktop-host.ts';
 import { HostClient } from '../../desktop/host-client.ts';
 import { repository } from '../worker-launcher.ts';
 import { parseDesktopRequest, type DesktopHome } from '../../../packages/app-contracts/desktop.ts';
-import { DESKTOP_PAGE_BYTES, type HistoryPage, type ArtifactPage, type ThreadActivity } from '../../../packages/app-contracts/desktop-pages.ts';
+import { DESKTOP_PAGE_BYTES, type HistoryPage, type ArtifactPage, type OperationPage, type ThreadActivity } from '../../../packages/app-contracts/desktop-pages.ts';
 import { until, createScenario } from './scenario.ts';
 import { digest } from '../../../packages/pi-adapter/controlled-tools.ts';
 import { ObservationOrder } from '../../../packages/pi-adapter/observation-order.ts';
@@ -82,6 +82,7 @@ test('R03 actual SQLite/HostClient: 60-Run history paginates by bytes, reconnect
   let activity:ThreadActivity;
   do{activity=await client.request({type:'thread-activity',threadId:id}) as ThreadActivity;await new Promise(r=>setTimeout(r,20));}while(!activity.operations.length);
   assert.equal(activity.activeRun?.id,newest);assert.equal(activity.operations[0]!.state,'pending');
+  const operations=await client.request({type:'operation-page',runId:newest,page:{limit:1}}) as OperationPage;assert.equal(operations.items[0]!.id,activity.operations[0]!.id);assert.equal(operations.hasMore,false);
   const op=activity.operations[0]!;await client.request({type:'command',command:{type:'approvals.resolve',requestId:'deny-new',operationId:op.id,parametersDigest:op.parametersDigest,decision:'deny'}});
   await assert.rejects(client.request({type:'artifact-page',threadId:id,page:{cursor:first.nextCursor!}}),/page_cursor_invalid/);
   await assert.rejects(client.request({type:'history-page',threadId:id,page:{cursor:Buffer.from('{}').toString('base64url')}}),/page_cursor_invalid/);
