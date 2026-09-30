@@ -1,3 +1,4 @@
+import { makeStrictJsonSchema } from '@earendil-works/pi-ai/api/constrained-sampling';
 import { fileToolSchemas } from './file-planning.ts';
 import { isDeepStrictEqual } from 'node:util';
 import { createBashToolDefinition, ModelRuntime } from '@earendil-works/pi-coding-agent';
@@ -65,6 +66,9 @@ function validateTools(request:Record<string,unknown>,selection:ModelSelection):
   if(!raw||typeof raw!=='object'||Array.isArray(raw))throw new Error('model_tool_shape');
   const t=raw as Record<string,unknown>;const f=(t.function??t) as Record<string,unknown>;
   if(!f||typeof f!=='object'||typeof f.name!=='string'||seen.has(f.name)||t.type!==undefined&&t.type!=='function')throw new Error('model_tool_type');
-  const schema=schemas.find(s=>s.name===f.name);if(!schema||!isDeepStrictEqual(shape(f.parameters??f.input_schema),shape(schema.parameters)))throw new Error('model_tool_schema');seen.add(f.name);
+  const schema=schemas.find(s=>s.name===f.name);
+  if(!schema || f.strict!==undefined&&typeof f.strict!=='boolean')throw new Error('model_tool_schema');
+  const expected=f.strict===true?makeStrictJsonSchema(schema.parameters):schema.parameters;
+  if(!isDeepStrictEqual(shape(f.parameters??f.input_schema),shape(expected)))throw new Error('model_tool_schema');seen.add(f.name);
  }
 }

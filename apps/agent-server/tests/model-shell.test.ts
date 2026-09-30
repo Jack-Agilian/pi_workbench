@@ -145,3 +145,26 @@ for(const constrainedCost of [false,true])test(`unlimited request counts: native
   assert.equal(f.core.modelAdmission(access.configuration,access.reserveCostUsd).status,constrainedCost?'budget_exhausted':'ready');
  }finally{await f.dispose();}
 });
+
+import { validateModelPayload } from '../../../packages/pi-adapter/model-catalog.ts';
+test('bundled gpt-6-luna strict schemas: actual Pi payload admitted, mutations rejected, nullable optional arguments normalized',async()=>{
+ const {f,access,plan}=setupShell('responses');let calls=0;
+ delete plan.model.openai;plan.model.model='gpt-6-luna';delete access.configuration.openai;access.configuration.model=plan.model.model;
+ try{
+  const done=f.supervisor.startNext(plan,entry,{...access,fetch:async(_url,options)=>{
+   calls++;const body=String(options?.body),payload=JSON.parse(body) as {tools:{name:string;strict:boolean;parameters:{additionalProperties:boolean;properties:Record<string,unknown>}}[]};
+   assert.ok(payload.tools.every(t=>t.strict===true&&t.parameters.additionalProperties===false));
+   validateModelPayload(plan.model,access.requestUrl,body);
+   for(const mutate of [(p:typeof payload)=>{p.tools[0]!.parameters.additionalProperties=true;},(p:typeof payload)=>{p.tools[0]!.parameters.properties['unapproved']={type:'string'};},(p:typeof payload)=>{p.tools[0]!.name='unapproved';}]){
+    const altered=structuredClone(payload);mutate(altered);assert.throws(()=>validateModelPayload(plan.model,access.requestUrl,JSON.stringify(altered)),/schema/);
+   }
+   // Explicit synthetic nullable wire arguments; Pi converts strict optional nulls back to omitted values.
+   const reply=calls===1?syntheticReply('responses',calls,[{tool:'bash',parameters:{command:'printf SYNTHETIC > strict.md',timeout:0.001}}]).replaceAll('0.001','null'):
+    calls===2?syntheticReply('responses',calls,[{tool:'read',parameters:{path:'strict.md',offset:0.001,limit:0.001}}]).replaceAll('0.001','null'):syntheticReply('responses',calls);
+   return new Response(reply,{headers:{'content-type':'text/event-stream'}});
+  }})!;
+  await approveShell(f);await approveShell(f);await done;
+  assert.equal(calls,3);assert.equal(f.core.snapshot(f.thread).runs[0]!.state,'completed');assert.equal(readFileSync(join(f.cwd,'strict.md'),'utf8'),'SYNTHETIC');
+  assert.deepEqual(f.core.snapshot(f.thread).operations.map(o=>[o.tool,o.state]),[['bash','succeeded'],['read','succeeded']]);
+ }finally{await f.dispose();}
+});
