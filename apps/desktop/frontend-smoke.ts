@@ -36,10 +36,12 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
   let releasePreview: (() => void) | undefined;
   let delayPreview = false;
   let commands = 0;
+  let alternateSelection = false;
   let historyError = ''; let workspaceStatus: 'ready'|'invalid' = 'ready';
   let delayHistory = false; let releaseHistory: (() => void) | undefined;
   host.request = async raw => {
     if (raw.type === 'command') commands++;
+    if (raw.type === 'home' && alternateSelection) return {...home, workspaces:{selectedId:'SYNTHETIC-other',items:[...home.workspaces.items,{id:'SYNTHETIC-other',path:'/SYNTHETIC-other'}]}};
     if (raw.type === 'thread' && raw.threadId === chosen.id) throw Error('unbounded_renderer_request');
     if (raw.type === 'thread-activity' && raw.threadId === chosen.id) return {thread: fixture.thread, snapshotSeq: revision + 500, activeRun: fixture.runs.at(-1)!, operations: structuredClone(fixture.operations.filter(op => op.state === 'pending')), workspaceStatus};
     if (raw.type === 'history-page' && raw.threadId === chosen.id) {
@@ -65,7 +67,14 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
   };
   const metrics: unknown[] = [];
   try {
-    await switchTo(other.title); await switchTo(chosen.title);
+    alternateSelection = true; historyError = 'page_item_too_large';
+    await switchTo(other.title); await wait(() => js<boolean>("document.querySelectorAll('[data-run]').length===1"), 'before_failed_first_page');
+    await switchTo(chosen.title);
+    await wait(() => js<boolean>("!!document.querySelector('.retry-pages') && document.querySelector('h1').textContent==='SYNTHETIC allow'"), 'failed_first_page_activity');
+    const expectedWorkspace = home.workspaces.items.find(w => w.id === chosen.workspaceId)!.path;
+    assert.equal(await js<string>("document.querySelector('.execution-summary span').title"), expectedWorkspace);
+    assert.equal(await js<boolean>("!!document.querySelector('.view-toolbar .stop')"), true);
+    alternateSelection = false; historyError = ''; await click('.retry-pages');
     await wait(() => js<boolean>("document.querySelectorAll('[data-run]').length===8"), 'first_page');
     await wait(() => js<boolean>("!!document.querySelector('.load-operations')"), 'tools_first_page');
     await click('.load-operations');

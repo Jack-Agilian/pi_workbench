@@ -51,7 +51,6 @@ function App() {
   useEffect(() => {
     const current = ++generation.current; let stopped = false; let timer: ReturnType<typeof setTimeout>;
 
-
     const poll = async () => {
       try {
         const latestHome = await api.home();
@@ -141,7 +140,7 @@ function App() {
   const modeLabel=home?.mode==='model'?'模型会话':home?.mode==='model-offline'?'离线会话验证 · SYNTHETIC':'无模型演示';
   const currentRuns = thread?.runs ?? [];
   const pending = activity?.operations.filter(op => op.state === 'pending') ?? [];
-  const workspacePath=home?.workspaces.items.find(w=>w.id===(thread?.thread.workspaceId??home.workspaces.selectedId))?.path??'正在读取目录';
+  const workspacePath=home?.workspaces.items.find(w=>w.id===(activity?.thread.workspaceId??home.workspaces.selectedId))?.path??'正在读取目录';
   const selectedWorkspace=home?.workspaces.items.find(w=>w.id===home.workspaces.selectedId)?.path??'正在读取目录';
   const shellTools=home?.model?.limits?.shellTools;
   const isWorking = !!activity?.activeRun && active.has(activity.activeRun.state);
@@ -159,8 +158,8 @@ function App() {
       <div className="sidebar-foot"><span className="status-dot" /> 本地工作台<small>{modeLabel}</small></div>
     </aside>
     <main>
-      <header className="topbar"><span>工作台 <span className="muted">/ {thread?.thread.title ?? '开始一项工作'}</span></span><span className="mode-badge">{modeLabel}</span></header>
-      <div className="thread-heading"><div><div className="eyebrow">你的工作，清晰可见</div><h1>{thread?.thread.title ?? '从一个目标开始'}</h1><p>{modelMode?(shellTools?"逐项批准 Markdown 文件操作与 Bash 命令。Bash 可改动整个工作目录，停止不回滚副作用。":home?.model?.limits?.fileTools?"同一会话继续原生上下文。仅开放逐项批准的 Markdown 文件工具；停止不会回滚已发生的文件改动或费用。":"同一会话继续原生上下文。本模式不提供工具，停止不会撤销服务端已发生的费用。"):"每次发送建立一次执行。文件写入或命令执行前，由你决定是否批准。"}</p></div><span className="connection"><i className={disconnected ? 'offline' : ''} />{disconnected ? '连接断开' : '本地连接'}</span></div>
+      <header className="topbar"><span>工作台 <span className="muted">/ {activity?.thread.title ?? '开始一项工作'}</span></span><span className="mode-badge">{modeLabel}</span></header>
+      <div className="thread-heading"><div><div className="eyebrow">你的工作，清晰可见</div><h1>{activity?.thread.title ?? '从一个目标开始'}</h1><p>{modelMode?(shellTools?"逐项批准 Markdown 文件操作与 Bash 命令。Bash 可改动整个工作目录，停止不回滚副作用。":home?.model?.limits?.fileTools?"同一会话继续原生上下文。仅开放逐项批准的 Markdown 文件工具；停止不会回滚已发生的文件改动或费用。":"同一会话继续原生上下文。本模式不提供工具，停止不会撤销服务端已发生的费用。"):"每次发送建立一次执行。文件写入或命令执行前，由你决定是否批准。"}</p></div><span className="connection"><i className={disconnected ? 'offline' : ''} />{disconnected ? '连接断开' : '本地连接'}</span></div>
       <div className="execution-summary"><span title={workspacePath}>工作目录：{workspacePath}</span><span>{shellTools?'Bash 禁网 · 隔离环境 · 逐命令批准':modelMode?'工具受配置限制':'本地演示 · 工具禁网'}{modelMode?' · 模型请求仅走配置端点':''}</span></div>
       {home?.mode==='model' && <details className="model-settings" aria-label="模型配置" open={home.model?.status!=='ready'}><summary>模型配置 · {home.model?.provider} / {home.model?.model}</summary>{home.model?.limits && <p>{home.model.limits.endpoint} · {home.model.limits.requests===null?'LLM 请求次数不限':`本次授权最多 ${home.model.limits.requests} 次请求`} · 估算预算 ${home.model.limits.estimatedUsd} · 输出上限 {home.model.limits.outputTokens} token{home.model.limits.httpIdleTimeoutMs!==undefined && <> · 空闲等待 {home.model.limits.httpIdleTimeoutMs/1000} 秒</>}{home.model.limits.timeoutMs!==undefined && <> · 单次 LLM 请求总上限 {home.model.limits.timeoutMs/1000} 秒</>}</p>}{home.model?.status==='not_configured'?<p>尚未配置或配置无效。请先运行 model:config 创建非秘密配置，填写并检查后重新启动。本页不会使用全局 Pi 凭据。</p>:home.model?.status==='key_required'?<div><p>仅发送你批准的合成无敏感资料。请求与费用估算限额来自配置；估算不等于服务商硬预算。可在配置目录的 auth.json 保存 API key，重启后自动读取；也可临时选择私有 .key 文件。凭据内容不会传入页面。</p><button disabled={busy} onClick={()=>{setBusy(true);void api.selectModelCredential().then(()=>setTick(n=>n+1),failed).finally(()=>setBusy(false));}}>选择凭据并启用本次应用</button></div>:home.model?.status==='policy_required'?<p>授权策略待确认。请核对原配置并完成显式修订，已有请求记录继续保留。</p>:home.model?.status==='budget_exhausted'?<p>本授权的请求次数或预留预算不足。</p>:<p>{shellTools?'已就绪 · 文件与 Bash 均须逐项批准':home.model?.limits?.fileTools?'已就绪 · Markdown 读取、写入、修改均须逐项批准':'已就绪 · 无工具'}</p>}</details>}
       {problem && <div className="notice error" role="alert">{problem}<button onClick={() => void reconnect()} disabled={busy}>重新连接</button></div>}
