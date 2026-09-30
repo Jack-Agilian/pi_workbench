@@ -89,10 +89,14 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
     await wait(() => js<boolean>("document.querySelector('.approval-indicator').textContent==='1 项待审批'"), 'approval_arrived_collapsed');
     assert.equal(await js<boolean>("document.querySelector('.inspector').hidden && document.activeElement.id==='composer'"), true);
     await click('.show-approvals');
+    // Opening the rail changes line wrapping. Capture the navigation baseline only
+    // after ResizeObserver/scroll handlers have seen the resulting rendered frame.
+    await js('new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))');
     const saved = await js<number>("document.querySelector('.timeline').scrollTop");
     await switchTo(other.title); await wait(() => js<boolean>("document.querySelectorAll('[data-run]').length===1"), 'other');
     await switchTo(chosen.title); await wait(() => js<boolean>("document.querySelectorAll('[data-run]').length===36"), 'return');
-    assert.ok(Math.abs(await js<number>("document.querySelector('.timeline').scrollTop") - saved) < 3);
+    const restored = await js<number>("document.querySelector('.timeline').scrollTop");
+    assert.ok(Math.abs(restored - saved) < 3, `thread scroll changed: saved=${saved}, restored=${restored}`);
     assert.equal(await js<string>("document.querySelector('#composer').value"), 'SYNTHETIC 保留草稿');
     await click('.return-latest');
     await wait(() => js<boolean>("document.querySelector('.timeline').scrollHeight-document.querySelector('.timeline').clientHeight-document.querySelector('.timeline').scrollTop<3"), 'latest');
