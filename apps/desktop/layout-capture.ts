@@ -10,6 +10,8 @@ export async function captureLayout(window: BrowserWindow, label: string): Promi
   for (const [width, height] of [[1320, 860], [1024, 720], [820, 640]]) {
     window.setContentSize(width!, height!);
     await new Promise(r => setTimeout(r, 180));
+    // Wait for the resized Renderer to produce a frame before asking Chromium to copy it.
+    await window.webContents.executeJavaScript('new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))');
     const metrics = await window.webContents.executeJavaScript(`(() => {
       const actionable = selector => { const e=document.querySelector(selector); if(!e)return false; const b=e.getBoundingClientRect(); const top=document.elementFromPoint(b.x+b.width/2,b.y+b.height/2); return b.x>=0 && b.y>=0 && b.right<=innerWidth && b.bottom<=innerHeight && !!top && e.contains(top); };
       const box = selector => { const e = document.querySelector(selector); if (!e) return null;
@@ -22,7 +24,12 @@ export async function captureLayout(window: BrowserWindow, label: string): Promi
         approve:box('.approval .primary'),stop:box('.stop')}; })()`);
     if (!metrics.approvalActionable || !metrics.stopVisible || metrics.bodyOverflow || metrics.composer.y+metrics.composer.height>metrics.viewport.height+1) throw new Error('critical_control_outside_viewport:'+width);
     records.push(metrics);
-    writeFileSync(join(out, `${label}-${width}x${height}.png`), (await window.webContents.capturePage()).toPNG());
+    console.log(`layout capture: ${label} ${width}x${height}`);
+    try {
+      const screenshot = await window.webContents.capturePage(undefined, {stayAwake: true});
+      if (screenshot.isEmpty()) throw new Error('empty_capture');
+      writeFileSync(join(out, `${label}-${width}x${height}.png`), screenshot.toPNG());
+    } catch (cause) { throw new Error(`layout_capture_failed:${label}:${width}x${height}:visible=${window.isVisible()}:minimized=${window.isMinimized()}`, {cause}); }
   }
   writeFileSync(join(out, `${label}.json`), JSON.stringify(records, null, 2)+'\n');
   window.setContentSize(original[0]!, original[1]!);
