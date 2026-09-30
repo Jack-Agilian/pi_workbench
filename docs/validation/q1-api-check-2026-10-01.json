@@ -1,0 +1,44 @@
+{
+  "provider": "openai",
+  "model": "gpt-6-luna",
+  "explicitApi": null,
+  "resolvedApi": "openai-responses",
+  "basePath": "/v1",
+  "requestPath": "/v1/responses",
+  "launchModels": [
+    {
+      "provider": "openai",
+      "model": "gpt-6-luna",
+      "explicitApi": null,
+      "basePath": "/v1"
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-6-luna",
+      "explicitApi": null,
+      "basePath": "/v1"
+    }
+  ],
+  "nativeAssistantApis": [
+    {
+      "provider": "openai",
+      "model": "gpt-6-luna",
+      "api": "openai-responses"
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-6-luna",
+      "api": "openai-responses"
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-6-luna",
+      "api": "openai-responses"
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-6-luna",
+      "api": "openai-responses"
+    }
+  ]
+}

@@ -3001,6 +3001,30 @@
         "darwin"
       ],
       "locator": "docs/validation/q1-plan-rereview-2026-09-30.md"
+    },
+    {
+      "id": "EV-Q1-DESKTOP-MODEL-20261001",
+      "kind": "model",
+      "result": "failed",
+      "scope": "真实Electron代理2请求均403，用户手动2请求401/403；0工具执行，完整桌面工具闭环未通过。",
+      "commit": "ee409b1606c794fb853290e7e238bc30eebe638d",
+      "recordedAt": "2026-09-30T16:47:50.584537+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/q1-desktop-live-2026-10-01.md"
+    },
+    {
+      "id": "EV-Q1-DESKTOP-LOCAL-20261001",
+      "kind": "platform",
+      "result": "passed",
+      "scope": "真实Electron原历史与成果预览、正常关闭重开；失败Run持久化、原14请求不变、收据及PID/组退出；不冒充工具成功或完整人工验收。",
+      "commit": "ee409b1606c794fb853290e7e238bc30eebe638d",
+      "recordedAt": "2026-09-30T16:47:50.584668+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/q1-desktop-live-2026-10-01.md"
     }
   ]
 }

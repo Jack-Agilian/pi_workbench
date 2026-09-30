@@ -143,4 +143,4 @@ App Server 是产品 coordinator，不拥有模型轮询、重试器、Prompt �
 
 Pi AgentSession、ModelRuntime、pi-ai Provider 和 CredentialStore 继续为主路径，不自建多 Provider 模型业务网关或第二条模型/工具循环。可复用的网络出口组件仅负责目标限制与传输边界；候选库须有发行/许可与平台证据后才采用。M1 无工具、M2 有限文件先于交互 PTY；[当前顺序](../planning/NEXT_STEPS.md) 与 [术语](glossary.md) 为准。
 
-2026-09-30前端复用决策：F01保留有限产品实体刷新和只读historyEntry接缝；现有通用查询/缓存/去重列为Q1明确迁移交付（首选operationPage），Q2仅在维护收益与使用反馈支持时选择范围；指定TanStack Query v5，迁移时替换已有同等职责，不继续扩建ThreadPages或并存两套缓存。仅换useInfiniteQuery不能消除全页失效，maxPages也不是产品实体失效策略；Q1已限定采用Query 5.104.0承接工具查询，历史/成果尚待Q2，见[验证报告](../validation/ui-query-tools-2026-09-30.md)。pi-gui是主要桌面参考，滚动保持单一控制者，Virtual在实测布局瓶颈后采用。具体文件/API、范围、准入与回归见[指定参考实现](reference-implementations.md)。
+2026-09-30前端复用决策：F01保留有限产品实体刷新和只读historyEntry接缝；现有通用查询/缓存/去重列为Q1明确迁移交付（首选operationPage），Q2仅在维护收益与使用反馈支持时选择范围；指定TanStack Query v5，迁移时替换已有同等职责，不继续扩建ThreadPages或并存两套缓存。仅换useInfiniteQuery不能消除全页失效，maxPages也不是产品实体失效策略；Q1已限定采用Query 5.104.0承接工具查询，历史/成果保留原实现，Q2待收益评估，见[验证报告](../validation/ui-query-tools-2026-09-30.md)。pi-gui是主要桌面参考，滚动保持单一控制者，Virtual在实测布局瓶颈后采用。具体文件/API、范围、准入与回归见[指定参考实现](reference-implementations.md)。

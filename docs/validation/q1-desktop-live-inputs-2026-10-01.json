@@ -1,0 +1,102 @@
+{
+  "commit": "ee409b1606c794fb853290e7e238bc30eebe638d",
+  "recordedAt": "2026-09-30T16:45:54.882Z",
+  "platform": "darwin-arm64",
+  "provider": "openai",
+  "model": "gpt-6-luna",
+  "dataScope": "synthetic_non_sensitive",
+  "newLedgerRequests": 4,
+  "totalLedgerRequests": 18,
+  "prior14RequestRowsUnchanged": true,
+  "totalReservedUsd": 0.6166079999999999,
+  "remainingReservedUsd": 0.38339200000000007,
+  "activeRuns": 0,
+  "newTargetAbsent": true,
+  "priorArtifact": {
+    "path": "report.md",
+    "bytes": 107,
+    "sha256": "eabd7ce1918887773c5bacea98f3a30a145fb58744de71a36ebfe8771ff63070"
+  },
+  "results": [
+    {
+      "runId": "a78db693-0c8b-437a-b919-691615b0387f",
+      "operator": "codex_ui",
+      "state": "failed",
+      "requests": 1,
+      "operations": 0,
+      "reason": "provider_error",
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "syntheticProvider": false,
+      "httpStatus": "403",
+      "assistantAt": "2026-09-30T14:54:08.439Z",
+      "nativePersisted": true,
+      "sameNativeSession": true,
+      "cleanup": {
+        "exited": true,
+        "groupGone": true
+      },
+      "receiptDigest": "57e4dac598ca84c3b4a6ddcb3cae4ffbbafc5470d0092b3563bae05bcc0cb54b"
+    },
+    {
+      "runId": "50479cce-6c3d-4927-a550-497cf6c9864b",
+      "operator": "codex_ui",
+      "state": "failed",
+      "requests": 1,
+      "operations": 0,
+      "reason": "provider_error",
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "syntheticProvider": false,
+      "httpStatus": "403",
+      "assistantAt": "2026-09-30T16:09:13.390Z",
+      "nativePersisted": true,
+      "sameNativeSession": true,
+      "cleanup": {
+        "exited": true,
+        "groupGone": true
+      },
+      "receiptDigest": "2ea175015f07df00ffc295a7ea453ea9dd91dd5f521f8a84765f9e1b6a1d0f61"
+    },
+    {
+      "runId": "870f97ed-81a8-44d4-a532-4ca17286b042",
+      "operator": "user_ui_confirmed",
+      "state": "failed",
+      "requests": 1,
+      "operations": 0,
+      "reason": "provider_error",
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "syntheticProvider": false,
+      "httpStatus": "401",
+      "assistantAt": "2026-09-30T16:39:19.001Z",
+      "nativePersisted": true,
+      "sameNativeSession": true,
+      "cleanup": {
+        "exited": true,
+        "groupGone": true
+      },
+      "receiptDigest": "25a07942fdbb3418920374642ac4fedabb78b731d0dd36ffd56c44c9758b3275"
+    },
+    {
+      "runId": "c50abadf-1d07-4fc9-87bf-98168ffb15a2",
+      "operator": "user_ui_confirmed",
+      "state": "failed",
+      "requests": 1,
+      "operations": 0,
+      "reason": "provider_error",
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "syntheticProvider": false,
+      "httpStatus": "403",
+      "assistantAt": "2026-09-30T16:40:24.200Z",
+      "nativePersisted": true,
+      "sameNativeSession": true,
+      "cleanup": {
+        "exited": true,
+        "groupGone": true
+      },
+      "receiptDigest": "5af1818f369baa9b5c9cdd0a775ab80a1a34cd90c9059019ef8bc526caf8d212"
+    }
+  ]
+}

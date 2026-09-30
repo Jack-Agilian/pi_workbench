@@ -2,11 +2,13 @@
 
 当前依据：[SSOT](../ssot/README.md)、[任务账本](backlog.json)。以下当前事项优先于后文历史阶段的“下一步”。
 
-## 唯一当前事项：集成Q1后的真实桌面使用检查
+## 唯一当前事项：真实桌面使用检查（模型访问401/403待恢复）
 
 2026-09-30按用户授权，将前端 `codex/ui-history-artifacts@c0e99c2` 和后端 `codex/backend-history-safety@feaa3f4` 合入develop，组合代码提交 `169df60a51fc1d394d6cc45c335e54eddbc9cef7`。双方证据ID保留，分页与后端边界现在位于同一分支；集成检查与当前可测范围见 [收口报告](../validation/ui-p2-merged-2026-09-30.md)。
 
-F01/F02及规划已快进合入develop `46449024d31b0ce4601c971b90b8c036f88a27a7`，推送后独立读回同SHA。Q1在`codex/ui-query-tools`完成限定实现，代码`5b10b19fb608159a37459592b265c6392d0d5331`，见[发行与离线验证报告](../validation/ui-query-tools-2026-09-30.md)。Q1计划审核已对照实现完成[复核](../validation/q1-plan-rereview-2026-09-30.md)，按授权集成后进入真实桌面使用检查；不并行启动Q2、Virtual或durable。
+F01/F02及规划已快进合入develop `46449024d31b0ce4601c971b90b8c036f88a27a7`，推送后独立读回同SHA。Q1在`codex/ui-query-tools`完成限定实现，代码`5b10b19fb608159a37459592b265c6392d0d5331`，见[发行与离线验证报告](../validation/ui-query-tools-2026-09-30.md)。Q1计划审核已对照实现完成[复核](../validation/q1-plan-rereview-2026-09-30.md)，已快进集成并推送develop `ee409b1606c794fb853290e7e238bc30eebe638d`，独立读回一致；不并行启动Q2、Virtual或durable。
+
+2026-10-01真实Electron检查：代理发送2次、用户手动2次请求，均失败（403/401），无工具执行；原会话/成果核验预览、正常关闭重开、原账本保留与进程清理通过限定检查，见[实际报告](../validation/q1-desktop-live-2026-10-01.md)。累计18次、保守预留$0.616608/$1仅为报告时快照。当前配置及原生记录均确认Responses，不是messages接口；先恢复当前端点的访问，再续验下述工具闭环。
 
 ### Q1已交付范围
 
@@ -16,15 +18,15 @@ F01/F02及规划已快进合入develop `46449024d31b0ce4601c971b90b8c036f88a27a7
 
 ### Q1离线验收后的真实人工检查
 
-1. 在macOS arm64用 `npm run model:config -- check` 核对原配置，再运行 `npm run desktop:model`；保持单一真实profile、凭据与费用账本。本轮没有实际调用模型或修改配置。
+1. 在macOS arm64用 `npm run model:config -- check` 核对原配置，再运行 `npm run desktop:model`；保持单一真实profile、凭据与费用账本。配置不自动修改；本次实际失败请求单列在上方报告。
 2. 只在现有授权的合成无敏感项目中检查真实对话/原会话继续、读取/写入/修改Markdown、逐项批准或拒绝受限Bash、活跃停止、重启恢复和成果预览。先验证完整工作流程，再集中修问题，不用付费请求逐行调试。
 3. 当前配置输出512 token、每次执行最多8个文件/Bash操作，其中Bash最多6次/每条30秒；LLM次数不限，费用累计仍生效，单LLM总期限30分钟/网络空闲5分钟。扩大数据/工具/费用范围或输出上限另作明确配置修订，不自动改写旧策略或账本。
 
 [前端交接](UI_P2_FRONTEND_HANDOFF.md)、[后端契约](../ssot/backend-history-contract.md)保留范围。R03旧全量响应超限已由Renderer正式分页路径限定解决；home目录未分页、无虚拟列表、原生全部正文未补载。UI-01/02、ART-01继续in_progress，既有M0 Gate不因合并扩大；完整人工体验、Windows、PTY、市场与生产发行后置。
 
-已有真实任务代码 `688150f070797405250bb16ad3dc837bb0ddc64d`；[真实结果与首次失败](../validation/agent-task-live-2026-09-30.md)、[脱敏输入](../validation/agent-task-live-inputs-2026-09-30.json)、[实际模型生成报告](../validation/agent-task-result-2026-09-30.md)。本次集成没有新增真实请求，以下仍为该次任务的历史消费与验证范围。
+已有真实任务代码 `688150f070797405250bb16ad3dc837bb0ddc64d`；[真实结果与首次失败](../validation/agent-task-live-2026-09-30.md)、[脱敏输入](../validation/agent-task-live-inputs-2026-09-30.json)、[实际模型生成报告](../validation/agent-task-result-2026-09-30.md)。以下是原CLI任务的历史消费与验证范围；最新桌面失败请求见本文顶部。
 
-限定MODEL-03/04逐项done；M0-Pi补齐真实模型任务及Mac审批/取消/恢复证据后passed。M0-UI/M0-SDK沿用原passed，均不等于完整产品/通用沙箱/生产发布。真实任务走CLI→同DesktopHost/Worker产品链路，本轮没有重新声明Electron真实模型UI通过。
+限定MODEL-03/04逐项done；M0-Pi补齐真实模型任务及Mac审批/取消/恢复证据后passed。M0-UI/M0-SDK沿用原passed，均不等于完整产品/通用沙箱/生产发布。真实任务走CLI→同DesktopHost/Worker产品链路，后续桌面失败请求不构成Electron真实模型完整闭环通过。
 
 本轮gpt-6-luna新增10次LLM请求（正常7、拒绝1、活跃Shell取消1、原Session恢复1）；累计14次。历史账本和授权身份保留，累计保守预留$0.479584/$1。请求次数缺省不限，单LLM总期限30分钟、网络空闲5分钟；费用/数据/逐工具批准仍分别生效。实际账单未核验。
 
