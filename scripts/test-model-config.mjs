@@ -8,12 +8,12 @@ import { repository, sterileEnvironment } from '../apps/agent-server/worker-laun
 const root=realpathSync(mkdtempSync(join(tmpdir(),'m1-config-test-')));const path=join(root,'model.json');
 const run=(script,args,expected=0)=>{const result=spawnSync(process.execPath,[join(repository,'scripts',script),...args],{cwd:root,env:sterileEnvironment(join(root,'home')),encoding:'utf8',timeout:120000});assert.equal(result.status,expected,result.stdout+result.stderr);};
 try{
- run('model-config.mjs',['init',path]);const bytes=readFileSync(path,'utf8');assert.equal(JSON.parse(bytes).approved,false);
+ run('model-config.mjs',['init',path]);const bytes=readFileSync(path,'utf8');assert.equal(JSON.parse(bytes).approved,false);assert.equal(Object.hasOwn(JSON.parse(bytes),'maxRequests'),false);
  run('model-config.mjs',['init',path],1);assert.equal(readFileSync(path,'utf8'),bytes);
  run('model-config.mjs',['check',path],1);
  run('launch-desktop.mjs',['--model','--model-smoke-test','--model-config='+path]);
  const config={...JSON.parse(bytes),approved:true,provider:'anthropic',model:'claude-sonnet-4-5',endpoint:'https://api.anthropic.com',maxRequests:1,maxEstimatedCostUsd:5};
- writeFileSync(path,JSON.stringify(config));run('model-config.mjs',['check',path]);
+ writeFileSync(path,JSON.stringify({...config,maxRequests:null}));run('model-config.mjs',['check',path]);
  // Trusted smoke mode forces host network tripwire, even for configured model mode.
  run('launch-desktop.mjs',['--model','--model-smoke-test','--model-config='+path]);
  // Persistent Pi-shaped auth.json and both OpenAI template modes, with network denied.

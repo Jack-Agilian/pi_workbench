@@ -5,7 +5,8 @@ import { exact } from './worker-ipc.ts';
 import { identifier } from './index.ts';
 export interface OpenAIConnection { api: 'responses' | 'chat-completions'; contextWindow: number; inputUsdPerMillion: number; outputUsdPerMillion: number; tokenLimitField?: 'max_tokens' | 'max_completion_tokens' }
 export interface ModelSelection { mode: 'offline' | 'live'; provider: string; model: string; endpoint: string; maxOutputTokens: number; timeoutMs: number; openai?: OpenAIConnection; fileTools?: FileToolPolicy; shellTools?: ModelShellPolicy }
-export interface ModelConfiguration { version: 1; authorizationId: string; approved: boolean; dataScope: 'synthetic_non_sensitive'; provider: string; model: string; endpoint: string; maxRequests: number; maxOutputTokens: number; timeoutMs: number; maxEstimatedCostUsd: number; httpIdleTimeoutMs?: number; openai?: OpenAIConnection; fileTools?: FileToolPolicy; shellTools?: ModelShellPolicy }
+// maxRequests is optional legacy/validation compatibility, never emitted by product templates.
+export interface ModelConfiguration { version: 1; authorizationId: string; approved: boolean; dataScope: 'synthetic_non_sensitive'; provider: string; model: string; endpoint: string; maxRequests?: number | null; maxOutputTokens: number; timeoutMs: number; maxEstimatedCostUsd: number; httpIdleTimeoutMs?: number; openai?: OpenAIConnection; fileTools?: FileToolPolicy; shellTools?: ModelShellPolicy }
 export interface ModelOutcome { reason: 'stop' | 'length' | 'cancelled' | 'provider_error' | 'budget' | 'protocol'; inputTokens: number; outputTokens: number; estimatedCostUsd: number; synthetic: boolean }
 export function parseModelSelection(value: unknown): ModelSelection {
   const r = exact(value, ['mode','provider','model','endpoint','maxOutputTokens','timeoutMs',...(Object.hasOwn(Object(value),'openai')?['openai']:[]),...(Object.hasOwn(Object(value),'fileTools')?['fileTools']:[]),...(Object.hasOwn(Object(value),'shellTools')?['shellTools']:[])]);
@@ -18,7 +19,7 @@ export function parseModelSelection(value: unknown): ModelSelection {
   return r as unknown as ModelSelection;
 }
 export function parseModelConfiguration(value: unknown): ModelConfiguration {
-  const r = exact(value, ['version','authorizationId','approved','dataScope','provider','model','endpoint','maxRequests','maxOutputTokens','timeoutMs','maxEstimatedCostUsd',...(Object.hasOwn(Object(value),'httpIdleTimeoutMs')?['httpIdleTimeoutMs']:[]),...(Object.hasOwn(Object(value),'openai')?['openai']:[]),...(Object.hasOwn(Object(value),'fileTools')?['fileTools']:[]),...(Object.hasOwn(Object(value),'shellTools')?['shellTools']:[])]);
+  const r = exact(value, ['version','authorizationId','approved','dataScope','provider','model','endpoint',...(Object.hasOwn(Object(value),'maxRequests')?['maxRequests']:[]),'maxOutputTokens','timeoutMs','maxEstimatedCostUsd',...(Object.hasOwn(Object(value),'httpIdleTimeoutMs')?['httpIdleTimeoutMs']:[]),...(Object.hasOwn(Object(value),'openai')?['openai']:[]),...(Object.hasOwn(Object(value),'fileTools')?['fileTools']:[]),...(Object.hasOwn(Object(value),'shellTools')?['shellTools']:[])]);
   identifier(r.authorizationId);
   if (Object.hasOwn(r,'fileTools')) parseFileToolPolicy(r.fileTools);
   if (Object.hasOwn(r,'shellTools')) { const shell = parseModelShellPolicy(r.shellTools); const files = parseFileToolPolicy(r.fileTools); if (shell.maxCommands > files.maxOperations) throw new Error('model_shell_limit'); }
@@ -27,7 +28,7 @@ export function parseModelConfiguration(value: unknown): ModelConfiguration {
   if (Object.hasOwn(r,'httpIdleTimeoutMs') && (typeof r.httpIdleTimeoutMs !== 'number' || !Number.isSafeInteger(r.httpIdleTimeoutMs) || r.httpIdleTimeoutMs < 100 || r.httpIdleTimeoutMs > 86400000)) throw new Error('model_idle_limit');
   const endpoint = new URL(String(r.endpoint));
   if (endpoint.protocol !== 'https:' || endpoint.username || endpoint.password || endpoint.search || endpoint.hash || endpoint.port && endpoint.port !== '443') throw new Error('model_endpoint');
-  if (typeof r.maxRequests !== 'number' || !Number.isSafeInteger(r.maxRequests) || r.maxRequests < 1 || r.maxRequests > 20 || typeof r.maxEstimatedCostUsd !== 'number' || !Number.isFinite(r.maxEstimatedCostUsd) || r.maxEstimatedCostUsd <= 0 || r.maxEstimatedCostUsd > 10) throw new Error('model_budget');
+  if ((r.maxRequests != null && (typeof r.maxRequests !== 'number' || !Number.isSafeInteger(r.maxRequests) || r.maxRequests < 1 || r.maxRequests > 20)) || typeof r.maxEstimatedCostUsd !== 'number' || !Number.isFinite(r.maxEstimatedCostUsd) || r.maxEstimatedCostUsd <= 0 || r.maxEstimatedCostUsd > 10) throw new Error('model_budget');
   return r as unknown as ModelConfiguration;
 }
 export function parseModelOutcome(value: unknown): ModelOutcome {

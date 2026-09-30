@@ -18,7 +18,7 @@ export async function modelServices(options: { cwd: string; agentDir: string }, 
   runtime.registerNativeProvider({ ...provider,
     getModels: () => [model],
     stream: () => { throw new Error('raw_model_stream_not_admitted'); },
-    streamSimple: (m, c, o) => { if (++calls > (selection.fileTools?.maxModelRequests??1)) throw new Error('model_request_budget'); return provider.streamSimple(m, c, { ...o, ...limits }); },
+    streamSimple: (m, c, o) => { const cap=selection.fileTools ? selection.fileTools.maxModelRequests : 1; if (++calls > (cap ?? Infinity)) throw new Error('model_request_budget'); return provider.streamSimple(m, c, { ...o, ...limits }); },
   });
   await runtime.setRuntimeApiKey(selection.provider, key);
   return { model, services: { ...options, modelRuntime: runtime, settingsManager: SettingsManager.inMemory({

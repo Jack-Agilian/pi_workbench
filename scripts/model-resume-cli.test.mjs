@@ -43,5 +43,15 @@ test('resume CLI isolated profile: exact requests/Session binding, immutable pla
   assert.equal(readFileSync(result,'utf8'),'{"syntheticExistingAttempt":true}');assert.deepEqual(readFileSync(original),originalBytes);
   assert.equal(core.modelAdmission(config,0.1).used,2);
   assert.throws(()=>auditModelProfile(profile,{...config,authorizationId:'wrong'},0.1),/missing/);
+  const candidate={...config,maxRequests:undefined},previousFile=join(directory,'previous.json'),candidateFile=join(directory,'candidate.json');
+  writeFileSync(previousFile,JSON.stringify(config));writeFileSync(candidateFile,JSON.stringify(candidate));
+  const policy=action=>spawnSync(process.execPath,['--import',join(repository,'scripts/probe-no-network.mjs'),join(repository,'scripts/model-policy.mjs'),action,previousFile,candidateFile,'SYNTHETIC-unlimited'],{env:sterileEnvironment(root),cwd:root,encoding:'utf8',timeout:20000});
+  assert.equal(policy('check').status,1);
+  assert.equal(policy('check-requests').status,0);
+  assert.equal(auditModelProfile(profile,candidate,0.1).status,'policy_required');
+  const applied=policy('apply-approved-requests');assert.equal(applied.status,0,applied.stderr);
+  assert.equal(policy('apply-approved-requests').status,0);
+  const unlimited=auditModelProfile(profile,candidate,0.1);assert.equal(unlimited.remainingRequests,null);assert.equal(unlimited.status,'ready');assert.equal(unlimited.used,2);assert.equal(unlimited.reserved,0.2);
+
  }finally{core.close();rmSync(root,{recursive:true,force:true});}
 });

@@ -36,10 +36,12 @@ test('M2 validator planning is read-only and keeps the old 4/4 ledger', () => {
     assert.deepEqual(buildPlan({ ...f.options, config: reordered }), plan);
   } finally { f.dispose(); }
 });
-for (const kind of ['shell-enabled', 'unapproved', 'old-grant', 'too-many', 'missing-tools', 'budget', 'lock', 'result', 'existing-root']) {
+for (const kind of ['unlimited-total', 'unlimited-run', 'shell-enabled', 'unapproved', 'old-grant', 'too-many', 'missing-tools', 'budget', 'lock', 'result', 'existing-root']) {
   test(`M2 validator prepare blocks ${kind} without resetting data`, () => {
     const f = setup(), c = structuredClone(config), paths = acceptancePaths(f.profile, f.options.attempt);
     try {
+      if (kind === 'unlimited-total') c.maxRequests = null;
+      if (kind === 'unlimited-run') c.fileTools.maxModelRequests = null;
       if (kind === 'shell-enabled') c.shellTools = {maxCommands:2,timeoutMs:10000,profile:'restricted-bash-v1'};
       if (kind === 'unapproved') c.approved = false;
       if (kind === 'old-grant') c.authorizationId = 'SYNTHETIC-old-grant';

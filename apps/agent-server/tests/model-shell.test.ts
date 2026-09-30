@@ -123,3 +123,25 @@ test('dynamic shell IPC has a closed argument set and preserves version/identity
  assert.deepEqual(parseEnvelope(envelope),envelope);
  for(const bad of [{...envelope,version:6},{...envelope,body:{...body,hostClean:true}},{...envelope,body:{...body,parameters:{command:'x',cwd:'/tmp'}}},{...envelope,body:{...body,parameters:{command:'x'.repeat(65536)}}}])assert.throws(()=>parseEnvelope(bad));
 });
+
+import { fileRunDuration } from '../../../packages/app-contracts/file-tools.ts';
+for(const constrainedCost of [false,true])test(`unlimited request counts: native Pi continues beyond four; cost gate=${constrainedCost}`,async()=>{
+ const {f,access,plan}=setupShell();let calls=0;
+ delete plan.model.fileTools!.maxModelRequests;plan.model.shellTools!.maxCommands=6;
+ access.configuration={...access.configuration,maxRequests:undefined,fileTools:{...plan.model.fileTools!},shellTools:{...plan.model.shellTools!},maxEstimatedCostUsd:constrainedCost?0.025:1};
+ // Large envelope also exercises the guardian beyond the 32-bit setTimeout range.
+ if(!constrainedCost){plan.model.timeoutMs=1800000;access.configuration.timeoutMs=1800000;access.reserveCostUsd=0.0001;}
+ plan.deadline=Date.now()+fileRunDuration(plan.model.fileTools!,plan.model.timeoutMs,{total:access.configuration.maxEstimatedCostUsd,perRequest:access.reserveCostUsd});
+ try{
+  const done=f.supervisor.startNext(plan,entry,{...access,fetch:async()=>{
+   calls++;return new Response(syntheticReply('chat-completions',calls,calls<=5?[bash('printf x >> count.txt')]:[]),{headers:{'content-type':'text/event-stream'}});
+  }})!;
+  const operations=constrainedCost?2:5;
+  for(let i=0;i<operations;i++)await approveShell(f);
+  await done;
+  assert.equal(calls,constrainedCost?2:6);
+  assert.equal(readFileSync(join(f.cwd,'count.txt'),'utf8'),'x'.repeat(operations));
+  const snap=f.core.snapshot(f.thread);assert.equal(snap.runs[0]!.state,constrainedCost?'failed':'completed');
+  assert.equal(f.core.modelAdmission(access.configuration,access.reserveCostUsd).status,constrainedCost?'budget_exhausted':'ready');
+ }finally{await f.dispose();}
+});

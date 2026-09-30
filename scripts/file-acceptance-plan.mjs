@@ -42,7 +42,7 @@ export function auditLedger(profile, config, reserve) {
     return { version, totalRequests: all.length, used, reserved, active,
       ledgerDigest: hash(JSON.stringify({ all, revisions })),
       priorAuthorizationsDigest: hash(JSON.stringify(all.filter(r => r.authorization_id !== config.authorizationId).map(r => [r.run_id, r.authorization_id, r.policy_digest, r.reserved_cost]))),
-      remainingRequests: Math.max(0, config.maxRequests - used),
+      remainingRequests: config.maxRequests == null ? null : Math.max(0, config.maxRequests - used),
       remainingReservedUsd: Math.max(0, config.maxEstimatedCostUsd - reserved),
       fitsFullPlan: reserved + reserve * 8 <= config.maxEstimatedCostUsd };
   } finally { db.close(); }
@@ -60,7 +60,7 @@ export function buildPlan({ profile, attempt, config: raw, reserve, commit }) {
       (config.httpIdleTimeoutMs ?? config.timeoutMs) > 300000) blocked.push('limits_outside_reviewed_plan');
   if (config.shellTools) blocked.push('shell_outside_file_acceptance');
   const tools = config.fileTools;
-  if (!tools || tools.maxOperations > 6 || tools.maxModelRequests > 4 || tools.operationTimeoutMs > 300000)
+  if (!tools || tools.maxOperations > 6 || (tools.maxModelRequests == null || tools.maxModelRequests > 4) || tools.operationTimeoutMs > 300000)
     blocked.push('file_scope_not_approved');
   if (audit.used !== 0) blocked.push('authorization_already_used');
   if (audit.active !== 0) blocked.push('active_or_queued_work');

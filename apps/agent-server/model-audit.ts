@@ -12,7 +12,7 @@ export function auditModelProfile(profile:string,config:ModelConfiguration,cost:
       ? db.prepare('SELECT digest,legacy_digest FROM model_policy_revisions WHERE authorization_id=? ORDER BY seq').all(config.authorizationId):[];
     const digest=policyDigest(config);const known=new Set([digest,legacyPolicyDigest(config),...revisions.flatMap(r=>[r.digest,r.legacy_digest])]);
     const used=rows.length,reserved=rows.reduce((n,r)=>n+Number(r.reserved_cost),0);
-    const status=(revisions.length && revisions.at(-1)!.digest!==digest)||rows.some(r=>!known.has(r.policy_digest))?'policy_required':used>=config.maxRequests||reserved+cost>config.maxEstimatedCostUsd?'budget_exhausted':'ready';
+    const status=(revisions.length && revisions.at(-1)!.digest!==digest)||rows.some(r=>!known.has(r.policy_digest))?'policy_required':(config.maxRequests!=null && used>=config.maxRequests)||reserved+cost>config.maxEstimatedCostUsd?'budget_exhausted':'ready';
     const active=Number(db.prepare("SELECT count(*) AS n FROM runs WHERE state IN ('queued','starting','running','cancelling','unknown')").get()!.n);
     const marker=createHash('sha256').update(config.authorizationId).digest('hex').slice(0,16);
     const request=(stage:string)=>{
@@ -27,6 +27,6 @@ export function auditModelProfile(profile:string,config:ModelConfiguration,cost:
     const native=db.prepare('SELECT native_ref,native_persisted FROM threads WHERE id=?').get(thread.ack.id);
     if(run?.state!=='completed'||run.thread_id!==thread.ack.id||reservation?.authorization_id!==config.authorizationId||native?.native_persisted!==1||typeof native.native_ref!=='string')throw new Error('original_first_not_proven');
     return {status,used,reserved,active,marker,policyDigest:digest,threadId:String(thread.ack.id),firstRunId:String(first.ack.id),nativeSessionRef:native.native_ref,
-      remainingRequests:Math.max(0,config.maxRequests-used),remainingReservedUsd:Math.max(0,config.maxEstimatedCostUsd-reserved)};
+      remainingRequests:config.maxRequests==null?null:Math.max(0,config.maxRequests-used),remainingReservedUsd:Math.max(0,config.maxEstimatedCostUsd-reserved)};
   }finally{db.close();}
 }

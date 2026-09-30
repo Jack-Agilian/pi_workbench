@@ -1,6 +1,6 @@
 import type { ModelShellOperation } from '../../packages/app-contracts/model-shell.ts';
 import type { FileOperationPlan } from '../../packages/app-contracts/file-tools.ts';
-import { policyDigest, policyText, legacyPolicyDigest, assertTimeoutRevision } from './model-policy.ts';
+import { policyDigest, policyText, legacyPolicyDigest, assertTimeoutRevision, assertRequestCountRevision } from './model-policy.ts';
 import { type ModelConfiguration, parseModelOutcome, type ModelOutcome } from '../../packages/app-contracts/model.ts';
 import { parseShellIntent, parseShellOutcome, type ShellIntent, type ShellOutcome, type ShellView } from '../../packages/app-contracts/shell.ts';
 // Product intents/indexes and disposable display projections; Pi owns authoritative messages and the Session tree.
@@ -236,12 +236,13 @@ export class ProductCore {
     known.add(digest);known.add(legacyPolicyDigest(config));
     const used=prior.length,reserved=prior.reduce((n,r)=>n+r.reserved_cost,0);
     const status=latest && latest.digest!==digest || prior.some(r=>!known.has(r.policy_digest)) ? 'policy_required'
-      : used>=config.maxRequests || reserved+cost>config.maxEstimatedCostUsd ? 'budget_exhausted' : 'ready';
+      : (config.maxRequests!=null && used>=config.maxRequests) || reserved+cost>config.maxEstimatedCostUsd ? 'budget_exhausted' : 'ready';
     return {status,used,reserved};
   }
-  /** Explicit local maintenance, never a Renderer/Worker command. Only timeout may change. */
-  reviseModelPolicy(previous:ModelConfiguration, candidate:ModelConfiguration, revisionId:string):void {
-    identifier(revisionId);assertTimeoutRevision(previous,candidate);
+  /** Explicit local maintenance, never a Renderer/Worker command. Only the explicitly selected policy scope may change. */
+  reviseModelPolicy(previous:ModelConfiguration, candidate:ModelConfiguration, revisionId:string,scope:'timeout'|'request-count'='timeout'):void {
+    identifier(revisionId);
+    if(scope==='request-count')assertRequestCountRevision(previous,candidate);else if(scope==='timeout')assertTimeoutRevision(previous,candidate);else throw new Error('model_revision_scope');
     this.mutate(()=>{
       const digest=policyDigest(candidate),old=policyDigest(previous),legacy=legacyPolicyDigest(previous);
       const existing=this.get<{previous_digest:string;digest:string;legacy_digest:string}>('SELECT previous_digest,digest,legacy_digest FROM model_policy_revisions WHERE revision_id=?',revisionId);
@@ -256,7 +257,8 @@ export class ProductCore {
   reserveConfiguredModelRequest(binding:Binding, config:ModelConfiguration, cost:number, request?:{id:string;sequence:number}):boolean {
     return this.mutate(()=>{
       const id=identifier(request?.id??binding.runId),sequence=request?.sequence??1;
-      if(!Number.isSafeInteger(sequence)||sequence<1||sequence>(config.fileTools?.maxModelRequests??1))throw new Error('model_request_sequence');
+      const cap=config.fileTools ? config.fileTools.maxModelRequests : 1;
+      if(!Number.isSafeInteger(sequence)||sequence<1||(cap!=null && sequence>cap))throw new Error('model_request_sequence');
       const prior=this.get<{run_id:string;policy_digest:string;reserved_cost:number;request_seq:number}>('SELECT run_id,policy_digest,reserved_cost,request_seq FROM model_requests WHERE request_id=?',id);
       if(prior){if(!request||prior.run_id!==binding.runId||prior.policy_digest!==policyDigest(config)||prior.reserved_cost!==cost||prior.request_seq!==sequence)throw new Error('model_request_conflict');this.bound(binding);return false;}
       const next=this.one<{n:number}>('SELECT coalesce(max(request_seq),0)+1 n FROM model_requests WHERE run_id=?',binding.runId).n;

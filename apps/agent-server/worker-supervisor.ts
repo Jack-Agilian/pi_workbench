@@ -74,7 +74,7 @@ export class WorkerSupervisor {
     else sha256(plan.parametersDigest);
     if (plan.tool === 'bash') { parseShellIntent(plan.shell); if (plan.target !== '.' || parametersDigest({ command: plan.shell.command, timeout: plan.shell.timeoutMs / 1000 }) !== plan.parametersDigest) throw new Error('shell_parameters_mismatch'); }
     else if (plan.tool !== 'none') { sha256(plan.expectedContentDigest); if (plan.fileVersion !== null) sha256(plan.fileVersion); }
-    if (!['write','edit','bash','none'].includes(plan.tool) || plan.deadline <= Date.now() || plan.deadline > Date.now() + (plan.tool === 'none' ? plan.model.fileTools?fileRunDuration(plan.model.fileTools,plan.model.timeoutMs):86_405_000 : 120_000)) throw new Error('invalid_execution_plan');
+    if (!['write','edit','bash','none'].includes(plan.tool) || plan.deadline <= Date.now() || plan.deadline > Date.now() + (plan.tool === 'none' ? plan.model.fileTools?fileRunDuration(plan.model.fileTools,plan.model.timeoutMs,modelAccess?{total:modelAccess.configuration.maxEstimatedCostUsd,perRequest:modelAccess.reserveCostUsd}:undefined):86_405_000 : 120_000)) throw new Error('invalid_execution_plan');
     let journal: Journal | undefined; let child: ChildProcess | undefined;
     let binding: Dispatch | undefined;
     try { binding = this.core.dispatchNext(dispatch => {

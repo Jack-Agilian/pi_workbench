@@ -1,6 +1,7 @@
 // Bounded product policy/intent, not Pi SDK objects. Markdown-only for this increment.
 import { exact, record } from './worker-ipc.ts';
-export interface FileToolPolicy { maxOperations: number; maxModelRequests: number; operationTimeoutMs: number }
+// maxModelRequests is optional legacy/validation compatibility; omission means no count cap.
+export interface FileToolPolicy { maxOperations: number; maxModelRequests?: number | null; operationTimeoutMs: number }
 export type FileToolRequest =
  | { tool:'read'; parameters:{path:string;offset?:number;limit?:number} }
  | { tool:'write'; parameters:{path:string;content:string} }
@@ -8,8 +9,9 @@ export type FileToolRequest =
 export interface FileOperationPlan { request:FileToolRequest; fileVersion:string|null; expectedDigest:string|null; resourceLock:string; deadline:number; approvalDigest:string }
 export interface FileOperationView { fileVersion:string|null; resourceLock:string; summary:string; preview:string }
 export function parseFileToolPolicy(value:unknown):FileToolPolicy {
- const r=exact(value,['maxOperations','maxModelRequests','operationTimeoutMs']);
- for(const [key,min,max] of [['maxOperations',1,16],['maxModelRequests',1,20],['operationTimeoutMs',100,3600000]] as const)
+ const r=exact(value,['maxOperations',...(Object.hasOwn(Object(value),'maxModelRequests')?['maxModelRequests']:[]),'operationTimeoutMs']);
+ if(r.maxModelRequests != null && (typeof r.maxModelRequests !== 'number'||!Number.isSafeInteger(r.maxModelRequests)||r.maxModelRequests<1||r.maxModelRequests>20))throw new Error('file_tool_policy');
+ for(const [key,min,max] of [['maxOperations',1,16],['operationTimeoutMs',100,3600000]] as const)
   if(typeof r[key]!=='number'||!Number.isSafeInteger(r[key])||r[key]<min||r[key]>max)throw new Error('file_tool_policy');
  return r as unknown as FileToolPolicy;
 }
@@ -30,4 +32,11 @@ export function parseFileToolRequest(value:unknown):FileToolRequest {
 }
 const byteLength=(s:string)=>new TextEncoder().encode(s).byteLength;
 /** A Run budget envelope, not a per-request timer. Each phase is enforced independently. */
-export const fileRunDuration=(policy:FileToolPolicy,requestTimeoutMs:number)=>5000+policy.maxModelRequests*(requestTimeoutMs+1000)+policy.maxOperations*(policy.operationTimeoutMs+1000);
+export function fileRunDuration(policy:FileToolPolicy,requestTimeoutMs:number,costBudget?:{total:number;perRequest:number}):number {
+ // Without a count cap, derive only the outer time envelope from the retained cost budget.
+ // Individual requests still reserve cost in ProductCore; this is not another count gate.
+ const requests=policy.maxModelRequests ?? (costBudget && costBudget.perRequest>0 ? Math.ceil(costBudget.total/costBudget.perRequest) : NaN);
+ const duration=5000+requests*(requestTimeoutMs+1000)+policy.maxOperations*(policy.operationTimeoutMs+1000);
+ if(!Number.isSafeInteger(duration)||duration<5000||duration>Number.MAX_SAFE_INTEGER-Date.now())throw new Error('model_run_budget');
+ return duration;
+}

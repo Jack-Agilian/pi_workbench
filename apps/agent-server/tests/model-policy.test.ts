@@ -79,3 +79,47 @@ test('explicit idle/total revision reuses existing authorization and retains pri
   assert.equal(core.modelAdmission(config,0.1).status,'policy_required');
  }finally{core.close();rmSync(dir,{recursive:true,force:true});}
 });
+
+import { fileRunDuration, parseFileToolPolicy } from '../../../packages/app-contracts/file-tools.ts';
+test('unlimited request-count revision preserves history, identity and cost gate across reopen',()=>{
+ const dir=mkdtempSync(join(tmpdir(),'model-unlimited-')),path=join(dir,'db');let core=new ProductCore(path,[{id:'ws',path:dir}]);
+ const previous={...config,fileTools:{maxOperations:8,maxModelRequests:4,operationTimeoutMs:1000}};
+ const candidate=parseModelConfiguration({...previous,maxRequests:undefined,fileTools:{...previous.fileTools,maxModelRequests:undefined}});
+ try{
+  const threadId=core.handle({type:'threads.create',requestId:'t',workspaceId:'ws',title:'SYNTHETIC'}).id;
+  core.handle({type:'runs.start',requestId:'r',threadId,input:'SYNTHETIC budget'});
+  const b=core.dispatchNext()!;core.markRunning(b);
+  for(let sequence=1;sequence<=4;sequence++)core.reserveConfiguredModelRequest(b,previous,1/32,{id:'old-'+sequence,sequence});
+  // Host-only ledger fixture. Does not claim SDK/process cleanup.
+  core.settle(b,'completed',{piIdle:true,hostClean:true});
+  const rows=()=>{const db=new DatabaseSync(path,{readOnly:true});try{return db.prepare('SELECT * FROM model_requests ORDER BY rowid LIMIT 4').all();}finally{db.close();}};
+  const before=rows();assert.equal(core.modelAdmission(previous,1/32).status,'budget_exhausted');
+  assert.equal(core.modelAdmission(candidate,1/32).status,'policy_required');
+  assert.throws(()=>core.reviseModelPolicy(previous,candidate,'timeout-cannot-expand'),/scope/);
+  for(const bad of [{...candidate,maxEstimatedCostUsd:2},{...candidate,timeoutMs:1800000},{...candidate,authorizationId:'new'},{...candidate,fileTools:{...candidate.fileTools!,maxOperations:16}}])
+   assert.throws(()=>core.reviseModelPolicy(previous,bad,'bad','request-count'),/scope/);
+  core.reviseModelPolicy(previous,candidate,'unlimited-approved','request-count');
+  core.reviseModelPolicy(previous,candidate,'unlimited-approved','request-count');
+  assert.deepEqual(core.modelAdmission(candidate,1/32),{status:'ready',used:4,reserved:4/32});
+  core.close();core=new ProductCore(path,[]);
+  core.handle({type:'runs.start',requestId:'r2',threadId,input:'SYNTHETIC continuation'});const next=core.dispatchNext()!;core.markRunning(next);
+  for(let sequence=1;sequence<=28;sequence++)core.reserveConfiguredModelRequest(next,candidate,1/32,{id:'new-'+sequence,sequence});
+  assert.equal(core.reserveConfiguredModelRequest(next,candidate,1/32,{id:'new-28',sequence:28}),false);
+  assert.throws(()=>core.reserveConfiguredModelRequest(next,candidate,1/32,{id:'new-29',sequence:29}),/budget/);
+  assert.deepEqual(core.modelAdmission(candidate,1/32),{status:'budget_exhausted',used:32,reserved:1});
+  assert.deepEqual(rows(),before);assert.equal(core.modelAdmission(previous,0).status,'policy_required');
+ }finally{core.close();rmSync(dir,{recursive:true,force:true});}
+});
+test('count null is explicit; malformed caps fail; cost-derived Run envelope does not cap LLM count',()=>{
+ const files={maxOperations:8,operationTimeoutMs:1000};
+ assert.equal(parseModelConfiguration({...config,maxRequests:undefined,fileTools:files}).maxRequests,undefined);
+ assert.equal(parseFileToolPolicy(files).maxModelRequests,undefined);
+ assert.equal(parseModelConfiguration({...config,maxRequests:null,fileTools:files}).maxRequests,null);
+ for(const bad of [0,-1,'unlimited',false,Infinity,21]){
+  assert.throws(()=>parseModelConfiguration({...config,maxRequests:bad}));
+  assert.throws(()=>parseFileToolPolicy({...files,maxModelRequests:bad}));
+ }
+ assert.throws(()=>fileRunDuration(files,1800000),/budget/);
+ assert.throws(()=>fileRunDuration(files,1800000,{total:1,perRequest:0}),/budget/);
+ assert.equal(fileRunDuration(files,1800000,{total:1,perRequest:0.01}),5000+100*1801000+8*2000);
+});

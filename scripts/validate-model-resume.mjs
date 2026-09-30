@@ -32,7 +32,7 @@ assert.equal(original.stages?.find(s=>s.stage==='first')?.replyMatches,true);
 assert.equal(original.stages?.find(s=>s.stage==='first')?.state,'completed');
 assert.equal(original.hostClosed,true);assert.equal(original.provider,config.provider);assert.equal(original.model,config.model);
 assert.equal(audit.active,0);assert.equal(audit.status,'ready');
-assert.ok(audit.remainingRequests>=2 && audit.remainingReservedUsd>=catalog.reserveCostUsd*2,'Two bounded new requests must fit the existing authorization');
+assert.ok((audit.remainingRequests===null || audit.remainingRequests>=2) && audit.remainingReservedUsd>=catalog.reserveCostUsd*2,'Two bounded new requests must fit the existing authorization');
 const plan={version:1,attemptId,authorizationId:config.authorizationId,originalSha256:createHash('sha256').update(originalBytes).digest('hex'),audit,
  timeoutMs:config.timeoutMs,httpIdleTimeoutMs:config.httpIdleTimeoutMs??config.timeoutMs,reservePerRequestUsd:catalog.reserveCostUsd,maxNewRequests:2,stages:['resume','cancel']};
 if(action==='prepare'){

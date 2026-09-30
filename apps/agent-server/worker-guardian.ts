@@ -45,13 +45,14 @@ function close(): Promise<void> {
     // Only the host-owned directory is writable here; the Worker profile denies it.
     writeFileSync(spec.receipt + '.tmp', JSON.stringify(receipt), { flag: 'wx', mode: 0o600 }); renameSync(spec.receipt + '.tmp', spec.receipt);
     if (process.connected) await parent.send({ kind: 'cleanup' }).catch(() => {});
-    parent.close(); if (process.connected) process.disconnect(); clearTimeout(lifetime);
+    parent.close(); if (process.connected) process.disconnect(); clearInterval(lifetime);
   })();
   return closing;
 }
 process.on('disconnect', () => { void close(); });
 process.on('SIGTERM', () => { void close(); });
-const lifetime = setTimeout(() => { void close(); }, Math.max(1, spec.deadline - Date.now() + 3000));
+// Poll absolute time so a cost-derived long Run cannot overflow Node's 32-bit timer delay.
+const lifetime = setInterval(() => { if(Date.now() >= spec.deadline + 3000) void close(); }, 1000);
 function startWorker() {
   if (worker || closing || !process.connected) { void close(); return; }
   worker = spawn(spec.executable, spec.args, { cwd: spec.cwd, env: spec.env, detached: true, stdio: ['ignore','ignore','ignore','ipc'], serialization: 'json' });
