@@ -42,11 +42,11 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
   const claimed = new Set<string>();
   const fileClaims=new Map<string,string>();
   const settlements=new Map<string,{id:string;resolve():void;reject(error:Error):void}>();
-  const seen = new Set<string>();
+  const seen = new Map<string,string>();
   const references = new Map<string, { resolve(): void; reject(error: Error): void }>();
   let reservedReference: string | null = null;
   let priorEntries = new Set<string>();
-  const send = (body: WireBody, requestId = `worker-${++sequence}`) => sender.send({ version: 7, instanceId, runtimeBindingId, requestId, body } satisfies Envelope);
+  const send = (body: WireBody, requestId = `${body.type === 'observation' || body.type === 'presentation' ? body.type : 'worker'}-${++sequence}`) => sender.send({ version: 7, instanceId, runtimeBindingId, requestId, body } satisfies Envelope);
   const publish = () => runtime && started && !closed ? send({ type: 'presentation', projection: projectMessages(runtime.session.sessionManager.getBranch().filter(entry => !priorEntries.has(entry.id))) }) : Promise.resolve();
   function close(): Promise<void> {
     if (closing) return closing;
@@ -154,11 +154,14 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
     const { body, requestId } = message;
     if (['model-http-head','model-http-chunk','model-http-error','model-http-finished'].includes(body.type)) { if(!transport.receive(requestId,body))throw new Error('unexpected_http_response');return; }
     if (body.type === 'model-key') { if(creating || key !== undefined || !driver?.model)throw new Error('unexpected_model_key'); key=body.key;return; }
-    if (seen.has(requestId)) return;
-    if (seen.size >= 128) throw new Error('request_limit'); seen.add(requestId);
     if (body.type === 'cancel') { abort.abort(new Error('cancel_requested')); tools?.revoke(); transport.close(); if (config?.model) void runtime?.session.abort().catch(fail); for (const g of grants.values()) g.resolve(undefined); return; }
     if (body.type === 'close') { fail(); return; }
     if (closed) return;
+    const serialized=JSON.stringify(body),prior=seen.get(requestId);
+    if(prior!==undefined){if(prior!==serialized)throw new Error('request_id_conflict');return;}
+    // Only host lifecycle/control replies reach this map. Cancellation/close above
+    // always work, even on a saturated or failing connection.
+    if (seen.size >= 128) throw new Error('request_limit'); seen.set(requestId,serialized);
     if(body.type==='file-settled'){const p=settlements.get(requestId);if(!p||p.id!==body.operationId)throw new Error('file_settlement_mismatch');p.resolve();return;}
     if (body.type === 'shell-result') { if (shellPending?.requestId === requestId) shellPending.resolve(body.outcome); return; }
     if (body.type === 'session-reference-accepted') { references.get(requestId)?.resolve(); return; }

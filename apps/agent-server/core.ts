@@ -1,3 +1,5 @@
+import { readDesktopPage, row, runRow, artifactRow, displayOperation } from './desktop-pages.ts';
+import type { PageOptions, HistoryPage, OperationPage, ArtifactPage } from '../../packages/app-contracts/desktop-pages.ts';
 import type { ModelShellOperation } from '../../packages/app-contracts/model-shell.ts';
 import type { FileOperationPlan } from '../../packages/app-contracts/file-tools.ts';
 import { policyDigest, policyText, legacyPolicyDigest, assertTimeoutRevision, assertRequestCountRevision, assertToolScopeRevision } from './model-policy.ts';
@@ -215,9 +217,16 @@ export class ProductCore {
     return {selectedId:this.one<{id:string}>('SELECT workspace_id AS id FROM desktop_workspace WHERE singleton=1').id,items:this.all('SELECT id,path FROM workspaces ORDER BY rowid')};
   }
   workspacePath(id: string): string { return this.one<{path:string}>('SELECT path FROM workspaces WHERE id=?', id).path; }
+  activeRuns():RunView[] { return this.all(`SELECT id,thread_id AS threadId,state FROM runs WHERE state IN ${active} ORDER BY rowid`); }
   listThreads(): ThreadView[] { return this.all('SELECT id,workspace_id AS workspaceId,title FROM threads ORDER BY rowid DESC'); }
   /** Trusted host scheduling only. Renderer cannot select an executable or plan. */
-  nextQueuedIntent(): { id: string; input: string } | undefined { return this.get("SELECT id,input FROM runs WHERE state='queued' ORDER BY rowid LIMIT 1"); }
+  nextQueuedIntent(): { id: string; input: string; threadId:string } | undefined { return this.get("SELECT id,input,thread_id AS threadId FROM runs WHERE state='queued' ORDER BY rowid LIMIT 1"); }
+  threadWorkspace(threadId:string): {id:string;path:string} { return this.one('SELECT w.id,w.path FROM workspaces w JOIN threads t ON t.workspace_id=w.id WHERE t.id=?',threadId); }
+  /** No dispatch/Worker exists: retain the intent and explicit admission failure in the audit. */
+  rejectQueuedWorkspace(runId:string): void {
+    this.mutate(()=>{const run=this.run(runId);if(run.state!=='queued')throw new Error('run_not_queued');
+      this.event(run.threadId,run.id,'workspace.invalid',run.id);this.setRun(run,'failed');});
+  }
   runInputs(threadId: string): { id: string; input: string }[] { return this.all('SELECT id,input FROM runs WHERE thread_id=? ORDER BY rowid', threadId); }
   recordModelOutcome(binding: Binding, raw: unknown): void {
     const value = parseModelOutcome(raw);
@@ -518,6 +527,33 @@ export class ProductCore {
       operations: this.all<Operation>(`SELECT ${operationColumns} FROM operations WHERE run_id IN (SELECT id FROM runs WHERE thread_id=?) ORDER BY rowid`, threadId).map(op => this.operationView(op)),
       artifacts: this.all<ArtifactView>(`SELECT ${artifactColumns} FROM artifacts WHERE run_id IN (SELECT id FROM runs WHERE thread_id=?) ORDER BY rowid`, threadId),
     }), false);
+  }
+  historyPage(threadId:string,page:PageOptions={}):HistoryPage {
+    return this.transaction(()=>{
+      this.threadWorkspace(threadId);
+      return readDesktopPage(this.db,'history',threadId,page,id=>({run:runRow(this.db,id),
+        input:displayText(row<{input:string}>(this.db,'SELECT input FROM runs WHERE id=?',id).input,16384),
+        presentation:this.presentation(id),modelOutcome:this.modelOutcome(id)}));
+    },false);
+  }
+  operationPage(runId:string,page:PageOptions={}):OperationPage {
+    return this.transaction(()=>{this.run(runId);return readDesktopPage(this.db,'operations',runId,page,id=>displayOperation(this.operationView(this.operation(id))));},false);
+  }
+  artifactPage(threadId:string,page:PageOptions={}):ArtifactPage {
+    return this.transaction(()=>{this.threadWorkspace(threadId);return readDesktopPage(this.db,'artifacts',threadId,page,id=>artifactRow(this.db,id));},false);
+  }
+  threadActivity(threadId:string) {
+    return this.transaction(()=>{
+      const thread=this.one<ThreadView>('SELECT id,workspace_id AS workspaceId,title FROM threads WHERE id=?',threadId);
+      const run=this.get<RunView>(`SELECT id,thread_id AS threadId,state FROM runs WHERE thread_id=? AND state IN ${active} LIMIT 1`,threadId);
+      // At most 16 operations are admitted; expose current actions independently of history pages.
+      const operations=run?this.all<Operation>(`SELECT ${operationColumns} FROM operations WHERE run_id=? AND state IN ('pending','approved','executing') ORDER BY rowid LIMIT 16`,run.id).map(op=>this.operationView(op)):[];
+      return {thread:{...thread,title:displayText(thread.title,160)},activeRun:run??null,operations,
+        snapshotSeq:this.one<{n:number}>('SELECT coalesce(max(seq),0) n FROM events').n};
+    },false);
+  }
+  artifactWorkspace(id:string):{id:string;path:string} {
+    return this.one('SELECT w.id,w.path FROM workspaces w JOIN threads t ON t.workspace_id=w.id JOIN runs r ON r.thread_id=t.id JOIN artifacts a ON a.run_id=r.id WHERE a.id=?',id);
   }
   eventsAfter(threadId: string, cursor: number): ProductEvent[] {
     if (!Number.isSafeInteger(cursor) || cursor < 0) throw new Error('invalid_cursor');

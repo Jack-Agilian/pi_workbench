@@ -1,5 +1,4 @@
 import type { ModelShellPolicy } from '../../packages/app-contracts/model-shell.ts';
-import { inside } from '../../packages/pi-adapter/path-scope.ts';
 import { fileRunDuration, type FileToolPolicy } from '../../packages/app-contracts/file-tools.ts';
 import { parseModelConfiguration, type ModelConfiguration } from '../../packages/app-contracts/model.ts';
 import type { ModelAccess, ModelExecutionPlan } from './worker-supervisor.ts';
@@ -14,6 +13,7 @@ import { demoIntent } from '../../packages/pi-adapter/demo-intent.ts';
 import { ProductCore } from './core.ts';
 import { shellDemo } from './shell-demo.ts';
 import { WorkerSupervisor } from './worker-supervisor.ts';
+import { WorkspaceAdmission } from './workspace-admission.ts';
 import { repository } from './worker-launcher.ts';
 
 /** Trusted --demo App Server composition. The entire profile is owned by this launch, not chosen by a Renderer. */
@@ -26,12 +26,18 @@ export class DesktopHost {
   private running = false;
   private readonly modelMode?: {mode:'offline'|'live';fileTools?:FileToolPolicy;shellTools?:ModelShellPolicy;configuration?:ModelConfiguration;requestUrl?:string;reserveCostUsd?:number};
   private modelKey?:string;
-  private readonly profile: string;
-  private readonly protectedDirectories: readonly string[];
+  private readonly admission: WorkspaceAdmission;
+  private readonly credentialRootsFile:string;
+  private readonly credentialRoots:string[];
   constructor(profile: string, model?: {mode:'offline'|'live';fileTools?:FileToolPolicy;shellTools?:ModelShellPolicy;configuration?:ModelConfiguration;requestUrl?:string;reserveCostUsd?:number}, protectedDirectories:readonly string[]=[]) {
     this.modelMode=model;
     if(model?.configuration)parseModelConfiguration(model.configuration);
-    mkdirSync(profile, { recursive: true, mode: 0o700 }); const root = realpathSync(profile);this.profile=root;this.protectedDirectories=protectedDirectories.map(p=>realpathSync(p));
+    mkdirSync(profile, { recursive: true, mode: 0o700 }); const root = realpathSync(profile);
+    this.credentialRootsFile=join(root,'host','credential-directories.json');
+    const saved:unknown=existsSync(this.credentialRootsFile)?JSON.parse(readFileSync(this.credentialRootsFile,'utf8')):[];
+    if(!Array.isArray(saved)||saved.length>16||saved.some(p=>typeof p!=='string'||p.length>4096))throw new Error('credential_roots_invalid');
+    this.credentialRoots=saved;
+    this.admission=new WorkspaceAdmission(root,[...protectedDirectories,...this.credentialRoots]);
     const workspace = join(root, 'workspace'); const database = join(root, 'host'); const state = join(root, 'state'); const resourcesRoot = join(root, 'resources');
     for (const dir of [workspace, database, state, resourcesRoot]) mkdirSync(dir, { recursive: true, mode: 0o700 });
     const manifest = join(resourcesRoot, 'package.json'); const content = JSON.stringify({ name: 'synthetic-desktop-resources', version: '1.0.0', pi: { skills: [] } });
@@ -41,14 +47,28 @@ export class DesktopHost {
     if (files.length !== 1) throw new Error('unapproved_demo_resources');
     this.core = new ProductCore(join(database, 'product.sqlite'), [{ id: 'demo-workspace', path: workspace }]);
     this.supervisor = new WorkerSupervisor(this.core, { stateDirectory: state, databaseDirectory: database,
+      validateWorkspace:(id,path)=>{this.admission.check(path,id==='demo-workspace');},
       resources: { root: resourcesRoot, id: contentId(files), files, expectedSkillNames: [] } });
     this.recover();
   }
   selectWorkspace(path: string): void {
     if(this.closing||this.running||this.blocked)throw new Error('workspace_busy');
     const canonical=realpathSync(path);
-    if([this.profile,...this.protectedDirectories].some(protectedPath=>inside(canonical,protectedPath)||inside(protectedPath,canonical)))throw new Error('workspace_overlaps_host');
+    try { this.admission.check(canonical); } catch { throw new Error('workspace_overlaps_host'); }
     this.core.selectWorkspace(canonical);
+  }
+  private checkThreadWorkspace(threadId:string): void {
+    const workspace=this.core.threadWorkspace(threadId);this.admission.check(workspace.path,workspace.id==='demo-workspace');
+  }
+  /** Called by the trusted native credential bridge before it reads any bytes. */
+  protectCredentialDirectory(path:string):void {
+    if(this.closing||this.running)throw new Error('workspace_busy');
+    const canonical=realpathSync(path);
+    if(this.credentialRoots.includes(canonical))return;
+    if(this.credentialRoots.length>=16)throw new Error('credential_roots_limit');
+    this.admission.protect(canonical,this.core.workspaceSelection().items);
+    this.credentialRoots.push(canonical);
+    writeFileSync(this.credentialRootsFile,JSON.stringify(this.credentialRoots),{mode:0o600});
   }
   private recover() { try { this.supervisor.recover(); this.blocked = false; } catch { this.blocked = true; } }
   private home(): DesktopHome {
@@ -62,17 +82,27 @@ export class DesktopHost {
       ...(config ? { limits: { endpoint: config.endpoint, requests: config.maxRequests??null, estimatedUsd: config.maxEstimatedCostUsd, outputTokens: config.maxOutputTokens, timeoutMs:config.timeoutMs, httpIdleTimeoutMs:config.httpIdleTimeoutMs??config.timeoutMs,...(config.fileTools?{fileTools:config.fileTools}:{}),...(config.shellTools?{shellTools:config.shellTools}:{}) } } : {}),
     };
     return {
-      workspaces:this.core.workspaceSelection(),
+      workspaces:{...this.core.workspaceSelection(),items:this.core.workspaceSelection().items.map(w=>{
+        try{this.admission.check(w.path,w.id==='demo-workspace');return {...w,status:'ready' as const};}
+        catch{return {...w,status:'invalid' as const};}
+      })},
       mode: this.modelMode ? this.modelMode.mode === 'offline' ? 'model-offline' : 'model' : 'synthetic',
       ...(model ? { model } : {}), threads: threads.map(t => ({ ...t, title: displayText(t.title, 160) })),
       recovery: this.blocked ? 'blocked' : 'ready',
-      activeRuns: threads.flatMap(t => this.core.snapshot(t.id).runs).filter(r => ['starting','running','cancelling','unknown'].includes(r.state)),
+      activeRuns: this.core.activeRuns(),
     };
   }
   request(raw: unknown): DesktopValue {
     if (this.closing) throw new Error('host_closing');
     const request = parseDesktopRequest(raw);
     switch (request.type) {
+      case 'history-page':return this.core.historyPage(request.threadId,request.page);
+      case 'operation-page':return this.core.operationPage(request.runId,request.page);
+      case 'artifact-page':return this.core.artifactPage(request.threadId,request.page);
+      case 'thread-activity':{
+        let workspaceStatus:'ready'|'invalid'='ready';try{this.checkThreadWorkspace(request.threadId);}catch{workspaceStatus='invalid';}
+        return {...this.core.threadActivity(request.threadId),workspaceStatus};
+      }
       case 'home': return this.home();
       case 'thread': {
         const snapshot = this.core.snapshot(request.threadId);
@@ -82,11 +112,13 @@ export class DesktopHost {
       }
       case 'events': return this.core.eventsAfter(request.threadId, request.cursor);
       case 'preview': {
+        const workspace=this.core.artifactWorkspace(request.artifactId);this.admission.check(workspace.path,workspace.id==='demo-workspace');
         const preview = this.core.previewArtifact(request.artifactId);
         return preview.text === undefined ? preview : { status: preview.status, text: displayText(preview.text, 1_048_576) };
       }
       case 'recover': this.recover(); this.pump(); return this.home();
       case 'command': {
+        if(request.command.type==='runs.start'&&!this.core.hasRequest(request.command.requestId))this.checkThreadWorkspace(request.command.threadId);
         if(request.command.type==='runs.start' && this.modelMode?.mode==='live' && (!this.modelMode.configuration?.approved||!this.modelKey))throw new Error('model_not_configured');
         if(request.command.type==='runs.start' && this.modelMode?.mode==='live' && this.modelMode.configuration && !this.core.hasRequest(request.command.requestId) && this.core.modelAdmission(this.modelMode.configuration,this.modelMode.reserveCostUsd ?? 0).status!=='ready')throw new Error('model_policy_or_budget');
         const ack = this.supervisor.command(request.command); this.pump(); return ack;
@@ -101,6 +133,9 @@ export class DesktopHost {
   pump(): void {
     if (this.closing || this.blocked || this.running || (this.modelMode?.mode==='live' && (!this.modelMode.configuration?.approved || !this.modelKey))) return;
     const next = this.core.nextQueuedIntent(); if (!next) return;
+    try{this.checkThreadWorkspace(next.threadId);}catch{
+      this.core.rejectQueuedWorkspace(next.id);queueMicrotask(()=>this.pump());return;
+    }
     const shell = shellDemo(next.input);
     const args = demoIntent(next.id, next.input);
     const entry = join(repository, 'packages/pi-adapter/desktop-demo-worker.ts');

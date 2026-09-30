@@ -1,3 +1,4 @@
+import type { HistoryPage, OperationPage, ArtifactPage, ThreadActivity } from '../../packages/app-contracts/desktop-pages.ts';
 import { contextBridge, ipcRenderer } from 'electron';
 import type { Ack, Command, ProductEvent } from '../../packages/app-contracts/index.ts';
 import type { DesktopApi, DesktopHome, DesktopReply, DesktopRequest, DesktopThread, Preview } from '../../packages/app-contracts/desktop.ts';
@@ -7,6 +8,10 @@ async function request<T>(payload: DesktopRequest): Promise<T> {
   return reply.value as T;
 }
 const api: DesktopApi = {
+  historyPage:(threadId,page)=>request<HistoryPage>({type:'history-page',threadId,...(page?{page}:{})}),
+  operationPage:(runId,page)=>request<OperationPage>({type:'operation-page',runId,...(page?{page}:{})}),
+  artifactPage:(threadId,page)=>request<ArtifactPage>({type:'artifact-page',threadId,...(page?{page}:{})}),
+  threadActivity:threadId=>request<ThreadActivity>({type:'thread-activity',threadId}),
   selectWorkspace: async () => { if(!await ipcRenderer.invoke('workbench:workspace'))throw new Error('workspace_rejected'); },
   selectModelCredential: async () => { if(!await ipcRenderer.invoke('workbench:credential'))throw new Error('credential_rejected'); },
   home: () => request<DesktopHome>({ type: 'home' }),

@@ -7,7 +7,7 @@ import { describeModel } from '../../packages/pi-adapter/model-catalog.ts';
 import { DesktopHost } from './desktop-host.ts';
 import { exact } from '../../packages/app-contracts/worker-ipc.ts';
 import { identifier } from '../../packages/app-contracts/index.ts';
-import type { DesktopReply } from '../../packages/app-contracts/desktop.ts';
+import { desktopErrorCode, type DesktopReply } from '../../packages/app-contracts/desktop.ts';
 import { IpcSender } from '../../packages/pi-adapter/ipc-channel.ts';
 if (!['--demo','--model','--model-offline','--model-files-offline','--model-shell-offline'].includes(process.argv[2]??'') || !process.argv[3] || !process.send) throw new Error('explicit_desktop_demo_required');
 let model:ConstructorParameters<typeof DesktopHost>[1];
@@ -39,17 +39,18 @@ process.on('SIGTERM', () => { void close(); });
 process.on('message', raw => {
   if (closing) return;
   let id: string;
-  try { const r = exact(raw, Object.hasOwn(Object(raw),'credential')?['id','credential']:Object.hasOwn(Object(raw),'workspace')?['id','workspace']:['id','request']); id = identifier(r.id); }
+  try { const r = exact(raw, Object.hasOwn(Object(raw),'protectedDirectory')?['id','protectedDirectory']:Object.hasOwn(Object(raw),'credential')?['id','credential']:Object.hasOwn(Object(raw),'workspace')?['id','workspace']:['id','request']); id = identifier(r.id); }
   catch { void close(); return; }
   let reply: DesktopReply;
   try {
-    const secret=Object.hasOwn(Object(raw),'credential');const r = exact(raw, secret?['id','credential']:Object.hasOwn(Object(raw),'workspace')?['id','workspace']:['id','request']);
+    const secret=Object.hasOwn(Object(raw),'credential');const r = exact(raw, Object.hasOwn(Object(raw),'protectedDirectory')?['id','protectedDirectory']:secret?['id','credential']:Object.hasOwn(Object(raw),'workspace')?['id','workspace']:['id','request']);
     if(secret){if(typeof r.credential!=='string')throw new Error('model_key_invalid');host.setModelKey(r.credential);}
     const workspace=Object.hasOwn(r,'workspace');if(workspace){if(typeof r.workspace!=='string'||r.workspace.length>4096)throw new Error('workspace_invalid');host.selectWorkspace(r.workspace);}
-    const value = host.request(secret||workspace?{type:'home'}:r.request);
+    const protect=Object.hasOwn(r,'protectedDirectory');if(protect){if(typeof r.protectedDirectory!=='string'||r.protectedDirectory.length>4096)throw new Error('invalid_directory');host.protectCredentialDirectory(r.protectedDirectory);}
+    const value = host.request(secret||workspace||protect?{type:'home'}:r.request);
     if (Buffer.byteLength(JSON.stringify(value)) > 1_200_000) throw new Error('response_limit');
     reply = { ok: true, value };
-  } catch { reply = { ok: false, code: 'request_rejected' }; }
+  } catch(error) { reply = { ok: false, code: desktopErrorCode(error) }; }
   void sender.send({ id, reply }).catch(() => close());
 });
 await sender.send({ type: 'ready' }); host.pump();

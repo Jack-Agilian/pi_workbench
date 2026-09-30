@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { useModelCredentialFile } from './model-credential.ts';
 import { HostClient } from './host-client.ts';
-import { parseDesktopRequest, type DesktopReply } from '../../packages/app-contracts/desktop.ts';
+import { desktopErrorCode, parseDesktopRequest, type DesktopReply } from '../../packages/app-contracts/desktop.ts';
 const outputDirectory = dirname(fileURLToPath(import.meta.url));
 const root = resolve(outputDirectory, '../..');
 // Arguments come only from the local launch script. None is an IPC/Renderer option.
@@ -76,6 +76,7 @@ ipcMain.handle('workbench:credential', async (event, ...args: unknown[]) => {
   try {
     const result = await dialog.showOpenDialog(window!, { title: '选择本次模型凭据（仓库外的私有 .key 文件）', properties: ['openFile'], filters: [{ name: 'Private API key', extensions: ['key'] }] });
     if (result.canceled || result.filePaths.length !== 1 || host !== owner || closing || shutdownFailed || reconnecting || !trusted(event)) return false;
+    await owner.protectCredentialDirectory(dirname(realpathSync(result.filePaths[0]!)));
     await useModelCredentialFile(result.filePaths[0]!, root, key => owner.setModelKey(key));
     return true;
   } catch { return false; } finally { credentialDialog = false; }
@@ -87,7 +88,7 @@ ipcMain.handle('workbench:request', async (event, raw: unknown): Promise<Desktop
   let request; try { request = parseDesktopRequest(raw); } catch { return { ok: false, code: 'invalid_request' }; }
   inFlight++;
   try { return { ok: true, value: await host.request(request) }; }
-  catch (error) { return { ok: false, code: error instanceof Error && error.message === 'disconnected' ? 'disconnected' : 'request_rejected' }; }
+  catch (error) { return { ok: false, code: desktopErrorCode(error) }; }
   finally { inFlight--; }
 });
 ipcMain.handle('workbench:reconnect', async event => {
