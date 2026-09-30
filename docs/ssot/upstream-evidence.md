@@ -41,9 +41,13 @@ P04/P05/P06/P07/P13 的固定源码链接是复查入口，不声称逐字核验
 |---|---|---|
 | C01 | [pi-gui README](https://github.com/minghinmatthewlam/pi-gui) | 最初仅 README 候选；C 已固定 0b4cd334942ac01bfc6b3cba736a79984925d8cf/MIT，仅局部移植 Composer 键盘保护，未复制完整 SessionDriver/timeline。见 [C 证据](../validation/c-desktop-2026-09-23.md)。 |
 | C02 | [OpenPi README](https://github.com/heyhuynhgiabuu/openpi) | 2026-09-30重新读取的README已说明main-supervised sidecar；此前main直接托管描述属于旧资料。参考定制资源页和职责边界，未完成新模块、依赖与许可审计。 |
+| C03 | [pi-gui固定时间线源码](https://github.com/minghinmatthewlam/pi-gui/tree/163054227d370a49d09099c61eb65798481294ac/apps/desktop/src/features/conversation) | 本次会话读取conversation-timeline.tsx、hooks/use-timeline-viewport.ts、timeline-layout.ts；借鉴组件/工具展开/阅读恢复。尚未移植，来源身份及许可准入限制见[模块映射](reference-implementations.md)。 |
 | L01 | [xterm.js](https://xtermjs.org/) | 浏览器终端组件候选；实施时精确锁版本与校验维护状态。 |
 | L02 | [node-pty README](https://github.com/microsoft/node-pty) | PTY 库候选，文档说明 macOS/Linux/Windows 与 ConPTY；未验证 Electron ABI、签名或进程清理。 |
 | L03 | [Electron 44.4.5 官方发行](https://github.com/electron/electron/releases/tag/v44.4.5) / [安全入口](https://www.electronjs.org/docs/latest/tutorial/security) / [React 19.3](https://react.dev/blog/2026/09/09/react-19-3) | C 固定发行与实际 registry/字节、公开 API 及 macOS 桌面测试见 [C 报告](../validation/c-desktop-2026-09-23.md)；其他平台、签名发布未验证。 |
+| L04 | [TanStack Query v5无限查询](https://tanstack.com/query/latest/docs/framework/react/guides/infinite-queries) | 通用查询职责的指定替换方向，未安装。官方语义已于前序复审核对；指定max-pages示例路径/blob来自审核包，源码身份与准入缺口见模块映射，不当作已验证发行。 |
+| L05 | [TanStack Virtual文档](https://tanstack.com/virtual/latest/docs/introduction) | 有实测DOM/布局瓶颈后采用的方向；dynamic示例路径/blob来自审核包，本次未重测发行、源码或兼容性。 |
+| L06 | [SQLite Scrolling Window Queries](https://www.sqlite.org/rowvalue.html#scrolling_window_queries) | 沿用后端分页契约的keyset模式参考；Thread/Run归属、固定插入上界与字节限制仍为产品适配，本次没有新数据库运行证据。 |
 
 未在本次重新逐项核验的 Picot、Pi Desktop、Zosma、PI WEB 留在历史参考表，不列为已选依赖。特别注意同名仓库；禁止只按“OpenPi”或“Pi Desktop”名称复制代码。
 

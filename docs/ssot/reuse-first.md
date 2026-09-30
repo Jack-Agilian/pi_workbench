@@ -1,6 +1,6 @@
 # 复用优先架构
 
-状态：当前实施基线；实现与兼容验证未完成。日期：2026-09-22。
+状态：当前实施基线；实现与兼容验证未完成。初版：2026-09-22；模块参考更新：2026-09-30。
 
 ## 1. 首要原则
 
@@ -87,8 +87,8 @@ Pi 根入口导出的 `AssistantMessageComponent`、`ToolExecutionComponent` 等
 
 | 参考 | 计划复用方式 | 不照搬的部分 |
 |---|---|---|
-| `minghinmatthewlam/pi-gui` | 优先评估 `packages/pi-sdk-driver`、timeline、工具卡、Composer、diff/terminal 与测试 | 不默认共享用户全局凭据和全部扩展；不采用未经验证的并行写入假设 |
-| `heyhuynhgiabuu/openpi` | 定向借鉴 Customizations 页、设置、文件/Git/终端交互和权限边界测试 | 当前 README 将 SDK 放在 Electron main，不能误称其已有独立 sidecar；本项目保留 Worker 隔离 |
+| `minghinmatthewlam/pi-gui` | 主要桌面应用参考；当前指定timeline/viewport/layout文件见[模块映射](reference-implementations.md)，原Composer采用保留 | 不默认共享用户全局凭据和全部扩展；不采用未经验证的并行写入假设 |
+| `heyhuynhgiabuu/openpi` | 定向借鉴 Customizations 页、设置、文件/Git/终端交互和权限边界测试 | 已有证据C02记录main-supervised sidecar；不作为第二套React组件主线，本项目保留自身Worker授权边界 |
 | xterm.js + node-pty | 终端显示与 PTY 生命周期依赖现成库 | 不等于安全沙箱，不自动证明所有进程都已取消 |
 
 依据：[C01][C02][L01][L02]。社区 UI 最初仅做 README 级选型；C 已按 [固定来源/MIT/测试](../validation/c-desktop-2026-09-23.md) 局部移植键盘保护，其余组件仍待评估。不直接 import 别人的应用内部目录，不复制未核查模块；后续移植同样需 commit、LICENSE、源文件列表、修改清单和回归。原有其他参考项目留作候选，不再同时拼装六套 UI。
@@ -143,4 +143,4 @@ App Server 是产品 coordinator，不拥有模型轮询、重试器、Prompt �
 
 Pi AgentSession、ModelRuntime、pi-ai Provider 和 CredentialStore 继续为主路径，不自建多 Provider 模型业务网关或第二条模型/工具循环。可复用的网络出口组件仅负责目标限制与传输边界；候选库须有发行/许可与平台证据后才采用。M1 无工具、M2 有限文件先于交互 PTY；[当前顺序](../planning/NEXT_STEPS.md) 与 [术语](glossary.md) 为准。
 
-2026-09-30前端复用决策：保留ThreadPages的有限产品实体刷新，新增只读historyEntry接缝，不引入通用缓存框架。TanStack Query v5无限查询默认顺序重取缓存页，仅换useInfiniteQuery不能消除查询放大；maxPages会裁掉保留页，不等于本产品的实体失效策略。若通用缓存职责继续扩大再评估；滚动仍只有现有控制者，本次不引入虚拟列表。
+2026-09-30前端复用决策：F01保留有限产品实体刷新和只读historyEntry接缝；后续通用查询/缓存/去重指定TanStack Query v5方向，迁移时替换已有同等职责，不继续扩建ThreadPages或并存两套缓存。仅换useInfiniteQuery不能消除全页失效，maxPages也不是产品实体失效策略；当前没有安装Query。pi-gui是主要桌面参考，滚动保持单一控制者，Virtual在实测布局瓶颈后采用。具体文件/API、范围、准入与回归见[指定参考实现](reference-implementations.md)。

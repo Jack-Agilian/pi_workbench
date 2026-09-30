@@ -18,3 +18,7 @@
 新增的historyEntry只返回既有HistoryItem安全投影；不新增数据库写入器、通用缓存框架或第二套Session树。ThreadPages只是Renderer的已加载产品展示范围。没有虚拟列表/内存总量上限；加载越多DOM越大，普通正文更新不再重读已加载范围；home会话目录及原生Session全部正文尚未分页。窗口重启不保存滚动位置。Windows、PTY、真实模型桌面人工体验和生产发行未验证。
 
 2026-09-30已按用户授权与后端完整分支合入develop，见 [集成记录](../validation/ui-p2-merged-2026-09-30.md)。当前工作与后续人工使用顺序只以NEXT_STEPS顶部为准，不把限定组合验收提升为UI-01/02、ART-01全部完成。
+
+## 后续复用方向
+
+采用[模块参考映射](../ssot/reference-implementations.md)的指定pi-gui三文件、Query v5及有条件Virtual路线。ThreadPages只保留产品事件/水位/页链适配，不继续建设通用缓存；实际迁移替换原职责，维持2次查询、批次失败、切换及重连断言。当前未移植新组件或安装库；草稿/焦点与单一滚动控制者保留，历史UI超时仍待定位。

@@ -24,3 +24,7 @@
 R01/R02、后端页预算和Renderer接入已在同一版本。没有虚拟列表、home目录分页或原生全部正文补载，不代表完整UI-P2/Windows/PTY/生产发行通过。当前唯一工作事项以NEXT_STEPS顶部为准；真实人工使用测试与自动测试失败/未覆盖范围分开记录。
 
 F01修正接缝：新增historyEntry(threadId, runId)，字段/归属/字节校验沿用产品边界；正文、工具和成果独立失效，新记录只补头部缺口。整批成功才发布，切换停止后续查询，未知事件/非法页位置显式重同步。详见后端契约F01节；不增加Pi入口或数据库写入者。
+
+## 后续复用方向
+
+[模块参考映射](../ssot/reference-implementations.md)明确保留固定SQLite产品查询、historyEntry、工作区准入、审批与Guardian。新增通用持久任务/调度/观察流前，先对照P16的durable存储、Harness恢复、requestId与工具replay/背压；记录Session、审批、未知副作用、清理及预算差距，不新增第二份权威历史。前端Query迁移不改变后端命令身份/所有权，模型调用与库采用准入分别记录。
