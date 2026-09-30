@@ -2632,6 +2632,18 @@
         "darwin"
       ],
       "locator": "docs/validation/ui-p2-frontend-2026-09-30.md"
+    },
+    {
+      "id": "EV-UI-P2-INTEGRATION-20260930",
+      "kind": "platform",
+      "result": "passed",
+      "scope": "macOS集成树6884e27的严格类型、20项桌面测试及实际Electron UI四场景/三尺寸合成展示交互；零真实模型，不含后端分页、R01/R02、Windows或生产发行。",
+      "commit": "6884e278bb2d9057a78fa5b74b513a1d0798320e",
+      "recordedAt": "2026-09-30T07:09:55.539910+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/ui-p2-integration-2026-09-30.md"
     }
   ]
 }
