@@ -28,9 +28,12 @@ export async function runAgentShellSmoke(window:BrowserWindow,host:HostClient){
    assert.equal(await js<boolean>("document.querySelector('.run-label').textContent.includes('等待你的批准')"),true);
    assert.equal(await js<boolean>(`document.querySelector('.approval').textContent.includes(${JSON.stringify(directory)}) && document.querySelector('.approval').textContent.includes('工具结果将发送给本次模型')`),true);
    if(i===0){await captureLayout(window,'agent-shell-approval');await js("document.querySelectorAll('.approval details').forEach(e=>e.open=true)");await captureLayout(window,'agent-shell-expanded');}
+   const approvedDigest=await js<string>("document.querySelector('.approval code').textContent");
+   const pending=await host.request({type:'thread',threadId}) as DesktopThread;assert.equal(pending.operations[i]?.parametersDigest,approvedDigest);
    await click('.approval .primary');
    await wait(async()=>{const s=await host.request({type:'thread',threadId}) as DesktopThread;return Boolean(s.operations[i]?.shell?.outcome);},'settled-'+i);
-   await wait(()=>js<boolean>("!document.querySelector('.approval .primary')"),'approval-removed');
+   // The next approval may render immediately; only the approved operation must disappear.
+   await wait(()=>js<boolean>(`![...document.querySelectorAll('.approval code')].some(e=>e.textContent===${JSON.stringify(approvedDigest)})`),'approved-operation-removed');
   }
   await wait(()=>js<boolean>("!!document.querySelector('[data-state=completed]')"),'complete');
   const result=join(directory,'synthetic-shell.md');assert.match(readFileSync(result,'utf8'),/SYNTHETIC shell result/);const time=statSync(result).mtimeMs;
