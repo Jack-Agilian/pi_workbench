@@ -931,7 +931,8 @@
             "EV-UI-P2-PAGES-MAC-20260930",
             "EV-UI-P2-PAGES-REGRESSION-20260930",
             "EV-UI-P2-MERGED-UI-MAC-20260930",
-            "EV-REFERENCE-MAPPING-REVIEW-20260930"
+            "EV-REFERENCE-MAPPING-REVIEW-20260930",
+            "EV-Q1-PLAN-REREVIEW-20260930"
           ]
         },
         {
@@ -946,12 +947,13 @@
             "EV-UI-TARGETED-MOCK-20260930",
             "EV-UI-TARGETED-MAC-20260930",
             "EV-UI-TARGETED-REGRESSION-20260930",
-            "EV-REFERENCE-MAPPING-REVIEW-20260930"
+            "EV-REFERENCE-MAPPING-REVIEW-20260930",
+            "EV-Q1-PLAN-REREVIEW-20260930"
           ]
         },
         {
           "id": "UI-01-A03",
-          "requirement": "现有只读查询通用职责分范围迁向Query v5：Q1首选operationPage，验收后Q2历史/成果；同一范围单一缓存所有者，删除被替代机制，保留产品水位/页链及F01断言",
+          "requirement": "Q1工具查询通用职责由Query接管，同一范围单一缓存所有者，删除被替代机制，保留产品水位/页链及F01断言；Q2仅在收益明确后选择历史/成果范围，不以全应用统一库为目标",
           "plannedChecks": [
             "query-release-and-public-api-admission",
             "query-offline-focus-and-retry-policy",
@@ -959,18 +961,19 @@
             "query-late-ipc-and-bounded-concurrency",
             "query-batch-atomic-publication",
             "query-q1-removes-replaced-mechanism",
-            "query-q2-after-q1-evidence"
+            "query-q2-benefit-evaluation-after-real-use"
           ],
           "evidenceRefs": [
             "EV-EXISTING-MIGRATION-REVIEW-20260930",
             "EV-UI-Q1-RELEASE-20260930",
             "EV-UI-Q1-MOCK-20260930",
             "EV-UI-Q1-MAC-20260930",
-            "EV-UI-Q1-REGRESSION-20260930"
+            "EV-UI-Q1-REGRESSION-20260930",
+            "EV-Q1-PLAN-REREVIEW-20260930"
           ]
         }
       ],
-      "statusReason": "2026-09-30前后端分页组合已集成develop，F01定向刷新与F02复用修正已进入develop@4644902。历史169df60另一工作树两次UI超时根因仍未定位；本轮当前树通过不关闭该项。Q1工具查询5b10b19已限定采用Query5.104.0，缓存/异步状态/去重交由库承担，重连隔离与浏览位置、审批/停止及原F01断言通过离线验证，待复审集成。Q2历史/成果尚未迁移；虚拟列表、原生全部正文、完整真实人工体验和另存为未完成，保持in_progress，不扩大Gate。"
+      "statusReason": "2026-09-30前后端分页组合已集成develop，F01定向刷新与F02复用修正已进入develop@4644902。历史169df60另一工作树两次UI超时根因仍未定位；本轮当前树通过不关闭该项。Q1工具查询5b10b19已限定采用Query5.104.0，缓存/异步状态/去重交由库承担，重连隔离与浏览位置、审批/停止及原F01断言通过离线验证，复审通过进入集成与真实桌面检查。Q2历史/成果尚未迁移，是否实施依维护收益及使用反馈决定；虚拟列表、原生全部正文、完整真实人工体验和另存为未完成，保持in_progress，不扩大Gate。"
     },
     {
       "id": "UI-02",
@@ -1037,11 +1040,12 @@
             "EV-UI-Q1-RELEASE-20260930",
             "EV-UI-Q1-MOCK-20260930",
             "EV-UI-Q1-MAC-20260930",
-            "EV-UI-Q1-REGRESSION-20260930"
+            "EV-UI-Q1-REGRESSION-20260930",
+            "EV-Q1-PLAN-REREVIEW-20260930"
           ]
         }
       ],
-      "statusReason": "2026-09-30前后端分页组合已集成develop，F01定向刷新与F02复用修正已进入develop@4644902。历史169df60另一工作树两次UI超时根因仍未定位；本轮当前树通过不关闭该项。Q1工具查询5b10b19已限定采用Query5.104.0，缓存/异步状态/去重交由库承担，重连隔离与浏览位置、审批/停止及原F01断言通过离线验证，待复审集成。Q2历史/成果尚未迁移；虚拟列表、原生全部正文、完整真实人工体验和另存为未完成，保持in_progress，不扩大Gate。"
+      "statusReason": "2026-09-30前后端分页组合已集成develop，F01定向刷新与F02复用修正已进入develop@4644902。历史169df60另一工作树两次UI超时根因仍未定位；本轮当前树通过不关闭该项。Q1工具查询5b10b19已限定采用Query5.104.0，缓存/异步状态/去重交由库承担，重连隔离与浏览位置、审批/停止及原F01断言通过离线验证，复审通过进入集成与真实桌面检查。Q2历史/成果尚未迁移，是否实施依维护收益及使用反馈决定；虚拟列表、原生全部正文、完整真实人工体验和另存为未完成，保持in_progress，不扩大Gate。"
     },
     {
       "id": "GIT-01",

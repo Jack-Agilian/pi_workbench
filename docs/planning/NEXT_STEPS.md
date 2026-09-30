@@ -2,17 +2,17 @@
 
 当前依据：[SSOT](../ssot/README.md)、[任务账本](backlog.json)。以下当前事项优先于后文历史阶段的“下一步”。
 
-## 唯一当前事项：Q1工具查询迁移交付复审与develop集成准备
+## 唯一当前事项：集成Q1后的真实桌面使用检查
 
 2026-09-30按用户授权，将前端 `codex/ui-history-artifacts@c0e99c2` 和后端 `codex/backend-history-safety@feaa3f4` 合入develop，组合代码提交 `169df60a51fc1d394d6cc45c335e54eddbc9cef7`。双方证据ID保留，分页与后端边界现在位于同一分支；集成检查与当前可测范围见 [收口报告](../validation/ui-p2-merged-2026-09-30.md)。
 
-F01/F02及规划已快进合入develop `46449024d31b0ce4601c971b90b8c036f88a27a7`，推送后独立读回同SHA。Q1在`codex/ui-query-tools`完成限定实现，代码`5b10b19fb608159a37459592b265c6392d0d5331`，见[发行与离线验证报告](../validation/ui-query-tools-2026-09-30.md)。本轮先收口Q1复审与集成准备，不并行启动Q2、Virtual或durable；没有新增真实模型调用。
+F01/F02及规划已快进合入develop `46449024d31b0ce4601c971b90b8c036f88a27a7`，推送后独立读回同SHA。Q1在`codex/ui-query-tools`完成限定实现，代码`5b10b19fb608159a37459592b265c6392d0d5331`，见[发行与离线验证报告](../validation/ui-query-tools-2026-09-30.md)。Q1计划审核已对照实现完成[复核](../validation/q1-plan-rereview-2026-09-30.md)，按授权集成后进入真实桌面使用检查；不并行启动Q2、Virtual或durable。
 
 ### Q1已交付范围
 
 现有operationPage工具范围由精确TanStack Query 5.104.0接管缓存、加载/错误及重复读取；删除该范围旧LoadedRange缓存。宿主生成连接身份、旧请求隔离、手动重试、断网本地读取、整批水位/发布及IPC背压已接入；保留F01的64/256历史正文2次方法查询断言。重连仅携带浏览位置，新缓存重新读取。具体接缝和默认值见[SSOT迁移契约](../ssot/reference-implementations.md)。
 
-下一步先复审此有限增量并按授权集成，再做以下真实人工检查。Q2历史/成果迁移列入后续队列，依赖Q1与使用反馈，不作为另一个当前事项。滚动按pi-gui校正，Virtual仍只在实测布局瓶颈后启动；durable不迁移。历史另一工作树UI超时仍未定位；本轮发现并修复的重连浏览深度回归与该历史问题分开记录。
+接下来做以下真实桌面使用检查，真实模型/工具与操作者身份分别记录，不把代理程序化操作称为用户人工验收。Q2是候选后续增量，仅在Q1和使用反馈证明具体维护收益后选择范围，不以所有查询都换库为目标，也不阻塞真实使用。滚动按pi-gui校正，Virtual仍只在实测布局瓶颈后启动；durable不迁移。历史另一工作树UI超时仍未定位；本轮发现并修复的重连浏览深度回归与该历史问题分开记录。
 
 ### Q1离线验收后的真实人工检查
 

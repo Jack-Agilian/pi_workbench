@@ -1315,7 +1315,8 @@
           "EV-UI-Q1-RELEASE-20260930",
           "EV-UI-Q1-MOCK-20260930",
           "EV-UI-Q1-MAC-20260930",
-          "EV-UI-Q1-REGRESSION-20260930"
+          "EV-UI-Q1-REGRESSION-20260930",
+          "EV-Q1-PLAN-REREVIEW-20260930"
         ]
       }
     }
@@ -2988,6 +2989,18 @@
         "darwin"
       ],
       "locator": "docs/validation/ui-query-tools-2026-09-30.md"
+    },
+    {
+      "id": "EV-Q1-PLAN-REREVIEW-20260930",
+      "kind": "review",
+      "result": "passed",
+      "scope": "对照计划审核与bf47fa7实际Q1；桌面38项复跑、配置/原账本只读预检；Q2改为收益条件选择，不冒充真实模型/桌面人工验证。",
+      "commit": "bf47fa7c8d819d49435f62ba50dce2b39939edca",
+      "recordedAt": "2026-09-30T14:47:26.931966+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/q1-plan-rereview-2026-09-30.md"
     }
   ]
 }
