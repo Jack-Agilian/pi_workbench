@@ -4,7 +4,7 @@
 
 ## 1. 当前事实与本轮边界
 
-本次从 `51ea53462eacdc4ed8ffc3fb48b260b87631b5a2` 继续，包含M2、审核修复、显式验收驱动和布局修订；develop仍是 `148022b`。独立功能分支未合并develop。
+Agent Shell从 `51ea53462eacdc4ed8ffc3fb48b260b87631b5a2` 继续，包含M2、审核修复、显式验收驱动和布局修订。2026-09-30已按用户授权快进集成develop，集成基线 `34ed62e3fc875c56059eb19c1f02781d72c78bfc`；当前下一增量为UI-P2，见 [集成记录](../validation/develop-integration-2026-09-30.md)。
 
 | 能力 | 状态 |
 |---|---|

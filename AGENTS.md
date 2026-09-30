@@ -1,6 +1,6 @@
 # Repository working agreement
 
-本仓库已实现限定的 macOS 无模型桌面、Pi SDK/真实 Worker 接入、D1 退出与恢复闭环及限定的 D2-S 非交互 Bash 产品接入；具体基线、验证范围与未完成项以 `docs/ssot/` 和 `docs/planning/NEXT_STEPS.md` 为准。M1-A 无工具会话离线增量已限定验证；M1-B 已完成限定真实无工具文本、原会话恢复与活跃取消，30分钟单LLM总上限已获确认；M1收口已集成develop，M2/Agent Shell已限定通过真实gpt-6-luna项目read/write/Bash、逐操作审批、活跃取消与原Session恢复；MODEL-03/04限定done、M0-Pi限定passed。当前唯一事项为Agent Shell/M2交付复审与develop集成准备；请求次数缺省不限，历史请求和费用保留，证据见docs/validation/agent-task-live-2026-09-30.md；术语见 `docs/ssot/glossary.md`。交互 PTY、其他平台、完整真实模型桌面人工体验和生产发行尚未完成，不得将局部实现或历史报告扩大为完整产品或本轮实测。
+本仓库已实现限定的 macOS 无模型桌面、Pi SDK/真实 Worker 接入、D1 退出与恢复闭环及限定的 D2-S 非交互 Bash 产品接入；具体基线、验证范围与未完成项以 `docs/ssot/` 和 `docs/planning/NEXT_STEPS.md` 为准。M1-A 无工具会话离线增量已限定验证；M1-B 已完成限定真实无工具文本、原会话恢复与活跃取消，30分钟单LLM总上限已获确认；M1收口已集成develop，M2/Agent Shell已限定通过真实gpt-6-luna项目read/write/Bash、逐操作审批、活跃取消与原Session恢复；MODEL-03/04限定done、M0-Pi限定passed。Agent Shell/M2已按授权集成develop；当前唯一事项为UI-P2长历史与成果浏览体验；请求次数缺省不限，历史请求和费用保留，证据见docs/validation/agent-task-live-2026-09-30.md；术语见 `docs/ssot/glossary.md`。交互 PTY、其他平台、完整真实模型桌面人工体验和生产发行尚未完成，不得将局部实现或历史报告扩大为完整产品或本轮实测。
 
 ## 修改与验证
 

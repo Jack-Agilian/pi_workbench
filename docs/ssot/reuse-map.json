@@ -2578,6 +2578,18 @@
         "darwin"
       ],
       "locator": "docs/validation/agent-task-live-2026-09-30.md"
+    },
+    {
+      "id": "EV-DEVELOP-INTEGRATION-20260930",
+      "kind": "sdk",
+      "result": "passed",
+      "scope": "develop快进集成34ed62e后的13条集中命令：类型、A1工具资源认证、产品Core/SDK/Worker、文件工具、模型Bash、合成模型/策略与桌面离线回归。真实模型0；不含本轮Electron UI、Windows、PTY、包安装或初始化，不扩大既有Gate。",
+      "commit": "34ed62e3fc875c56059eb19c1f02781d72c78bfc",
+      "recordedAt": "2026-09-30T05:22:08.141734+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/develop-integration-2026-09-30.md"
     }
   ]
 }

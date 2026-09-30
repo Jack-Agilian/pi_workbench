@@ -901,7 +901,7 @@
           ]
         }
       ],
-      "statusReason": "C已按授权集成develop；D1 Mac正常退出、取消结算、证据不足保留窗口及显式恢复通过。仅限定退出/恢复增量，下一项D2 Shell/PTY产品接入；Windows环境未确认、完整任务范围与M0 Gate未完成。"
+      "statusReason": "M2/Agent Shell及限定布局改进已于2026-09-30按授权集成develop；已有证据保持原SHA和范围。当前下一增量为UI-P2长历史/右栏与成果浏览，尚未实施；保留in_progress，不把限定M0 Gate通过扩为完整UI、无障碍或真实模型桌面人工验收。"
     },
     {
       "id": "UI-02",
@@ -955,7 +955,7 @@
           ]
         }
       ],
-      "statusReason": "C已按授权集成develop；D1 Mac正常退出、取消结算、证据不足保留窗口及显式恢复通过。仅限定退出/恢复增量，下一项D2 Shell/PTY产品接入；Windows环境未确认、完整任务范围与M0 Gate未完成。"
+      "statusReason": "M2/Agent Shell及限定布局改进已于2026-09-30按授权集成develop；已有证据保持原SHA和范围。当前下一增量为UI-P2长历史/右栏与成果浏览，尚未实施；保留in_progress，不把限定M0 Gate通过扩为完整UI、无障碍或真实模型桌面人工验收。"
     },
     {
       "id": "GIT-01",
@@ -1045,7 +1045,7 @@
           ]
         }
       ],
-      "statusReason": "C增加真实Markdown纯文本预览、外部修改可见和成果来源；历史对账范围保留，另存为/其他格式未完成。"
+      "statusReason": "C的真实Markdown纯文本预览、外部修改与成果来源，以及M2/Agent Shell的限定真实成果链路已集成develop。下一增量UI-P2改善名称、来源与changed/missing展示；另存为/其他格式未完成，保留in_progress。"
     },
     {
       "id": "SKL-01",

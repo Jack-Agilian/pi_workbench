@@ -1,6 +1,6 @@
 # 当前实施 SSOT
 
-更新：2026-09-29。范围：Pi 桌面工作台的复用策略、模块责任、接入边界和下一步交付。
+更新：2026-09-30。范围：Pi 桌面工作台的复用策略、模块责任、接入边界和下一步交付。
 
 **决策：复用优先，Pi SDK 是默认实现；薄适配只承接产品差异，不重写上游已有能力。** 用户已明确要求尽量不重复造轮子。本目录是这一要求的实施基线，不代表实现、兼容测试或团队验收已经完成。
 
@@ -135,4 +135,8 @@ M2 实机复审：[两处正确性修正与 Mac 回归](../validation/review-m2-
 
 ## 限定真实项目任务（2026-09-30）
 
-[被测代码、首次拒绝和四场景证据](../validation/agent-task-live-2026-09-30.md)：gpt-6-luna真实read/write/Bash任务、拒绝、活跃Shell取消与原Session恢复通过，新增10请求、旧账本/身份保留。MODEL-03/04限定done，M0-Pi按既定条件passed；CLI真实产品链路与历史Electron UI证据分列。前面的待授权/blocked是历史，唯一当前事项以NEXT_STEPS顶部的交付复审与develop集成准备为准。
+[被测代码、首次拒绝和四场景证据](../validation/agent-task-live-2026-09-30.md)：gpt-6-luna真实read/write/Bash任务、拒绝、活跃Shell取消与原Session恢复通过，新增10请求、旧账本/身份保留。MODEL-03/04限定done，M0-Pi按既定条件passed；CLI真实产品链路与历史Electron UI证据分列。前面的待授权/blocked是历史，唯一当前事项以NEXT_STEPS顶部为准。
+
+## develop 集成（2026-09-30）
+
+用户授权后已快进集成M2与Agent Shell全部20个提交，基线 `34ed62e3fc875c56059eb19c1f02781d72c78bfc`；[集成检查与范围](../validation/develop-integration-2026-09-30.md)。既有证据保留原被测SHA，Gate状态不因合并扩大；唯一下一步为UI-P2长历史与成果浏览体验，本次没有开始实现或新增模型调用。

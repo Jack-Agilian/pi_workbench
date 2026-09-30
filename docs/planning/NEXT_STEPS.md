@@ -2,15 +2,17 @@
 
 当前依据：[SSOT](../ssot/README.md)、[任务账本](backlog.json)。以下当前事项优先于后文历史阶段的“下一步”。
 
-## 唯一当前事项：Agent Shell/M2交付复审与develop集成准备
+## 唯一当前事项：UI-P2 长历史与成果浏览体验
 
-2026-09-30：功能分支 `codex/agent-shell-mvp` 已完成限定真实项目任务。运行代码 `688150f070797405250bb16ad3dc837bb0ddc64d`；[真实结果与首次失败](../validation/agent-task-live-2026-09-30.md)、[脱敏输入](../validation/agent-task-live-inputs-2026-09-30.json)、[实际模型生成报告](../validation/agent-task-result-2026-09-30.md)。develop仍为 `148022b05250cfda824725778e9a056d00cd6830`，本轮没有合并。
+2026-09-30：用户授权后，develop 从 `148022b05250cfda824725778e9a056d00cd6830` 快进合入 `codex/agent-shell-mvp` 的20个提交，集成代码与证据基线为 `34ed62e3fc875c56059eb19c1f02781d72c78bfc`。M2、审核修复、Agent Shell、请求次数缺省不限与Pi strict schema修正现已进入同一集成分支；[本次集成检查](../validation/develop-integration-2026-09-30.md)。
 
-推进顺序只有一条：
+下一增量按 [主功能/UI计划](AGENT_MVP_UI_PLAN.md) 的UI-P2推进，本次只完成集成，尚未实施UI-P2：
 
-1. 复审本分支已有M2/Agent Shell增量及本轮工具策略修订、Pi strict schema修正。核对历史失败、各自被测SHA和真实/合成证据范围，处理确有依据的发现。
-2. 按集成授权将审定成果合入develop；当前仅准备集成，不自动合并。不要另外开启孤立功能分支或重跑已通过的真实任务作为小改动调试。
-3. 集成后再推进UI-P2的长历史/成果浏览体验；保持Pi循环、Provider、Session和审批所有权。PTY、Windows、市场和生产发行仍后置。
+1. 改善长历史浏览及右栏折叠/宽度；待审批动作始终可发现，不抢焦点、不丢草稿。
+2. 改善成果名称、来源执行与changed/missing状态展示；只索引真实成果，复用现有安全投影。
+3. 集中完成三个既定窗口尺寸的截图和审批/取消/草稿回归；不要用新增真实模型调用调试小改动。保持Pi循环、Provider、Session和审批所有权；PTY、Windows、市场和生产发行后置。
+
+已有真实任务代码 `688150f070797405250bb16ad3dc837bb0ddc64d`；[真实结果与首次失败](../validation/agent-task-live-2026-09-30.md)、[脱敏输入](../validation/agent-task-live-inputs-2026-09-30.json)、[实际模型生成报告](../validation/agent-task-result-2026-09-30.md)。本次集成没有新增真实请求，以下仍为该次任务的历史消费与验证范围。
 
 限定MODEL-03/04逐项done；M0-Pi补齐真实模型任务及Mac审批/取消/恢复证据后passed。M0-UI/M0-SDK沿用原passed，均不等于完整产品/通用沙箱/生产发布。真实任务走CLI→同DesktopHost/Worker产品链路，本轮没有重新声明Electron真实模型UI通过。
 
