@@ -71,3 +71,8 @@ MODEL-03保持in_progress；MODEL-04新增为in_progress，A01–A03仅离线限
 ## 文档检查收口
 
 更新后的 `.venv/bin/python scripts/check-ssot.py`、`scripts/test-tools.py`、`scripts/check-docs.py --structural-only`、`scripts/check-docs.py --typecheck` 全部退出0。覆盖任务/证据引用、原始27个快照、文档链接/已知凭据标记及示例类型；不推导外部服务或系统隔离结论。此时运行代码为0c28ed2，文档为待提交差异，已在持久JSON明确记录。
+
+
+## 干净工作树复验
+
+文档提交 `d8ea2152f42571169c5957ff315a18183e36294a` 后，确认工作树干净再运行 `npm run test:file-acceptance`：23/23通过，CLI prepare/inspect、重复prepare拒绝、非交互execute拒绝均真正执行，未走“脏工作树只测门禁”的提前返回；仍是隔离合成配置，无真实请求。随后SSOT、脚本、结构及完整文档类型四条检查全部通过。该提交的运行代码与0c28ed2相同；本段是后续文档证据，不把尚不存在的提交写成被测SHA。

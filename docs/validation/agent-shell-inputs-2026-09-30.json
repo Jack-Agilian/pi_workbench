@@ -401,8 +401,7 @@
     }
   ],
   "limitations": [
-    "No real model, new request budget, manual IME/accessibility, Windows, PTY, arbitrary detached descendants, production sandbox, reinstall or fresh clone tested.",
-    "File acceptance suite during documentation edits tests dirty-code admission; clean-checkout CLI preparation is recorded separately after documentation commit."
+    "No real model, new request budget, manual IME/accessibility, Windows, PTY, arbitrary detached descendants, production sandbox, reinstall or fresh clone tested."
   ],
   "layout": {
     "agent-shell-approval": [
@@ -917,5 +916,37 @@
         "exitCode": 0
       }
     ]
-  }
+  },
+  "cleanCloseout": [
+    {
+      "commit": "d8ea2152f42571169c5957ff315a18183e36294a",
+      "command": "npm run test:file-acceptance",
+      "exitCode": 0,
+      "tests": 23,
+      "passed": 23,
+      "failed": 0,
+      "cliCleanGateOnly": false,
+      "rawLogSha256": "72f08f835c26c832366e0aa8ab2fc1b48536648c915dec0c495f29baaf9c485c"
+    },
+    {
+      "commit": "d8ea2152f42571169c5957ff315a18183e36294a",
+      "command": ".venv/bin/python scripts/check-ssot.py",
+      "exitCode": 0
+    },
+    {
+      "commit": "d8ea2152f42571169c5957ff315a18183e36294a",
+      "command": ".venv/bin/python scripts/test-tools.py",
+      "exitCode": 0
+    },
+    {
+      "commit": "d8ea2152f42571169c5957ff315a18183e36294a",
+      "command": ".venv/bin/python scripts/check-docs.py --structural-only",
+      "exitCode": 0
+    },
+    {
+      "commit": "d8ea2152f42571169c5957ff315a18183e36294a",
+      "command": ".venv/bin/python scripts/check-docs.py --typecheck",
+      "exitCode": 0
+    }
+  ]
 }
