@@ -1,5 +1,5 @@
 import { readDesktopPage, row, runRow, artifactRow, displayOperation } from './desktop-pages.ts';
-import type { PageOptions, HistoryPage, OperationPage, ArtifactPage } from '../../packages/app-contracts/desktop-pages.ts';
+import { DESKTOP_PAGE_BYTES, type HistoryEntry, type HistoryItem, type PageOptions, type HistoryPage, type OperationPage, type ArtifactPage } from '../../packages/app-contracts/desktop-pages.ts';
 import type { ModelShellOperation } from '../../packages/app-contracts/model-shell.ts';
 import type { FileOperationPlan } from '../../packages/app-contracts/file-tools.ts';
 import { policyDigest, policyText, legacyPolicyDigest, assertTimeoutRevision, assertRequestCountRevision, assertToolScopeRevision } from './model-policy.ts';
@@ -528,12 +528,24 @@ export class ProductCore {
       artifacts: this.all<ArtifactView>(`SELECT ${artifactColumns} FROM artifacts WHERE run_id IN (SELECT id FROM runs WHERE thread_id=?) ORDER BY rowid`, threadId),
     }), false);
   }
+  private historyItem(id:string):HistoryItem {
+    return {run:runRow(this.db,id),input:displayText(row<{input:string}>(this.db,'SELECT input FROM runs WHERE id=?',id).input,16384),
+      presentation:this.presentation(id),modelOutcome:this.modelOutcome(id)};
+  }
+  /** Product display lookup, never a native Session or execution input. */
+  historyEntry(threadId:string,runId:string):HistoryEntry {
+    identifier(threadId);identifier(runId);
+    return this.transaction(()=>{
+      const run=this.run(runId);if(run.threadId!==threadId)throw new Error('not_found');
+      const value={item:this.historyItem(runId),snapshotSeq:this.one<{n:number}>('SELECT coalesce(max(seq),0) n FROM events').n};
+      if(Buffer.byteLength(JSON.stringify(value))+2048>DESKTOP_PAGE_BYTES)throw new Error('page_item_too_large');
+      return value;
+    },false);
+  }
   historyPage(threadId:string,page:PageOptions={}):HistoryPage {
     return this.transaction(()=>{
       this.threadWorkspace(threadId);
-      return readDesktopPage(this.db,'history',threadId,page,id=>({run:runRow(this.db,id),
-        input:displayText(row<{input:string}>(this.db,'SELECT input FROM runs WHERE id=?',id).input,16384),
-        presentation:this.presentation(id),modelOutcome:this.modelOutcome(id)}));
+      return readDesktopPage(this.db,'history',threadId,page,id=>this.historyItem(id));
     },false);
   }
   operationPage(runId:string,page:PageOptions={}):OperationPage {

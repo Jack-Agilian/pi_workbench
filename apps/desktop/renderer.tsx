@@ -87,7 +87,7 @@ function App() {
       finally { if (!stopped) timer = setTimeout(() => void poll(), 350); }
     };
     void poll();
-    return () => { stopped = true; clearTimeout(timer); };
+    return () => { stopped = true; currentReader.cancelPending(); clearTimeout(timer); };
   }, [selected, tick]);
   function pageError(error: unknown) {
     const code = error instanceof Error ? error.message : '';

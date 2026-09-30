@@ -8,6 +8,7 @@ export interface PageOptions { cursor?: string; limit?: number }
 /** Cursor is opaque keyset position, never the product event sequence. */
 export interface DesktopPage<T> { items:T[]; nextCursor:string|null; hasMore:boolean; snapshotSeq:number }
 export interface HistoryItem { run:RunView; input:string; presentation:Presentation; modelOutcome:ModelOutcome|null }
+export interface HistoryEntry { item:HistoryItem; snapshotSeq:number }
 export type HistoryPage = DesktopPage<HistoryItem>;
 export type OperationPage = DesktopPage<OperationView>;
 export type ArtifactPage = DesktopPage<ArtifactView>;

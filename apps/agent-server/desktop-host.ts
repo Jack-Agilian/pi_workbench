@@ -96,6 +96,7 @@ export class DesktopHost {
     if (this.closing) throw new Error('host_closing');
     const request = parseDesktopRequest(raw);
     switch (request.type) {
+      case 'history-entry':return this.core.historyEntry(request.threadId,request.runId);
       case 'history-page':return this.core.historyPage(request.threadId,request.page);
       case 'operation-page':return this.core.operationPage(request.runId,request.page);
       case 'artifact-page':return this.core.artifactPage(request.threadId,request.page);

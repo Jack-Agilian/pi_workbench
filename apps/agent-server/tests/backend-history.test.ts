@@ -129,3 +129,26 @@ test('R02 real Worker: hundreds of display messages preserve duplicate control f
   assert.equal(f.core.snapshot(f.thread).runs[0]!.state,'cancelled');assert.equal(existsSync(join(f.cwd,'report.md')),false);
  }finally{await f.dispose();}
 });
+
+test('targeted history: real SQLite/IPC returns the same safe projection, fences Thread ownership and never writes',async()=>{
+ const base=temporary(),profile=join(base,'profile'),host=new DesktopHost(profile),id=thread(host),other=thread(host,'demo-workspace','other');
+ addHistory(host,id,0);const page=host.core.historyPage(id),run=page.items[0]!.run.id;
+ const before=host.core.eventsAfter(id,0);const entry=host.core.historyEntry(id,run);
+ assert.deepEqual(entry.item,page.items[0]);assert.equal(entry.snapshotSeq,page.snapshotSeq);
+ assert.ok(Buffer.byteLength(JSON.stringify(entry))<=DESKTOP_PAGE_BYTES);
+ assert.throws(()=>host.core.historyEntry(other,run),/not_found/);
+ assert.throws(()=>host.core.historyEntry(id,'missing'),/not_found/);
+ assert.deepEqual(host.core.eventsAfter(id,0),before);
+ await host.close();const client=new HostClient(process.execPath,repository,profile);
+ try{
+  await client.connect();assert.deepEqual(await client.request({type:'history-entry',threadId:id,runId:run}),JSON.parse(JSON.stringify(entry)));
+  await assert.rejects(client.request({type:'history-entry',threadId:other,runId:run}),/request_rejected/);
+  await client.reconnect();assert.deepEqual(await client.request({type:'history-entry',threadId:id,runId:run}),JSON.parse(JSON.stringify(entry)));
+ }finally{await client.close();rmSync(base,{recursive:true,force:true});}
+});
+test('targeted history request has one bounded ID and no path, query or execution authority',()=>{
+ assert.deepEqual(parseDesktopRequest({type:'history-entry',threadId:'t',runId:'r'}),{type:'history-entry',threadId:'t',runId:'r'});
+ for(const extra of [{runId:['r']},{runId:''},{runId:'r'.repeat(200)},{database:'/test'},{query:'SELECT 1'},{execute:true}]){
+  assert.throws(()=>parseDesktopRequest({type:'history-entry',threadId:'t',runId:'r',...extra}));
+ }
+});

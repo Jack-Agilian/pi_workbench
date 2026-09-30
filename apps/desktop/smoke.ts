@@ -13,6 +13,7 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
     catch (error) { throw new Error(`desktop_smoke_script_failed:${source.slice(0, 220)}`, { cause: error }); }
   };
   const wait = async (predicate: () => Promise<boolean>, name: string) => {
+    console.log(`desktopSmoke wait: ${name}`);
     const until = Date.now() + 20000;
     while (!await predicate()) { if (Date.now() > until) throw new Error(`ui_timeout:${name}`); await new Promise<void>(r => setTimeout(r, 60)); }
   };

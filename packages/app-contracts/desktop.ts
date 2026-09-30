@@ -1,4 +1,4 @@
-import { parsePageOptions, type PageOptions, type HistoryPage, type OperationPage, type ArtifactPage, type ThreadActivity } from './desktop-pages.ts';
+import { parsePageOptions, type PageOptions, type HistoryPage, type HistoryEntry, type OperationPage, type ArtifactPage, type ThreadActivity } from './desktop-pages.ts';
 import type { ModelShellPolicy } from './model-shell.ts';
 import type { FileToolPolicy } from './file-tools.ts';
 import type { ModelOutcome } from './model.ts';
@@ -9,17 +9,19 @@ export interface DesktopThread extends Snapshot { modelOutcomes?: {runId:string;
 export interface DesktopHome { workspaces: {selectedId:string;items:{id:string;path:string;status?:'ready'|'invalid'}[]}; mode: 'synthetic' | 'model-offline' | 'model'; model?: {status:'not_configured'|'key_required'|'ready'|'policy_required'|'budget_exhausted';provider:string;model:string;limits?:{endpoint:string;requests:number|null;estimatedUsd:number;outputTokens:number;timeoutMs?:number;httpIdleTimeoutMs?:number;fileTools?:FileToolPolicy;shellTools?:ModelShellPolicy}}; threads: ThreadView[]; activeRuns: RunView[]; recovery: 'ready' | 'blocked' }
 export type Preview = { status: 'ready' | 'changed' | 'missing' | 'unavailable'; text?: string };
 export type DesktopRequest =
+  | { type:'history-entry'; threadId:string; runId:string }
   | { type:'history-page'|'artifact-page'; threadId:string; page?:PageOptions }
   | { type:'operation-page'; runId:string; page?:PageOptions }
   | { type:'thread-activity'; threadId:string }
   | { type: 'home' } | { type: 'recover' }
   | { type: 'thread'; threadId: string } | { type: 'events'; threadId: string; cursor: number }
   | { type: 'preview'; artifactId: string } | { type: 'command'; command: Command };
-export type DesktopValue = HistoryPage | OperationPage | ArtifactPage | ThreadActivity | DesktopHome | DesktopThread | Preview | Ack | ProductEvent[];
+export type DesktopValue = HistoryEntry | HistoryPage | OperationPage | ArtifactPage | ThreadActivity | DesktopHome | DesktopThread | Preview | Ack | ProductEvent[];
 export type DesktopReply = { ok: true; value: DesktopValue } | { ok: false; code: 'invalid_request' | 'request_rejected' | 'disconnected' | 'busy' | 'workspace_invalid' | 'page_cursor_invalid' | 'page_item_too_large' };
 export function parseDesktopRequest(raw: unknown): DesktopRequest {
   const r = record(raw); let result: DesktopRequest;
   switch (r.type) {
+    case 'history-entry': exact(r,['type','threadId','runId']);result={type:r.type,threadId:identifier(r.threadId),runId:identifier(r.runId)};break;
     case 'thread-activity': exact(r,['type','threadId']);result={type:r.type,threadId:identifier(r.threadId)};break;
     case 'history-page': case 'artifact-page':
       exact(r,['type','threadId',...(Object.hasOwn(r,'page')?['page']:[])]);result={type:r.type,threadId:identifier(r.threadId),page:parsePageOptions(r.page)};break;
@@ -39,6 +41,7 @@ export function parseDesktopRequest(raw: unknown): DesktopRequest {
   return result;
 }
 export interface DesktopApi {
+  historyEntry(threadId:string,runId:string):Promise<HistoryEntry>;
   historyPage(threadId:string,page?:PageOptions):Promise<HistoryPage>;
   operationPage(runId:string,page?:PageOptions):Promise<OperationPage>;
   artifactPage(threadId:string,page?:PageOptions):Promise<ArtifactPage>;

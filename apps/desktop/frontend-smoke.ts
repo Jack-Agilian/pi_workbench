@@ -12,6 +12,7 @@ import { captureLayout } from './layout-capture.ts';
 export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) {
   const js = <T>(code: string): Promise<T> => window.webContents.executeJavaScript(code, true);
   const wait = async (check: () => Promise<boolean>, label: string) => {
+    console.log(`frontend wait: ${label}`);
     const end = Date.now() + 10000;
     while (!await check()) { if (Date.now() > end) throw Error('frontend_timeout:' + label); await new Promise(r => setTimeout(r, 35)); }
   };
@@ -32,6 +33,8 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
   fixture.operations.push(...Array.from({length:15},(_,i)=>({...fixture.operations[0]!,id:`SYNTHETIC-old-operation-${i}`,state:'succeeded' as const})));
   fixture.runs.at(-1)!.state = 'running';
   let revision = original.cursor + 100;
+  let eventKind = 'SYNTHETIC_UI_ONLY', eventRun = originalRun.id;
+  let entryReads=0, historyReads=0;
   let previewStatus: Preview['status'] = 'ready';
   let releasePreview: (() => void) | undefined;
   let delayPreview = false;
@@ -44,7 +47,12 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
     if (raw.type === 'home' && alternateSelection) return {...home, workspaces:{selectedId:'SYNTHETIC-other',items:[...home.workspaces.items,{id:'SYNTHETIC-other',path:'/SYNTHETIC-other'}]}};
     if (raw.type === 'thread' && raw.threadId === chosen.id) throw Error('unbounded_renderer_request');
     if (raw.type === 'thread-activity' && raw.threadId === chosen.id) return {thread: fixture.thread, snapshotSeq: revision + 500, activeRun: fixture.runs.at(-1)!, operations: structuredClone(fixture.operations.filter(op => op.state === 'pending')), workspaceStatus};
+    if (raw.type === 'history-entry' && raw.threadId === chosen.id) {
+      entryReads++; const run=fixture.runs.find(r=>r.id===raw.runId)!;
+      return {item:structuredClone({run,input:fixture.inputs.find(i=>i.id===run.id)!.text,presentation:{messages:[],omitted:false},modelOutcome:null}),snapshotSeq:revision};
+    }
     if (raw.type === 'history-page' && raw.threadId === chosen.id) {
+      historyReads++;
       if (historyError) throw Error(historyError);
       if (delayHistory) { delayHistory = false; await new Promise<void>(r => { releaseHistory = r; }); }
       const offset = Number(raw.page?.cursor ?? 0), limit = raw.page?.limit ?? 8;
@@ -58,7 +66,7 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
       const items=all.slice(offset,offset+limit), hasMore=offset+items.length<all.length;
       return {items:structuredClone(items),hasMore,nextCursor:hasMore?String(offset+items.length):null,snapshotSeq:revision};
     }
-    if (raw.type === 'events' && raw.threadId === chosen.id) return raw.cursor < revision ? [{seq: revision, runSeq: 1, threadId: chosen.id, runId: originalRun.id, kind: 'SYNTHETIC_UI_ONLY', entityId: chosen.id, eventType: null, sourceType: null}] : [];
+    if (raw.type === 'events' && raw.threadId === chosen.id) return raw.cursor < revision ? [{seq: revision, runSeq: 1, threadId: chosen.id, runId: eventRun, kind: eventKind, entityId: chosen.id, eventType: null, sourceType: null}] : [];
     if (raw.type === 'preview' && raw.artifactId === original.artifacts[0]!.id) {
       if (delayPreview) await new Promise<void>(resolve => {releasePreview = resolve;});
       return {status: previewStatus, ...(previewStatus === 'ready' ? {text: 'SYNTHETIC <img onerror=unsafe()> UI preview'} : {})};
@@ -113,8 +121,13 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
     await js("document.querySelector('.timeline').scrollTop=1500");
     await wait(() => js<boolean>("!!document.querySelector('.return-latest')"), 'browsing');
     const anchor = await js<{id: string; offset: number}>("(()=>{const t=document.querySelector('.timeline');const y=t.getBoundingClientRect().top;const e=[...t.querySelectorAll('[data-run]')].find(e=>e.getBoundingClientRect().bottom>y);return {id:e.dataset.run,offset:e.getBoundingClientRect().top-y}})()");
+    const beforeHistoryReads=historyReads,beforeEntryReads=entryReads;
+    eventKind='display.replaced';eventRun=fixture.runs[0]!.id;
     fixture.inputs[0]!.text += '\n' + 'SYNTHETIC earlier record grows\n'.repeat(30); revision++;
-    await new Promise(r => setTimeout(r, 600));
+    await wait(async()=>entryReads>beforeEntryReads,'targeted_body_read');
+    await new Promise(r => setTimeout(r, 100));
+    assert.equal(entryReads-beforeEntryReads,1);assert.equal(historyReads,beforeHistoryReads);
+    eventKind='SYNTHETIC_UI_ONLY';eventRun=originalRun.id;
     const offset = await js<number>(`document.querySelector('[data-run="${anchor.id}"]').getBoundingClientRect().top-document.querySelector('.timeline').getBoundingClientRect().top`);
     assert.ok(Math.abs(offset - anchor.offset) < 3, `anchor moved ${offset - anchor.offset}`);
     await click('.inspector-toggle');
