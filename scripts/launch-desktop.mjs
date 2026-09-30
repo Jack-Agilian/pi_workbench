@@ -30,7 +30,7 @@ const child = spawn(executable, [join(root, 'dist/desktop/main.mjs'), mode, ...(
     LANG: 'zh_CN.UTF-8', NO_COLOR: '1' },
 });
 const stop = () => child.kill('SIGTERM'); process.on('SIGINT', stop); process.on('SIGTERM', stop);
-let timer;
-if (test) timer = setTimeout(() => child.kill('SIGTERM'), 120_000);
-try { process.exitCode = await new Promise((resolveExit, reject) => { child.once('error', reject); child.once('exit', code => resolveExit(code ?? 1)); }); }
+let timer;let timedOut=false;
+if (test) timer = setTimeout(() => {timedOut=true;child.kill('SIGTERM');}, 120_000);
+try { const code = await new Promise((resolveExit, reject) => { child.once('error', reject); child.once('exit', code => resolveExit(code ?? 1)); }); process.exitCode=timedOut?1:code; if(timedOut)console.error('desktop_smoke_timeout'); }
 finally { clearTimeout(timer); process.removeListener('SIGINT', stop); process.removeListener('SIGTERM', stop); if (test) rmSync(profile, { recursive: true, force: true }); }

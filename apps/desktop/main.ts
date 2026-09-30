@@ -111,6 +111,9 @@ await host.connect();
 if (closing || quitting || shutdownFailed) return;
 window = new BrowserWindow({ width: 1320, height: 900, minWidth: 820, minHeight: 640, title: 'Pi Workbench', backgroundColor: '#f6f7f9',
   webPreferences: { preload: join(outputDirectory, 'preload.cjs'), nodeIntegration: false, contextIsolation: true, sandbox: true, webSecurity: true, webviewTag: false } });
+// Test-only frame progress under macOS occlusion; ordinary product windows retain
+// Electron's power-saving default. These modes never use real model credentials.
+if(process.argv.some(arg=>['--smoke-test','--shell-smoke-test','--model-smoke-test'].includes(arg)))window.webContents.setBackgroundThrottling(false);
 window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
 window.webContents.on('will-navigate', event => event.preventDefault());
 window.webContents.on('will-attach-webview', event => event.preventDefault());
