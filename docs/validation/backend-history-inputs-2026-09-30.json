@@ -369,5 +369,116 @@
     "scope": "Two actual launcher/Electron/host startup and owned storage checks. No manual interaction or GUI layout acceptance.",
     "initialProbeFailure": "The first diagnostic script looked for Local State at profile root; actual userData was profile/browser. Both launches shut down cleanly. Re-run verified actual browser/SingletonLock and passed; no production change.",
     "driverSha256": "af2ca0336dece757b746974a2d4ef767c1aa7ca622d1bf73e02c96572e74cea3"
+  },
+  "integration": {
+    "upstreamDevelop": "e0616040983bc4358c354e34986639341ec481c6",
+    "mergeCommit": "ff9ce661850987348f4a281d1e1b81a437f658ea",
+    "uiTestBaselineWaitCommit": "0f74a9ae7feba118933c284c67eec10e030d26ca",
+    "testDriverCorrectionCommit": "ecffc9d03483cfc6878846ceeda5f3d05b70cb9e",
+    "initialCommands": [
+      {
+        "command": "npm run typecheck",
+        "exitCode": 0,
+        "seconds": 2.03,
+        "commit": "ff9ce661850987348f4a281d1e1b81a437f658ea",
+        "logSha256": "22df5d47848ff6e1f3c0926a3aa3f05da31fb2c76601187b826c3ad4d7870689"
+      },
+      {
+        "command": "npm run test:backend-history",
+        "exitCode": 0,
+        "seconds": 6.35,
+        "commit": "ff9ce661850987348f4a281d1e1b81a437f658ea",
+        "logSha256": "c16a54317d8aa363e79d52319cc77cc4bac5333c188d8be438c983fecd8df5ed"
+      },
+      {
+        "command": "npm run test:desktop",
+        "exitCode": 0,
+        "seconds": 13.09,
+        "commit": "ff9ce661850987348f4a281d1e1b81a437f658ea",
+        "logSha256": "d03e88e23f515732642ccd1dd49161864dcb720ed10ba847c0ddf6f819dea017"
+      },
+      {
+        "command": "npm run test:desktop-ui",
+        "exitCode": 1,
+        "seconds": 22.59,
+        "commit": "ff9ce661850987348f4a281d1e1b81a437f658ea",
+        "logSha256": "02d7f88bd1dc1a68f56c7a9c83998b760b96041205cb6b1ffc620ee48d3e4865"
+      },
+      {
+        "command": "npm run test:desktop-agent-shell",
+        "exitCode": 1,
+        "seconds": 117.82,
+        "commit": "ff9ce661850987348f4a281d1e1b81a437f658ea",
+        "logSha256": "75b066523de188e16e8dfc3b678560242905cc12ba6329ebef402123450ceefa"
+      }
+    ],
+    "finalCommands": [
+      {
+        "command": "npm run typecheck",
+        "exitCode": 0,
+        "seconds": 2.07,
+        "commit": "ecffc9d03483cfc6878846ceeda5f3d05b70cb9e",
+        "logSha256": "22df5d47848ff6e1f3c0926a3aa3f05da31fb2c76601187b826c3ad4d7870689"
+      },
+      {
+        "command": "npm run test:desktop-ui",
+        "exitCode": 0,
+        "seconds": 16.67,
+        "commit": "ecffc9d03483cfc6878846ceeda5f3d05b70cb9e",
+        "logSha256": "9881b3e1661faab9ec2774fcce42dffe012d2fb38ac55b8dcec168ac8980f2b7"
+      },
+      {
+        "command": "npm run test:desktop-agent-shell",
+        "exitCode": 0,
+        "seconds": 5.23,
+        "commit": "ecffc9d03483cfc6878846ceeda5f3d05b70cb9e",
+        "logSha256": "65379e561bda20919a804de394329c11757be41abc3ed7e4baa8ad323304fe49"
+      },
+      {
+        "command": "npm run test:desktop-file-agent",
+        "exitCode": 0,
+        "seconds": 5.2,
+        "commit": "ecffc9d03483cfc6878846ceeda5f3d05b70cb9e",
+        "logSha256": "896c98af03b0b84e038a6ea426c81148002bec8d6f9063ae3c16d1d90d2a6baf"
+      },
+      {
+        "command": "npm run test:desktop-model",
+        "exitCode": 0,
+        "seconds": 4.49,
+        "commit": "ecffc9d03483cfc6878846ceeda5f3d05b70cb9e",
+        "logSha256": "8fbf83b307d1c7011a7f81449537362510d2951cf4c2f2985585ec7224788624"
+      }
+    ],
+    "incompleteRun": {
+      "command": "npm run test:desktop-ui",
+      "commit": "0f74a9ae7feba118933c284c67eec10e030d26ca",
+      "exitCode": 0,
+      "acceptedAsPass": false,
+      "reason": "No completion marker; animation-frame wait did not progress. Existing launcher deadline could return success after graceful test termination.",
+      "logSha256": "418c91760f68cfbf1abc423024649e0c20e3b92a32906542951afe50f920ac7c"
+    },
+    "sourceHashes": {
+      "apps/agent-server/core.ts": "642382c2b6d5492128d3011a560ddb3c8d1963e8255866f2b12bc60f9b27f1c0",
+      "apps/agent-server/desktop-entry.ts": "b62666fc3cc8e0bef9f198b4a0b093a72898ee576951ea480a96dad3c295f07b",
+      "apps/agent-server/desktop-host.ts": "f0d37e25533d7324c21981c80c7d7b240a00224b03e9ce5bf77f7e078bcf61d9",
+      "apps/agent-server/desktop-pages.ts": "9ec73337435a9c6617ae645c5498c7dd629fba6cea78867685ee0f021f78b1e4",
+      "apps/agent-server/tests/backend-history.test.ts": "8ed90c66dcf93766e06b50cfc82cebc7b4749b10257b1435d76dd3886b662c66",
+      "apps/agent-server/tests/display-worker-fixture.ts": "4e0e02a727195a7396d9a7b4d74bf781cbbdf798beb1ebd6d8a44f9313e8c221",
+      "apps/agent-server/tests/model-shell.test.ts": "863c205dc687221f4bbd2c7dca6bf69776f7bb50f3776fc634def811085137aa",
+      "apps/agent-server/worker-supervisor.ts": "e9fc53608e9f034c5f8264d4e7d8aa3c62e1730a0a20ed2e0365e075aac453b5",
+      "apps/agent-server/workspace-admission.ts": "2070aeef8ad5d9648be5cd4351fcc830aa8132bd1e958283dd4dfee11a8bbc79",
+      "apps/desktop/frontend-smoke.ts": "8741b3d421b05f561e24321006dedfcbc9afe957366b35d132a50e3baedb962d",
+      "apps/desktop/host-client.ts": "f2aa76a1f42cc65931b71092ff85e6eaa1b58599380a0970566bb881153a42f2",
+      "apps/desktop/main.ts": "70b196c4700303643fb35d82d212e963969e5b2b9d807d872f66d26fa7c43463",
+      "apps/desktop/preload.ts": "6cacf8ab8c7a0b03d516be9e6869209bc607e2f44085a6ad20b9df9fcf3224be",
+      "packages/app-contracts/desktop-pages.ts": "06a0440a554f732e6afbe84a35633189cca4a95a5967fbef0727ea352f309b26",
+      "packages/app-contracts/desktop.ts": "0d5df2c7d45aba9845bc2cb2bc01ae75c0371fc6f2e730a4cd54e12df638613f",
+      "packages/pi-adapter/observation-order.ts": "74a54f79305f5c71e42944ddf340c9fb920fe05ccb3ba8c0ad5cfbe4b1b1d87e",
+      "packages/pi-adapter/worker-runtime.ts": "df87b2ace20ffd56a58405c645ccb690bb4e6c4d19b80d80bf96eea65ddeb94d",
+      "scripts/desktop-profile.mjs": "fc780958d3d392a1a688f0ad59e87bd873d1d920cfe5c9670e2c8fab5b8840db",
+      "scripts/desktop-profile.test.mjs": "17ba09bfd3517303b9c61f36a120295ffbd62efeaf6e500ef26cee43492e0dca",
+      "scripts/launch-desktop.mjs": "a66b1b82418be8dd8a8a2b6b276c24267c6147868fefcb271dedb572f5c4bfce",
+      "scripts/test-backend-history.mjs": "d6f727ef761fee9be26804b1ca9edcc98ae17c2ead6b4bd6ebf890b77e535941"
+    }
   }
 }

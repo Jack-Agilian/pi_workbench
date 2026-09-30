@@ -1,5 +1,7 @@
 # UI-P2 后端前置与 develop 审核修正（2026-09-30）
 
+后续远端develop前进后的同步、组合回归失败及测试驱动修正见文末；不以最初后端全部通过覆盖后续失败。
+
 ## 基线与实际提交
 
 开工时当前工作树为干净的旧detached HEAD；fetch后以实际 `origin/develop@58d3130d9ed480e283434c749e285efd6ba2092d` 新建 `codex/backend-history-safety`，没有回退develop、覆盖未提交内容或操作其他工作树。实施范围来自develop@58d3130审核的R01/R02/R03和双线计划。
@@ -92,4 +94,26 @@ Renderer/style未修改，旧thread全量入口仍保留上限，只有前端采
 | `.venv/bin/python scripts/check-docs.py --typecheck` | 7 passed / 0 skipped |
 | `git diff --check` | passed |
 
-本轮34个变更文件的常见秘密模式扫描0命中，无忽略的临时/构建/数据库或密钥文件误提交；不把有限模式扫描当作完整安全审计。docs/startup、依赖锁、Renderer/style和其他工作树均未修改。未合并develop；新分支推送后另行独立读回SHA，报告不填写尚不存在的文档提交SHA。
+首次后端增量34个变更文件的常见秘密模式扫描0命中，无忽略的临时/构建/数据库或密钥文件误提交；不把有限模式扫描当作完整安全审计。docs/startup、依赖锁、Renderer/style和其他工作树均未修改。未合并develop；新分支推送后另行独立读回SHA，报告不填写尚不存在的文档提交SHA。
+
+## 同步后续前端集成与组合回归
+
+推送前独立读回发现develop已前进到 `e0616040983bc4358c354e34986639341ec481c6`，新增前端布局/滚动/成果组件与证据，没有修改后端执行边界。本功能分支通过普通merge同步，提交 `ff9ce661850987348f4a281d1e1b81a437f658ea`；四份SSOT冲突按双方真实状态和证据ID合并，前端运行组件与远端逐字节一致，不覆盖另一工作树或改写历史。远端develop未被本轮修改。
+
+在该组合SHA上，typecheck、test:backend-history（13）、test:desktop（20）通过；test:desktop-ui退出1，展开右栏后立即保存的滚动基线与重返会话位置不符；test:desktop-agent-shell退出1，截图前关键控件检查失败。原始失败保留，未宣称组合验证已全通过。
+
+`0f74a9ae7feba118933c284c67eec10e030d26ca` 只改前端测试驱动：展开右栏后等待两个实际绘制帧再保存导航基线，保持小于3px的原断言并增加位置诊断。该次重跑未出现完成标记、进程返回0，**不记通过**。审读发现既有启动器120秒测试超时只发SIGTERM，正常退出可能返回0；此外macOS窗口遮挡会节流动画帧。[Electron官方说明](https://github.com/electron/electron/blob/main/docs/api/browser-window.md#page-visibility)及安装的44.4.5声明均支持测试专用backgroundThrottling控制。
+
+`ecffc9d03483cfc6878846ceeda5f3d05b70cb9e` 在显式smoke模式关闭后台帧节流，普通产品窗口保留默认；启动器记录测试超时并返回1。120秒是既有自动桌面测试的期限，未改LLM/产品运行期限。没有跳过截图、扩大误差或重试吞错；没有专门等待120秒去重新触发修正后的超时分支，该分支属于代码检查，正常完成与完整业务断言实际重跑如下：
+
+| 命令（全部被测ecffc9d） | 结果 |
+|---|---|
+| `npm run typecheck` | passed |
+| `npm run test:desktop-ui` | passed，明确完成标记；三尺寸/三栏宽、审批/停止、草稿与滚动位置、成果及原四场景 |
+| `npm run test:desktop-agent-shell` | passed，真实Pi/Bash+合成Provider，逐审批和三尺寸截图/原会话重连 |
+| `npm run test:desktop-file-agent` | passed，实际文件工具+合成Provider |
+| `npm run test:desktop-model` | passed，合成流/恢复/取消 |
+
+此前完整A/B/模型离线与退出矩阵证据继续指向45e45a5；同步后没有无差别重复全套。所有阶段真实模型调用仍为0。Renderer/style保留上游原样；只补测试绘制同步及宿主测试模式/启动器超时语义。下一步依旧是前端消费已交付分页API及长历史组合验收，当前旧thread全量入口限制未消失。
+
+在ecffc9d加本节证据文档差异上，最终再次执行check-ssot（60）、test-tools（15）、check-docs结构（5通过/2有意跳过）及完整示例类型（7通过），全部退出0；不把后续纯文档提交冒充代码被测SHA。

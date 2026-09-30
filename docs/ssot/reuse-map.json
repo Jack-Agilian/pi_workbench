@@ -1266,7 +1266,8 @@
           "EV-BACKEND-HISTORY-MAC-20260930",
           "EV-BACKEND-HISTORY-PAGES-20260930",
           "EV-UI-P2-FRONTEND-MOCK-20260930",
-          "EV-UI-P2-FRONTEND-MAC-20260930"
+          "EV-UI-P2-FRONTEND-MAC-20260930",
+          "EV-BACKEND-MERGE-PASSED-20260930"
         ]
       }
     }
@@ -2699,6 +2700,42 @@
         "darwin"
       ],
       "locator": "docs/validation/ui-p2-integration-2026-09-30.md"
+    },
+    {
+      "id": "EV-BACKEND-MERGE-FAILED-20260930",
+      "kind": "platform",
+      "result": "failed",
+      "commit": "ff9ce661850987348f4a281d1e1b81a437f658ea",
+      "scope": "同步前端后类型/后端/桌面模块通过；Electron UI滚动基线断言及Agent Shell截图关键控件检查失败，保留原输出。",
+      "recordedAt": "2026-09-30T07:36:52.088102+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/backend-history-2026-09-30.md"
+    },
+    {
+      "id": "EV-BACKEND-FRAME-INCOMPLETE-20260930",
+      "kind": "platform",
+      "result": "failed",
+      "commit": "0f74a9ae7feba118933c284c67eec10e030d26ca",
+      "scope": "仅补绘制等待后UI进程退出0但没有完成标记，按未完成失败记录；既有测试超时返回0缺陷不作为通过。",
+      "recordedAt": "2026-09-30T07:36:52.088102+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/backend-history-2026-09-30.md"
+    },
+    {
+      "id": "EV-BACKEND-MERGE-PASSED-20260930",
+      "kind": "platform",
+      "result": "passed",
+      "commit": "ecffc9d03483cfc6878846ceeda5f3d05b70cb9e",
+      "scope": "仅测试模式禁后台帧节流、超时返回失败；类型与四套实际Electron UI/模型/文件/Bash合成Provider检查通过，保持原断言；未专门重触发120秒超时分支，未接入分页Renderer，真实模型0。",
+      "recordedAt": "2026-09-30T07:36:52.088102+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/backend-history-2026-09-30.md"
     }
   ]
 }
