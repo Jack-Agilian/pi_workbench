@@ -340,3 +340,16 @@ npm run demo:agent-shell
 
 
 Agent Shell手动真实验收入口：`npm run validate:agent-shell -- --execute-approved <attempt-id> <approved-synthetic-workspace>`。需要已配置并批准的工具范围、专用合成README.md/data.md/check.sh与交互终端；会产生真实模型费用且每条工具须人工决定，不属于自动测试或默认产品启动。实际案例、清理和失败边界见 [2026-09-30报告](validation/agent-task-live-2026-09-30.md)。
+
+## UI-P2 后端与并行开发
+
+```bash
+npm run test:backend-history
+npm run demo:agent-shell -- --dev-profile=backend
+# 前端在自己的工作树中运行：
+npm run demo:agent-shell -- --dev-profile=frontend
+```
+
+开发profile保存在当前工作树 `.artifacts/desktop-profiles/<name>`，隔离SQLite、原生Session、租约和Electron用户数据。该选项只允许离线/合成模式，不能与真实模型、凭据配置或smoke选项组合；正式入口和临时测试目录行为不变。两线各自初始化node_modules/.venv/dist，可复用固定Node和已校验的只读下载缓存，不共享可变安装目录或复制真实费用库。GUI回归串行执行。
+
+`test:backend-history` 使用实际临时数据库与子进程，覆盖旧目录重新准入、分页、重连、真实成果预览、展示消息去重和双宿主隔离。合成历史/协议生产者明确标记，真实模型0；双宿主不等于两个GUI窗口人工体验。产品API与事件水位语义见 [共享契约](ssot/backend-history-contract.md)，前端接入次序见 [交接](planning/BACKEND_HISTORY_HANDOFF.md)。

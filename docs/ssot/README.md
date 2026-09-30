@@ -148,3 +148,6 @@ M2 实机复审：[两处正确性修正与 Mac 回归](../validation/review-m2-
 ## UI-P2 分页组合（2026-09-30，尚未集成develop）
 
 前端分支已采用后端45e45a5/8e1b598共享契约，新增历史/工具/成果分页和独立活动显示；[实际SHA、失败与限定证据](../validation/ui-p2-pages-2026-09-30.md)。超过旧传输上限的60条持久合成Run可由Electron逐页读取，并通过真实Worker新任务取消和重连核对；零真实模型。上一节“R03未解决”描述旧集成基线，当前分支已限定解决Renderer传输路径，未完成虚拟列表、home目录分页或原生全部正文。唯一当前事项为NEXT_STEPS顶部的复审与集成收口。
+## UI-P2 后端前置（2026-09-30）
+
+[运行边界/分页契约](backend-history-contract.md) · [前端交接](../planning/BACKEND_HISTORY_HANDOFF.md) · [代码与验证范围](../validation/backend-history-2026-09-30.md)。基于develop@58d3130，只增加宿主工作区重新准入、展示消息水位、已有SQLite上的有界分页和工作树离线profile。复用Pi原生Session/工具、SQLite查询模式、Electron用户数据目录，不新建Harness或引入分页框架。Renderer尚未接入，旧全量读取上限仍存在；当前唯一事项继续UI-P2，CORE-03/SEC-02/UI-01/ART-01保持in_progress，既有Gate不扩大。

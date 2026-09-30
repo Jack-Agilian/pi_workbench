@@ -104,3 +104,4 @@ M2 最新复审：[修正与实机证据](validation/review-m2-2026-09-29.md) ·
 最新集成：[2026-09-30 develop集成检查](validation/develop-integration-2026-09-30.md)。M2/Agent Shell已进入develop；下一步以 [NEXT_STEPS](planning/NEXT_STEPS.md) 顶部UI-P2为准。
 
 UI-P2前端分页组合：[接入证据与范围](validation/ui-p2-pages-2026-09-30.md)。正式历史/工具/成果分页、独立审批/停止、错误与重连已限定Mac验证；尚未集成develop，唯一当前事项见NEXT_STEPS顶部。
+当前UI-P2后端接口见 [运行边界与分页契约](ssot/backend-history-contract.md)、[前端交接](planning/BACKEND_HISTORY_HANDOFF.md) 和 [本轮脱敏报告](validation/backend-history-2026-09-30.md)。
