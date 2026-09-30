@@ -1128,7 +1128,7 @@
         "esbuild build"
       ],
       "reuse": "Electron公开窗口/沙盒/IPC，React渲染和esbuild构建；复用既有产品与Pi Worker链路",
-      "productDelta": "闭合产品桥、Thread/Run视图、审批/取消/成果与有界纯文本投影；显式无模型驱动；关闭结果/重连接管分离，未确认命令按意图保留身份并显式重试；D1正常退出/信号统一结算，关闭失败后原窗口显式恢复，候选新宿主不迟到发布；D2-S展示固定命令审批/profile/期限及stdout/stderr有界完成快照，交互终端尚未接入；M1正文流/最终快照、应用专用持久凭据加载及原生临时选择、策略待确认/预算耗尽准入和双时间限制显示；仅产品DTO；M2已有视图增加逐read/write/edit审批、有限版本/参数摘要、后续模型轮流式正文与重连展示；显式SYNTHETIC离线入口，不由Renderer选择工具或worker代码；原生目录选择无自由路径Renderer入口，实际cwd/阶段/逐命令有界结果、三尺寸核心动作核查；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开；2026-09-30后端工作区重新准入、展示消息与控制去重分离、固定SQLite分页/独立活动快照及工作树离线profile，Renderer消费尚待UI-P2，不重写原生Session",
+      "productDelta": "闭合产品桥、Thread/Run视图、审批/取消/成果与有界纯文本投影；显式无模型驱动；关闭结果/重连接管分离，未确认命令按意图保留身份并显式重试；D1正常退出/信号统一结算，关闭失败后原窗口显式恢复，候选新宿主不迟到发布；D2-S展示固定命令审批/profile/期限及stdout/stderr有界完成快照，交互终端尚未接入；M1正文流/最终快照、应用专用持久凭据加载及原生临时选择、策略待确认/预算耗尽准入和双时间限制显示；仅产品DTO；M2已有视图增加逐read/write/edit审批、有限版本/参数摘要、后续模型轮流式正文与重连展示；显式SYNTHETIC离线入口，不由Renderer选择工具或worker代码；原生目录选择无自由路径Renderer入口，实际cwd/阶段/逐命令有界结果、三尺寸核心动作核查；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开；2026-09-30后端工作区重新准入、展示消息与控制去重分离、固定SQLite分页/独立活动快照及工作树离线profile，Renderer消费尚待UI-P2，不重写原生Session；UI-P2前端右栏折叠/三档宽度、常驻审批/停止、Thread滚动锚点、按需成果核验展示；全量历史传输分页仍待接入",
       "acceptanceGate": "真实桌面进程/来源/CSP、Thread隔离、审批/取消/恢复；平台/模型/Gate分别验收；确认丢失/交错重试、异常关闭与受证据约束的恢复",
       "implementationState": "in_progress",
       "adoption": {
@@ -1191,6 +1191,10 @@
               },
               {
                 "name": "useRef",
+                "kind": "runtime"
+              },
+              {
+                "name": "useLayoutEffect",
                 "kind": "runtime"
               }
             ],
@@ -1260,7 +1264,9 @@
           "EV-AGENT-TASK-MODEL-20260930",
           "EV-AGENT-TASK-MAC-20260930",
           "EV-BACKEND-HISTORY-MAC-20260930",
-          "EV-BACKEND-HISTORY-PAGES-20260930"
+          "EV-BACKEND-HISTORY-PAGES-20260930",
+          "EV-UI-P2-FRONTEND-MOCK-20260930",
+          "EV-UI-P2-FRONTEND-MAC-20260930"
         ]
       }
     }
@@ -2645,6 +2651,54 @@
         "darwin"
       ],
       "locator": "docs/validation/backend-history-2026-09-30.md"
+    },
+    {
+      "id": "EV-UI-P2-FRONTEND-MOCK-20260930",
+      "kind": "mock",
+      "result": "passed",
+      "scope": "实际Electron中的36条合成展示Run及preview响应，验证栏宽/审批入口、草稿焦点、Thread滚动与迟到结果；不冒充真实模型/持久历史/分页。",
+      "commit": "9b890840e6e9a5f76b8f7a9eed3c3038f63e0a9c",
+      "recordedAt": "2026-09-30T06:58:58.737221+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/ui-p2-frontend-2026-09-30.md"
+    },
+    {
+      "id": "EV-UI-P2-FRONTEND-MAC-20260930",
+      "kind": "platform",
+      "result": "passed",
+      "scope": "Mac Electron三尺寸、既有实际Host/Pi/Bash/文件离线回归；Provider合成、真实模型0。截图失败与修正分列，不扩大M0 Gate，后端分页未完成。",
+      "commit": "9b890840e6e9a5f76b8f7a9eed3c3038f63e0a9c",
+      "recordedAt": "2026-09-30T06:58:58.737221+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/ui-p2-frontend-2026-09-30.md"
+    },
+    {
+      "id": "EV-UI-P2-CAPTURE-FAIL-20260930",
+      "kind": "platform",
+      "result": "failed",
+      "scope": "实现SHA上的desktop-ui收尾及一次原样重跑均在截图阶段报UnknownVizError；没有吞错或取消截图断言，后续独立驱动修正SHA另记通过。",
+      "commit": "3c02b996c66576e8618c85048dd7488c2c6488a5",
+      "recordedAt": "2026-09-30T06:59:54.990849+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/ui-p2-frontend-2026-09-30.md"
+    },
+    {
+      "id": "EV-UI-P2-INTEGRATION-20260930",
+      "kind": "platform",
+      "result": "passed",
+      "scope": "macOS集成树6884e27的严格类型、20项桌面测试及实际Electron UI四场景/三尺寸合成展示交互；零真实模型，不含后端分页、R01/R02、Windows或生产发行。",
+      "commit": "6884e278bb2d9057a78fa5b74b513a1d0798320e",
+      "recordedAt": "2026-09-30T07:09:55.539910+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/ui-p2-integration-2026-09-30.md"
     }
   ]
 }

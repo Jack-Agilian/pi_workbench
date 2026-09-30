@@ -2,15 +2,19 @@
 
 当前依据：[SSOT](../ssot/README.md)、[任务账本](backlog.json)。以下当前事项优先于后文历史阶段的“下一步”。
 
-## 唯一当前事项：UI-P2 长历史与成果浏览体验
+## 唯一当前事项：UI-P2 分页接入与前后端组合验收
 
 2026-09-30：用户授权后，develop 从 `148022b05250cfda824725778e9a056d00cd6830` 快进合入 `codex/agent-shell-mvp` 的20个提交，集成代码与证据基线为 `34ed62e3fc875c56059eb19c1f02781d72c78bfc`。M2、审核修复、Agent Shell、请求次数缺省不限与Pi strict schema修正现已进入同一集成分支；[本次集成检查](../validation/develop-integration-2026-09-30.md)。
 
-按 [主功能/UI计划](AGENT_MVP_UI_PLAN.md) 的UI-P2推进，并采纳develop@58d3130审核的后端前置。当前阶段只此一项，前后端分工如下：
+2026-09-30：用户授权后，develop 从 `58d3130d9ed480e283434c749e285efd6ba2092d` 快进合入前端分支的3个提交，集成代码/证据基线 `6884e278bb2d9057a78fa5b74b513a1d0798320e`。右栏收起/宽度、常驻审批与停止、草稿/滚动位置及成果核验展示已进入develop；[集成记录](../validation/ui-p2-integration-2026-09-30.md)。
 
-1. 后端 `codex/backend-history-safety` 已提交旧工作区重新准入、展示/控制消息分离、真实数据库历史/操作/成果分页与离线开发profile。代码 `45e45a5d598771c484926dd82d404f4242761185`，证据见 [后端报告](../validation/backend-history-2026-09-30.md)，接口以 [共享契约](../ssot/backend-history-contract.md) 和 [前端交接](BACKEND_HISTORY_HANDOFF.md) 为准。未合并develop，不修改其他工作树或Renderer。
-2. 前端下一步采用同一契约，接入分页及独立活动/审批快照；改善右栏折叠/宽度、成果名称/来源和changed/missing展示。旧thread全量入口仍有1.2 MB上限，前端未切换前不能宣布长历史问题已解决；审批始终可发现，不抢焦点、不丢草稿。
-3. 集成后集中完成三个既定窗口尺寸、长历史分页、审批/取消/草稿/重连回归。两线使用各自 `--dev-profile` 离线目录，GUI测试串行；不要用新增真实模型调用调试小改动。Pi循环、Provider、Session和审批所有权不变；PTY、Windows、市场和生产发行后置。
+接下来只有一条推进顺序：
+
+1. 后端 `codex/backend-history-safety` 已完成R01/R02、离线开发profile和历史/操作/成果分页，代码 `45e45a5d598771c484926dd82d404f4242761185`，操作分页补充断言 `8e1b5987d607101fb04df571280e3c75c939efc3`。当前功能分支已同步前端集成基线 `e0616040983bc4358c354e34986639341ec481c6`；未将后端分支合入develop。[后端契约](../ssot/backend-history-contract.md)、[后端交接](BACKEND_HISTORY_HANDOFF.md)、[后端证据](../validation/backend-history-2026-09-30.md)。
+2. 前端采用同一份已提交契约，接入更早历史加载、分页滚动锚点和重连；当前活动Run/审批独立可见，不能用前端裁剪掩盖传输超限。
+3. 合流后集中验证长会话、审批/取消/恢复、成果状态及三个窗口尺寸；保持草稿/焦点和原命令身份，真实模型验收单独安排，不用付费请求调试小改动。
+
+边界见 [前端交接](UI_P2_FRONTEND_HANDOFF.md) 与 [前端证据](../validation/ui-p2-frontend-2026-09-30.md)。UI-01/02、ART-01继续in_progress，超大历史R03未解决；PTY、Windows、市场和生产发行后置。
 
 已有真实任务代码 `688150f070797405250bb16ad3dc837bb0ddc64d`；[真实结果与首次失败](../validation/agent-task-live-2026-09-30.md)、[脱敏输入](../validation/agent-task-live-inputs-2026-09-30.json)、[实际模型生成报告](../validation/agent-task-result-2026-09-30.md)。本次集成没有新增真实请求，以下仍为该次任务的历史消费与验证范围。
 

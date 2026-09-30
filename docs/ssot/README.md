@@ -141,6 +141,10 @@ M2 实机复审：[两处正确性修正与 Mac 回归](../validation/review-m2-
 
 用户授权后已快进集成M2与Agent Shell全部20个提交，基线 `34ed62e3fc875c56059eb19c1f02781d72c78bfc`；[集成检查与范围](../validation/develop-integration-2026-09-30.md)。既有证据保留原被测SHA，Gate状态不因合并扩大；唯一下一步为UI-P2长历史与成果浏览体验，本次没有开始实现或新增模型调用。
 
+## UI-P2 前端集成（2026-09-30）
+
+前端三个提交已按授权进入develop，基线 `6884e278bb2d9057a78fa5b74b513a1d0798320e`；[本次集成检查](../validation/ui-p2-integration-2026-09-30.md)。右栏可收起/调宽，审批与停止常驻，按会话保留草稿/浏览位置，成果显示来源/版本及宿主核验状态。下一步为后端修正/分页契约接入与组合验收；R03全量历史超限未解决，任务与Gate不因合并自动晋级。
+
 ## UI-P2 后端前置（2026-09-30）
 
 [运行边界/分页契约](backend-history-contract.md) · [前端交接](../planning/BACKEND_HISTORY_HANDOFF.md) · [代码与验证范围](../validation/backend-history-2026-09-30.md)。基于develop@58d3130，只增加宿主工作区重新准入、展示消息水位、已有SQLite上的有界分页和工作树离线profile。复用Pi原生Session/工具、SQLite查询模式、Electron用户数据目录，不新建Harness或引入分页框架。Renderer尚未接入，旧全量读取上限仍存在；当前唯一事项继续UI-P2，CORE-03/SEC-02/UI-01/ART-01保持in_progress，既有Gate不扩大。

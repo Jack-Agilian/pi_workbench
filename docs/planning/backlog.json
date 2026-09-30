@@ -920,7 +920,9 @@
             "EV-D1-SYNTHETIC-20260924",
             "EV-D1-REGRESSION-20260924",
             "EV-M1-SDK-20260928",
-            "EV-M1-MAC-20260928"
+            "EV-M1-MAC-20260928",
+            "EV-UI-P2-FRONTEND-MOCK-20260930",
+            "EV-UI-P2-FRONTEND-MAC-20260930"
           ]
         },
         {
@@ -934,7 +936,7 @@
           ]
         }
       ],
-      "statusReason": "UI-P2后端前置已在功能分支实现：有界历史/操作/成果页、独立当前审批快照和工作树离线profile。Renderer接入、虚拟列表/右栏与三尺寸集成验收未完成；既有M0 Gate仅维持原范围。"
+      "statusReason": "前端布局/右栏/草稿/滚动位置和成果状态已集成develop；当前后端分支同步该基线并完成运行边界、有界分页和离线profile。分页Renderer消费与组合长历史验收仍待完成，R03的旧全量入口限制保留；in_progress，既有Gate不扩大。"
     },
     {
       "id": "UI-02",
@@ -984,11 +986,13 @@
             "EV-D1-SYNTHETIC-20260924",
             "EV-D1-REGRESSION-20260924",
             "EV-M1-SDK-20260928",
-            "EV-M1-MAC-20260928"
+            "EV-M1-MAC-20260928",
+            "EV-UI-P2-FRONTEND-MOCK-20260930",
+            "EV-UI-P2-FRONTEND-MAC-20260930"
           ]
         }
       ],
-      "statusReason": "M2/Agent Shell及限定布局改进已于2026-09-30按授权集成develop；已有证据保持原SHA和范围。当前下一增量为UI-P2长历史/右栏与成果浏览，尚未实施；保留in_progress，不把限定M0 Gate通过扩为完整UI、无障碍或真实模型桌面人工验收。"
+      "statusReason": "前端布局/右栏/草稿/滚动位置和成果状态已集成develop；当前后端分支同步该基线并完成运行边界、有界分页和离线profile。分页Renderer消费与组合长历史验收仍待完成，R03的旧全量入口限制保留；in_progress，既有Gate不扩大。"
     },
     {
       "id": "GIT-01",
@@ -1079,7 +1083,7 @@
           ]
         }
       ],
-      "statusReason": "已有真实Markdown来源与版本索引保持；本轮补成果元数据分页和按需ready/changed/missing预览，保护失效工作区不得读取。前端成果体验/另存为/其他格式未完成，保留in_progress。"
+      "statusReason": "真实成果索引及前端名称/来源/版本、按需preview状态展示已集成develop；当前后端分支提供成果元数据分页和工作区重新准入。前端分页消费、另存为/其他格式未完成，in_progress。"
     },
     {
       "id": "SKL-01",

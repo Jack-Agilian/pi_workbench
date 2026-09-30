@@ -1,0 +1,160 @@
+{
+  "baseline": "58d3130d9ed480e283434c749e285efd6ba2092d",
+  "implementationCommit": "3c02b996c66576e8618c85048dd7488c2c6488a5",
+  "captureCommit": "9b890840e6e9a5f76b8f7a9eed3c3038f63e0a9c",
+  "platform": "macOS 27.0 arm64",
+  "node": "24.21.0",
+  "electron": "44.4.5",
+  "realModelCalls": 0,
+  "checks": [
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "startedAt": "2026-09-30T06:56:54.427383+00:00",
+      "log": ".artifacts/ui-p2-frontend/frame-typecheck.log"
+    },
+    {
+      "command": "npm run test:desktop-agent-shell",
+      "exitCode": 0,
+      "startedAt": "2026-09-30T06:56:56.722178+00:00",
+      "log": ".artifacts/ui-p2-frontend/frame-test-desktop-agent-shell.log"
+    },
+    {
+      "command": "npm run test:desktop-file-agent",
+      "exitCode": 0,
+      "startedAt": "2026-09-30T06:57:02.411970+00:00",
+      "log": ".artifacts/ui-p2-frontend/frame-test-desktop-file-agent.log"
+    },
+    {
+      "command": "npm run test:desktop-model",
+      "exitCode": 0,
+      "startedAt": "2026-09-30T06:57:07.933076+00:00",
+      "log": ".artifacts/ui-p2-frontend/frame-test-desktop-model.log"
+    }
+  ],
+  "uiInteractions": {
+    "scope": "SYNTHETIC display fixtures in real Electron; no model calls or execution claims",
+    "metrics": [
+      {
+        "width": 1320,
+        "height": 860,
+        "size": "compact",
+        "overflow": false,
+        "rail": 264,
+        "composerVisible": true
+      },
+      {
+        "width": 1320,
+        "height": 860,
+        "size": "normal",
+        "overflow": false,
+        "rail": 306,
+        "composerVisible": true
+      },
+      {
+        "width": 1320,
+        "height": 860,
+        "size": "wide",
+        "overflow": false,
+        "rail": 380,
+        "composerVisible": true
+      },
+      {
+        "width": 1024,
+        "height": 720,
+        "size": "compact",
+        "overflow": false,
+        "rail": 264,
+        "composerVisible": true
+      },
+      {
+        "width": 1024,
+        "height": 720,
+        "size": "normal",
+        "overflow": false,
+        "rail": 264,
+        "composerVisible": true
+      },
+      {
+        "width": 1024,
+        "height": 720,
+        "size": "wide",
+        "overflow": false,
+        "rail": 320,
+        "composerVisible": true
+      },
+      {
+        "width": 820,
+        "height": 640,
+        "size": "compact",
+        "overflow": false,
+        "rail": 260,
+        "composerVisible": true
+      },
+      {
+        "width": 820,
+        "height": 640,
+        "size": "normal",
+        "overflow": false,
+        "rail": 260,
+        "composerVisible": true
+      },
+      {
+        "width": 820,
+        "height": 640,
+        "size": "wide",
+        "overflow": false,
+        "rail": 290,
+        "composerVisible": true
+      }
+    ],
+    "anchorPreserved": true,
+    "threadScrollRestored": true,
+    "draftAndSelectionPreserved": true,
+    "latePreviewRejected": true,
+    "previewStatuses": [
+      "ready",
+      "changed",
+      "missing",
+      "unavailable"
+    ],
+    "commands": 0
+  },
+  "screenshots": [
+    {
+      "file": "agent-shell-approval-820x640.png",
+      "sha256": "fbc3d44c935a93c51932ec3324e564c4eb93b4f96ab0078cf3994b663942adba"
+    },
+    {
+      "file": "ui-p2-approval-1024x720.png",
+      "sha256": "c80a6c151fd5d14213711340ecf6fadfd9071a0729e0c94e2491d84b461c2cc6"
+    },
+    {
+      "file": "ui-p2-approval-1320x860.png",
+      "sha256": "73cc7e47810da817d8f0f57c87a78dbbe625cdfe1804daa99e2555178d0a9aa6"
+    },
+    {
+      "file": "ui-p2-approval-820x640.png",
+      "sha256": "1c74e7c62c7b4689aa6a7dfebba8880483dd49b82807422a5f418bff8ccaf768"
+    }
+  ],
+  "logs": [
+    {
+      "name": "frame-test-desktop-ui.log",
+      "sha256": "e7eab64621a21f88c588440060201027d2b91b5aa1653ba9f8bace41f34fe641"
+    },
+    {
+      "name": "final-test-desktop.log",
+      "sha256": "70000da90cf9f8e30a6f6922c8bab260ff9512d668c0ebc90ce1273fa8a40d19"
+    },
+    {
+      "name": "final-test-desktop-ui.log",
+      "sha256": "2777169ea94b93c4e34bc38532d2e6f7923fd79ebc17145bef64c2b739dfe908"
+    },
+    {
+      "name": "retry-test-desktop-ui.log",
+      "sha256": "2777169ea94b93c4e34bc38532d2e6f7923fd79ebc17145bef64c2b739dfe908"
+    }
+  ],
+  "scope": "Desktop unit tests: implementation commit. Final real Electron UI and typecheck: capture commit. Two screenshot failures at implementation commit retained. SYNTHETIC history/preview fixture is not runtime history evidence. Backend pagination and R01/R02 unimplemented here."
+}
