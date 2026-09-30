@@ -28,3 +28,5 @@ F01修正接缝：新增historyEntry(threadId, runId)，字段/归属/字节校�
 ## 后续复用方向
 
 [模块参考映射](../ssot/reference-implementations.md)明确保留固定SQLite产品查询、historyEntry、工作区准入、审批与Guardian。新增通用持久任务/调度/观察流前，先对照P16的durable存储、Harness恢复、requestId与工具replay/背压；记录Session、审批、未知副作用、清理及预算差距，不新增第二份权威历史。前端Query迁移不改变后端命令身份/所有权，模型调用与库采用准入分别记录。
+
+Q1只读查询迁移协作项：当前DesktopApi未暴露连接代次、现有IPC不支持AbortSignal；实施时提供不含路径/秘密且不具授权能力的环境/连接身份，或验证等价的QueryClient重建隔离方案。保留16个pending的现有背压和迟到回复绑定；不因前端换库新增自由数据库参数、取消执行后门或第二套账本。详见[SSOT迁移契约](../ssot/reference-implementations.md)。

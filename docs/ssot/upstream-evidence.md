@@ -139,3 +139,7 @@ Context7 用于定位官方文档，最终核对安装包 docs/providers.md 的 
 继续evaluate，未安装或导入，不更改Pi0.87.1锁。候选采用前仍需实际发行/类型/运行时入口、Session迁移、审批一次领取、进程清理、未知副作用不重发、预算及故障恢复兼容证明。修正旧理由不等于上述能力已通过。
 
 [官方TanStack Query v5无限查询](https://tanstack.com/query/latest/docs/framework/react/guides/infinite-queries)经Context7与官方页面核对：失效后顺序读取缓存页，maxPages限制保留页。故本次定向读取先复用现有小适配，不为消除F01直接添加缓存库；没有候选库运行时实测。
+
+## L04补充：现有查询迁移的默认行为（2026-09-30）
+
+本次通过Context7 `/tanstack/query` 定位React v5的[默认行为](https://tanstack.com/query/latest/docs/framework/react/guides/important-defaults)、[网络模式](https://tanstack.com/query/latest/docs/framework/react/guides/network-mode)和[取消](https://tanstack.com/query/latest/docs/framework/react/guides/query-cancellation)说明；网络模式和取消另直接核对官方页面。默认重取/重试必须显式适配本地IPC，always仅是查询调度，取消底层工作要求传输实现配合。由此补充[Q1迁移契约](reference-implementations.md)，不是已选发行或兼容验证；本次未安装包、未跑模型或产品回归。

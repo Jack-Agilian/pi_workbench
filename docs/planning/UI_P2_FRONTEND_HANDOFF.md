@@ -22,3 +22,7 @@
 ## 后续复用方向
 
 采用[模块参考映射](../ssot/reference-implementations.md)的指定pi-gui三文件、Query v5及有条件Virtual路线。ThreadPages只保留产品事件/水位/页链适配，不继续建设通用缓存；实际迁移替换原职责，维持2次查询、批次失败、切换及重连断言。当前未移植新组件或安装库；草稿/焦点与单一滚动控制者保留，历史UI超时仍待定位。
+
+## Q1现有只读查询迁移（待实施）
+
+F01集成后的下一代码增量首选operationPage迁向Query v5，替换已有通用机制而非只约束新功能；historyEntry与F01回归复用。按[SSOT迁移契约](../ssot/reference-implementations.md)明确缓存身份、自动重试/重取设置、离线调度、IPC背压和整批发布。宿主重连身份尚需可信桥接缝，cancelQueries不等于终止现有IPC。一个范围只保留一个缓存所有者；Q1通过后再分批迁移历史/成果，不一次重写前端。

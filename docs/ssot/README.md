@@ -6,7 +6,7 @@
 
 ## 阅读顺序与权威边界
 
-1. [复用优先架构](reuse-first.md)：决定什么依赖上游、什么只包一层、什么确需自研；含替代旧方案的 ADR。模块级参考文件/API、替换范围和保留边界见[指定参考实现](reference-implementations.md)。
+1. [复用优先架构](reuse-first.md)：决定什么依赖上游、什么只包一层、什么确需自研；含替代旧方案的 ADR。模块级参考文件/API、已有代码Q1/Q2迁移、替换范围和保留边界见[指定参考实现](reference-implementations.md)。
 2. [模块接入契约](integration-contracts.md)：决定接口边界、权限、状态所有权和故障语义。
 3. [上游证据](upstream-evidence.md)：固定源码提交、公开导出与核验限制；不把 main 上的源码当作已发布 API。
 4. [机器可读复用清单](reuse-map.json)：逐项记录复用方式、上游符号/入口、产品增量和验收门槛。

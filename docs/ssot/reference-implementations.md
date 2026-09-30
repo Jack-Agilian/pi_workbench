@@ -40,18 +40,53 @@ durable继续对照P16固定 `1b347794e2a630e4359f2584f4eea388145d0ddf`；源码
 4. 滚动借鉴以旧页前插、流式增长不打断阅读、工具展开/栏宽改变、会话切换、草稿/焦点和审批/停止可达为验收；不把复杂自研滚动引擎作为默认下一步。
 5. durable采用前逐项核对Session迁移、审批/幂等、未知工具结果、取消结算、宿主及后代清理、费用账本和观察背压。工具中断结果本身不能证明macOS后代已清理。
 
+## 已有代码迁移：明确交付而非只约束新功能
+
+2026-09-30复审采纳`EXISTING_CODE_MIGRATION.md`。已有投入不是继续维护通用机制的充分理由；按后续维护职责、适配与迁移风险决定替换。F01修复查询放大，查询库迁移减少通用机制维护，两项目标分别验收，不重做已正确的F01逻辑。
+
+| 增量 | 具体交付与删除范围 | 验收与停止条件 |
+|---|---|---|
+| Q1：现有工具只读查询迁移（下一代码增量，尚未实施） | 首选`operationPage`：复用DesktopApi、OperationPage与原组件，由Query v5承接该范围的缓存、加载/错误与重复读取协调；删除ThreadPages中该范围被接管的通用机制。产品事件批次协调与工具页游标适配保留 | 精确发行/许可/类型准入、宿主环境身份、无网络本地查询、重连迟到结果、分页/焦点/审批回归均通过；同一范围只有一个缓存所有者。列出删掉与留下的职责，不以引入依赖或行数变化代替维护收益 |
+| Q2：历史/成果同类通用职责（Q1验收后的后续增量） | 按查询范围分批替换；沿用historyEntry、F01失效表、头部补齐与旧页链。原组件和产品契约继续使用 | 每个范围都保持同一组一致性/查询计数回归并删除旧同等机制；不要求长期保留两套生产实现 |
+| 滚动与组件校正 | 对照C03既有行为校正小型适配与工具展开，不复制pi-gui完整driver/布局引擎 | 保留阅读意图、单一滚动控制者、草稿/焦点和审批可达；Virtual仍须实测需求触发，不借迁移制造虚拟化工作 |
+
+本轮只采纳计划，未实施Q1；具体精确版本与实施基线在开工时核对，不能把v5主版本或示例blob当锁文件。当前源码核对基线为 `2ebd795445aea8f18581119d598f116309043d35`：ThreadPages仍用LoadedRange/operations Map和串行队列，Renderer维护pageBusy/pageProblem；这些是迁移候选，不能宣称已由库承担。
+
+### Q1必须补齐的产品接缝
+
+- 查询键覆盖不含秘密的宿主/数据环境身份、连接代次、Thread/Run及查询种类；页身份进入独立页键或infinite query的pageParams，不能解析产品游标或用数据库绝对路径/凭据作键。当前DesktopApi没有公开宿主连接代次；实施需通过可信桥提供不具授权能力的不透明身份，或证明等价的按环境重建QueryClient方案，不能只用threadId/runId假定跨重连安全。
+- 一个范围只由新缓存拥有。允许Q1工具查询与尚未迁移的历史/成果范围共存；不得把同一工具页再镜像到旧operations Map作为第二份可变缓存。只读组合视图与批次发布屏障属于产品展示协调，须说明其必要性。
+- 同批实体去重，全部必要读取成功后才推进事件水位、发布完整显示；库逐查询成功不等于整批成功。保留F01正文2次查询、多页前插、300事件、失败/迟到/切换和未知事件断言；不用新库的逐项缓存更新削弱旧一致性。
+- 有界IPC并发和背压继续生效；当前HostClient最多16个pending请求，库去重不等于限制不同查询的并发。实施需核验多Run刷新不会制造请求洪峰，不扩成通用调度器，也不增加限制值掩盖问题。
+- 纯本地只读查询显式采用适合离线的调度设置，例如`networkMode: always`。它只控制查询库是否因浏览器离线状态暂停，不改变Worker/Shell网络权限，不适用于未经批准的模型调用。[官方网络模式](https://tanstack.com/query/latest/docs/framework/react/guides/network-mode)
+- 显式配置staleTime、refetchOnMount/refetchOnWindowFocus/refetchOnReconnect、retry/retryOnMount与缓存回收策略。Q1默认禁用自动失败重试及窗口聚焦/网络重连重取，宿主重连仍走产品显式重同步；需要瞬时只读重试时另定有限次数、已知错误与可观察结果。无效游标、权限拒绝、超大条目不盲重试；错误UI/手动恢复路径保留。不得因默认过期、回收或maxPages驱逐而重读全部历史或丢失可见页。[官方默认行为](https://tanstack.com/query/latest/docs/framework/react/guides/important-defaults)
+- 当前preload/HostClient没有AbortSignal或取消单次IPC的协议。`cancelQueries`不能证明已发送的宿主查询/进程停止；使用signal检查阻止后续未发出的页查询，并保留连接/请求代次与迟到结果隔离，真实取消传输能力未实现时如实标明。[官方取消语义](https://tanstack.com/query/latest/docs/framework/react/guides/query-cancellation)
+- 启动、审批、取消、recover和reconnect继续走原产品命令/控制流程；不包装为自动重试查询、不乐观显示为已执行。缓存不拥有费用、权限、原生历史或清理事实。活动/审批读取保持独立，不等待历史迁移完成。
+
+### 迁移验收与回退
+
+同一套既有行为断言比较固定旧基线与迁移提交；增加离线状态、焦点恢复、同ID跨数据环境、实际宿主重连与缓存隔离测试。方法查询计数、真实IPC延迟和实际UI体验分别记录；方法计数不冒充时延改进。集中运行受影响类型、模块、真实IPC与Electron检查，合成数据/Provider，不新增模型费用。
+
+每个范围以独立可回退提交交付，报告精确版本、采用入口、删除的旧机制、保留适配和结果。不得顺带升级Pi、迁移数据库或改造UI。如果职责没有减少或一致性破坏，暂停该范围迁移、保留可用版本，记录具体差距；不因已引入库再叠第二层框架，也不重启无边界选型。
+
+此次复核通过Context7定位并阅读Query v5官方默认、网络模式与取消说明；其中取消/网络模式另直接核对官方页面。属于接口行为依据，不是新依赖兼容或运行证据；示例main的选项仍须在未来所选精确发行包中核验。后端ProductCore/WorkspaceAdmission/Guardian/固定分页继续保留，durable维持P16差距评估门槛。
+
 ## 未关闭项与推进顺序
 
-F01/F02的限定修正与本参考方向可以一并复审集成，不将全面Query迁移或虚拟化作为前置；F01修复也不表示通用查询复用工作已完成。后续扩展查询能力时按本表采用Query方向，不继续开放式列候选或扩建自有框架。若实际接缝无法满足上述边界，先记录具体差距与替代决定。
+F01/F02的限定修正与本参考方向可以一并复审集成，不将全面Query迁移或虚拟化作为前置；F01修复也不表示通用查询复用工作已完成。已有通用查询职责的Q1迁移已列为下一代码交付，不以出现新功能为触发条件；后续Q2继续分范围替换，不继续开放式列候选或扩建自有框架。若实际接缝无法满足上述边界，先记录具体差距与替代决定。
 
-历史 `169df60` 在另一工作树的两次UI超时根因仍未定位。当前树通过及新增阶段诊断不能关闭该项；保留复现环境/阶段/退出结果的待办，不把整个审核包宣布全部关闭。当前唯一事项仍为F01/F02交付复审与develop集成准备；之后按同一真实profile做完整人工使用检查，未关闭项继续跟踪，不能以付费调用调试刷新。
+历史 `169df60` 在另一工作树的两次UI超时根因仍未定位。当前树通过及新增阶段诊断不能关闭该项；保留复现环境/阶段/退出结果的待办，不把整个审核包宣布全部关闭。当前唯一事项仍为F01/F02交付复审与develop集成准备；之后先实施Q1并完成集中离线验收，再按同一真实profile做完整人工使用检查，未关闭项继续跟踪，不能以付费调用调试刷新。
 
 ## 来源与本次维护范围
 
-输入是用户提供的`frontend-backend-reuse-review-20260930`全包9文件：README、REVIEW、REUSE_OPTIONS、SOURCES、NEXT_STEPS、REFERENCE_IMPLEMENTATIONS、REREVIEW_AND_PLAN-96768a6、reproduce-query-counts.mjs及query-counts-96768a6.json。本文件将有用决定独立写入仓库；新克隆不需要本机tmp目录即可理解与复查。原包为历史审核/建议，保留不改，不充当新的产品运行证据。
+输入是用户提供的`frontend-backend-reuse-review-20260930`首次映射输入9文件：README、REVIEW、REUSE_OPTIONS、SOURCES、NEXT_STEPS、REFERENCE_IMPLEMENTATIONS、REREVIEW_AND_PLAN-96768a6、reproduce-query-counts.mjs及query-counts-96768a6.json。本文件将有用决定独立写入仓库；新克隆不需要本机tmp目录即可理解与复查。原包为历史审核/建议，保留不改，不充当新的产品运行证据。
 
 原复现脚本只适用于96768a6旧反例：合成端口没有historyEntry且断言74/290，不是当前实现的验收脚本；当前使用仓库thread-pages.test.ts及上述报告中的命令。
 
 本次基线 `28eeac6c8bcb5180685d653e0fce6da52597d741`，其上的文档差异只采纳模块映射、同步计划和来源；review证据不代表新SDK/模型/平台实测。任务/里程碑状态不晋级。本次没有新增运行功能；带来的变化是后续实现有具体参考、明确替换范围和不可丢失的产品边界。Skill评估：这是一次项目架构决定的维护，复用现有SSOT检查，不新增操作Skill。
 
 文档验证：在上述基线加本次文档差异上运行项目Python环境的`check-ssot.py`（60/60）、`test-tools.py`（15/15）和`check-docs.py --structural-only`（5通过/2跳过）；输出在`.artifacts/reference-mapping/`。未重跑产品代码、Electron或模型测试，沿用既有证据的原SHA与范围。
+
+迁移建议复审补充：输入新增EXISTING_CODE_MIGRATION.md，本次以2ebd795为代码核对基线，仅文档/计划变化；Q1/Q2均未实施，不继承前轮运行测试为迁移通过证据。现有Context7技能流程仍适用；该架构决策不另建Skill。
+
+迁移复审文档验证：在`2ebd795445aea8f18581119d598f116309043d35`加本次文档差异上运行`.venv/bin/python scripts/check-ssot.py`（60/60）、`.venv/bin/python scripts/test-tools.py`（15/15）、`.venv/bin/python scripts/check-docs.py --structural-only`（5通过/2跳过）及`git diff --check`，均通过。原始输出在`.artifacts/existing-code-migration/`；此处为可随新克隆定位的结果摘要。未重跑产品、Electron或模型测试。

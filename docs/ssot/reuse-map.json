@@ -1068,7 +1068,8 @@
           "EV-UI-TARGETED-MOCK-20260930",
           "EV-UI-TARGETED-MAC-20260930",
           "EV-UI-TARGETED-REGRESSION-20260930",
-          "EV-REFERENCE-MAPPING-REVIEW-20260930"
+          "EV-REFERENCE-MAPPING-REVIEW-20260930",
+          "EV-EXISTING-MIGRATION-REVIEW-20260930"
         ]
       }
     },
@@ -1145,8 +1146,8 @@
         "esbuild build"
       ],
       "reuse": "Electron公开窗口/沙盒/IPC，React渲染和esbuild构建；复用既有产品与Pi Worker链路",
-      "productDelta": "闭合产品桥、Thread/Run视图、审批/取消/成果与有界纯文本投影；显式无模型驱动；关闭结果/重连接管分离，未确认命令按意图保留身份并显式重试；D1正常退出/信号统一结算，关闭失败后原窗口显式恢复，候选新宿主不迟到发布；D2-S展示固定命令审批/profile/期限及stdout/stderr有界完成快照，交互终端尚未接入；M1正文流/最终快照、应用专用持久凭据加载及原生临时选择、策略待确认/预算耗尽准入和双时间限制显示；仅产品DTO；M2已有视图增加逐read/write/edit审批、有限版本/参数摘要、后续模型轮流式正文与重连展示；显式SYNTHETIC离线入口，不由Renderer选择工具或worker代码；原生目录选择无自由路径Renderer入口，实际cwd/阶段/逐命令有界结果、三尺寸核心动作核查；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开；UI-P2前端右栏折叠/三档宽度、常驻审批/停止、Thread滚动锚点、按需成果核验展示；现采用正式historyPage/operationPage/artifactPage和独立ThreadActivity；Renderer的thread-pages.ts维护只读已加载范围、事件衔接与重连，首屏错误也保留正确活动身份；F01新增Thread内单Run安全historyEntry只读查询，Renderer按事件定向刷新，头部桥接与旧尾游标分离，整批成功发布/切换停止后续读取；后续按reference-implementations.md对照pi-gui时间线/viewport/layout，通用查询职责指定Query v5替换方向（未安装），有实测布局瓶颈后采用Virtual，不并存两套缓存/滚动控制",
-      "acceptanceGate": "真实桌面进程/来源/CSP、Thread隔离、审批/取消/恢复；平台/模型/Gate分别验收；确认丢失/交错重试、异常关闭与受证据约束的恢复",
+      "productDelta": "闭合产品桥、Thread/Run视图、审批/取消/成果与有界纯文本投影；显式无模型驱动；关闭结果/重连接管分离，未确认命令按意图保留身份并显式重试；D1正常退出/信号统一结算，关闭失败后原窗口显式恢复，候选新宿主不迟到发布；D2-S展示固定命令审批/profile/期限及stdout/stderr有界完成快照，交互终端尚未接入；M1正文流/最终快照、应用专用持久凭据加载及原生临时选择、策略待确认/预算耗尽准入和双时间限制显示；仅产品DTO；M2已有视图增加逐read/write/edit审批、有限版本/参数摘要、后续模型轮流式正文与重连展示；显式SYNTHETIC离线入口，不由Renderer选择工具或worker代码；原生目录选择无自由路径Renderer入口，实际cwd/阶段/逐命令有界结果、三尺寸核心动作核查；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开；UI-P2前端右栏折叠/三档宽度、常驻审批/停止、Thread滚动锚点、按需成果核验展示；现采用正式historyPage/operationPage/artifactPage和独立ThreadActivity；Renderer的thread-pages.ts维护只读已加载范围、事件衔接与重连，首屏错误也保留正确活动身份；F01新增Thread内单Run安全historyEntry只读查询，Renderer按事件定向刷新，头部桥接与旧尾游标分离，整批成功发布/切换停止后续读取；按reference-implementations.md对照pi-gui时间线/viewport/layout，现有通用查询职责列为Q1 operationPage/后续Q2明确替换交付，指定Query v5（未安装/实施），有实测布局瓶颈后采用Virtual，不并存两套缓存/滚动控制",
+      "acceptanceGate": "真实桌面进程/来源/CSP、Thread隔离、审批/取消/恢复；平台/模型/Gate分别验收；确认丢失/交错重试、异常关闭与受证据约束的恢复；Q1还须验证环境/连接缓存隔离、无网络本地读取、显式重试/焦点策略、IPC背压与整批一致性，删除被替代旧机制",
       "implementationState": "in_progress",
       "adoption": {
         "status": "selected",
@@ -1294,7 +1295,8 @@
           "EV-UI-TARGETED-MOCK-20260930",
           "EV-UI-TARGETED-MAC-20260930",
           "EV-UI-TARGETED-REGRESSION-20260930",
-          "EV-REFERENCE-MAPPING-REVIEW-20260930"
+          "EV-REFERENCE-MAPPING-REVIEW-20260930",
+          "EV-EXISTING-MIGRATION-REVIEW-20260930"
         ]
       }
     }
@@ -2903,6 +2905,18 @@
       "scope": "基线28eeac6加本次文档差异：采纳全审核包中的模块/参考文件/API/替换范围/保留边界；指定Query方向但未安装，历史UI超时仍未关闭。不新增SDK、平台、发行或模型实测。",
       "commit": "28eeac6c8bcb5180685d653e0fce6da52597d741",
       "recordedAt": "2026-09-30T09:37:19.386662+00:00",
+      "platforms": [
+        "not_applicable"
+      ],
+      "locator": "docs/ssot/reference-implementations.md"
+    },
+    {
+      "id": "EV-EXISTING-MIGRATION-REVIEW-20260930",
+      "kind": "review",
+      "result": "passed",
+      "scope": "复审EXISTING_CODE_MIGRATION，核对2ebd795现有查询/IPC并查官方默认/取消/网络模式；本次文档差异将现有operationPage的Q1替换列为明确后续交付，Q2依赖Q1。未安装依赖、迁移代码或新增运行证据。",
+      "commit": "2ebd795445aea8f18581119d598f116309043d35",
+      "recordedAt": "2026-09-30T10:03:33.836288+00:00",
       "platforms": [
         "not_applicable"
       ],
