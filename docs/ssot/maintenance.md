@@ -102,3 +102,5 @@ Agent Shell的[本地实施报告](../validation/agent-shell-2026-09-30.md)将�
 
 
 Agent Shell [真实任务补证](../validation/agent-task-live-2026-09-30.md)将首次本机准入失败（0新增真实请求）、修正SHA上的SDK strict回归和真实四场景分开登记。model/platform证据可在逐项满足条件后推进MODEL-03/04和M0-Pi；必须单列CLI实际链路与历史Electron UI，不把未选择的edit、Windows或生产沙箱补成通过。
+
+UI-P2的[后端前置报告](../validation/backend-history-2026-09-30.md)区分真实SQLite/IPC/文件测试、合成历史与协议生产者、真实Pi工具+合成Provider、Electron程序化检查。代码先提交，证据引用实际被测SHA；后续文档只记录结果。分页接口存在不代表Renderer已使用，不把双Host隔离声称为双GUI验收，不因修复R01/R02或新增测试晋级完整任务/Gate。临时试测的fixture错误与最终代码回归分列；社区阅读结论不充当SDK实测。

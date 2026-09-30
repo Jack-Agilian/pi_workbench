@@ -1001,7 +1001,7 @@
       ],
       "upstreamSymbolsOrPaths": [],
       "reuse": "复用Pi原生任务执行，不重写",
-      "productDelta": "ProductCore持久Run/Operation/Approval、v2启动日志及v3原生落盘标记；Supervisor冷恢复先失效旧epoch授权，再按清理证据结算；C沿用同一核心，v4仅增有限展示缓存；D1复用产品取消与既有恢复，在宿主关闭时结算活动/排队工作并保留审计；D2-S SQL v5增加Shell意图/结果投影，取消与命令副作用分开，崩溃只对账原Operation；M1 SQL v6请求预留/模型结果及v7显式策略修订；语义摘要/旧账本证明、预算跨重开修订保留、独立HTTP清理及无工具结算；累计4/4真实请求；M2 SQL v8多请求预算/宿主文件意图，IPC v6逐HTTP关闭ACK和逐工具settlement；前成功后失败独立保留，真实文件和清理证据对账；guardian/supervisor关闭即拒绝排队消息；SQL v9逐Shell启动/恢复记录与可信Workspace选择，旧Thread绑定不变；2026-09-30产品默认无请求次数字段，旧数字限制仅历史/测试兼容；用户取消次数上限，旧请求/费用保留，独立修订禁止顺带扩权；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开",
+      "productDelta": "ProductCore持久Run/Operation/Approval、v2启动日志及v3原生落盘标记；Supervisor冷恢复先失效旧epoch授权，再按清理证据结算；C沿用同一核心，v4仅增有限展示缓存；D1复用产品取消与既有恢复，在宿主关闭时结算活动/排队工作并保留审计；D2-S SQL v5增加Shell意图/结果投影，取消与命令副作用分开，崩溃只对账原Operation；M1 SQL v6请求预留/模型结果及v7显式策略修订；语义摘要/旧账本证明、预算跨重开修订保留、独立HTTP清理及无工具结算；累计4/4真实请求；M2 SQL v8多请求预算/宿主文件意图，IPC v6逐HTTP关闭ACK和逐工具settlement；前成功后失败独立保留，真实文件和清理证据对账；guardian/supervisor关闭即拒绝排队消息；SQL v9逐Shell启动/恢复记录与可信Workspace选择，旧Thread绑定不变；2026-09-30产品默认无请求次数字段，旧数字限制仅历史/测试兼容；用户取消次数上限，旧请求/费用保留，独立修订禁止顺带扩权；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开；2026-09-30后端工作区重新准入、展示消息与控制去重分离、固定SQLite分页/独立活动快照及工作树离线profile，Renderer消费尚待UI-P2，不重写原生Session",
       "acceptanceGate": "幂等/绑定/取消/unknown；P0同Workspace写Run串行并覆盖等待审批与清理阶段",
       "implementationState": "in_progress",
       "adoption": {
@@ -1053,7 +1053,10 @@
           "EV-AGENT-SHELL-MAC-20260930",
           "EV-REQUEST-DEFAULTS-20260930",
           "EV-AGENT-TASK-MODEL-20260930",
-          "EV-AGENT-TASK-MAC-20260930"
+          "EV-AGENT-TASK-MAC-20260930",
+          "EV-BACKEND-HISTORY-MAC-20260930",
+          "EV-BACKEND-HISTORY-PAGES-20260930",
+          "EV-BACKEND-HISTORY-SDK-20260930"
         ]
       }
     },
@@ -1065,7 +1068,7 @@
       ],
       "upstreamSymbolsOrPaths": [],
       "reuse": "复用文件库/预览器而非模型文字猜测",
-      "productDelta": "真实文件/版本/来源验证；已登记成果的历史恢复与当前missing/changed安全预览分离",
+      "productDelta": "真实文件/版本/来源验证；已登记成果的历史恢复与当前missing/changed安全预览分离；2026-09-30后端工作区重新准入、展示消息与控制去重分离、固定SQLite分页/独立活动快照及工作树离线profile，Renderer消费尚待UI-P2，不重写原生Session",
       "acceptanceGate": "missing file拒绝与安全预览",
       "implementationState": "in_progress",
       "adoption": {
@@ -1086,7 +1089,9 @@
           "EV-REVIEW-B-IPC-REGRESSION-20260923",
           "EV-C-SDK-20260923",
           "EV-C-MAC-20260923",
-          "EV-C-REGRESSION-20260923"
+          "EV-C-REGRESSION-20260923",
+          "EV-BACKEND-HISTORY-MAC-20260930",
+          "EV-BACKEND-HISTORY-PAGES-20260930"
         ]
       }
     },
@@ -1123,7 +1128,7 @@
         "esbuild build"
       ],
       "reuse": "Electron公开窗口/沙盒/IPC，React渲染和esbuild构建；复用既有产品与Pi Worker链路",
-      "productDelta": "闭合产品桥、Thread/Run视图、审批/取消/成果与有界纯文本投影；显式无模型驱动；关闭结果/重连接管分离，未确认命令按意图保留身份并显式重试；D1正常退出/信号统一结算，关闭失败后原窗口显式恢复，候选新宿主不迟到发布；D2-S展示固定命令审批/profile/期限及stdout/stderr有界完成快照，交互终端尚未接入；M1正文流/最终快照、应用专用持久凭据加载及原生临时选择、策略待确认/预算耗尽准入和双时间限制显示；仅产品DTO；M2已有视图增加逐read/write/edit审批、有限版本/参数摘要、后续模型轮流式正文与重连展示；显式SYNTHETIC离线入口，不由Renderer选择工具或worker代码；原生目录选择无自由路径Renderer入口，实际cwd/阶段/逐命令有界结果、三尺寸核心动作核查；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开",
+      "productDelta": "闭合产品桥、Thread/Run视图、审批/取消/成果与有界纯文本投影；显式无模型驱动；关闭结果/重连接管分离，未确认命令按意图保留身份并显式重试；D1正常退出/信号统一结算，关闭失败后原窗口显式恢复，候选新宿主不迟到发布；D2-S展示固定命令审批/profile/期限及stdout/stderr有界完成快照，交互终端尚未接入；M1正文流/最终快照、应用专用持久凭据加载及原生临时选择、策略待确认/预算耗尽准入和双时间限制显示；仅产品DTO；M2已有视图增加逐read/write/edit审批、有限版本/参数摘要、后续模型轮流式正文与重连展示；显式SYNTHETIC离线入口，不由Renderer选择工具或worker代码；原生目录选择无自由路径Renderer入口，实际cwd/阶段/逐命令有界结果、三尺寸核心动作核查；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开；2026-09-30后端工作区重新准入、展示消息与控制去重分离、固定SQLite分页/独立活动快照及工作树离线profile，Renderer消费尚待UI-P2，不重写原生Session",
       "acceptanceGate": "真实桌面进程/来源/CSP、Thread隔离、审批/取消/恢复；平台/模型/Gate分别验收；确认丢失/交错重试、异常关闭与受证据约束的恢复",
       "implementationState": "in_progress",
       "adoption": {
@@ -1253,7 +1258,9 @@
           "EV-M2-MOCK-20260929",
           "EV-AGENT-SHELL-UI-20260930",
           "EV-AGENT-TASK-MODEL-20260930",
-          "EV-AGENT-TASK-MAC-20260930"
+          "EV-AGENT-TASK-MAC-20260930",
+          "EV-BACKEND-HISTORY-MAC-20260930",
+          "EV-BACKEND-HISTORY-PAGES-20260930"
         ]
       }
     }
@@ -2590,6 +2597,54 @@
         "darwin"
       ],
       "locator": "docs/validation/develop-integration-2026-09-30.md"
+    },
+    {
+      "id": "EV-BACKEND-HISTORY-MAC-20260930",
+      "kind": "platform",
+      "result": "passed",
+      "scope": "限定macOS真实SQLite/IPC/重开保护目录、60Run有界分页/活动审批、成果预览及双Host离线profile；包含明确合成生命周期/协议输入，不等于Renderer分页或双GUI验收。",
+      "commit": "45e45a5d598771c484926dd82d404f4242761185",
+      "recordedAt": "2026-09-30T07:20:32.005579+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/backend-history-2026-09-30.md"
+    },
+    {
+      "id": "EV-BACKEND-HISTORY-SDK-20260930",
+      "kind": "sdk",
+      "result": "passed",
+      "scope": "Pi0.87.1实际Worker/16Bash和混合文件操作成功，展示消息分离；A1–A4、Core/SDK/Worker、合成模型和Electron回归，真实模型0，不扩大历史Gate。",
+      "commit": "45e45a5d598771c484926dd82d404f4242761185",
+      "recordedAt": "2026-09-30T07:20:32.005579+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/backend-history-2026-09-30.md"
+    },
+    {
+      "id": "EV-BACKEND-HISTORY-PAGES-20260930",
+      "kind": "platform",
+      "result": "passed",
+      "scope": "仅新增操作分页断言后的类型/后端13/模型Shell20回归；实际IPC读取和16操作四页不丢失重复，生产代码与45e45a5相同。 同SHA双实际开发launcher/Electron/Host检查各自browser锁、SQLite/state与正常退出；首次临时脚本路径误判保留，不含人工GUI交互。",
+      "commit": "8e1b5987d607101fb04df571280e3c75c939efc3",
+      "recordedAt": "2026-09-30T07:20:32.005579+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/backend-history-2026-09-30.md"
+    },
+    {
+      "id": "EV-BACKEND-HISTORY-STATIC-20260930",
+      "kind": "static",
+      "result": "passed",
+      "scope": "8e1b598加后续SSOT/报告文档差异：check-ssot60、脚本15、结构5及示例类型7；diff/有限秘密模式检查通过，不代表额外模型或平台验收。",
+      "commit": "8e1b5987d607101fb04df571280e3c75c939efc3",
+      "recordedAt": "2026-09-30T07:25:03.142796+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/backend-history-2026-09-30.md"
     }
   ]
 }

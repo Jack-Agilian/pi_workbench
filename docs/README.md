@@ -102,3 +102,5 @@ M2 最新复审：[修正与实机证据](validation/review-m2-2026-09-29.md) ·
 [被测代码、首次拒绝和四场景证据](validation/agent-task-live-2026-09-30.md)：gpt-6-luna真实read/write/Bash任务、拒绝、活跃Shell取消与原Session恢复通过，新增10请求、旧账本/身份保留。MODEL-03/04限定done，M0-Pi按既定条件passed；CLI真实产品链路与历史Electron UI证据分列。前面的待授权/blocked是历史，唯一当前事项以NEXT_STEPS顶部的交付复审与develop集成准备为准。
 
 最新集成：[2026-09-30 develop集成检查](validation/develop-integration-2026-09-30.md)。M2/Agent Shell已进入develop；下一步以 [NEXT_STEPS](planning/NEXT_STEPS.md) 顶部UI-P2为准。
+
+当前UI-P2后端接口见 [运行边界与分页契约](ssot/backend-history-contract.md)、[前端交接](planning/BACKEND_HISTORY_HANDOFF.md) 和 [本轮脱敏报告](validation/backend-history-2026-09-30.md)。

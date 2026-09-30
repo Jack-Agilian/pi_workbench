@@ -553,9 +553,21 @@
             "EV-M1-SDK-20260928",
             "EV-M1-MAC-20260928"
           ]
+        },
+        {
+          "id": "CORE-03-A06",
+          "requirement": "展示/观察消息不消耗控制请求去重额度；重复控制不重复执行，16次操作仍可正常结算和取消",
+          "plannedChecks": [
+            "test:backend-history",
+            "test:product-model-shell"
+          ],
+          "evidenceRefs": [
+            "EV-BACKEND-HISTORY-MAC-20260930",
+            "EV-BACKEND-HISTORY-SDK-20260930"
+          ]
         }
       ],
-      "statusReason": "C已按授权集成develop；D1 Mac正常退出、取消结算、证据不足保留窗口及显式恢复通过。仅限定退出/恢复增量，下一项D2 Shell/PTY产品接入；Windows环境未确认、完整任务范围与M0 Gate未完成。 D2-S限定Mac非交互Bash产品链路通过；独立组/命令结果与副作用分开，D2-T、Windows及完整Gate仍未完成。 S01输出/收据字节预算修正后Mac产品与退出回归通过；仍不完成终端、其他平台或M0 Gate。"
+      "statusReason": "限定Mac产品协调、退出/恢复及M2真实任务已有历史证据；本轮补展示消息与控制去重分离，16操作及分页重连离线回归见backend-history报告。全局单写保持，完整任务/其他平台不晋级。"
     },
     {
       "id": "CORE-04",
@@ -778,9 +790,20 @@
             "EV-D2S-S01-MAC-20260928",
             "EV-D2S-S01-REGRESSION-20260928"
           ]
+        },
+        {
+          "id": "SEC-02-A04",
+          "requirement": "保护集变化后旧Thread不得继续进入受保护workspace；不重绑历史Thread，queued拒绝保留审计，临时凭据目录先保护后读取",
+          "plannedChecks": [
+            "test:backend-history",
+            "test:desktop"
+          ],
+          "evidenceRefs": [
+            "EV-BACKEND-HISTORY-MAC-20260930"
+          ]
         }
       ],
-      "statusReason": "B-IPC宿主计划绑定摘要/目标/fileVersion/期限/资源锁，领取后同一IPC授权；实际Worker SQLite拒绝与文件冲突通过。非原子CAS，通用策略/其他平台未验收。 D2-S限定Mac非交互Bash产品链路通过；独立组/命令结果与副作用分开，D2-T、Windows及完整Gate仍未完成。 S01输出/收据字节预算修正后Mac产品与退出回归通过；仍不完成终端、其他平台或M0 Gate。"
+      "statusReason": "既有摘要/目标/版本/期限与逐工具审批保持；本轮统一旧Thread启动、派发、批准、工具及冷恢复的工作区准入，保护当前配置和临时凭据目录。限定Mac证据，不声称原子CAS、任意TOCTOU防护或跨平台生产沙箱。"
     },
     {
       "id": "SEC-03",
@@ -899,9 +922,19 @@
             "EV-M1-SDK-20260928",
             "EV-M1-MAC-20260928"
           ]
+        },
+        {
+          "id": "UI-01-A02",
+          "requirement": "共享有界分页查询区分历史游标与事件序号；真实大历史经IPC分批读取且重连/新增无丢失或重复；当前审批单独可读",
+          "plannedChecks": [
+            "test:backend-history"
+          ],
+          "evidenceRefs": [
+            "EV-BACKEND-HISTORY-MAC-20260930"
+          ]
         }
       ],
-      "statusReason": "M2/Agent Shell及限定布局改进已于2026-09-30按授权集成develop；已有证据保持原SHA和范围。当前下一增量为UI-P2长历史/右栏与成果浏览，尚未实施；保留in_progress，不把限定M0 Gate通过扩为完整UI、无障碍或真实模型桌面人工验收。"
+      "statusReason": "UI-P2后端前置已在功能分支实现：有界历史/操作/成果页、独立当前审批快照和工作树离线profile。Renderer接入、虚拟列表/右栏与三尺寸集成验收未完成；既有M0 Gate仅维持原范围。"
     },
     {
       "id": "UI-02",
@@ -1028,7 +1061,8 @@
             "EV-REVIEW-B-IPC-MAC-20260923",
             "EV-REVIEW-B-IPC-REGRESSION-20260923",
             "EV-C-SDK-20260923",
-            "EV-C-MAC-20260923"
+            "EV-C-MAC-20260923",
+            "EV-BACKEND-HISTORY-MAC-20260930"
           ]
         },
         {
@@ -1045,7 +1079,7 @@
           ]
         }
       ],
-      "statusReason": "C的真实Markdown纯文本预览、外部修改与成果来源，以及M2/Agent Shell的限定真实成果链路已集成develop。下一增量UI-P2改善名称、来源与changed/missing展示；另存为/其他格式未完成，保留in_progress。"
+      "statusReason": "已有真实Markdown来源与版本索引保持；本轮补成果元数据分页和按需ready/changed/missing预览，保护失效工作区不得读取。前端成果体验/另存为/其他格式未完成，保留in_progress。"
     },
     {
       "id": "SKL-01",

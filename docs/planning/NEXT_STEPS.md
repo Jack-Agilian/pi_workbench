@@ -6,11 +6,11 @@
 
 2026-09-30：用户授权后，develop 从 `148022b05250cfda824725778e9a056d00cd6830` 快进合入 `codex/agent-shell-mvp` 的20个提交，集成代码与证据基线为 `34ed62e3fc875c56059eb19c1f02781d72c78bfc`。M2、审核修复、Agent Shell、请求次数缺省不限与Pi strict schema修正现已进入同一集成分支；[本次集成检查](../validation/develop-integration-2026-09-30.md)。
 
-下一增量按 [主功能/UI计划](AGENT_MVP_UI_PLAN.md) 的UI-P2推进，本次只完成集成，尚未实施UI-P2：
+按 [主功能/UI计划](AGENT_MVP_UI_PLAN.md) 的UI-P2推进，并采纳develop@58d3130审核的后端前置。当前阶段只此一项，前后端分工如下：
 
-1. 改善长历史浏览及右栏折叠/宽度；待审批动作始终可发现，不抢焦点、不丢草稿。
-2. 改善成果名称、来源执行与changed/missing状态展示；只索引真实成果，复用现有安全投影。
-3. 集中完成三个既定窗口尺寸的截图和审批/取消/草稿回归；不要用新增真实模型调用调试小改动。保持Pi循环、Provider、Session和审批所有权；PTY、Windows、市场和生产发行后置。
+1. 后端 `codex/backend-history-safety` 已提交旧工作区重新准入、展示/控制消息分离、真实数据库历史/操作/成果分页与离线开发profile。代码 `45e45a5d598771c484926dd82d404f4242761185`，证据见 [后端报告](../validation/backend-history-2026-09-30.md)，接口以 [共享契约](../ssot/backend-history-contract.md) 和 [前端交接](BACKEND_HISTORY_HANDOFF.md) 为准。未合并develop，不修改其他工作树或Renderer。
+2. 前端下一步采用同一契约，接入分页及独立活动/审批快照；改善右栏折叠/宽度、成果名称/来源和changed/missing展示。旧thread全量入口仍有1.2 MB上限，前端未切换前不能宣布长历史问题已解决；审批始终可发现，不抢焦点、不丢草稿。
+3. 集成后集中完成三个既定窗口尺寸、长历史分页、审批/取消/草稿/重连回归。两线使用各自 `--dev-profile` 离线目录，GUI测试串行；不要用新增真实模型调用调试小改动。Pi循环、Provider、Session和审批所有权不变；PTY、Windows、市场和生产发行后置。
 
 已有真实任务代码 `688150f070797405250bb16ad3dc837bb0ddc64d`；[真实结果与首次失败](../validation/agent-task-live-2026-09-30.md)、[脱敏输入](../validation/agent-task-live-inputs-2026-09-30.json)、[实际模型生成报告](../validation/agent-task-result-2026-09-30.md)。本次集成没有新增真实请求，以下仍为该次任务的历史消费与验证范围。
 
