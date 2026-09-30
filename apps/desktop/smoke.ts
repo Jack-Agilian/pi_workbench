@@ -110,6 +110,9 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
   const first = home.threads[0]!; await click(first.title);
   await wait(() => js<boolean>(`document.querySelector('#composer')?.value === ${JSON.stringify(`草稿 ${first.id}`)}`), 'draft_restore');
 
+  const { runFrontendSmoke } = await import('./frontend-smoke.ts');
+  await runFrontendSmoke(window, host);
+
   // Trusted test-only transport fault after the real command is durably accepted.
   // This lives in the smoke module, never the Renderer/preload or product protocol.
   const request = host.request.bind(host); const attempts: Command[] = [];
