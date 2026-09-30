@@ -1,3 +1,4 @@
+import { OperationQueries, type OperationKey } from './operation-queries.ts';
 import type { DesktopApi, DesktopThread } from '../../packages/app-contracts/desktop.ts';
 import type { ArtifactView, OperationView, ProductEvent } from '../../packages/app-contracts/index.ts';
 import type { DesktopPage, HistoryItem, PageOptions, ThreadActivity } from '../../packages/app-contracts/desktop-pages.ts';
@@ -13,11 +14,12 @@ class LoadedRange<T> {
   private async fetch(options: PageOptions, check: Check) {
     check(); const page = await this.source(options); check(); return page;
   }
-  async refresh(check: Check) {
-    const oldest = this.value?.items.at(-1);
+  async refresh(check: Check, resumeAt?: string) {
+    const item = this.value?.items.at(-1);
+    const oldest = item ? this.identity(item) : resumeAt;
     let page = await this.fetch({limit: 8}, check);
     const items = [...page.items];
-    while (oldest && !items.some(item => this.identity(item) === this.identity(oldest)) && page.hasMore) {
+    while (oldest && !items.some(item => this.identity(item) === oldest) && page.hasMore) {
       const next = await this.fetch({limit: 8, cursor: page.nextCursor!}, check);
       page = {...next, snapshotSeq: Math.min(page.snapshotSeq, next.snapshotSeq)};
       items.push(...page.items);
@@ -54,7 +56,7 @@ export interface ThreadPagesView {
 }
 interface State {
   history: LoadedRange<HistoryItem>; artifacts: LoadedRange<ArtifactView>;
-  operations: Map<string, LoadedRange<OperationView>>; cursor?: number;
+  operations: Map<string, OperationKey>; cursor?: number;
 }
 type PageApi = Pick<DesktopApi, 'historyPage'|'historyEntry'|'artifactPage'|'operationPage'|'events'>;
 // Explicit product invalidations. New/unknown event kinds resynchronize conservatively.
@@ -66,31 +68,46 @@ const operationKinds = new Set(['approval.requested','approval.allow','approval.
   'operation.late_succeeded','operation.late_failed','operation.late_unknown','operation.reconciled_succeeded','operation.reconciled_failed']);
 const noDisplayKinds = new Set(['thread.created','session.bound','session.persisted','session.rebound','model.request_reserved',
   'observation.activity','observation.idle','observation.diagnostic']);
+interface BrowsePositions { history?: string; artifacts?: string; operations: Map<string, string | undefined> }
 export class ThreadPages {
   private state: State;
   private queue: Promise<unknown> = Promise.resolve();
   private generation = 0;
+  private batch = 0;
+  readonly tools: OperationQueries;
   private api: PageApi; readonly threadId: string;
-  constructor(api: PageApi, threadId: string) {
+  private readonly resume?: BrowsePositions;
+  constructor(api: PageApi, threadId: string, scope: string = crypto.randomUUID(), resume?: BrowsePositions) {
+    this.resume = resume;
+    this.tools = new OperationQueries(api, scope, threadId);
     this.api=api; this.threadId=threadId;
     this.state = {history: new LoadedRange(page => api.historyPage(threadId, page), item => item.run.id),
       artifacts: new LoadedRange(page => api.artifactPage(threadId, page), item => item.id), operations: new Map()};
   }
   /** Already sent IPC reads may finish, but cannot publish or start the next read. */
-  cancelPending() { this.generation++; }
+  cancelPending() { this.generation++; this.tools.cancel(); }
+  dispose() { this.cancelPending(); this.tools.dispose(); }
+  /** Only opaque row positions cross a host restart, never Query data/status/promises. */
+  browsePositions(): BrowsePositions {
+    return {history: this.state.history.value?.items.at(-1)?.run.id ?? this.resume?.history,
+      artifacts: this.state.artifacts.value?.items.at(-1)?.id ?? this.resume?.artifacts,
+      operations: this.state.operations.size ? new Map([...this.state.operations].map(([id,key]) =>
+        [id,this.tools.page(key).items.at(-1)?.id])) : this.resume?.operations ?? new Map()};
+  }
   private serial(work: (state: State, check: Check) => Promise<void>): Promise<ThreadPagesView> {
     const generation = this.generation;
     const check = () => { if (generation !== this.generation) throw Error('pages_cancelled'); };
     const result = this.queue.then(async () => {
-      check();
+      check(); this.batch++; this.tools.retain(this.state.operations.values());
       const state: State = {...this.state, history: this.state.history.copy(), artifacts: this.state.artifacts.copy(),
-        operations: new Map([...this.state.operations].map(([id, range]) => [id, range.copy()]))};
+        operations: new Map(this.state.operations)};
       try { await work(state, check); }
       catch (error) {
+        check();
         if (!(error instanceof Error) || error.message !== 'page_cursor_invalid') throw error;
         check(); await this.resync(state, check);
       }
-      check(); this.state = state; return this.view();
+      check(); this.state = state; this.tools.retain(state.operations.values()); return this.view();
     });
     this.queue = result.catch(() => {}); return result;
   }
@@ -98,24 +115,26 @@ export class ThreadPages {
     const {history, artifacts, operations} = this.state;
     if (!history.value || !artifacts.value) throw Error('pages_not_loaded');
     return {history: history.value, artifacts: artifacts.value,
-      operations: new Map([...operations].flatMap(([id, range]) => range.value ? [[id, range.value] as const] : []))};
+      operations: new Map([...operations].map(([id, key]) => [id, this.tools.page(key)]))};
   }
   private async readOperations(state: State, check: Check, changed = new Set<string>()) {
     for (const item of state.history.value!.items) {
       const id = item.run.id;
-      let range = state.operations.get(id);
-      if (!range) { range = new LoadedRange(page => this.api.operationPage(id, page), op => op.id); state.operations.set(id, range); }
-      if (changed.has(id) || !range.value) await range.refresh(check);
+      const previous = state.operations.get(id);
+      if (changed.has(id) || !previous) {
+        const key = this.tools.key(id, this.batch);
+        await this.tools.read(key, previous, false, check, this.resume?.operations.get(id)); state.operations.set(id, key);
+      }
     }
   }
   private async read(state: State, check: Check) {
-    await state.history.refresh(check); await state.artifacts.refresh(check);
+    await state.history.refresh(check, this.resume?.history); await state.artifacts.refresh(check, this.resume?.artifacts);
     await this.readOperations(state, check, new Set(state.history.value!.items.map(item => item.run.id)));
   }
   private async resync(state: State, check: Check) {
     await this.read(state, check);
     state.cursor = Math.min(state.history.value!.snapshotSeq, state.artifacts.value!.snapshotSeq,
-      ...[...state.operations.values()].map(range => range.value!.snapshotSeq));
+      ...[...state.operations.values()].map(key => this.tools.page(key).snapshotSeq));
   }
   /** Reconnect starts a fresh page chain while preserving browsed depth. */
   refresh() { return this.serial((state, check) => this.resync(state, check)); }
@@ -146,10 +165,19 @@ export class ThreadPages {
       state.cursor = events.at(-1)!.seq;
     }
   }); }
-  more(kind: 'history'|'artifacts'|string) { return this.serial(async (state, check) => {
+  more(kind: 'history'|'artifacts'|string) {
+    const expected = this.state.operations.get(kind);
+    return this.serial(async (state, check) => {
     if (kind === 'history') { await state.history.more(check); await this.readOperations(state, check); }
     else if (kind === 'artifacts') await state.artifacts.more(check);
-    else { const range = state.operations.get(kind); if (!range) throw Error('run_not_loaded'); await range.more(check); }
+    else {
+      const previous = state.operations.get(kind);
+      if (previous !== expected) return; // Repeated click refers to the same displayed page, not a second advance.
+      if (!previous) throw Error('run_not_loaded');
+      const page = this.tools.page(previous); if (!page.hasMore) return;
+      const key = this.tools.key(kind, this.batch, page.nextCursor);
+      await this.tools.read(key, previous, true, check); state.operations.set(kind, key);
+    }
   }); }
 }
 /** Reuse the existing display components, not the legacy unbounded thread request. */

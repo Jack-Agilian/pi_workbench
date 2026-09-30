@@ -1,4 +1,4 @@
-import { StrictMode, useEffect, useRef, useState } from 'react';
+import { StrictMode, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { createRoot } from 'react-dom/client';
 import type { Command, RunState } from '../../packages/app-contracts/index.ts';
 import type { DesktopApi, DesktopHome } from '../../packages/app-contracts/desktop.ts';
@@ -24,6 +24,11 @@ function App() {
   const pages = pageState?.id === selected ? pageState.value : null;
   const thread = pages && activity ? projectPages(pages, activity) : null;
   const readers = useRef(new Map<string, ThreadPages>());
+  const queryScope = useRef('');
+  const [pageReader, setPageReader] = useState<ThreadPages | null>(null);
+  const tools = pageReader?.threadId === selected ? pageReader.tools : undefined;
+  const toolsBusy = useSyncExternalStore(tools?.subscribe ?? (() => () => {}), tools?.busy ?? (() => false));
+  const toolsProblem = useSyncExternalStore(tools?.subscribe ?? (() => () => {}), tools?.error ?? (() => ''));
   const [pageProblem, setPageProblem] = useState('');
   const [pageBusy, setPageBusy] = useState(false);
   const pageAction = useRef(false);
@@ -55,6 +60,11 @@ function App() {
       try {
         const latestHome = await api.home();
         if (stopped || generation.current !== current) return;
+        if (latestHome.queryScope && queryScope.current && latestHome.queryScope !== queryScope.current) {
+          ++pageEpoch.current;
+          for (const reader of readers.current.values()) reader.cancelPending();
+          queryScope.current = ''; setTick(n => n + 1);
+        }
         setHome(latestHome);
         if (selected) {
           const value = await api.threadActivity(selected);
@@ -74,21 +84,43 @@ function App() {
     let stopped = false; let timer: ReturnType<typeof setTimeout>;
     setPageProblem(''); setPageBusy(false); pageAction.current = false;
     if (!selected) return;
-    let reader = readers.current.get(selected);
-    if (!reader) { reader = new ThreadPages(api, selected); readers.current.set(selected, reader); }
-    const currentReader = reader;
+    let currentReader: ThreadPages | undefined;
     let initialized = false;
     const poll = async () => {
+      if (stopped || pageEpoch.current !== epoch) return;
       try {
+        if (!currentReader) {
+          const scope = await api.queryScope();
+          if (stopped || pageEpoch.current !== epoch) return;
+          if (queryScope.current !== scope) {
+            for (const [threadId, reader] of readers.current) {
+              const positions = reader.browsePositions(); reader.dispose();
+              readers.current.set(threadId, new ThreadPages(api, threadId, scope, positions));
+            }
+            queryScope.current = scope; setPages(null);
+          }
+          currentReader = readers.current.get(selected);
+          if (!currentReader) {
+            currentReader = new ThreadPages(api, selected, scope); readers.current.set(selected, currentReader);
+          }
+          setPageReader(currentReader);
+        }
+        // Tool read failures require explicit retry. Activity/approval polling stays independent.
+        if (currentReader.tools.error()) return;
         const value = await (initialized ? currentReader.poll() : currentReader.refresh());
         initialized = true;
-        if (!stopped && pageEpoch.current === epoch) setPages({id: selected, value});
-      } catch (error) { if (!stopped && pageEpoch.current === epoch) setPageProblem(pageError(error)); }
-      finally { if (!stopped) timer = setTimeout(() => void poll(), 350); }
+        if (!stopped && pageEpoch.current === epoch) { setPages({id: selected, value}); setPageProblem(''); }
+      } catch (error) {
+        if (!stopped && pageEpoch.current === epoch && !currentReader?.tools.error()) setPageProblem(pageError(error));
+      } finally { if (!stopped && pageEpoch.current === epoch) timer = setTimeout(() => void poll(), 350); }
     };
     void poll();
-    return () => { stopped = true; currentReader.cancelPending(); clearTimeout(timer); };
+    return () => { stopped = true; currentReader?.cancelPending(); clearTimeout(timer); };
   }, [selected, tick]);
+  useEffect(() => () => {
+    for (const reader of readers.current.values()) reader.dispose();
+    readers.current.clear();
+  }, []);
   function pageError(error: unknown) {
     const code = error instanceof Error ? error.message : '';
     return code === 'page_item_too_large' ? '单条记录超过展示传输上限。已读内容保留，当前审批与停止仍可使用。'
@@ -99,11 +131,13 @@ function App() {
     const reader = readers.current.get(selected);
     if (!reader || pageAction.current) return;
     const epoch = pageEpoch.current;
-    pageAction.current = true; setPageBusy(true);
+    const toolPage = kind !== undefined && kind !== 'history' && kind !== 'artifacts';
+    if (reader.tools.busy()) return;
+    if (!toolPage) { pageAction.current = true; setPageBusy(true); }
     try {
       const value = await (kind ? reader.more(kind) : reader.refresh());
       if (pageEpoch.current === epoch) { setPages({id: selected, value}); setPageProblem(''); }
-    } catch (error) { if (pageEpoch.current === epoch) setPageProblem(pageError(error)); }
+    } catch (error) { if (pageEpoch.current === epoch && !reader.tools.error()) setPageProblem(pageError(error)); }
     finally { if (pageEpoch.current === epoch) { pageAction.current = false; setPageBusy(false); } }
   }
   async function command(value: Command) {
@@ -131,7 +165,9 @@ function App() {
     }
   }
   async function reconnect() {
-    setBusy(true);
+    setBusy(true); ++pageEpoch.current;
+    for (const reader of readers.current.values()) reader.cancelPending();
+    setPageReader(null); setPages(null);
     try { await api.reconnect(); setProblem(''); setDisconnected(false); setTick(n => n + 1); }
     catch (error) { failed(error); } finally { setBusy(false); }
   }
@@ -174,11 +210,11 @@ function App() {
       <div className="content-grid" data-inspector={inspectorOpen ? 'open' : 'closed'} data-width={inspectorWidth}>
         <section className="conversation" aria-label="会话时间线">
           <div className="timeline" ref={scroll.viewport} onScroll={scroll.onScroll} tabIndex={0} aria-label="执行记录"><div className="timeline-content" ref={scroll.content}>
-            {pageProblem && <div className="notice" role="status">{pageProblem}<button className="retry-pages" disabled={pageBusy || disconnected} onClick={() => void loadPages()}>重新读取记录</button></div>}
-            {selected && !pages && !pageProblem && <p role="status">正在读取最近记录…</p>}
-            {pages?.history.hasMore && <button className="load-history" disabled={pageBusy || disconnected} onClick={() => { scroll.onScroll(); void loadPages('history'); }}>{pageBusy ? '正在加载…' : '加载更早记录'}</button>}
+            {(pageProblem || toolsProblem) && <div className="notice" role="status">{toolsProblem ? pageError(new Error(toolsProblem)) : pageProblem}<button className="retry-pages" disabled={pageBusy || toolsBusy || disconnected} onClick={() => void loadPages()}>重新读取记录</button></div>}
+            {selected && !pages && !pageProblem && !toolsProblem && <p role="status">正在读取最近记录…</p>}
+            {pages?.history.hasMore && <button className="load-history" disabled={pageBusy || toolsBusy || disconnected} onClick={() => { scroll.onScroll(); void loadPages('history'); }}>{pageBusy ? '正在加载…' : '加载更早记录'}</button>}
             {!currentRuns.length && (!selected || pages) && <div className="empty"><span className="empty-mark">✧</span><h2>{modelMode?'开始一段会话':'让第一份成果落地'}</h2><p>{modelMode?'发送消息、继续上下文；离线验证回复会明确标为合成内容。':'演示会把你的目标写入真实 Markdown 文件，体验审批和成果核验。'}</p><div className="suggestions">{['整理本周工作记录','记录一次项目讨论','起草下一步行动清单'].map(text => <button key={text} disabled={!selected || !!unconfirmedRun} onClick={() => setDrafts(all => ({ ...all, [selected]: text }))}>{text}<span>↗</span></button>)}</div>{!selected && <p className="hint">先在左侧新建一个会话</p>}</div>}
-            {thread && <RunHistory thread={thread} mode={home?.mode} busy={busy} disconnected={disconnected} command={command} operationPages={pages?.operations} loading={pageBusy} loadMore={runId => void loadPages(runId)} />}
+            {thread && <RunHistory thread={thread} mode={home?.mode} busy={busy} disconnected={disconnected} command={command} operationPages={pages?.operations} loading={pageBusy || toolsBusy} loadMore={runId => void loadPages(runId)} />}
           </div></div>
           {scroll.browsing && <button className="return-latest" onClick={scroll.returnLatest}>返回最新 ↓</button>}
           {!modelMode && <div className="suggestions"><button disabled={!selected || !!unconfirmedRun || busy || disconnected} onClick={() => setDrafts(all => ({ ...all, [selected]: '/demo-shell' }))}>填入只读命令演示</button><button disabled={!selected || !!unconfirmedRun || busy || disconnected} onClick={() => setDrafts(all => ({ ...all, [selected]: '/demo-shell-wait' }))}>填入可停止命令演示</button></div>}<form className="composer" onSubmit={event => { event.preventDefault(); void submit(); }}>

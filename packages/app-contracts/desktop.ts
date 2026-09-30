@@ -6,7 +6,7 @@ import { identifier, parseCommand, type Ack, type Command, type ProductEvent, ty
 import { exact, record } from './worker-ipc.ts';
 import type { Presentation } from './presentation.ts';
 export interface DesktopThread extends Snapshot { modelOutcomes?: {runId:string;value:ModelOutcome|null}[]; inputs: { id: string; text: string }[]; presentations: { runId: string; value: Presentation }[] }
-export interface DesktopHome { workspaces: {selectedId:string;items:{id:string;path:string;status?:'ready'|'invalid'}[]}; mode: 'synthetic' | 'model-offline' | 'model'; model?: {status:'not_configured'|'key_required'|'ready'|'policy_required'|'budget_exhausted';provider:string;model:string;limits?:{endpoint:string;requests:number|null;estimatedUsd:number;outputTokens:number;timeoutMs?:number;httpIdleTimeoutMs?:number;fileTools?:FileToolPolicy;shellTools?:ModelShellPolicy}}; threads: ThreadView[]; activeRuns: RunView[]; recovery: 'ready' | 'blocked' }
+export interface DesktopHome { queryScope?: string; workspaces: {selectedId:string;items:{id:string;path:string;status?:'ready'|'invalid'}[]}; mode: 'synthetic' | 'model-offline' | 'model'; model?: {status:'not_configured'|'key_required'|'ready'|'policy_required'|'budget_exhausted';provider:string;model:string;limits?:{endpoint:string;requests:number|null;estimatedUsd:number;outputTokens:number;timeoutMs?:number;httpIdleTimeoutMs?:number;fileTools?:FileToolPolicy;shellTools?:ModelShellPolicy}}; threads: ThreadView[]; activeRuns: RunView[]; recovery: 'ready' | 'blocked' }
 export type Preview = { status: 'ready' | 'changed' | 'missing' | 'unavailable'; text?: string };
 export type DesktopRequest =
   | { type:'history-entry'; threadId:string; runId:string }
@@ -41,9 +41,11 @@ export function parseDesktopRequest(raw: unknown): DesktopRequest {
   return result;
 }
 export interface DesktopApi {
+  /** Opaque host connection identity; carries no execution authority or filesystem path. */
+  queryScope(): Promise<string>;
   historyEntry(threadId:string,runId:string):Promise<HistoryEntry>;
   historyPage(threadId:string,page?:PageOptions):Promise<HistoryPage>;
-  operationPage(runId:string,page?:PageOptions):Promise<OperationPage>;
+  operationPage(runId:string,page?:PageOptions,queryScope?:string):Promise<OperationPage>;
   artifactPage(threadId:string,page?:PageOptions):Promise<ArtifactPage>;
   threadActivity(threadId:string):Promise<ThreadActivity>;
   selectWorkspace(): Promise<void>;

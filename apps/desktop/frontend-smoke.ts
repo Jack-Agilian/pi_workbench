@@ -34,7 +34,8 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
   fixture.runs.at(-1)!.state = 'running';
   let revision = original.cursor + 100;
   let eventKind = 'SYNTHETIC_UI_ONLY', eventRun = originalRun.id;
-  let entryReads=0, historyReads=0;
+  let entryReads=0, historyReads=0, operationReads=0;
+  let operationError='', delayOperation=false; let releaseOperation:(()=>void)|undefined;
   let previewStatus: Preview['status'] = 'ready';
   let releasePreview: (() => void) | undefined;
   let delayPreview = false;
@@ -62,6 +63,8 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
     }
     if (raw.type === 'artifact-page' && raw.threadId === chosen.id) return {items: structuredClone(fixture.artifacts), hasMore: false, nextCursor: null, snapshotSeq: revision};
     if (raw.type === 'operation-page' && fixture.runs.some(run => run.id === raw.runId)) {
+      operationReads++; if(operationError)throw Error(operationError);
+      if(delayOperation){delayOperation=false;await new Promise<void>(r=>{releaseOperation=r;});}
       const offset=Number(raw.page?.cursor??0), limit=raw.page?.limit??8, all=fixture.operations.filter(op=>op.runId===raw.runId);
       const items=all.slice(offset,offset+limit), hasMore=offset+items.length<all.length;
       return {items:structuredClone(items),hasMore,nextCursor:hasMore?String(offset+items.length):null,snapshotSeq:revision};
@@ -85,7 +88,16 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
     alternateSelection = false; historyError = ''; await click('.retry-pages');
     await wait(() => js<boolean>("document.querySelectorAll('[data-run]').length===8"), 'first_page');
     await wait(() => js<boolean>("!!document.querySelector('.load-operations')"), 'tools_first_page');
-    await click('.load-operations');
+    operationError='page_item_too_large';await click('.load-operations');
+    await wait(()=>js<boolean>("!!document.querySelector('.retry-pages')"),'query_tool_error');
+    const failedReads=operationReads;await new Promise(r=>setTimeout(r,800));assert.equal(operationReads,failedReads);
+    assert.equal(await js<boolean>("!!document.querySelector('.view-toolbar .stop') && document.querySelector('.approval-indicator').textContent==='1 项待审批'"),true);
+    operationError='';await click('.retry-pages');
+    await wait(()=>js<boolean>("!document.querySelector('.retry-pages') && !document.querySelector('.load-operations').disabled"),'query_manual_retry');
+    delayOperation=true;await click('.load-operations');
+    await wait(async()=>Boolean(releaseOperation),'query_slow_tool');
+    assert.equal(await js<boolean>("document.querySelector('.load-operations').disabled && !!document.querySelector('.view-toolbar .stop')"),true);
+    releaseOperation!();
     await wait(() => js<boolean>("document.querySelectorAll('.tool-card').length===16 && !document.querySelector('.load-operations')"), 'tools_more');
     for (const count of [16, 24, 32, 36]) {
       await click('.load-history');

@@ -58,6 +58,7 @@ function targetedFixture(count=256) {
   let items=Array.from({length:count},(_,i)=>record(count-i)),seq=1;
   const events:ProductEvent[]=[],cursors:number[]=[];
   const calls:{method:string;id?:string}[]=[];
+  let pending=0,peak=0;
   let failure='',invalidCursor=false,release:(()=>void)|undefined,delay=false;
   const operations=new Map<string,import('../../packages/app-contracts/index.ts').OperationView[]>();
   let artifacts:import('../../packages/app-contracts/index.ts').ArtifactView[]=[];
@@ -78,11 +79,11 @@ function targetedFixture(count=256) {
       if(failure===id)throw Error('disconnected');
       return {item:structuredClone(items.find(i=>i.run.id===id)!),snapshotSeq:seq+500};},
     async artifactPage(_thread,p){calls.push({method:'artifactPage'});if(failure==='artifact')throw Error('disconnected');return page(artifacts,p,i=>i.id);},
-    async operationPage(id,p){calls.push({method:'operationPage',id});if(failure==='operation')throw Error('disconnected');return page(operations.get(id)??[],p,i=>i.id);},
+    async operationPage(id,p){calls.push({method:'operationPage',id});pending++;peak=Math.max(peak,pending);try{await new Promise(r=>setImmediate(r));if(failure==='operation'||failure===`operation:${id}`)throw Error('disconnected');return page(operations.get(id)??[],p,i=>i.id);}finally{pending--;}},
     async events(_thread,cursor){calls.push({method:'events'});cursors.push(cursor);return events.filter(e=>e.seq>cursor).slice(0,128);},
   };
   const reader=new ThreadPages(api,'thread');
-  return {reader,calls,cursors,emit,operations,
+  return {reader,api,calls,cursors,emit,operations,peak:()=>peak,
     async load(){await reader.refresh();while(reader.view().history.hasMore)await reader.more('history');calls.length=0;},
     change(id:string){items=items.map(i=>i.run.id===id?{...i,input:'SYNTHETIC updated'}:i);emit('display.replaced',id);},
     insert(n:number){for(let i=0;i<n;i++){const id=String(Number(items[0]!.run.id)+1);items=[record(Number(id)),...items];emit('run.queued',id);}},
@@ -140,4 +141,36 @@ test('targeted: switch fences in-flight and queued work, no next request or part
   await new Promise(r=>setImmediate(r));f.reader.cancelPending();f.release();await rejected;
   assert.deepEqual(f.reader.view(),old);assert.deepEqual(f.calls,[{method:'events'},{method:'historyEntry',id:'8'}]);
   await f.reader.refresh();assert.equal(f.reader.view().history.items[0]!.input,'SYNTHETIC updated');
+});
+
+test('query migration: later tool read failure preserves the entire published batch and retries dirty runs', async()=>{
+  const f=targetedFixture(8);await f.load();const old=f.reader.view();
+  const op={id:'1',runId:'8',toolCallId:'synthetic',tool:'write' as const,artifactPath:null,parametersDigest:'0'.repeat(64),deadline:1,state:'denied' as const};
+  f.operations.set('8',[op]);f.emit('operation.failed','8');f.emit('operation.failed','7');f.fail('operation:7');
+  await assert.rejects(f.reader.poll(),/disconnected/);
+  assert.deepEqual(f.reader.view(),old);assert.equal(f.reader.tools.error(),'disconnected');
+  f.fail('');await f.reader.poll();assert.deepEqual(f.cursors,[1,1]);
+  assert.equal(f.reader.view().operations.get('8')!.items[0]!.id,'1');
+  assert.equal(f.calls.filter(c=>c.method==='operationPage'&&c.id==='8').length,2);
+  assert.equal(f.reader.tools.error(),'');
+  assert.equal(f.reader.tools.client.getQueryCache().getAll().length,8);
+  f.reader.dispose();assert.equal(f.reader.tools.client.getQueryCache().getAll().length,0);
+});
+test('query migration: many dirty Runs retain sequential IPC backpressure',async()=>{
+  const f=targetedFixture(64);await f.load();
+  for(let i=1;i<=64;i++)f.emit('operation.failed',String(i));
+  await f.reader.poll();assert.equal(f.calls.filter(c=>c.method==='operationPage').length,64);
+  assert.equal(f.peak(),1);assert.equal(f.reader.tools.client.getQueryCache().getAll().length,64);f.reader.dispose();
+});
+
+test('query migration: replacement restores browsed positions with fresh data and no old Query cache',async()=>{
+  const f=targetedFixture(24);
+  f.operations.set('24',Array.from({length:12},(_,i)=>({id:String(12-i),runId:'24',toolCallId:'s',tool:'write',artifactPath:null,parametersDigest:'0'.repeat(64),deadline:1,state:'denied'})));
+  await f.reader.refresh();await f.reader.more('history');await f.reader.more('24');
+  const positions=f.reader.browsePositions();f.reader.dispose();f.insert(3);
+  const replacement=new ThreadPages(f.api,'thread','new-host',positions);
+  assert.throws(()=>replacement.view(),/pages_not_loaded/);
+  const view=await replacement.refresh();assert.ok(view.history.items.some(i=>i.run.id===positions.history));
+  assert.equal(view.operations.get('24')!.items.length,12);
+  assert.equal(f.reader.tools.client.getQueryCache().getAll().length,0);replacement.dispose();
 });

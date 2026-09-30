@@ -81,13 +81,17 @@ ipcMain.handle('workbench:credential', async (event, ...args: unknown[]) => {
     return true;
   } catch { return false; } finally { credentialDialog = false; }
 });
-ipcMain.handle('workbench:request', async (event, raw: unknown): Promise<DesktopReply> => {
-  if (!trusted(event)) return { ok: false, code: 'invalid_request' };
+ipcMain.handle('workbench:query-scope', (event, ...args: unknown[]) => {
+  if (!trusted(event) || args.length || closing || shutdownFailed || reconnecting) return null;
+  try { return host.queryScope; } catch { return null; }
+});
+ipcMain.handle('workbench:request', async (event, raw: unknown, queryScope?: unknown, ...extra: unknown[]): Promise<DesktopReply> => {
+  if (!trusted(event) || extra.length || (queryScope !== undefined && (typeof queryScope !== 'string' || queryScope.length > 64))) return { ok: false, code: 'invalid_request' };
   if (closing || shutdownFailed) return { ok: false, code: 'disconnected' };
   if (inFlight >= 16) return { ok: false, code: 'busy' };
   let request; try { request = parseDesktopRequest(raw); } catch { return { ok: false, code: 'invalid_request' }; }
   inFlight++;
-  try { return { ok: true, value: await host.request(request) }; }
+  try { return { ok: true, value: await host.request(request, queryScope) }; }
   catch (error) { return { ok: false, code: desktopErrorCode(error) }; }
   finally { inFlight--; }
 });

@@ -2,11 +2,11 @@ import { spawn, type ChildProcess } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { mkdirSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
-import { parseDesktopRequest, type DesktopReply, type DesktopRequest, type DesktopValue } from '../../packages/app-contracts/desktop.ts';
+import { parseDesktopRequest, type DesktopHome, type DesktopReply, type DesktopRequest, type DesktopValue } from '../../packages/app-contracts/desktop.ts';
 import { IpcSender } from '../../packages/pi-adapter/ipc-channel.ts';
 import { exact } from '../../packages/app-contracts/worker-ipc.ts';
 interface HostExit { code: number | null; signal: NodeJS.Signals | null }
-interface Connection { child: ChildProcess; sender: IpcSender; ended: Promise<HostExit>; ready: Promise<void> }
+interface Connection { queryScope: string; child: ChildProcess; sender: IpcSender; ended: Promise<HostExit>; ready: Promise<void> }
 /** Bounded, process-handle-bound transport. Disconnect rejects every pending request; nothing is replayed. */
 export class HostClient {
   private connection?: Connection;
@@ -17,6 +17,10 @@ export class HostClient {
   private readonly node: string; private readonly root: string; private readonly profile: string;
   private readonly mode: '--demo'|'--model'|'--model-offline'|'--model-files-offline'|'--model-shell-offline';private readonly configuration?:string; private readonly denyModelNetwork: boolean;
   constructor(node: string, root: string, profile: string, mode:'--demo'|'--model'|'--model-offline'|'--model-files-offline'|'--model-shell-offline'='--demo', configuration?:string, denyModelNetwork=false) { this.denyModelNetwork=denyModelNetwork; this.node = node; this.root = root; this.profile = profile;this.mode=mode;this.configuration=configuration; }
+  get queryScope() {
+    if (this.stopped || this.reconnecting || !this.connection?.child.connected) throw Error('disconnected');
+    return this.connection.queryScope;
+  }
   get processId() { return this.connection?.child.pid; }
   private start(): Connection {
     const home = join(this.profile, 'server-home'); const temp = join(home, 'tmp'); mkdirSync(temp, { recursive: true });
@@ -26,7 +30,7 @@ export class HostClient {
         XDG_CONFIG_HOME: join(home, '.config'), PI_OFFLINE: '1', PI_SKIP_VERSION_CHECK: '1', PI_CODING_AGENT_DIR: join(home, 'agent'), NO_COLOR: '1' },
     });
     let ready!: () => void; let failed!: (e: Error) => void; let ended!: (exit: HostExit) => void;
-    const connection: Connection = { child, sender: new IpcSender((m, cb) => child.send(m, cb)),
+    const connection: Connection = { queryScope: randomUUID(), child, sender: new IpcSender((m, cb) => child.send(m, cb)),
       ready: new Promise<void>((r, e) => { ready = r; failed = e; }), ended: new Promise<HostExit>(r => { ended = r; }) };
     this.connection = connection;
     const fail = () => {
@@ -61,8 +65,12 @@ export class HostClient {
     return connection;
   }
   connect(): Promise<void> { return this.stopped ? Promise.reject(new Error('disconnected')) : (this.connection ?? this.start()).ready; }
-  async request(raw: DesktopRequest): Promise<DesktopValue> {
-    return this.exchange({request:parseDesktopRequest(raw)});
+  async request(raw: DesktopRequest, expectedQueryScope?: string): Promise<DesktopValue> {
+    const scope = this.queryScope;
+    if (expectedQueryScope !== undefined && expectedQueryScope !== scope) throw Error('disconnected');
+    const value = await this.exchange({request:parseDesktopRequest(raw)});
+    if (this.queryScope !== scope) throw Error('disconnected');
+    return raw.type === 'home' ? {...value as DesktopHome, queryScope: scope} : value;
   }
   async selectWorkspace(path:string):Promise<void> { if(typeof path!=='string'||!path||path.length>4096)throw new Error('invalid_workspace');await this.exchange({workspace:path}); }
   async protectCredentialDirectory(path:string):Promise<void> { if(typeof path!=='string'||!path||path.length>4096)throw new Error('invalid_directory');await this.exchange({protectedDirectory:path}); }

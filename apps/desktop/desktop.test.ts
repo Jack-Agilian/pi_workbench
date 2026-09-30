@@ -10,6 +10,9 @@ import { parseDesktopRequest, type DesktopHome, type DesktopThread } from '../..
 import type { Ack } from '../../packages/app-contracts/index.ts';
 import { parsePresentation, displayText } from '../../packages/app-contracts/presentation.ts';
 import { shouldSubmit } from './composer-key.ts';
+import { ThreadPages } from './thread-pages.ts';
+import type { HistoryPage, HistoryEntry, OperationPage, ArtifactPage } from '../../packages/app-contracts/desktop-pages.ts';
+import type { ProductEvent } from '../../packages/app-contracts/index.ts';
 import { HostClient } from './host-client.ts';
 import { repository } from '../agent-server/worker-launcher.ts';
 import { projectMessages } from '../../packages/pi-adapter/presentation.ts';
@@ -126,9 +129,28 @@ test('actual App Server transport closes on exit+disconnect and reopens SQLite w
   const root = realpathSync(mkdtempSync(join(tmpdir(), 'c-client-'))); const client = new HostClient(process.execPath, repository, root);
   try {
     await client.connect(); const original = client.processId!; assert.notEqual(original, process.pid);
+    const scope = client.queryScope; assert.ok(!scope.includes(root));
     const command = { type: 'threads.create' as const, requestId: 'persisted-thread', workspaceId: 'demo-workspace', title: 'SYNTHETIC reconnect' };
-    const ack = await client.request({ type: 'command', command });
+    const ack = await client.request({ type: 'command', command }) as Ack;
+    const run = await client.request({type:'command',command:{type:'runs.start',requestId:'q1-synthetic',threadId:ack.id,input:'SYNTHETIC Query IPC approval'}}) as Ack;
+    await until(async()=> (await client.request({type:'thread',threadId:ack.id}) as DesktopThread).operations.some(op=>op.state==='pending'),'q1_pending');
+    const port = {
+      historyPage: async (threadId:string,p?:import('../../packages/app-contracts/desktop-pages.ts').PageOptions) => await client.request({type:'history-page',threadId,page:p}) as HistoryPage,
+      historyEntry: async (threadId:string,runId:string) => await client.request({type:'history-entry',threadId,runId}) as HistoryEntry,
+      artifactPage: async (threadId:string,p?:import('../../packages/app-contracts/desktop-pages.ts').PageOptions) => await client.request({type:'artifact-page',threadId,page:p}) as ArtifactPage,
+      operationPage: async (runId:string,p?:import('../../packages/app-contracts/desktop-pages.ts').PageOptions,scope?:string) => await client.request({type:'operation-page',runId,page:p},scope) as OperationPage,
+      events: async (threadId:string,cursor:number) => await client.request({type:'events',threadId,cursor}) as ProductEvent[],
+    };
+    const reader = new ThreadPages(port,ack.id,scope), initialStart = performance.now();
+    const initial = await reader.refresh();const initialMs = performance.now()-initialStart;
+    assert.equal(initial.operations.get(run.id)!.items[0]!.state,'pending'); reader.dispose();
     await client.reconnect(); assert.notEqual(client.processId, original); assert.throws(() => process.kill(original, 0));
+    assert.notEqual(client.queryScope,scope);
+    await assert.rejects(client.request({type:'operation-page',runId:run.id},scope),/disconnected/);
+    const reopened = new ThreadPages(port,ack.id,client.queryScope), reopenStart = performance.now();
+    const view = await reopened.refresh();const reopenMs = performance.now()-reopenStart;
+    assert.equal(view.history.items.length,1);assert.equal(view.operations.get(run.id)!.items[0]!.state,'denied');
+    reopened.dispose();console.log(JSON.stringify({q1RealIpc:true,initialMs,reopenMs,modelCalls:0}));
     assert.deepEqual(await client.request({ type: 'command', command }), ack);
     const second = client.processId!; await client.close(); assert.throws(() => process.kill(second, 0));
     await client.close(); await assert.rejects(client.request({ type: 'home' }), /disconnected/);
