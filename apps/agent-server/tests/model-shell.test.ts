@@ -168,3 +168,23 @@ test('bundled gpt-6-luna strict schemas: actual Pi payload admitted, mutations r
   assert.deepEqual(f.core.snapshot(f.thread).operations.map(o=>[o.tool,o.state]),[['bash','succeeded'],['read','succeeded']]);
  }finally{await f.dispose();}
 });
+
+for(const mixed of [false,true])test(`R02 sixteen approved operations, mixed=${mixed}: native Pi completes without consuming display replay quota`,async()=>{
+ const {f,access,plan}=setupShell();let calls=0;
+ delete plan.model.fileTools!.maxModelRequests;plan.model.fileTools!.maxOperations=16;plan.model.shellTools!.maxCommands=16;
+ access.configuration={...access.configuration,maxRequests:undefined,fileTools:{...plan.model.fileTools!},shellTools:{...plan.model.shellTools!}};
+ plan.deadline=Date.now()+90000;
+ try{
+  const done=f.supervisor.startNext(plan,entry,{...access,fetch:async()=>{
+   calls++;const tools=calls>16?[]:mixed&&calls%2===0?[{tool:'write' as const,parameters:{path:`mixed-${calls}.md`,content:'# SYNTHETIC mixed'}}]:[bash('printf x >> sixteen.txt')];
+   return new Response(syntheticReply('chat-completions',calls,tools),{headers:{'content-type':'text/event-stream'}});
+  }})!;
+  for(let i=0;i<16;i++)await approveShell(f);await done;
+  const snapshot=f.core.snapshot(f.thread);assert.equal(snapshot.runs[0]!.state,'completed');assert.equal(calls,17);
+  assert.equal(snapshot.operations.length,16);assert.ok(snapshot.operations.every(o=>o.state==='succeeded'));
+  let page=f.core.operationPage(f.run,{limit:5});const ids=page.items.map(op=>op.id);
+  while(page.hasMore){page=f.core.operationPage(f.run,{limit:5,cursor:page.nextCursor!});ids.push(...page.items.map(op=>op.id));}
+  assert.deepEqual(ids,snapshot.operations.map(op=>op.id).reverse());assert.equal(new Set(ids).size,16);
+  assert.equal(readFileSync(join(f.cwd,'sixteen.txt'),'utf8'),'x'.repeat(mixed?8:16));
+ }finally{await f.dispose();}
+});

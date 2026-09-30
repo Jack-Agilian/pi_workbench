@@ -16,6 +16,7 @@ import { IpcSender } from '../../packages/pi-adapter/ipc-channel.ts';
 import { inside, verifyContent } from '../../packages/pi-adapter/approved-resources.ts';
 import { ProductCore } from './core.ts';
 import { artifactPath, inspectMarkdown } from './artifact.ts';
+import { ObservationOrder } from '../../packages/pi-adapter/observation-order.ts';
 import { launchSpec, shellLaunch, spawnGuardian, type LaunchSpec, type TrustedWorkerEntry } from './worker-launcher.ts';
 
 /** Host-approved one-operation intent. Not a Renderer command and not accepted from the Worker. */
@@ -31,8 +32,9 @@ interface Active {
   httpSequence?:number; modelAccess?: ModelAccess; http?: ModelHttp; httpClosing?:boolean; httpDeadline?:number; httpRequests?:number; preparingFile?:boolean; fileFailed?:boolean;
   shellRequest?: { id: string; operationId: string };
   requests: Map<string, string>; replies: Map<string, WireBody>; pending: Map<string, string>; startedAt: number;
+  observations: ObservationOrder;
 }
-export interface SupervisorOptions { stateDirectory: string; databaseDirectory: string; resources: ResourceSelection; readyTimeoutMs?: number }
+export interface SupervisorOptions { stateDirectory: string; databaseDirectory: string; resources: ResourceSelection; readyTimeoutMs?: number; validateWorkspace?: (workspaceId:string, path:string)=>void }
 export class WorkerSupervisor {
   private readonly core: ProductCore;
   private readonly options: SupervisorOptions;
@@ -44,7 +46,11 @@ export class WorkerSupervisor {
   get guardianPid() { return this.active?.child.pid; }
   get completion() { return this.active?.done; }
   command(raw: unknown) {
-    const command = parseCommand(raw); const ack = this.core.handle(command);
+    const command = parseCommand(raw);
+    if(command.type==='approvals.resolve'&&command.decision==='allow'&&this.active&&!this.core.hasRequest(command.requestId)){
+      const {binding,config}=this.active.journal;this.options.validateWorkspace?.(binding.workspaceId,config.workspace);
+    }
+    const ack = this.core.handle(command);
     const active = this.active;
     if (active && command.type === 'approvals.resolve') this.deliverApproval(active, command.operationId);
     if (active && command.type === 'runs.cancel' && command.runId === active.journal.binding.runId) {
@@ -79,6 +85,7 @@ export class WorkerSupervisor {
     let binding: Dispatch | undefined;
     try { binding = this.core.dispatchNext(dispatch => {
       const workspace = this.core.workspacePath(dispatch.workspaceId); if(realpathSync(workspace)!==workspace)throw new Error('workspace_mapping_changed'); if (plan.tool !== 'bash' && plan.tool !== 'none') artifactPath(workspace, plan.target);
+      this.options.validateWorkspace?.(dispatch.workspaceId, workspace);
       const lease = join(this.options.stateDirectory, 'leases', randomUUID());
       const agentDir = join(this.options.stateDirectory, 'workers', randomUUID());
       const sessions = join(this.options.stateDirectory, 'sessions', dispatch.threadId);
@@ -96,7 +103,7 @@ export class WorkerSupervisor {
     let resolve!: () => void; let reject!: (error: unknown) => void; const done = new Promise<void>((r, e) => { resolve = r; reject = e; });
     this.closeResult = done;
     const sender = new IpcSender((message, callback) => guardian.send(message, callback));
-    const active: Active = { journal, child: guardian, sender, done, resolve, reject, armed: false, hello: false, ready: false, closed: false, requests: new Map(), replies: new Map(), pending: new Map(), startedAt: Date.now() };
+    const active: Active = { journal, child: guardian, sender, done, resolve, reject, armed: false, hello: false, ready: false, closed: false, requests: new Map(), replies: new Map(), pending: new Map(), observations:new ObservationOrder(), startedAt: Date.now() };
     this.active = active;
     if(modelAccess)active.modelAccess=modelAccess;
     guardian.on('message', raw => { try { this.receive(active, raw); } catch { this.stop(active); } });
@@ -126,6 +133,8 @@ export class WorkerSupervisor {
     if (outer.kind !== 'worker') throw new Error('unknown_guardian_message');
     const message = parseEnvelope(outer.message); const { body, requestId } = message; const { binding, config, plan, spec } = active.journal;
     if (message.instanceId !== spec.instanceId || message.runtimeBindingId !== binding.runtimeBindingId) throw new Error('stale_connection');
+    if(['file-operation','shell-operation','operation','shell-exec','file-result','result'].includes(body.type))this.options.validateWorkspace?.(binding.workspaceId,config.workspace);
+    if(body.type!=='observation'&&body.type!=='presentation')active.observations.assertControl(requestId);
     if (body.type==='model-http' || body.type==='model-http-read' || body.type==='model-http-finish') {
       if(plan.tool!=='none'||plan.model.mode!=='live'||!active.ready||active.closed||active.result!==undefined||Date.now()>=plan.deadline)throw new Error('model_http_not_admitted');
       const number=Number(requestId.replace(/^http-/,''));if(requestId!==`http-${number}`||number!==(active.httpSequence??0)+1||number>4096)throw new Error('model_http_sequence');active.httpSequence=number;
@@ -150,6 +159,14 @@ export class WorkerSupervisor {
       if(!active.http)throw new Error('model_transport_missing');
       active.http.receive(body,reply=>this.send(active,reply,requestId));return;
     }
+    if(body.type==='observation'||body.type==='presentation'){
+      if(!active.observations.accept(body.type,requestId))return;
+      if(body.type==='observation'){if(active.ready&&!active.closed)this.core.observe(binding,body);}
+      else {if(!active.ready||active.closed)throw new Error('unexpected_presentation');this.core.projectSession(binding,body.projection);}
+      return;
+    }
+    // Control facts are never evicted. At most 16 admitted operations per Run;
+    // this independent defensive cap cannot be consumed by display/stream updates.
     const serialized = JSON.stringify(body); const prior = active.requests.get(requestId);
     if (prior) {
       if (prior !== serialized) throw new Error('request_id_conflict');
@@ -224,8 +241,6 @@ export class WorkerSupervisor {
         else this.core.finishOperation(binding, operation.id, 'unknown'); break;
       }
       case 'model-outcome': if(plan.tool!=='none'||!active.ready||active.closed||body.outcome.synthetic!==(plan.model.mode==='offline'))throw new Error('model_outcome_not_admitted'); this.core.recordModelOutcome(binding,body.outcome);break;
-      case 'observation': if (active.ready && !active.closed) this.core.observe(binding, body); break;
-      case 'presentation': if (!active.ready || active.closed) throw new Error('unexpected_presentation'); this.core.projectSession(binding, body.projection); break;
       case 'done': if (!active.ready || active.result !== undefined) throw new Error('unexpected_done'); active.result = body.ok; void this.send(active, { type: 'close' }).catch(() => this.stop(active)); break;
       case 'closed': active.closed = true; this.nativeReference(active, body.nativeRef); break;
       case 'fault': this.stop(active); break;
@@ -429,6 +444,7 @@ export class WorkerSupervisor {
     this.core.recoverAfterCrash();
     for (const { journal, cancelRequested } of pending) {
       const { binding, plan } = journal;
+      this.options.validateWorkspace?.(binding.workspaceId,journal.config.workspace);
       const native = this.core.nativeSessionReference(binding.threadId);
       if (native.reference) {
         if (this.nativeFile(journal, native.reference)) this.core.reconcileNativeSession(binding.runId, native.reference);

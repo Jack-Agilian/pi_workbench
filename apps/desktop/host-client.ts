@@ -65,6 +65,7 @@ export class HostClient {
     return this.exchange({request:parseDesktopRequest(raw)});
   }
   async selectWorkspace(path:string):Promise<void> { if(typeof path!=='string'||!path||path.length>4096)throw new Error('invalid_workspace');await this.exchange({workspace:path}); }
+  async protectCredentialDirectory(path:string):Promise<void> { if(typeof path!=='string'||!path||path.length>4096)throw new Error('invalid_directory');await this.exchange({protectedDirectory:path}); }
   async setModelKey(key:string):Promise<void> { if(typeof key!=='string'||!key||key.length>8192||/[\r\n\0]/.test(key))throw new Error('invalid_credential');await this.exchange({credential:key}); }
   private async exchange(payload:object):Promise<DesktopValue> {
     const connection = this.connection;
