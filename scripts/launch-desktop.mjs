@@ -24,6 +24,10 @@ const executable = join(root, 'node_modules/electron/dist/Electron.app/Contents/
 if (!existsSync(executable)) throw new Error('Run npm run prepare:desktop first; launch never downloads dependencies.');
 await import('./build-desktop.mjs');
 const profile = test ? realpathSync(mkdtempSync(join(tmpdir(), 'pi-desktop-ui-'))) : selectedProfile;
+if (process.argv.includes('--smoke-test')) {
+  const { seedPaginationFixture } = await import('../apps/desktop/pagination-fixture.ts');
+  await seedPaginationFixture(profile);
+}
 mkdirSync(join(profile, 'home/tmp'), { recursive: true });
 const child = spawn(executable, [join(root, 'dist/desktop/main.mjs'), mode, ...(mode==='--model'?[`--model-config=${resolve(config)}`]:[]), `--host-node=${realpathSync(process.execPath)}`, `--demo-profile=${profile}`, ...(test ? [modelTest?'--model-smoke-test':shellTest ? '--shell-smoke-test' : '--smoke-test'] : [])], {
   cwd: profile, stdio: 'inherit', env: { HOME: join(profile, 'home'), TMPDIR: join(profile, 'home/tmp'), PATH: dirname(process.execPath),

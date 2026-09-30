@@ -1,7 +1,9 @@
 import { StrictMode, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import type { Command, RunState } from '../../packages/app-contracts/index.ts';
-import type { DesktopApi, DesktopHome, DesktopThread } from '../../packages/app-contracts/desktop.ts';
+import type { DesktopApi, DesktopHome } from '../../packages/app-contracts/desktop.ts';
+import type { ThreadActivity } from '../../packages/app-contracts/desktop-pages.ts';
+import { ThreadPages, projectPages, type ThreadPagesView } from './thread-pages.ts';
 import { RunHistory } from './run-history.tsx';
 import { ApprovalList } from './approval-list.tsx';
 import { ArtifactPanel } from './artifact-panel.tsx';
@@ -15,8 +17,17 @@ function App() {
   const [inspectorOpen, setInspectorOpen] = useState(true);
   const [inspectorWidth, setInspectorWidth] = useState('normal');
   const [home, setHome] = useState<DesktopHome | null>(null);
-  const [selected, setSelected] = useState(''); const [threadState, setThread] = useState<DesktopThread | null>(null);
-  const thread = threadState?.thread.id === selected ? threadState : null;
+  const [selected, setSelected] = useState('');
+  const [activityState, setActivity] = useState<ThreadActivity | null>(null);
+  const activity = activityState?.thread.id === selected ? activityState : null;
+  const [pageState, setPages] = useState<{id: string; value: ThreadPagesView} | null>(null);
+  const pages = pageState?.id === selected ? pageState.value : null;
+  const thread = pages && activity ? projectPages(pages, activity) : null;
+  const readers = useRef(new Map<string, ThreadPages>());
+  const [pageProblem, setPageProblem] = useState('');
+  const [pageBusy, setPageBusy] = useState(false);
+  const pageAction = useRef(false);
+  const pageEpoch = useRef(0);
   const [drafts, setDrafts] = useState<Record<string, string>>({}); const [title, setTitle] = useState('');
   const [problem, setProblem] = useState(''); const [disconnected, setDisconnected] = useState(false);
   const [busy, setBusy] = useState(false); const [tick, setTick] = useState(0);
@@ -39,7 +50,7 @@ function App() {
   }, []);
   useEffect(() => {
     const current = ++generation.current; let stopped = false; let timer: ReturnType<typeof setTimeout>;
-    let cursor: number | undefined;
+
 
     const poll = async () => {
       try {
@@ -47,12 +58,9 @@ function App() {
         if (stopped || generation.current !== current) return;
         setHome(latestHome);
         if (selected) {
-          const changed = cursor === undefined || (await api.events(selected, cursor)).length > 0;
-          if (changed) {
-            const value = await api.thread(selected);
-            if (stopped || generation.current !== current) return;
-            cursor = value.cursor; setThread(value);
-          }
+          const value = await api.threadActivity(selected);
+          if (stopped || generation.current !== current) return;
+          setActivity(value);
         }
         if (!stopped) setDisconnected(false);
       } catch (error) { if (!stopped) failed(error); }
@@ -61,6 +69,44 @@ function App() {
     void poll();
     return () => { stopped = true; clearTimeout(timer); };
   }, [selected, tick]);
+  // History errors and slow pages do not block the independent current-activity poll.
+  useEffect(() => {
+    const epoch = ++pageEpoch.current;
+    let stopped = false; let timer: ReturnType<typeof setTimeout>;
+    setPageProblem(''); setPageBusy(false); pageAction.current = false;
+    if (!selected) return;
+    let reader = readers.current.get(selected);
+    if (!reader) { reader = new ThreadPages(api, selected); readers.current.set(selected, reader); }
+    const currentReader = reader;
+    let initialized = false;
+    const poll = async () => {
+      try {
+        const value = await (initialized ? currentReader.poll() : currentReader.refresh());
+        initialized = true;
+        if (!stopped && pageEpoch.current === epoch) setPages({id: selected, value});
+      } catch (error) { if (!stopped && pageEpoch.current === epoch) setPageProblem(pageError(error)); }
+      finally { if (!stopped) timer = setTimeout(() => void poll(), 350); }
+    };
+    void poll();
+    return () => { stopped = true; clearTimeout(timer); };
+  }, [selected, tick]);
+  function pageError(error: unknown) {
+    const code = error instanceof Error ? error.message : '';
+    return code === 'page_item_too_large' ? '单条记录超过展示传输上限。已读内容保留，当前审批与停止仍可使用。'
+      : code === 'page_cursor_invalid' ? '历史位置已失效，请重新读取已浏览的记录。'
+      : '历史或成果暂时无法加载，已读内容保留。可以重试，重试不会重新执行任务。';
+  }
+  async function loadPages(kind?: string) {
+    const reader = readers.current.get(selected);
+    if (!reader || pageAction.current) return;
+    const epoch = pageEpoch.current;
+    pageAction.current = true; setPageBusy(true);
+    try {
+      const value = await (kind ? reader.more(kind) : reader.refresh());
+      if (pageEpoch.current === epoch) { setPages({id: selected, value}); setPageProblem(''); }
+    } catch (error) { if (pageEpoch.current === epoch) setPageProblem(pageError(error)); }
+    finally { if (pageEpoch.current === epoch) { pageAction.current = false; setPageBusy(false); } }
+  }
   async function command(value: Command) {
     if (commandPending.current) return;
     commandPending.current = true; setBusy(true); setProblem('');
@@ -75,7 +121,7 @@ function App() {
     if (response && pendingCreation.current === intent) { pendingCreation.current = null; setTitle(''); setSelected(response.id); setTick(n => n + 1); }
   }
   async function submit() {
-    if (!selected || !draft.trim() || commandPending.current || busy || disconnected) return;
+    if (!selected || !draft.trim() || commandPending.current || busy || disconnected || !canSend) return;
     const current = selected;
     const intent = pendingRuns.current.get(current) ?? { type: 'runs.start', requestId: id(), threadId: current, input: draft };
     pendingRuns.current.set(current, intent);
@@ -91,15 +137,15 @@ function App() {
     catch (error) { failed(error); } finally { setBusy(false); }
   }
   const modelMode=home?.mode==='model'||home?.mode==='model-offline';
-  const canSend=!modelMode||home?.model?.status==='ready';
+  const canSend=activity?.workspaceStatus === 'ready' && (!modelMode||home?.model?.status==='ready');
   const modeLabel=home?.mode==='model'?'模型会话':home?.mode==='model-offline'?'离线会话验证 · SYNTHETIC':'无模型演示';
   const currentRuns = thread?.runs ?? [];
-  const pending = thread?.operations.filter(op => op.state === 'pending') ?? [];
+  const pending = activity?.operations.filter(op => op.state === 'pending') ?? [];
   const workspacePath=home?.workspaces.items.find(w=>w.id===(thread?.thread.workspaceId??home.workspaces.selectedId))?.path??'正在读取目录';
   const selectedWorkspace=home?.workspaces.items.find(w=>w.id===home.workspaces.selectedId)?.path??'正在读取目录';
   const shellTools=home?.model?.limits?.shellTools;
-  const isWorking = currentRuns.some(run => active.has(run.state));
-  const stoppableRun = currentRuns.find(run => run.state === 'running' || run.state === 'starting') ?? currentRuns.find(run => run.state === 'queued');
+  const isWorking = !!activity?.activeRun && active.has(activity.activeRun.state);
+  const stoppableRun = activity?.activeRun && ['running','starting','queued'].includes(activity.activeRun.state) ? activity.activeRun : null;
   return <div className="shell">
     <aside className="sidebar">
       <div className="brand"><span className="brand-mark">π</span><div>Pi Workbench<small>把想法变成成果</small></div></div>
@@ -118,6 +164,7 @@ function App() {
       <div className="execution-summary"><span title={workspacePath}>工作目录：{workspacePath}</span><span>{shellTools?'Bash 禁网 · 隔离环境 · 逐命令批准':modelMode?'工具受配置限制':'本地演示 · 工具禁网'}{modelMode?' · 模型请求仅走配置端点':''}</span></div>
       {home?.mode==='model' && <details className="model-settings" aria-label="模型配置" open={home.model?.status!=='ready'}><summary>模型配置 · {home.model?.provider} / {home.model?.model}</summary>{home.model?.limits && <p>{home.model.limits.endpoint} · {home.model.limits.requests===null?'LLM 请求次数不限':`本次授权最多 ${home.model.limits.requests} 次请求`} · 估算预算 ${home.model.limits.estimatedUsd} · 输出上限 {home.model.limits.outputTokens} token{home.model.limits.httpIdleTimeoutMs!==undefined && <> · 空闲等待 {home.model.limits.httpIdleTimeoutMs/1000} 秒</>}{home.model.limits.timeoutMs!==undefined && <> · 单次 LLM 请求总上限 {home.model.limits.timeoutMs/1000} 秒</>}</p>}{home.model?.status==='not_configured'?<p>尚未配置或配置无效。请先运行 model:config 创建非秘密配置，填写并检查后重新启动。本页不会使用全局 Pi 凭据。</p>:home.model?.status==='key_required'?<div><p>仅发送你批准的合成无敏感资料。请求与费用估算限额来自配置；估算不等于服务商硬预算。可在配置目录的 auth.json 保存 API key，重启后自动读取；也可临时选择私有 .key 文件。凭据内容不会传入页面。</p><button disabled={busy} onClick={()=>{setBusy(true);void api.selectModelCredential().then(()=>setTick(n=>n+1),failed).finally(()=>setBusy(false));}}>选择凭据并启用本次应用</button></div>:home.model?.status==='policy_required'?<p>授权策略待确认。请核对原配置并完成显式修订，已有请求记录继续保留。</p>:home.model?.status==='budget_exhausted'?<p>本授权的请求次数或预留预算不足。</p>:<p>{shellTools?'已就绪 · 文件与 Bash 均须逐项批准':home.model?.limits?.fileTools?'已就绪 · Markdown 读取、写入、修改均须逐项批准':'已就绪 · 无工具'}</p>}</details>}
       {problem && <div className="notice error" role="alert">{problem}<button onClick={() => void reconnect()} disabled={busy}>重新连接</button></div>}
+      {activity?.workspaceStatus === 'invalid' && <div className="notice error" role="alert">此会话的工作目录已不可用，发送已停用。历史仍可浏览，请恢复原目录后再继续。</div>}
       {home?.recovery === 'blocked' && <div className="notice" role="status">执行结果或清理尚未核实，新任务暂不执行。<button disabled={busy} onClick={() => { void api.recover().then(value => { setHome(value); setTick(n => n + 1); }, failed); }}>核验并恢复</button></div>}
       <div className="view-toolbar">
         <button className="inspector-toggle" aria-controls="task-inspector" aria-expanded={inspectorOpen} onClick={() => setInspectorOpen(open => !open)}>{inspectorOpen ? '收起审批与成果' : '展开审批与成果'}</button>
@@ -128,8 +175,11 @@ function App() {
       <div className="content-grid" data-inspector={inspectorOpen ? 'open' : 'closed'} data-width={inspectorWidth}>
         <section className="conversation" aria-label="会话时间线">
           <div className="timeline" ref={scroll.viewport} onScroll={scroll.onScroll} tabIndex={0} aria-label="执行记录"><div className="timeline-content" ref={scroll.content}>
-            {!currentRuns.length && <div className="empty"><span className="empty-mark">✧</span><h2>{modelMode?'开始一段会话':'让第一份成果落地'}</h2><p>{modelMode?'发送消息、继续上下文；离线验证回复会明确标为合成内容。':'演示会把你的目标写入真实 Markdown 文件，体验审批和成果核验。'}</p><div className="suggestions">{['整理本周工作记录','记录一次项目讨论','起草下一步行动清单'].map(text => <button key={text} disabled={!selected || !!unconfirmedRun} onClick={() => setDrafts(all => ({ ...all, [selected]: text }))}>{text}<span>↗</span></button>)}</div>{!selected && <p className="hint">先在左侧新建一个会话</p>}</div>}
-            {thread && <RunHistory thread={thread} mode={home?.mode} busy={busy} disconnected={disconnected} command={command} />}
+            {pageProblem && <div className="notice" role="status">{pageProblem}<button className="retry-pages" disabled={pageBusy || disconnected} onClick={() => void loadPages()}>重新读取记录</button></div>}
+            {selected && !pages && !pageProblem && <p role="status">正在读取最近记录…</p>}
+            {pages?.history.hasMore && <button className="load-history" disabled={pageBusy || disconnected} onClick={() => { scroll.onScroll(); void loadPages('history'); }}>{pageBusy ? '正在加载…' : '加载更早记录'}</button>}
+            {!currentRuns.length && (!selected || pages) && <div className="empty"><span className="empty-mark">✧</span><h2>{modelMode?'开始一段会话':'让第一份成果落地'}</h2><p>{modelMode?'发送消息、继续上下文；离线验证回复会明确标为合成内容。':'演示会把你的目标写入真实 Markdown 文件，体验审批和成果核验。'}</p><div className="suggestions">{['整理本周工作记录','记录一次项目讨论','起草下一步行动清单'].map(text => <button key={text} disabled={!selected || !!unconfirmedRun} onClick={() => setDrafts(all => ({ ...all, [selected]: text }))}>{text}<span>↗</span></button>)}</div>{!selected && <p className="hint">先在左侧新建一个会话</p>}</div>}
+            {thread && <RunHistory thread={thread} mode={home?.mode} busy={busy} disconnected={disconnected} command={command} operationPages={pages?.operations} loading={pageBusy} loadMore={runId => void loadPages(runId)} />}
           </div></div>
           {scroll.browsing && <button className="return-latest" onClick={scroll.returnLatest}>返回最新 ↓</button>}
           {!modelMode && <div className="suggestions"><button disabled={!selected || !!unconfirmedRun || busy || disconnected} onClick={() => setDrafts(all => ({ ...all, [selected]: '/demo-shell' }))}>填入只读命令演示</button><button disabled={!selected || !!unconfirmedRun || busy || disconnected} onClick={() => setDrafts(all => ({ ...all, [selected]: '/demo-shell-wait' }))}>填入可停止命令演示</button></div>}<form className="composer" onSubmit={event => { event.preventDefault(); void submit(); }}>
@@ -143,7 +193,7 @@ function App() {
           <label className="rail-width">栏宽 <select aria-label="审批与成果栏宽" value={inspectorWidth} onChange={event => setInspectorWidth(event.target.value)}><option value="compact">紧凑</option><option value="normal">标准</option><option value="wide">宽</option></select></label>
           <ApprovalList pending={pending} workspacePath={workspacePath} modelMode={modelMode} busy={busy} disconnected={disconnected} command={command} />
           {!pending.length && <div className="approval-empty"><span>✓</span> 暂无待处理审批</div>}
-          <ArtifactPanel key={selected} thread={thread} api={api} disconnected={disconnected} />
+          <ArtifactPanel key={selected} thread={thread} api={api} disconnected={disconnected} hasMore={pages?.artifacts.hasMore ?? false} loading={pageBusy} loadMore={() => void loadPages('artifacts')} />
           <div className="inspector-foot">{modelMode?(shellTools?'Bash 可改动非 Markdown 文件；命令成功不自动登记成果。':home?.model?.limits?.fileTools?'仅核验成功的写入或修改登记成果；读取也须批准。':'无工具会话，不产生文件成果。'):'演示消息均已标记为合成内容，真实工具只在批准后执行。'}</div>
         </aside>
       </div>

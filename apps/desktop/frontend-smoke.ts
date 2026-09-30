@@ -25,18 +25,37 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
   const fixture = structuredClone(original);
   const originalRun = original.runs[0]!;
   fixture.runs = Array.from({length: 36}, (_, i) => ({...originalRun, id: `SYNTHETIC-ui-run-${i}`, state: 'completed'}));
+  fixture.runs.at(-1)!.id = originalRun.id; // Preserve the already-browsed real head identity in this UI-only projection.
   fixture.inputs = fixture.runs.map((r, i) => ({id: r.id, text: `SYNTHETIC history ${i}\n` + '可读的旧记录，不是真实模型输出。'.repeat(12)}));
   fixture.presentations = [];
   fixture.operations = [{...original.operations[0]!, state: 'pending', runId: fixture.runs.at(-1)!.id, deadline: Date.now() + 120000}];
+  fixture.operations.push(...Array.from({length:15},(_,i)=>({...fixture.operations[0]!,id:`SYNTHETIC-old-operation-${i}`,state:'succeeded' as const})));
   fixture.runs.at(-1)!.state = 'running';
   let revision = original.cursor + 100;
   let previewStatus: Preview['status'] = 'ready';
   let releasePreview: (() => void) | undefined;
   let delayPreview = false;
   let commands = 0;
+  let historyError = ''; let workspaceStatus: 'ready'|'invalid' = 'ready';
+  let delayHistory = false; let releaseHistory: (() => void) | undefined;
   host.request = async raw => {
     if (raw.type === 'command') commands++;
-    if (raw.type === 'thread' && raw.threadId === chosen.id) return {...structuredClone(fixture), cursor: revision};
+    if (raw.type === 'thread' && raw.threadId === chosen.id) throw Error('unbounded_renderer_request');
+    if (raw.type === 'thread-activity' && raw.threadId === chosen.id) return {thread: fixture.thread, snapshotSeq: revision + 500, activeRun: fixture.runs.at(-1)!, operations: structuredClone(fixture.operations.filter(op => op.state === 'pending')), workspaceStatus};
+    if (raw.type === 'history-page' && raw.threadId === chosen.id) {
+      if (historyError) throw Error(historyError);
+      if (delayHistory) { delayHistory = false; await new Promise<void>(r => { releaseHistory = r; }); }
+      const offset = Number(raw.page?.cursor ?? 0), limit = raw.page?.limit ?? 8;
+      const runs = [...fixture.runs].reverse().slice(offset, offset + limit);
+      const hasMore = offset + runs.length < fixture.runs.length;
+      return {items: structuredClone(runs.map(run => ({run, input: fixture.inputs.find(i => i.id === run.id)!.text, presentation: {messages: [], omitted: false}, modelOutcome: null}))), hasMore, nextCursor: hasMore ? String(offset + runs.length) : null, snapshotSeq: revision};
+    }
+    if (raw.type === 'artifact-page' && raw.threadId === chosen.id) return {items: structuredClone(fixture.artifacts), hasMore: false, nextCursor: null, snapshotSeq: revision};
+    if (raw.type === 'operation-page' && fixture.runs.some(run => run.id === raw.runId)) {
+      const offset=Number(raw.page?.cursor??0), limit=raw.page?.limit??8, all=fixture.operations.filter(op=>op.runId===raw.runId);
+      const items=all.slice(offset,offset+limit), hasMore=offset+items.length<all.length;
+      return {items:structuredClone(items),hasMore,nextCursor:hasMore?String(offset+items.length):null,snapshotSeq:revision};
+    }
     if (raw.type === 'events' && raw.threadId === chosen.id) return raw.cursor < revision ? [{seq: revision, runSeq: 1, threadId: chosen.id, runId: originalRun.id, kind: 'SYNTHETIC_UI_ONLY', entityId: chosen.id, eventType: null, sourceType: null}] : [];
     if (raw.type === 'preview' && raw.artifactId === original.artifacts[0]!.id) {
       if (delayPreview) await new Promise<void>(resolve => {releasePreview = resolve;});
@@ -47,7 +66,15 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
   const metrics: unknown[] = [];
   try {
     await switchTo(other.title); await switchTo(chosen.title);
-    await wait(() => js<boolean>("document.querySelectorAll('[data-run]').length===36"), 'history');
+    await wait(() => js<boolean>("document.querySelectorAll('[data-run]').length===8"), 'first_page');
+    await wait(() => js<boolean>("!!document.querySelector('.load-operations')"), 'tools_first_page');
+    await click('.load-operations');
+    await wait(() => js<boolean>("document.querySelectorAll('.tool-card').length===16 && !document.querySelector('.load-operations')"), 'tools_more');
+    for (const count of [16, 24, 32, 36]) {
+      await click('.load-history');
+      await wait(() => js<boolean>(`document.querySelectorAll('[data-run]').length===${count}`), 'older_page');
+    }
+    assert.equal(await js<boolean>("!!document.querySelector('.load-history')"), false);
     await wait(() => js<boolean>("document.querySelector('.timeline').scrollTop>1000"), 'initial_latest');
     await js("(()=>{const t=document.querySelector('#composer');Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set.call(t,'SYNTHETIC 保留草稿');t.dispatchEvent(new Event('input',{bubbles:true}));t.focus();t.setSelectionRange(3,7)})()");
     revision++;
@@ -103,6 +130,27 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
       assert.equal(await js<boolean>("!!document.querySelector('.preview img')"), false);
       assert.equal(await js<boolean>("!!document.querySelector('.preview pre')"), status === 'ready');
     }
+    for (const code of ['page_cursor_invalid', 'page_item_too_large']) {
+      historyError = code; revision++;
+      await wait(() => js<boolean>("!!document.querySelector('.retry-pages')"), 'page_error');
+      assert.equal(await js<number>("document.querySelectorAll('[data-run]').length"), 36);
+      assert.equal(await js<boolean>("!!document.querySelector('.view-toolbar .stop')"), true);
+      historyError = ''; await click('.retry-pages');
+      await wait(() => js<boolean>("!document.querySelector('.retry-pages')"), 'page_retry');
+    }
+    workspaceStatus = 'invalid';
+    await wait(() => js<boolean>("document.querySelector('.composer .primary').disabled && document.querySelector('.notice.error')?.textContent.includes('工作目录')"), 'invalid_workspace');
+    workspaceStatus = 'ready';
+    await wait(() => js<boolean>("!document.querySelector('.notice.error')"), 'valid_workspace');
+    delayHistory = true; revision++;
+    await wait(async () => !!releaseHistory, 'delayed_history');
+    fixture.operations[0]!.state = 'denied';
+    await wait(() => js<boolean>("document.querySelector('.approval-indicator').textContent==='暂无待审批'"), 'activity_during_slow_history');
+    await switchTo(other.title); await wait(() => js<boolean>("document.querySelectorAll('[data-run]').length===1"), 'switch_during_page');
+    releaseHistory!();
+    await new Promise(r => setTimeout(r, 400));
+    assert.equal(await js<number>("document.querySelectorAll('[data-run]').length"), 1);
+    await switchTo(chosen.title); await wait(() => js<boolean>("document.querySelectorAll('[data-run]').length===36"), 'restore_after_late_page');
     delayPreview = true; await click('.artifact');
     await wait(async () => !!releasePreview, 'delayed_preview');
     await switchTo(other.title); await wait(() => js<boolean>("document.querySelectorAll('[data-run]').length===1"), 'switch_during_preview');
@@ -113,5 +161,5 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
     const directory = join(app.getAppPath(), '../../.artifacts/ui-p2-frontend'); mkdirSync(directory, {recursive: true});
     writeFileSync(join(directory, 'interaction-results.json'), JSON.stringify({scope: 'SYNTHETIC display fixtures in real Electron; no model calls or execution claims',metrics,anchorPreserved: true,threadScrollRestored: true,draftAndSelectionPreserved: true,latePreviewRejected: true,previewStatuses: ['ready','changed','missing','unavailable'],commands}, null, 2));
     console.log('UI-P2 frontend: 3 sizes / 3 widths, collapsed approvals/stop, scroll anchor + thread restore, draft/focus, preview statuses and late response fencing passed (SYNTHETIC UI fixtures)');
-  } finally { releasePreview?.(); host.request = request; }
+  } finally { releaseHistory?.(); releasePreview?.(); host.request = request; }
 }

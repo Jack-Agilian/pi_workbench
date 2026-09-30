@@ -96,8 +96,8 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
   }
   // Switching threads preserves their own inputs/results, without exposing the native Session path or bindings.
   const home = await host.request({ type: 'home' }) as DesktopHome;
-  assert.equal(home.threads.length, 4);
-  for (const t of home.threads) {
+  assert.equal(home.threads.length, 5);
+  for (const t of home.threads.filter(t => t.title !== 'SYNTHETIC persisted pagination')) {
     const snapshot = await host.request({ type: 'thread', threadId: t.id }) as DesktopThread;
     assert.equal(snapshot.runs.length, 1);
     assert.equal(JSON.stringify(snapshot).includes('runtimeBindingId'), false);
@@ -112,6 +112,8 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
 
   const { runFrontendSmoke } = await import('./frontend-smoke.ts');
   await runFrontendSmoke(window, host);
+  const { runPaginationSmoke } = await import('./pagination-smoke.ts');
+  await runPaginationSmoke(window, host);
 
   // Trusted test-only transport fault after the real command is durably accepted.
   // This lives in the smoke module, never the Renderer/preload or product protocol.
@@ -141,13 +143,13 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
   loseAck = 'threads.create'; await fill('#title', 'SYNTHETIC retry A'); await click('＋ 新建会话');
   await wait(() => js<boolean>("document.querySelector('.new-thread').textContent.includes('重试新建会话') && !!document.querySelector('.notice.error')"), 'create_ack_lost');
   assert.equal(await js<boolean>("document.querySelector('#title').disabled"), true);
-  const beforeRetry = await host.request({ type: 'home' }) as DesktopHome; assert.equal(beforeRetry.threads.length, 6);
+  const beforeRetry = await host.request({ type: 'home' }) as DesktopHome; assert.equal(beforeRetry.threads.length, home.threads.length + 2);
   const a = beforeRetry.threads.find(t => t.title === 'SYNTHETIC retry A')!;
   await reconnectUi(); await click('＋ 重试新建会话');
   await wait(() => js<boolean>("document.querySelector('h1')?.textContent === 'SYNTHETIC retry A' && !document.querySelector('#title').disabled"), 'create_retry_ack');
   const creations = attempts.filter(c => c.type === 'threads.create' && c.title === a.title);
   assert.equal(creations.length, 2); assert.deepEqual(creations[0], creations[1]);
-  assert.equal((await host.request({ type: 'home' }) as DesktopHome).threads.length, 6);
+  assert.equal((await host.request({ type: 'home' }) as DesktopHome).threads.length, home.threads.length + 2);
 
   await submit('SYNTHETIC unconfirmed A', true);
   assert.equal(await js<boolean>("document.querySelector('#composer').disabled"), true);
