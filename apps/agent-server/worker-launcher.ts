@@ -10,6 +10,7 @@ import type { WorkerInit } from '../../packages/app-contracts/worker-ipc.ts';
 export const repository = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 export interface LaunchSpec {
   shell?: ShellLaunch;
+  modelShell?: { template: ShellLaunch; maxCommands: number; index: string };
   instanceId: string; runtimeBindingId: string; nonce: string; receipt: string;
   executable: string; args: string[]; cwd: string; env: Record<string, string>; deadline: number;
 }

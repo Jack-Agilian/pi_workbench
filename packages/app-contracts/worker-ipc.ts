@@ -1,10 +1,11 @@
+import { parseBashParameters, type BashParameters } from './model-shell.ts';
 import { parseFileToolRequest, type FileToolRequest } from './file-tools.ts';
 import { parseModelSelection, parseModelOutcome, type ModelSelection, type ModelOutcome } from './model.ts';
 // Workbench protocol, not Pi SDK API. No product database or SDK types on this channel.
 import { parseShellOutcome, type ShellOutcome } from './shell.ts';
 import { identifier, toolCallIdentity, sha256, type Dispatch } from './index.ts';
 import { parsePresentation, type Presentation } from './presentation.ts';
-export const IPC_VERSION = 6;
+export const IPC_VERSION = 7;
 export const MAX_MESSAGE_BYTES = 65_536;
 export interface ResourceSelection { root: string; id: string; files: readonly { path: string; sha256: string }[]; expectedSkillNames: readonly string[] }
 export interface WorkerInit { binding: Dispatch; workspace: string; agentDir: string; sessions: string; resources: ResourceSelection; deadline: number; model?: ModelSelection }
@@ -15,6 +16,7 @@ export type WireBody =
   | { type: 'model-http-head'; status: number; headers: Record<string,string> }
   | { type: 'model-http-read' }
   | { type:'model-http-finish' } | { type:'model-http-finished' }
+  | { type:'shell-operation'; toolCallId:string; parameters:BashParameters; resourceLock:string }
   | { type:'file-operation'; toolCallId:string; request:FileToolRequest; resourceLock:string }
   | { type:'file-result'; operationId:string; ok:boolean } | { type:'file-settled'; operationId:string }
   | { type: 'model-http-chunk'; data: string; end: boolean }
@@ -36,7 +38,7 @@ export type WireBody =
   | { type: 'done'; ok: boolean }
   | { type: 'closed'; nativeRef: string | null }
   | { type: 'fault'; code: 'initialization_failed' | 'execution_failed' | 'protocol_failed' };
-export interface Envelope { version: 6; instanceId: string; runtimeBindingId: string; requestId: string; body: WireBody }
+export interface Envelope { version: 7; instanceId: string; runtimeBindingId: string; requestId: string; body: WireBody }
 export function record(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value) || ![Object.prototype, null].includes(Object.getPrototypeOf(value))) throw new Error('invalid_record');
   const fields = Object.getOwnPropertyDescriptors(value);
@@ -67,6 +69,7 @@ export function parseEnvelope(value: unknown): Envelope {
     case 'model-http-head': check('status','headers'); number(b.status); if (Number(b.status)<100 || Number(b.status)>599) throw new Error('http_status'); parseHeaders(b.headers); break;
     case 'model-http-chunk': check('data','end'); if (typeof b.data !== 'string' || b.data.length > 24000 || !/^[A-Za-z0-9+/]*={0,2}$/.test(b.data)) throw new Error('http_chunk'); boolean(b.end); break;
     case 'model-http-read': case 'model-http-error': case 'model-http-finish': case 'model-http-finished': check(); break;
+    case 'shell-operation': check('toolCallId','parameters','resourceLock'); toolCallIdentity(b.toolCallId); parseBashParameters(b.parameters); sha256(b.resourceLock); break;
     case 'file-operation': check('toolCallId','request','resourceLock'); toolCallIdentity(b.toolCallId); parseFileToolRequest(b.request); sha256(b.resourceLock); break;
     case 'file-result': check('operationId','ok'); identifier(b.operationId); boolean(b.ok); break;
     case 'file-settled': check('operationId'); identifier(b.operationId); break;

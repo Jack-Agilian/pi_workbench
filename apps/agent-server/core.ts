@@ -1,10 +1,11 @@
+import type { ModelShellOperation } from '../../packages/app-contracts/model-shell.ts';
 import type { FileOperationPlan } from '../../packages/app-contracts/file-tools.ts';
 import { policyDigest, policyText, legacyPolicyDigest, assertTimeoutRevision } from './model-policy.ts';
 import { type ModelConfiguration, parseModelOutcome, type ModelOutcome } from '../../packages/app-contracts/model.ts';
 import { parseShellIntent, parseShellOutcome, type ShellIntent, type ShellOutcome, type ShellView } from '../../packages/app-contracts/shell.ts';
 // Product intents/indexes and disposable display projections; Pi owns authoritative messages and the Session tree.
 import { randomUUID } from 'node:crypto';
-import { chmodSync, realpathSync } from 'node:fs';
+import { chmodSync, realpathSync, statSync } from 'node:fs';
 import { DatabaseSync, type SQLInputValue } from 'node:sqlite';
 import { identifier, toolCallIdentity, parseCommand, sha256, type Ack, type ArtifactView, type Binding, type Dispatch,
   type OperationView, type ProductEvent, type RuntimeObservation, type RunView, type Snapshot, type ThreadView } from '../../packages/app-contracts/index.ts';
@@ -33,7 +34,7 @@ export class ProductCore {
       if (path !== ':memory:') chmodSync(path, 0o600);
       this.db.exec('PRAGMA busy_timeout=1000; PRAGMA synchronous=FULL;');
       const version = this.one<{ user_version: number }>('PRAGMA user_version').user_version;
-      if (![0, 1, 2, 3, 4, 5, 6, 7, 8].includes(version)) throw new Error('unsupported_database_version');
+      if (![0, 1, 2, 3, 4, 5, 6, 7, 8, 9].includes(version)) throw new Error('unsupported_database_version');
       if (version === 0) {
         this.db.exec(`BEGIN IMMEDIATE;
           CREATE TABLE workspaces(id TEXT PRIMARY KEY, path TEXT NOT NULL UNIQUE) STRICT;
@@ -84,12 +85,17 @@ export class ProductCore {
         DROP TABLE model_requests_v7;
         CREATE TABLE file_operations(operation_id TEXT PRIMARY KEY REFERENCES operations(id), plan TEXT NOT NULL) STRICT;
         PRAGMA user_version=8; COMMIT;`);
+      if (version < 9) this.db.exec(`BEGIN IMMEDIATE;
+        CREATE TABLE model_shell_operations(operation_id TEXT PRIMARY KEY REFERENCES operations(id), plan TEXT NOT NULL, launched INTEGER NOT NULL DEFAULT 0 CHECK(launched IN (0,1))) STRICT;
+        CREATE TABLE desktop_workspace(singleton INTEGER PRIMARY KEY CHECK(singleton=1), workspace_id TEXT NOT NULL REFERENCES workspaces(id)) STRICT;
+        PRAGMA user_version=9; COMMIT;`);
       this.transaction(() => {
         for (const workspace of workspaces) {
           identifier(workspace.id); const canonical = realpathSync(workspace.path);
           const prior = this.get<{ path: string }>('SELECT path FROM workspaces WHERE id=?', workspace.id);
           if (prior && prior.path !== canonical) throw new Error('workspace_mapping_changed');
           if (!prior) this.db.prepare('INSERT INTO workspaces VALUES (?,?)').run(workspace.id, canonical);
+          this.db.prepare('INSERT OR IGNORE INTO desktop_workspace VALUES (1,?)').run(workspace.id);
         }
       });
     } catch (error) { this.db.close(); throw error; }
@@ -194,6 +200,19 @@ export class ProductCore {
   /** Host-only recovery journal. Kept independently of the Worker writable Session tree. */
   workerLaunches(): { runId: string; record: string; cancelRequested: number }[] {
     return this.all('SELECT run_id AS runId,record,cancel_requested AS cancelRequested FROM worker_launches');
+  }
+  /** Trusted host-only selection; no product/Renderer command accepts filesystem paths. */
+  selectWorkspace(path: string): void {
+    const canonical=realpathSync(path);if(!statSync(canonical).isDirectory())throw new Error('workspace_not_directory');
+    this.mutate(()=>{
+      if(this.get("SELECT id FROM runs WHERE state IN ('queued','starting','running','cancelling','unknown')"))throw new Error('workspace_busy');
+      const id=this.get<{id:string}>('SELECT id FROM workspaces WHERE path=?',canonical)?.id??randomUUID();
+      this.db.prepare('INSERT OR IGNORE INTO workspaces VALUES (?,?)').run(id,canonical);
+      this.db.prepare('INSERT INTO desktop_workspace VALUES (1,?) ON CONFLICT(singleton) DO UPDATE SET workspace_id=excluded.workspace_id').run(id);
+    });
+  }
+  workspaceSelection(): {selectedId:string;items:{id:string;path:string}[]} {
+    return {selectedId:this.one<{id:string}>('SELECT workspace_id AS id FROM desktop_workspace WHERE singleton=1').id,items:this.all('SELECT id,path FROM workspaces ORDER BY rowid')};
   }
   workspacePath(id: string): string { return this.one<{path:string}>('SELECT path FROM workspaces WHERE id=?', id).path; }
   listThreads(): ThreadView[] { return this.all('SELECT id,workspace_id AS workspaceId,title FROM threads ORDER BY rowid DESC'); }
@@ -314,7 +333,7 @@ export class ProductCore {
       this.event(run.threadId, run.id, 'observation.' + kind, run.id, origin); return true;
     });
   }
-  requestOperation(binding: Binding, intent: { toolCallId: string; tool: string; parametersDigest: string; deadline: number; artifactPath?: string; shell?: ShellIntent; file?: FileOperationPlan }): OperationView {
+  requestOperation(binding: Binding, intent: { toolCallId: string; tool: string; parametersDigest: string; deadline: number; artifactPath?: string; shell?: ShellIntent; file?: FileOperationPlan; modelShell?: ModelShellOperation }): OperationView {
     if (intent.shell) { parseShellIntent(intent.shell); if (intent.tool !== 'bash' || intent.artifactPath !== undefined) throw new Error('shell_file_conflict'); }
     toolCallIdentity(intent.toolCallId); identifier(intent.tool); sha256(intent.parametersDigest);
     if (!Number.isFinite(intent.deadline) || intent.deadline <= Date.now() || intent.deadline > Date.now() + 86_400_000) throw new Error('invalid_deadline');
@@ -329,11 +348,24 @@ export class ProductCore {
       }
       const id = randomUUID();
       this.db.prepare("INSERT INTO operations(id,run_id,binding_id,tool_call_id,tool,digest,deadline,artifact_path,state) VALUES (?,?,?,?,?,?,?,?,'pending')").run(id, run.id, binding.runtimeBindingId, intent.toolCallId, intent.tool, intent.parametersDigest, intent.deadline, target);
+      if (intent.modelShell) this.db.prepare('INSERT INTO model_shell_operations(operation_id,plan) VALUES (?,?)').run(id,JSON.stringify(intent.modelShell));
       if (intent.file) this.db.prepare('INSERT INTO file_operations VALUES (?,?)').run(id,JSON.stringify(intent.file));
       if (intent.shell) this.db.prepare('INSERT INTO shell_display VALUES (?,?,NULL)').run(id, JSON.stringify(intent.shell));
       this.db.prepare("INSERT INTO approvals VALUES (?,'pending')").run(id);
       this.event(run.threadId, run.id, 'approval.requested', id);
       return this.operationView(this.operation(id));
+    });
+  }
+  modelShellOperation(id: string): (ModelShellOperation & { launched: boolean }) | undefined {
+    const row = this.get<{plan:string;launched:number}>('SELECT plan,launched FROM model_shell_operations WHERE operation_id=?', id);
+    return row ? {...JSON.parse(row.plan) as ModelShellOperation, launched: row.launched === 1} : undefined;
+  }
+  recordShellLaunch(binding: Binding, id: string): void {
+    this.mutate(() => {
+      const run = this.bound(binding); const op = this.operation(id); const plan = this.modelShellOperation(id);
+      if (run.state !== 'running' || op.runId !== run.id || op.runtimeBindingId !== binding.runtimeBindingId || op.state !== 'executing' || !plan || plan.launched || Date.now() >= op.deadline) throw new Error('shell_launch_not_admitted');
+      this.db.prepare('UPDATE model_shell_operations SET launched=1 WHERE operation_id=?').run(id);
+      this.event(run.threadId,run.id,'shell.launch',id);
     });
   }
   fileOperation(id:string):FileOperationPlan|undefined {
@@ -369,12 +401,16 @@ export class ProductCore {
   private requireSettled(run: Run, evidence: { piIdle: boolean; hostClean: boolean }): void {
     if (evidence.piIdle !== true || evidence.hostClean !== true || this.get(`SELECT id FROM operations WHERE run_id=? AND state IN ${outstanding}`, run.id)) throw new Error('cleanup_unconfirmed');
   }
+  operationAllowsCompletion(id: string): boolean {
+    const op=this.operationView(this.operation(id));const outcome=op.shell?.outcome;
+    return op.state==='succeeded'||op.state==='failed'&&Boolean(this.modelShellOperation(id)?.launched)&&Boolean(outcome&&outcome.exitCode!==null&&outcome.signal===null&&!outcome.timedOut&&outcome.sideEffects==='possible');
+  }
   settle(binding: Binding, result: 'completed' | 'failed' | 'cancelled', evidence: { piIdle: boolean; hostClean: boolean }): void {
     if (!['completed', 'failed', 'cancelled'].includes(result)) throw new Error('invalid_run_result');
     this.mutate(() => {
       const run = this.bound(binding); this.requireSettled(run, evidence);
       if (run.state === 'starting' || (run.state === 'cancelling') !== (result === 'cancelled')) throw new Error('invalid_terminal_transition');
-      if (result === 'completed' && this.get("SELECT id FROM operations WHERE run_id=? AND state='failed'", run.id)) throw new Error('failed_operation');
+      if (result === 'completed' && this.all<{id:string}>("SELECT id FROM operations WHERE run_id=? AND state IN ('failed','denied')", run.id).some(op=>!this.operationAllowsCompletion(op.id))) throw new Error('failed_operation');
       this.setRun(run, result);
     });
   }

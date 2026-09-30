@@ -204,7 +204,7 @@ test('schema v3 forward migration preserves the pre-Assistant product intent and
     // DesktopHost.close now intentionally cancels queued work, which is not this fixture.
     f.host.core.close();
     const db = new DatabaseSync(join(f.root, 'host/product.sqlite'));
-    db.exec('DROP TABLE file_operations; DROP TABLE model_policy_revisions; DROP TABLE model_requests; DROP TABLE model_outcomes; DROP TABLE shell_display; DROP TABLE run_display; PRAGMA user_version=3;'); db.close();
+    db.exec('DROP TABLE desktop_workspace; DROP TABLE model_shell_operations; DROP TABLE file_operations; DROP TABLE model_policy_revisions; DROP TABLE model_requests; DROP TABLE model_outcomes; DROP TABLE shell_display; DROP TABLE run_display; PRAGMA user_version=3;'); db.close();
     const reopened = new DesktopHost(f.root);
     try {
       const restored = reopened.request({ type: 'thread', threadId: f.thread }) as DesktopThread;
@@ -276,3 +276,21 @@ test('native credential file selection rejects repository files, public modes an
 });
 
 import './model-credentials.test.ts';
+
+test('workspace selection is trusted host-only, durable and never remaps an existing Thread',async()=>{
+ const profile=realpathSync(mkdtempSync(join(tmpdir(),'workspace-profile-')));const selected=realpathSync(mkdtempSync(join(tmpdir(),'SYNTHETIC-selected-')));
+ let host=new DesktopHost(profile,{mode:'offline',fileTools:{maxOperations:4,maxModelRequests:4,operationTimeoutMs:10000}});
+ try{
+  assert.throws(()=>parseDesktopRequest({type:'workspace',path:selected}));assert.throws(()=>parseDesktopRequest({type:'home',workspace:selected}));
+  const old=host.core.handle({type:'threads.create',requestId:'old-thread',workspaceId:'demo-workspace',title:'old'}).id;
+  for(const path of [profile,join(profile,'host'),tmpdir()])assert.throws(()=>host.selectWorkspace(path),/overlaps_host/);
+  host.selectWorkspace(selected);const home=host.request({type:'home'}) as DesktopHome;assert.notEqual(home.workspaces.selectedId,'demo-workspace');
+  host.selectWorkspace(selected);assert.equal((host.request({type:'home'}) as DesktopHome).workspaces.items.length,2);
+  const thread=host.core.handle({type:'threads.create',requestId:'new-thread',workspaceId:home.workspaces.selectedId,title:'SYNTHETIC chosen'}).id;
+  assert.equal(host.core.snapshot(old).thread.workspaceId,'demo-workspace');assert.equal(host.core.workspacePath(host.core.snapshot(thread).thread.workspaceId),selected);
+  const run=host.core.handle({type:'runs.start',requestId:'pending-selected',threadId:thread,input:'SYNTHETIC queued'}).id;
+  assert.throws(()=>host.selectWorkspace(selected),/workspace_busy/);host.core.handle({type:'runs.cancel',requestId:'cancel-pending',runId:run});
+  await host.close();host=new DesktopHost(profile);assert.equal((host.request({type:'home'}) as DesktopHome).workspaces.selectedId,home.workspaces.selectedId);
+  assert.equal(host.core.snapshot(thread).thread.workspaceId,home.workspaces.selectedId);
+ }finally{await host.close();rmSync(profile,{recursive:true,force:true});rmSync(selected,{recursive:true,force:true});}
+});

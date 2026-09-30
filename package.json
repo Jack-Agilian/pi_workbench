@@ -47,7 +47,10 @@
     "test:desktop-file-agent": "node scripts/launch-desktop.mjs --model-files-offline --model-smoke-test",
     "demo:file-agent": "node scripts/launch-desktop.mjs --model-files-offline",
     "validate:file-agent": "node scripts/validate-file-agent.mjs",
-    "test:file-acceptance": "node scripts/test-file-acceptance.mjs"
+    "test:file-acceptance": "node scripts/test-file-acceptance.mjs",
+    "test:product-model-shell": "node scripts/run-product-worker.mjs --model-shell",
+    "demo:agent-shell": "node scripts/launch-desktop.mjs --model-shell-offline",
+    "test:desktop-agent-shell": "node scripts/launch-desktop.mjs --model-shell-offline --model-smoke-test"
   },
   "dependencies": {
     "@earendil-works/pi-ai": "0.87.1",

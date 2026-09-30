@@ -1,6 +1,6 @@
 import { fileToolSchemas } from './file-planning.ts';
 import { isDeepStrictEqual } from 'node:util';
-import { ModelRuntime } from '@earendil-works/pi-coding-agent';
+import { createBashToolDefinition, ModelRuntime } from '@earendil-works/pi-coding-agent';
 import { InMemoryCredentialStore, InMemoryModelsStore } from '@earendil-works/pi-ai';
 import { parseModelSelection, type ModelSelection } from '../app-contracts/model.ts';
 
@@ -54,8 +54,8 @@ export function validateModelPayload(selection:ModelSelection,url:string,body:st
 function validateTools(request:Record<string,unknown>,selection:ModelSelection):void {
  const tools=request.tools;
  if(!selection.fileTools){if(tools!==undefined&&(!Array.isArray(tools)||tools.length))throw new Error('model_tools_not_approved');return;}
- if(!Array.isArray(tools)||tools.length!==3||request.tool_choice!==undefined&&request.tool_choice!=='auto')throw new Error('model_tool_set');
- const schemas=fileToolSchemas();const seen=new Set<string>();
+ if(!Array.isArray(tools)||tools.length!==(selection.shellTools?4:3)||request.tool_choice!==undefined&&request.tool_choice!=='auto')throw new Error('model_tool_set');
+ const schemas=[...fileToolSchemas(),...(selection.shellTools?[createBashToolDefinition('/')]:[])];const seen=new Set<string>();
  const shape=(value:unknown):unknown=>{
   if(Array.isArray(value))return value.map(shape);
   if(value&&typeof value==='object')return Object.fromEntries(Object.entries(value).filter(([key])=>!['description','$schema'].includes(key)).map(([key,v])=>[key,shape(v)]));

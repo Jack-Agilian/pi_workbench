@@ -1,3 +1,4 @@
+import { parseBashParameters } from '../app-contracts/model-shell.ts';
 import { parseFileToolRequest } from '../app-contracts/file-tools.ts';
 import { modelFetch } from './model-fetch.ts';
 import { modelStream } from './model-stream.ts';
@@ -35,7 +36,7 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
   let creating: Promise<void> | undefined; let executing: Promise<void> | undefined; let closing: Promise<void> | undefined;
   let closed = false; let started = false; let unbind = () => {}; let subscriptionGeneration = 0;
   const abort = new AbortController();
-  const grants = new Map<string, { resolve: (value: ToolApproval | undefined) => void; localId: string }>();
+  const grants = new Map<string, { resolve: (value: ToolApproval | undefined) => void; localId: string; tool: string }>();
   let shellGrant: { operationId: string; parametersDigest: string } | undefined;
   let shellPending: { requestId: string; resolve(outcome: ShellOutcome): void; reject(error: Error): void } | undefined;
   const claimed = new Set<string>();
@@ -45,7 +46,7 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
   const references = new Map<string, { resolve(): void; reject(error: Error): void }>();
   let reservedReference: string | null = null;
   let priorEntries = new Set<string>();
-  const send = (body: WireBody, requestId = `worker-${++sequence}`) => sender.send({ version: 6, instanceId, runtimeBindingId, requestId, body } satisfies Envelope);
+  const send = (body: WireBody, requestId = `worker-${++sequence}`) => sender.send({ version: 7, instanceId, runtimeBindingId, requestId, body } satisfies Envelope);
   const publish = () => runtime && started && !closed ? send({ type: 'presentation', projection: projectMessages(runtime.session.sessionManager.getBranch().filter(entry => !priorEntries.has(entry.id))) }) : Promise.resolve();
   function close(): Promise<void> {
     if (closing) return closing;
@@ -78,7 +79,7 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
       if (outcome.truncated) execution.onData(Buffer.from('\n[Workbench transport output limit reached]\n'));
       if (outcome.timedOut) throw new Error(`timeout:${execution.timeout}`);
       return { exitCode: outcome.exitCode ?? (outcome.signal ? 128 + (osConstants.signals[outcome.signal as keyof typeof osConstants.signals] ?? 0) : 1) };
-    } finally { execution.signal?.removeEventListener('abort', onAbort); shellPending = undefined; }
+    } finally { execution.signal?.removeEventListener('abort', onAbort); shellPending = undefined; shellGrant = undefined; }
   } };
   async function initialize(c: WorkerInit) {
     if (c.binding.runtimeBindingId !== runtimeBindingId) throw new Error('binding_mismatch');
@@ -96,17 +97,18 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
         try{await send({type:'file-result',operationId,ok},id);await accepted;}finally{settlements.delete(id);fileClaims.delete(operation.operationId);}
       }}:{}),
       authorize: async operation => {
-        if (closed || !(c.model?.fileTools?['read','write','edit']:['write','edit','bash']).includes(operation.tool) || (operation.tool !== 'bash' && !operation.target)) throw new Error('tool_not_admitted');
+        if (closed || !(c.model?.fileTools?['read','write','edit',...(c.model.shellTools?['bash']:[])]:['write','edit','bash']).includes(operation.tool) || (operation.tool !== 'bash' && !operation.target)) throw new Error('tool_not_admitted');
         verifyContent(c.resources);
         await publish();
         const requestId = `operation-${++sequence}`;
-        const promise = new Promise<ToolApproval | undefined>(resolve => { grants.set(requestId, { resolve, localId: operation.operationId }); });
-        if(c.model?.fileTools)await send({type:'file-operation',toolCallId:operation.toolCallId,request:parseFileToolRequest({tool:operation.tool,parameters:operation.parameters}),resourceLock:c.resources.id},requestId);
+        const promise = new Promise<ToolApproval | undefined>(resolve => { grants.set(requestId, { resolve, localId: operation.operationId, tool: operation.tool }); });
+        if(c.model?.shellTools&&operation.tool==='bash')await send({type:'shell-operation',toolCallId:operation.toolCallId,parameters:parseBashParameters(operation.parameters),resourceLock:c.resources.id},requestId);
+        else if(c.model?.fileTools)await send({type:'file-operation',toolCallId:operation.toolCallId,request:parseFileToolRequest({tool:operation.tool,parameters:operation.parameters}),resourceLock:c.resources.id},requestId);
         else await send({ type: 'operation', toolCallId: operation.toolCallId, tool: operation.tool as 'write' | 'edit' | 'bash', parametersDigest: operation.parametersDigest,
           target: operation.target ? relative(c.workspace, operation.target) : '.', resourceLock: c.resources.id }, requestId);
         try { const approval = await promise; if (approval) await driver?.afterGrant?.(abort.signal); return approval; } finally { grants.delete(requestId); }
       } });
-    const definitions = c.model?.fileTools ? [defineTool({...tools.read,executionMode:'sequential'}),defineTool({...tools.write,executionMode:'sequential'}),defineTool({...tools.edit,executionMode:'sequential'})] : c.model ? [] : [defineTool(tools.write), defineTool(tools.edit), defineTool(tools.bash)];
+    const definitions = c.model?.fileTools ? [defineTool({...tools.read,executionMode:'sequential'}),defineTool({...tools.write,executionMode:'sequential'}),defineTool({...tools.edit,executionMode:'sequential'}),...(c.model.shellTools?[defineTool({...tools.bash,executionMode:'sequential'})]:[])] : c.model ? [] : [defineTool(tools.write), defineTool(tools.edit), defineTool(tools.bash)];
     const factory: CreateAgentSessionRuntimeFactory = async options => {
       if (closed) throw new Error('worker_closed');
       const reference = options.sessionManager.getSessionFile();
@@ -121,7 +123,7 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
       const configured = c.model && driver?.model ? await driver.model(options, c.model, key ?? '', transport.fetch) : undefined; key = undefined;
       const services = configured?.services ?? await createIsolatedServices(options); if (!c.model) services.resourceLoader = resources.loader;
       const result = await createAgentSession({ ...services, sessionManager: options.sessionManager, sessionStartEvent: options.sessionStartEvent,
-        ...(configured ? { model: configured.model } : {}), tools: c.model?.fileTools?['read','write','edit']:c.model ? [] : ['write','edit','bash'], customTools: definitions, noTools: c.model&&!c.model.fileTools ? 'all' : 'builtin', thinkingLevel: 'off' });
+        ...(configured ? { model: configured.model } : {}), tools: c.model?.fileTools?['read','write','edit',...(c.model.shellTools?['bash']:[])]:c.model ? [] : ['write','edit','bash'], customTools: definitions, noTools: c.model&&!c.model.fileTools ? 'all' : 'builtin', thinkingLevel: 'off' });
       try { await driver?.testOnly?.afterSessionCreated?.(close); } catch (error) { result.session.dispose(); throw error; }
       if (closed) { result.session.dispose(); throw new Error('worker_closed'); }
       return { ...result, services, diagnostics: services.diagnostics };
@@ -169,8 +171,8 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
       const pending = grants.get(requestId); if (!pending) return;
       if (body.type === 'grant') {
         if (abort.signal.aborted || body.expiresAt > config!.deadline || Date.now() >= body.expiresAt) { pending.resolve(undefined); return; }
-        shellGrant = { operationId: body.operationId, parametersDigest: body.parametersDigest };
-        if(config!.model?.fileTools)fileClaims.set(pending.localId,body.operationId);else claimed.add(body.operationId); pending.resolve({ ...body, operationId: pending.localId });
+        if(pending.tool==='bash')shellGrant = { operationId: body.operationId, parametersDigest: body.parametersDigest };
+        if(config!.model?.fileTools){if(pending.tool!=='bash')fileClaims.set(pending.localId,body.operationId);}else claimed.add(body.operationId); pending.resolve({ ...body, operationId: pending.localId });
       } else pending.resolve(undefined); return;
     }
     if (body.type === 'start') {
@@ -182,7 +184,7 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
         try {
           abort.signal.throwIfAborted(); verifyContent(config!.resources);
           if (config!.model) {
-            if (JSON.stringify(runtime!.session.getActiveToolNames().sort())!==JSON.stringify(config!.model.fileTools?['edit','read','write']:[])) throw new Error('model_tool_set_mismatch');
+            if (JSON.stringify(runtime!.session.getActiveToolNames().sort())!==JSON.stringify(config!.model.fileTools?[...(config!.model.shellTools?['bash']:[]),'edit','read','write']:[])) throw new Error('model_tool_set_mismatch');
             stream = modelStream(runtime!.session, priorEntries, projection => send({type:'presentation',projection}));
             const unsubscribe = runtime!.session.subscribe(event => stream?.observe(event));
             try { await runtime!.session.prompt(config!.binding.input); } finally { unsubscribe(); await stream.finish(); stream.close(); }

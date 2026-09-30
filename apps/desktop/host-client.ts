@@ -15,8 +15,8 @@ export class HostClient {
   private stopped = false;
   private closeResult?: Promise<void>;
   private readonly node: string; private readonly root: string; private readonly profile: string;
-  private readonly mode: '--demo'|'--model'|'--model-offline'|'--model-files-offline';private readonly configuration?:string; private readonly denyModelNetwork: boolean;
-  constructor(node: string, root: string, profile: string, mode:'--demo'|'--model'|'--model-offline'|'--model-files-offline'='--demo', configuration?:string, denyModelNetwork=false) { this.denyModelNetwork=denyModelNetwork; this.node = node; this.root = root; this.profile = profile;this.mode=mode;this.configuration=configuration; }
+  private readonly mode: '--demo'|'--model'|'--model-offline'|'--model-files-offline'|'--model-shell-offline';private readonly configuration?:string; private readonly denyModelNetwork: boolean;
+  constructor(node: string, root: string, profile: string, mode:'--demo'|'--model'|'--model-offline'|'--model-files-offline'|'--model-shell-offline'='--demo', configuration?:string, denyModelNetwork=false) { this.denyModelNetwork=denyModelNetwork; this.node = node; this.root = root; this.profile = profile;this.mode=mode;this.configuration=configuration; }
   get processId() { return this.connection?.child.pid; }
   private start(): Connection {
     const home = join(this.profile, 'server-home'); const temp = join(home, 'tmp'); mkdirSync(temp, { recursive: true });
@@ -64,6 +64,7 @@ export class HostClient {
   async request(raw: DesktopRequest): Promise<DesktopValue> {
     return this.exchange({request:parseDesktopRequest(raw)});
   }
+  async selectWorkspace(path:string):Promise<void> { if(typeof path!=='string'||!path||path.length>4096)throw new Error('invalid_workspace');await this.exchange({workspace:path}); }
   async setModelKey(key:string):Promise<void> { if(typeof key!=='string'||!key||key.length>8192||/[\r\n\0]/.test(key))throw new Error('invalid_credential');await this.exchange({credential:key}); }
   private async exchange(payload:object):Promise<DesktopValue> {
     const connection = this.connection;

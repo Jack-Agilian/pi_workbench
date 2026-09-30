@@ -829,3 +829,9 @@ details p {
 }
 /* Long commands remain inspectable without moving the approval buttons off screen. */
 .approval .target { max-height:96px; overflow:auto; }
+
+.execution-summary { padding:0 24px 8px; display:flex; gap:8px 18px; flex-wrap:wrap; font-size:12px; color:#52645b; }
+.execution-summary span:first-child { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:100%; }
+.choose-workspace { margin-bottom:10px; width:100%; }
+.workspace-label > div { min-width:0; }
+.workspace-label small { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }

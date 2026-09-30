@@ -9,15 +9,16 @@ import { exact } from '../../packages/app-contracts/worker-ipc.ts';
 import { identifier } from '../../packages/app-contracts/index.ts';
 import type { DesktopReply } from '../../packages/app-contracts/desktop.ts';
 import { IpcSender } from '../../packages/pi-adapter/ipc-channel.ts';
-if (!['--demo','--model','--model-offline','--model-files-offline'].includes(process.argv[2]??'') || !process.argv[3] || !process.send) throw new Error('explicit_desktop_demo_required');
+if (!['--demo','--model','--model-offline','--model-files-offline','--model-shell-offline'].includes(process.argv[2]??'') || !process.argv[3] || !process.send) throw new Error('explicit_desktop_demo_required');
 let model:ConstructorParameters<typeof DesktopHost>[1];
+if(process.argv[2]==='--model-shell-offline')model={mode:'offline',fileTools:{maxOperations:8,maxModelRequests:4,operationTimeoutMs:30000},shellTools:{maxCommands:4,timeoutMs:10000,profile:'restricted-bash-v1'}};
 if(process.argv[2]==='--model-files-offline')model={mode:'offline',fileTools:{maxOperations:8,maxModelRequests:4,operationTimeoutMs:30000}};
 if(process.argv[2]==='--model-offline')model={mode:'offline'};
 if(process.argv[2]==='--model'){
   model={mode:'live'};
   try { const configuration=parseModelConfiguration(JSON.parse(readFileSync(process.argv[4]!,'utf8'))); const catalog=await describeModel(configuration.provider,configuration.model,configuration.maxOutputTokens,configuration);if(configuration.endpoint!==catalog.endpoint)throw new Error('model_endpoint_mismatch');model={mode:'live',configuration,requestUrl:catalog.requestUrl,reserveCostUsd:catalog.reserveCostUsd}; } catch { /* Show not_configured without exposing file contents/parse errors. */ }
 }
-const host = new DesktopHost(process.argv[3],model);
+const host = new DesktopHost(process.argv[3],model,process.argv[2]==='--model'&&process.argv[4]?[dirname(process.argv[4])]:[]);
 if(model?.mode==='live' && model.configuration?.approved && process.argv[4]) {
   const authPath=join(dirname(process.argv[4]),'auth.json');
   if(existsSync(authPath))try{const key=readConfiguredApiKey(authPath,model.configuration.provider,repository);if(key)host.setModelKey(key);}catch{/* Invalid private credentials stay key_required; never echo parser data. */}
@@ -38,13 +39,14 @@ process.on('SIGTERM', () => { void close(); });
 process.on('message', raw => {
   if (closing) return;
   let id: string;
-  try { const r = exact(raw, Object.hasOwn(Object(raw),'credential')?['id','credential']:['id','request']); id = identifier(r.id); }
+  try { const r = exact(raw, Object.hasOwn(Object(raw),'credential')?['id','credential']:Object.hasOwn(Object(raw),'workspace')?['id','workspace']:['id','request']); id = identifier(r.id); }
   catch { void close(); return; }
   let reply: DesktopReply;
   try {
-    const secret=Object.hasOwn(Object(raw),'credential');const r = exact(raw, secret?['id','credential']:['id','request']);
+    const secret=Object.hasOwn(Object(raw),'credential');const r = exact(raw, secret?['id','credential']:Object.hasOwn(Object(raw),'workspace')?['id','workspace']:['id','request']);
     if(secret){if(typeof r.credential!=='string')throw new Error('model_key_invalid');host.setModelKey(r.credential);}
-    const value = host.request(secret?{type:'home'}:r.request);
+    const workspace=Object.hasOwn(r,'workspace');if(workspace){if(typeof r.workspace!=='string'||r.workspace.length>4096)throw new Error('workspace_invalid');host.selectWorkspace(r.workspace);}
+    const value = host.request(secret||workspace?{type:'home'}:r.request);
     if (Buffer.byteLength(JSON.stringify(value)) > 1_200_000) throw new Error('response_limit');
     reply = { ok: true, value };
   } catch { reply = { ok: false, code: 'request_rejected' }; }

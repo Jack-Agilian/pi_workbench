@@ -1,3 +1,5 @@
+import type { ModelShellPolicy } from '../../packages/app-contracts/model-shell.ts';
+import { inside } from '../../packages/pi-adapter/path-scope.ts';
 import { fileRunDuration, type FileToolPolicy } from '../../packages/app-contracts/file-tools.ts';
 import { parseModelConfiguration, type ModelConfiguration } from '../../packages/app-contracts/model.ts';
 import type { ModelAccess, ModelExecutionPlan } from './worker-supervisor.ts';
@@ -22,12 +24,14 @@ export class DesktopHost {
   private closing = false;
   private closeResult?: Promise<void>;
   private running = false;
-  private readonly modelMode?: {mode:'offline'|'live';fileTools?:FileToolPolicy;configuration?:ModelConfiguration;requestUrl?:string;reserveCostUsd?:number};
+  private readonly modelMode?: {mode:'offline'|'live';fileTools?:FileToolPolicy;shellTools?:ModelShellPolicy;configuration?:ModelConfiguration;requestUrl?:string;reserveCostUsd?:number};
   private modelKey?:string;
-  constructor(profile: string, model?: {mode:'offline'|'live';fileTools?:FileToolPolicy;configuration?:ModelConfiguration;requestUrl?:string;reserveCostUsd?:number}) {
+  private readonly profile: string;
+  private readonly protectedDirectories: readonly string[];
+  constructor(profile: string, model?: {mode:'offline'|'live';fileTools?:FileToolPolicy;shellTools?:ModelShellPolicy;configuration?:ModelConfiguration;requestUrl?:string;reserveCostUsd?:number}, protectedDirectories:readonly string[]=[]) {
     this.modelMode=model;
     if(model?.configuration)parseModelConfiguration(model.configuration);
-    mkdirSync(profile, { recursive: true, mode: 0o700 }); const root = realpathSync(profile);
+    mkdirSync(profile, { recursive: true, mode: 0o700 }); const root = realpathSync(profile);this.profile=root;this.protectedDirectories=protectedDirectories.map(p=>realpathSync(p));
     const workspace = join(root, 'workspace'); const database = join(root, 'host'); const state = join(root, 'state'); const resourcesRoot = join(root, 'resources');
     for (const dir of [workspace, database, state, resourcesRoot]) mkdirSync(dir, { recursive: true, mode: 0o700 });
     const manifest = join(resourcesRoot, 'package.json'); const content = JSON.stringify({ name: 'synthetic-desktop-resources', version: '1.0.0', pi: { skills: [] } });
@@ -40,6 +44,12 @@ export class DesktopHost {
       resources: { root: resourcesRoot, id: contentId(files), files, expectedSkillNames: [] } });
     this.recover();
   }
+  selectWorkspace(path: string): void {
+    if(this.closing||this.running||this.blocked)throw new Error('workspace_busy');
+    const canonical=realpathSync(path);
+    if([this.profile,...this.protectedDirectories].some(protectedPath=>inside(canonical,protectedPath)||inside(protectedPath,canonical)))throw new Error('workspace_overlaps_host');
+    this.core.selectWorkspace(canonical);
+  }
   private recover() { try { this.supervisor.recover(); this.blocked = false; } catch { this.blocked = true; } }
   private home(): DesktopHome {
     const threads = this.core.listThreads();
@@ -48,10 +58,11 @@ export class DesktopHost {
       status: this.modelMode.mode === 'offline' ? 'ready' : !config?.approved ? 'not_configured' : this.modelKey ? this.core.modelAdmission(config,this.modelMode.reserveCostUsd ?? 0).status : 'key_required',
       provider: config?.provider ?? (this.modelMode.mode === 'offline' ? 'workbench-synthetic' : ''),
       model: config?.model ?? (this.modelMode.mode === 'offline' ? 'synthetic-text' : ''),
-      ...(!config&&this.modelMode.fileTools?{limits:{endpoint:'synthetic://no-network',requests:0,estimatedUsd:0,outputTokens:1024,fileTools:this.modelMode.fileTools}}:{}),
-      ...(config ? { limits: { endpoint: config.endpoint, requests: config.maxRequests, estimatedUsd: config.maxEstimatedCostUsd, outputTokens: config.maxOutputTokens, timeoutMs:config.timeoutMs, httpIdleTimeoutMs:config.httpIdleTimeoutMs??config.timeoutMs,...(config.fileTools?{fileTools:config.fileTools}:{}) } } : {}),
+      ...(!config&&this.modelMode.fileTools?{limits:{endpoint:'synthetic://no-network',requests:0,estimatedUsd:0,outputTokens:1024,fileTools:this.modelMode.fileTools,...(this.modelMode.shellTools?{shellTools:this.modelMode.shellTools}:{})}}:{}),
+      ...(config ? { limits: { endpoint: config.endpoint, requests: config.maxRequests, estimatedUsd: config.maxEstimatedCostUsd, outputTokens: config.maxOutputTokens, timeoutMs:config.timeoutMs, httpIdleTimeoutMs:config.httpIdleTimeoutMs??config.timeoutMs,...(config.fileTools?{fileTools:config.fileTools}:{}),...(config.shellTools?{shellTools:config.shellTools}:{}) } } : {}),
     };
     return {
+      workspaces:this.core.workspaceSelection(),
       mode: this.modelMode ? this.modelMode.mode === 'offline' ? 'model-offline' : 'model' : 'synthetic',
       ...(model ? { model } : {}), threads: threads.map(t => ({ ...t, title: displayText(t.title, 160) })),
       recovery: this.blocked ? 'blocked' : 'ready',
@@ -94,8 +105,8 @@ export class DesktopHost {
     const args = demoIntent(next.id, next.input);
     const entry = join(repository, 'packages/pi-adapter/desktop-demo-worker.ts');
     try {
-      const config=this.modelMode?.configuration;const fileTools=config?.fileTools??this.modelMode?.fileTools;
-      const modelPlan:ModelExecutionPlan|undefined=this.modelMode?{tool:'none',deadline:Date.now()+(fileTools?fileRunDuration(fileTools,config?.timeoutMs??30000):(config?.timeoutMs??30000)+5000),model:{mode:this.modelMode.mode,provider:config?.provider??'workbench-synthetic',model:config?.model??'synthetic-text',endpoint:config?.endpoint??'synthetic://no-network',maxOutputTokens:config?.maxOutputTokens??1024,timeoutMs:config?.timeoutMs??30000,...(config?.openai?{openai:config.openai}:{}),...(fileTools?{fileTools}:{})}}:undefined;
+      const config=this.modelMode?.configuration;const fileTools=config?.fileTools??this.modelMode?.fileTools;const shellTools=config?.shellTools??this.modelMode?.shellTools;
+      const modelPlan:ModelExecutionPlan|undefined=this.modelMode?{tool:'none',deadline:Date.now()+(fileTools?fileRunDuration(fileTools,config?.timeoutMs??30000):(config?.timeoutMs??30000)+5000),model:{mode:this.modelMode.mode,provider:config?.provider??'workbench-synthetic',model:config?.model??'synthetic-text',endpoint:config?.endpoint??'synthetic://no-network',maxOutputTokens:config?.maxOutputTokens??1024,timeoutMs:config?.timeoutMs??30000,...(config?.openai?{openai:config.openai}:{}),...(fileTools?{fileTools}:{}),...(shellTools?{shellTools}:{})}}:undefined;
       const access:ModelAccess|undefined=config && this.modelKey && this.modelMode?.requestUrl && this.modelMode.reserveCostUsd!==undefined?{key:this.modelKey,configuration:config,requestUrl:this.modelMode.requestUrl,reserveCostUsd:this.modelMode.reserveCostUsd}:undefined;
       const completion = modelPlan?this.supervisor.startNext(modelPlan,{path:join(repository, this.modelMode?.mode==='offline'?'packages/pi-adapter/model-test-worker.ts':'packages/pi-adapter/model-worker.ts')},access):this.supervisor.startNext(shell ? { tool: 'bash', target: '.', shell, parametersDigest: parametersDigest({ command: shell.command, timeout: shell.timeoutMs / 1000 }), deadline: Date.now() + 120_000 } : { tool: 'write', target: args.path, parametersDigest: parametersDigest(args),
         fileVersion: null, expectedContentDigest: digest(args.content), deadline: Date.now() + 120_000 },

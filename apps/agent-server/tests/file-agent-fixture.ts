@@ -1,6 +1,6 @@
 // Explicit SYNTHETIC HTTP response builder. Not a real model recording.
 import type { FileToolRequest } from '../../../packages/app-contracts/file-tools.ts';
-export function syntheticReply(api:'chat-completions'|'responses',turn:number,tools:FileToolRequest[]=[],text='SYNTHETIC file agent done'){
+export function syntheticReply(api:'chat-completions'|'responses',turn:number,tools:(FileToolRequest|{tool:'bash';parameters:{command:string;timeout?:number}})[]=[],text='SYNTHETIC file agent done'){
  const id=`synthetic-response-${turn}`;
  if(api==='chat-completions'){
   const delta=tools.length?{role:'assistant',content:'SYNTHETIC planning',tool_calls:tools.map((t,i)=>({index:i,id:`synthetic-tool-${turn}-${i}`,type:'function',function:{name:t.tool,arguments:JSON.stringify(t.parameters)}}))}:{role:'assistant',content:text};

@@ -1,3 +1,4 @@
+import { modelShellIntent, parseBashParameters, type BashParameters } from '../../packages/app-contracts/model-shell.ts';
 import { fileRunDuration, parseFileToolRequest, type FileToolRequest, type FileOperationPlan } from '../../packages/app-contracts/file-tools.ts';
 import { plannedFileDigest } from '../../packages/pi-adapter/file-planning.ts';
 import { validateModelPayload } from '../../packages/pi-adapter/model-catalog.ts';
@@ -48,7 +49,7 @@ export class WorkerSupervisor {
     if (active && command.type === 'approvals.resolve') this.deliverApproval(active, command.operationId);
     if (active && command.type === 'runs.cancel' && command.runId === active.journal.binding.runId) {
       void active.http?.close().catch(()=>{});
-      if (active.journal.plan.tool === 'bash') void active.sender.send({ kind: 'shell-cancel' }).catch(() => this.stop(active));
+      if (active.journal.plan.tool === 'bash' || active.journal.spec.modelShell) void active.sender.send({ kind: 'shell-cancel' }).catch(() => this.stop(active));
       void this.send(active, { type: 'cancel' }).catch(() => this.stop(active));
       // Acknowledgement means request persisted. Hung SDK/driver is killed after bounded grace.
       const timer = setTimeout(() => this.stop(active), 400); void active.done.then(() => clearTimeout(timer), () => clearTimeout(timer));
@@ -64,7 +65,7 @@ export class WorkerSupervisor {
       if (plan.model.mode === 'live') {
         if (!modelAccess || !modelAccess.key || /[\r\n\0]/.test(modelAccess.key) || modelAccess.key.length > 8192) throw new Error('model_not_configured');
         const configuration = parseModelConfiguration(structuredClone(modelAccess.configuration));
-        if (!configuration.approved || (['provider','model','endpoint','maxOutputTokens','timeoutMs'] as const).some(k => configuration[k] !== plan.model[k]) || JSON.stringify(configuration.openai)!==JSON.stringify(plan.model.openai) || JSON.stringify(configuration.fileTools)!==JSON.stringify(plan.model.fileTools)) throw new Error('model_policy_mismatch');
+        if (!configuration.approved || (['provider','model','endpoint','maxOutputTokens','timeoutMs'] as const).some(k => configuration[k] !== plan.model[k]) || JSON.stringify(configuration.openai)!==JSON.stringify(plan.model.openai) || JSON.stringify(configuration.fileTools)!==JSON.stringify(plan.model.fileTools) || JSON.stringify(configuration.shellTools)!==JSON.stringify(plan.model.shellTools)) throw new Error('model_policy_mismatch');
         const url = new URL(modelAccess.requestUrl); const endpoint = new URL(configuration.endpoint);
         if (url.origin !== endpoint.origin || url.username || url.password || url.hash || !Number.isFinite(modelAccess.reserveCostUsd) || modelAccess.reserveCostUsd < 0) throw new Error('model_access_not_admitted');
         modelAccess = Object.freeze({ ...modelAccess, configuration: Object.freeze(configuration) });
@@ -77,7 +78,7 @@ export class WorkerSupervisor {
     let journal: Journal | undefined; let child: ChildProcess | undefined;
     let binding: Dispatch | undefined;
     try { binding = this.core.dispatchNext(dispatch => {
-      const workspace = this.core.workspacePath(dispatch.workspaceId); if (plan.tool !== 'bash' && plan.tool !== 'none') artifactPath(workspace, plan.target);
+      const workspace = this.core.workspacePath(dispatch.workspaceId); if(realpathSync(workspace)!==workspace)throw new Error('workspace_mapping_changed'); if (plan.tool !== 'bash' && plan.tool !== 'none') artifactPath(workspace, plan.target);
       const lease = join(this.options.stateDirectory, 'leases', randomUUID());
       const agentDir = join(this.options.stateDirectory, 'workers', randomUUID());
       const sessions = join(this.options.stateDirectory, 'sessions', dispatch.threadId);
@@ -85,6 +86,7 @@ export class WorkerSupervisor {
       const config: WorkerInit = { binding: dispatch, workspace, agentDir, sessions, resources: structuredClone(this.options.resources), deadline: plan.deadline, ...(plan.tool === 'none' ? { model: plan.model } : {}) };
       const spec = launchSpec(config, { instanceId: randomUUID(), nonce: randomUUID() }, { lease, databaseDirectory: this.options.databaseDirectory }, entry);
       if (plan.tool === 'bash') spec.shell = shellLaunch(plan.shell, workspace, lease);
+      if(plan.tool==='none'&&plan.model.shellTools)spec.modelShell={template:shellLaunch(modelShellIntent({command:':'},plan.model.shellTools),workspace,lease),maxCommands:plan.model.shellTools.maxCommands,index:join(lease,'shell-index.json')};
       journal = { binding: dispatch, config, plan: Object.freeze({ ...plan }), spec, lease };
       // Guardian exists before commit, but may not launch any Worker until the committed host arms it.
       child = spawnGuardian(spec, lease); return JSON.stringify(journal);
@@ -109,7 +111,7 @@ export class WorkerSupervisor {
   private send(active: Active, body: WireBody, requestId = `host-${++this.sequence}`): Promise<void> {
     if(active.stopping)return Promise.reject(new Error('worker_stopping'));
     const { spec } = active.journal;
-    return active.sender.send({ version: 6, instanceId: spec.instanceId, runtimeBindingId: spec.runtimeBindingId, requestId, body } satisfies Envelope);
+    return active.sender.send({ version: 7, instanceId: spec.instanceId, runtimeBindingId: spec.runtimeBindingId, requestId, body } satisfies Envelope);
   }
   private receive(active: Active, raw: unknown) {
     if (this.active !== active || active.stopping) return; // owned channel, fenced synchronously before disconnect
@@ -168,6 +170,7 @@ export class WorkerSupervisor {
         if (!active.hello || active.ready || body.resourceLock !== config.resources.id) throw new Error('resource_lock_mismatch');
         verifyContent(config.resources); this.nativeReference(active, body.nativeRef);
         this.core.markRunning(binding); active.ready = true; void this.send(active, { type: 'start' }).catch(() => this.stop(active)); break;
+      case 'shell-operation': { this.prepareShellOperation(active,body.toolCallId,body.parameters,body.resourceLock,requestId); break; }
       case 'file-operation': {
         if(plan.tool!=='none'||!plan.model.fileTools||!active.ready||active.closed||active.fileFailed||active.preparingFile||active.pending.size||body.resourceLock!==config.resources.id)throw new Error('file_operation_not_admitted');
         active.preparingFile=true;
@@ -197,11 +200,17 @@ export class WorkerSupervisor {
         active.pending.set(op.id, requestId); this.deliverApproval(active, op.id); break;
       }
       case 'shell-exec': {
-        if (plan.tool !== 'bash' || !active.ready || active.closed || active.shellRequest || !active.pending.has(body.operationId) || body.parametersDigest !== plan.parametersDigest || Date.now() >= plan.deadline) throw new Error('shell_not_authorized');
+        const dynamic = this.core.modelShellOperation(body.operationId);
+        const digest = plan.tool === 'bash' ? plan.parametersDigest : dynamic ? parametersDigest(dynamic.parameters) : null;
+        if ((plan.tool !== 'bash' && !(plan.tool === 'none' && plan.model.shellTools && dynamic)) || !active.ready || active.closed || active.shellRequest || !active.pending.has(body.operationId) || body.parametersDigest !== digest || Date.now() >= (dynamic?.deadline ?? plan.deadline)) throw new Error('shell_not_authorized');
         const snap = this.core.snapshot(binding.threadId); const op = snap.operations.find(o => o.id === body.operationId);
         if (op?.state !== 'executing' || snap.runs.find(r => r.id === binding.runId)?.state !== 'running') throw new Error('shell_not_authorized');
         verifyContent(config.resources); active.shellRequest = { id: requestId, operationId: op.id };
-        void active.sender.send({ kind: 'shell-start', operationId: op.id, deadline: plan.deadline }).catch(() => this.stop(active)); break;
+        if(dynamic){
+          // Durable launch precedes dispatch. A lost response is reconciled, never replayed.
+          this.core.recordShellLaunch(binding,op.id);
+          void active.sender.send({kind:'model-shell-start',operationId:op.id,deadline:dynamic.deadline,intent:dynamic.intent}).catch(()=>this.stop(active));
+        }else void active.sender.send({ kind: 'shell-start', operationId: op.id, deadline: plan.deadline }).catch(() => this.stop(active)); break;
       }
       case 'result': {
         if (plan.tool === 'none' || !active.pending.has(body.operationId)) throw new Error('unowned_operation');
@@ -222,6 +231,32 @@ export class WorkerSupervisor {
       case 'fault': this.stop(active); break;
       default: throw new Error('unexpected_worker_message');
     }
+  }
+  private prepareShellOperation(active: Active, toolCallId: string, raw: BashParameters, resourceLock: string, requestId: string): void {
+    const {plan,config,binding}=active.journal;
+    if(plan.tool!=='none'||!plan.model.shellTools||!plan.model.fileTools||!active.ready||active.closed||active.fileFailed||active.preparingFile||active.pending.size||resourceLock!==config.resources.id)throw new Error('model_shell_not_admitted');
+    const operations=this.core.snapshot(binding.threadId).operations.filter(o=>o.runId===binding.runId);
+    if(operations.length>=plan.model.fileTools.maxOperations||operations.filter(o=>o.tool==='bash').length>=plan.model.shellTools.maxCommands)throw new Error('model_shell_limit');
+    verifyContent(config.resources);const parameters=parseBashParameters(raw);const intent=modelShellIntent(parameters,plan.model.shellTools);
+    const deadline=Math.min(plan.deadline,Date.now()+plan.model.fileTools.operationTimeoutMs);
+    const approvalDigest=parametersDigest({parameters,intent,workspace:config.workspace,resourceLock,binding,deadline});
+    const modelShell={parameters,intent,resourceLock,deadline,approvalDigest};
+    const op=this.core.requestOperation(binding,{toolCallId,tool:'bash',parametersDigest:approvalDigest,deadline,shell:intent,modelShell});
+    active.pending.set(op.id,requestId);this.deliverApproval(active,op.id);
+  }
+  private deliverShellApproval(active: Active, operationId: string, requestId: string): void {
+    const {binding,config}=active.journal;const intent=this.core.modelShellOperation(operationId);
+    const op=this.core.snapshot(binding.threadId).operations.find(o=>o.id===operationId);
+    if(!op||!intent)throw new Error('model_shell_intent_missing');
+    let reply:WireBody={type:'deny'};
+    if(op.state==='approved'){
+      try{
+        verifyContent(config.resources);if(intent.resourceLock!==config.resources.id)throw new Error('resource_lock_mismatch');
+        this.core.claimOperation(binding,operationId,intent.approvalDigest);
+        reply={type:'grant',operationId,parametersDigest:parametersDigest(intent.parameters),expiresAt:intent.deadline,fileVersion:null};
+      }catch{this.stop(active);return;}
+    }else if(op.state==='denied'){active.pending.delete(operationId);active.fileFailed=true;}else return;
+    active.replies.set(requestId,reply);void this.send(active,reply,requestId).catch(()=>this.stop(active));
   }
   private markdownVersion(workspace:string,path:string):string|null {
     try{const f=inspectMarkdown(workspace,path);if(f.bytes>16000)throw new Error('file_size_limit');return f.digest;}
@@ -263,12 +298,15 @@ export class WorkerSupervisor {
     return plan.tool === 'bash' ? parametersDigest({ intent: plan.shell, toolParametersDigest: plan.parametersDigest, workspace: config.workspace, binding, deadline: plan.deadline }) : plan.parametersDigest;
   }
   private shellReceipt(journal: Journal, operationId: string): ShellOutcome | undefined {
-    if (!journal.spec.shell) return;
+    const dynamic = this.core.modelShellOperation(operationId);
+    const path = dynamic && journal.spec.modelShell ? join(journal.lease,operationId+'.json') : journal.spec.shell?.receipt;
+    if (!path) return;
     try {
-      const r = exact(JSON.parse(readFileSync(journal.spec.shell.receipt, 'utf8')), ['instanceId','runtimeBindingId','nonce','operationId','pid','groupGone','outcome']);
-      if (r.instanceId !== journal.spec.instanceId || r.runtimeBindingId !== journal.binding.runtimeBindingId || r.nonce !== journal.spec.nonce || r.groupGone !== true || (r.operationId !== operationId && r.operationId !== null)) return;
+      const r = exact(JSON.parse(readFileSync(path, 'utf8')), ['instanceId','runtimeBindingId','nonce','operationId','pid','groupGone','outcome']);
+      if (r.instanceId !== journal.spec.instanceId || r.runtimeBindingId !== journal.binding.runtimeBindingId || r.nonce !== journal.spec.nonce || r.groupGone !== true || (r.operationId !== operationId && (dynamic || r.operationId !== null))) return;
       if (r.pid !== null && (typeof r.pid !== 'number' || !Number.isSafeInteger(r.pid) || r.pid <= 0)) return;
       const outcome = parseShellOutcome(r.outcome);
+      if(dynamic&&r.operationId!==operationId)return;
       if (r.operationId === null && (r.pid !== null || outcome.sideEffects !== 'not-started')) return;
       return outcome;
     } catch { return; }
@@ -282,6 +320,12 @@ export class WorkerSupervisor {
       const run = this.core.snapshot(journal.binding.threadId).runs.find(r => r.id === journal.binding.runId);
       const interrupted = outcome.signal !== null && !outcome.timedOut && run?.state !== 'cancelling';
       this.core.finishOperation(journal.binding, op.id, interrupted ? 'unknown' : outcome.exitCode === 0 && !outcome.timedOut ? 'succeeded' : 'failed');
+    }
+    if(journal.spec.modelShell){
+      active.pending.delete(shellRequest.operationId);active.shellRequest=undefined;
+      // A known ordinary exit (including nonzero) may return to Pi. Cancellation,
+      // timeout, failed spawn or ambiguous signal must not authorize another request.
+      if(outcome.timedOut||outcome.signal!==null||outcome.exitCode===null)active.fileFailed=true;
     }
     if (!active.replies.has(shellRequest.id)) {
       const reply: WireBody = { type: 'shell-result', outcome }; active.replies.set(shellRequest.id, reply);
@@ -314,7 +358,7 @@ export class WorkerSupervisor {
     if(active.stopping)return;
     const requestId = active.pending.get(operationId); if (!requestId || active.replies.has(requestId)) return;
     const { binding, plan, config } = active.journal;
-    if(plan.tool==='none'){this.deliverFileApproval(active,operationId,requestId);return;}
+    if(plan.tool==='none'){if(this.core.modelShellOperation(operationId))this.deliverShellApproval(active,operationId,requestId);else this.deliverFileApproval(active,operationId,requestId);return;}
     const op = this.core.snapshot(binding.threadId).operations.find(o => o.id === operationId); if (!op) return;
     let reply: WireBody = { type: 'deny' };
     if (op.state === 'approved') {
@@ -328,10 +372,20 @@ export class WorkerSupervisor {
   }
   private stop(active: Active) { active.stopping=true; void active.http?.close().catch(()=>{}); if (active.child.connected) active.child.disconnect(); }
   close(): Promise<void> { const active = this.active; if (!active) return this.closeResult ?? Promise.resolve(); this.stop(active); return active.done; }
+  /** Closed guardian inventory proves whether a committed dispatch ever reached it. */
+  private shellInventory(journal: Journal): string[] | undefined {
+    if(!journal.spec.modelShell)return;
+    try{
+      const r=exact(JSON.parse(readFileSync(journal.spec.modelShell.index,'utf8')),['instanceId','runtimeBindingId','nonce','operations','closed']);
+      if(r.instanceId!==journal.spec.instanceId||r.runtimeBindingId!==journal.binding.runtimeBindingId||r.nonce!==journal.spec.nonce||r.closed!==true||!Array.isArray(r.operations)||r.operations.length>journal.spec.modelShell.maxCommands||new Set(r.operations).size!==r.operations.length||r.operations.some(id=>typeof id!=='string'||!this.core.modelShellOperation(id)?.launched))return;
+      return r.operations as string[];
+    }catch{return;}
+  }
   private clean(journal: Journal): boolean {
     try {
       const r = exact(JSON.parse(readFileSync(journal.spec.receipt, 'utf8')), ['instanceId','runtimeBindingId','nonce','workerPid','exited','groupGone']);
       if (journal.plan.tool === 'bash' && !this.shellReceipt(journal, this.core.snapshot(journal.binding.threadId).operations.find(o => o.runId === journal.binding.runId)?.id ?? 'not-requested')) return false;
+      if(journal.spec.modelShell){const inventory=this.shellInventory(journal);if(!inventory||inventory.some(id=>!this.shellReceipt(journal,id)))return false;}
       return r.instanceId === journal.spec.instanceId && r.runtimeBindingId === journal.binding.runtimeBindingId && r.nonce === journal.spec.nonce && r.exited === true && r.groupGone === true;
     } catch { return false; }
   }
@@ -342,6 +396,7 @@ export class WorkerSupervisor {
       const { binding, spec } = active.journal;
       if (!active.armed && !existsSync(spec.receipt)) {
         // Owned guardian has exited and was never armed: protocol forbids it from spawning a Worker.
+        if(spec.modelShell)writeFileSync(spec.modelShell.index,JSON.stringify({instanceId:spec.instanceId,runtimeBindingId:binding.runtimeBindingId,nonce:spec.nonce,operations:[],closed:true}),{flag:'wx',mode:0o600});
         writeFileSync(spec.receipt, JSON.stringify({ instanceId: spec.instanceId, runtimeBindingId: binding.runtimeBindingId,
           nonce: spec.nonce, workerPid: null, exited: true, groupGone: true }), { flag: 'wx', mode: 0o600 });
       }
@@ -351,7 +406,7 @@ export class WorkerSupervisor {
         const snap = this.core.snapshot(binding.threadId); const run = snap.runs.find(r => r.id === binding.runId)!;
         const outstanding = snap.operations.some(o => o.runId === run.id && ['pending','approved','executing','unknown'].includes(o.state));
         if (active.closed && active.result !== undefined && run.state !== 'unknown' && !outstanding) {
-          this.core.settle(binding, run.state === 'cancelling' ? 'cancelled' : active.result && (active.journal.plan.tool === 'none' ? ['stop','length'].includes(this.core.modelOutcome(run.id)?.reason ?? '') && snap.operations.filter(o=>o.runId===run.id).every(o=>o.state==='succeeded') : snap.operations.filter(o => o.runId === run.id).length === 1 && snap.operations.some(o => o.runId === run.id && o.state === 'succeeded')) ? 'completed' : 'failed', { piIdle: true, hostClean: true });
+          this.core.settle(binding, run.state === 'cancelling' ? 'cancelled' : active.result && (active.journal.plan.tool === 'none' ? ['stop','length'].includes(this.core.modelOutcome(run.id)?.reason ?? '') && !active.fileFailed && snap.operations.filter(o=>o.runId===run.id).every(o=>this.core.operationAllowsCompletion(o.id)) : snap.operations.filter(o => o.runId === run.id).length === 1 && snap.operations.some(o => o.runId === run.id && o.state === 'succeeded')) ? 'completed' : 'failed', { piIdle: true, hostClean: true });
         } else {
           this.core.recoverAfterCrash();
           if (run.state === 'starting' && !outstanding) this.core.reconcileRun(run.id, 'failed', { piIdle: true, hostClean: true });
@@ -380,7 +435,18 @@ export class WorkerSupervisor {
         else if (native.persisted) throw new Error('native_session_missing');
       }
       for (const op of this.core.snapshot(binding.threadId).operations.filter(o => o.runId === binding.runId)) {
-        if(op.state==='unknown'&&plan.tool==='none'&&plan.model.fileTools){
+        if(op.state==='unknown'&&plan.tool==='none'&&this.core.modelShellOperation(op.id)){
+          const inventory=this.shellInventory(journal);if(!inventory)throw new Error('shell_evidence_missing');
+          if(!inventory.includes(op.id)){
+            this.core.recordShellOutcome(binding,op.id,{exitCode:null,signal:null,timedOut:false,stdout:'',stderr:'',truncated:false,sideEffects:'not-started'});
+            this.core.reconcileOperation(op.id,'failed');
+          }else{
+            const outcome=this.shellReceipt(journal,op.id);if(!outcome)throw new Error('shell_evidence_missing');
+            this.core.recordShellOutcome(binding,op.id,outcome);
+            if(outcome.signal!==null&&!outcome.timedOut&&!cancelRequested)throw new Error('shell_side_effect_unresolved');
+            this.core.reconcileOperation(op.id,outcome.exitCode===0&&!outcome.timedOut?'succeeded':'failed');
+          }
+        } else if(op.state==='unknown'&&plan.tool==='none'&&plan.model.fileTools){
           const file=this.core.fileOperation(op.id);if(!file)throw new Error('file_intent_missing');
           if(file.request.tool==='read') {
             // Cleanup is already proven. An interrupted read has no file mutation to
@@ -405,7 +471,7 @@ export class WorkerSupervisor {
           else throw new Error('side_effect_unresolved');
         }
         const current = this.core.snapshot(binding.threadId).operations.find(o => o.id === op.id)!;
-        if(plan.tool==='none'&&plan.model.fileTools&&current.state==='succeeded'){const file=this.core.fileOperation(op.id)!;if(file.request.tool!=='read')this.core.reconcileArtifact(binding,op.id,file.request.parameters.path);}
+        if(plan.tool==='none'&&plan.model.fileTools&&current.tool!=='bash'&&current.state==='succeeded'){const file=this.core.fileOperation(op.id)!;if(file.request.tool!=='read')this.core.reconcileArtifact(binding,op.id,file.request.parameters.path);}
         if (plan.tool !== 'bash' && plan.tool !== 'none' && current.state === 'succeeded') this.core.reconcileArtifact(binding, op.id, plan.target);
       }
       this.core.reconcileRun(binding.runId, cancelRequested ? 'cancelled' : 'failed', { piIdle: true, hostClean: true });

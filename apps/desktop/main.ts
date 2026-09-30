@@ -11,9 +11,9 @@ const root = resolve(outputDirectory, '../..');
 // Arguments come only from the local launch script. None is an IPC/Renderer option.
 const nodeArg = process.argv.find(arg => arg.startsWith('--host-node='));
 const profileArg = process.argv.find(arg => arg.startsWith('--demo-profile='));
-const mode=process.argv.includes('--model')?'--model':process.argv.includes('--model-offline')?'--model-offline':process.argv.includes('--model-files-offline')?'--model-files-offline':'--demo';
+const mode=process.argv.includes('--model-shell-offline')?'--model-shell-offline':process.argv.includes('--model')?'--model':process.argv.includes('--model-offline')?'--model-offline':process.argv.includes('--model-files-offline')?'--model-files-offline':'--demo';
 const modelConfig=process.argv.find(a=>a.startsWith('--model-config='))?.slice('--model-config='.length);
-if (!['--demo','--model','--model-offline','--model-files-offline'].some(m=>process.argv.includes(m)) || !nodeArg || !profileArg) throw new Error('explicit_demo_launch_required');
+if (!['--demo','--model','--model-offline','--model-files-offline','--model-shell-offline'].some(m=>process.argv.includes(m)) || !nodeArg || !profileArg) throw new Error('explicit_demo_launch_required');
 const node = realpathSync(nodeArg.slice('--host-node='.length)); const profile = resolve(profileArg.slice('--demo-profile='.length));
 if (execFileSync(node, ['-p','process.versions.node'], { env: {}, encoding: 'utf8' }).trim() !== '24.21.0') throw new Error('host_runtime_mismatch');
 mkdirSync(join(profile, 'browser'), { recursive: true, mode: 0o700 });
@@ -59,6 +59,17 @@ protocol.handle('workbench', request => {
 const trusted = (event: Electron.IpcMainInvokeEvent) => window && event.sender === window.webContents && event.senderFrame === window.webContents.mainFrame && event.senderFrame.url === origin;
 let inFlight = 0;
 let credentialDialog = false;
+let workspaceDialog = false;
+ipcMain.handle('workbench:workspace',async(event,...args:unknown[])=>{
+  if(!trusted(event)||args.length||closing||shutdownFailed||reconnecting||workspaceDialog)return false;
+  workspaceDialog=true;const owner=host;
+  try{
+    const result=await dialog.showOpenDialog(window!,{title:'选择此后新会话的工作目录',properties:['openDirectory']});
+    if(result.canceled)return true;
+    if(result.filePaths.length!==1||host!==owner||closing||shutdownFailed||reconnecting||!trusted(event))return false;
+    await owner.selectWorkspace(result.filePaths[0]!);return true;
+  }catch{return false;}finally{workspaceDialog=false;}
+});
 ipcMain.handle('workbench:credential', async (event, ...args: unknown[]) => {
   if (!trusted(event) || args.length || mode !== '--model' || closing || shutdownFailed || reconnecting || credentialDialog) return false;
   credentialDialog = true; const owner = host;
