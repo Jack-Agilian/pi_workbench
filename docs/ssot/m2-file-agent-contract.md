@@ -8,7 +8,7 @@
 
 已通过 Context7 阅读固定版本 [Agent 工具执行说明](https://github.com/earendil-works/pi/blob/v0.87.1/packages/agent/README.md)，并核对安装包公开 ToolDefinition 声明中的 `executionMode?: ToolExecutionMode`。全部选编文件工具设为 `executionMode: 'sequential'`，复用 Pi 的顺序批处理；这是公开类型成员，不是包根运行时导出。同一模型轮返回 write/read 的实际 SDK 合成测试已覆盖顺序执行；另以两种 OpenAI 协议的合成 SSE 覆盖 edit 和后续模型轮。没有真实模型 fixture。
 
-工具模式由可信宿主组合选择，仅批准的 workspace、资源lock和 read/write/edit 可用。旧M1配置仍然零工具；不能因升级自动扩大既有数据/工具授权。Renderer不传worker entry、可执行代码、数据库/凭据路径或自由工具名。真实模式的工具范围和数据范围另行明确批准，旧4/4授权不可续用。
+工具模式由可信宿主组合选择，仅批准的 workspace、资源lock和 read/write/edit 可用。旧M1配置仍然零工具；不能因升级自动扩大既有数据/工具授权。Renderer不传worker entry、可执行代码、数据库/凭据路径或自由工具名。真实模式的工具范围和数据范围另行明确批准，2026-09-30用户取消请求次数上限，旧4次记录与费用继续累计；此决定不自动扩大工具权限。
 
 ## 已实施接缝
 
@@ -25,9 +25,9 @@
 
 SQL前向迁移至v8：原model_requests四列原样保留，每Run增加宿主请求ID/序号；新增file_operations只存审批/对账所需意图，不是消息树。IPC v6新增 `file-operation/file-result/file-settled` 与 `model-http-finish/model-http-finished`，是产品消息，非Pi API。每次HTTP关闭确认后才允许下一次；旧read回复仅消耗原请求墓碑，不进入新请求。监督器与guardian在停止开始即屏蔽排队消息。
 
-`fileTools` 必须显式存在于宿主批准的model.json，包含每Run操作上限(1–16)、每Run模型调用上限(1–20)及单操作期限(100–3600000ms)。缺省仍零工具；单纯timeout修订不允许添加/扩大文件工具。总授权maxRequests/费用继续跨Run累计，不会由每Run上限覆盖。
+`fileTools` 必须显式存在于宿主批准的model.json，包含每Run操作上限(1–16)及单操作期限(100–3600000ms)。产品默认没有模型请求次数字段；旧数值次数限制仅为历史/验证配置兼容。缺省仍零工具；单纯timeout修订不允许添加/扩大文件工具。请求记录/费用继续跨Run累计；缺省不按累计或单Run次数拒绝请求。
 
-已拒绝、失败或未结算的宿主Operation阻断下一次HTTP；Pi在进入宿主审批前收到参数/路径错误时，可能继续请求模型修正，仍逐次扣预算。超界路径合成测试故意重复错误，准确消耗4次额度后停止，零文件副作用；不把它描述成自动重试网络失败。
+已拒绝、失败或未结算的宿主Operation阻断下一次HTTP；Pi在进入宿主审批前收到参数/路径错误时，可能继续请求模型修正，仍逐次扣预算。超界路径合成测试故意重复错误，使用显式的SYNTHETIC测试限制，准确消耗4次额度后停止，零文件副作用；不把它描述成自动重试网络失败。
 
 ## 时间与结束语义
 

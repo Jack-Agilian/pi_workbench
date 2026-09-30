@@ -35,7 +35,6 @@ key 是明文保存，权限必须为 0600；不要放入聊天、Git、`model.j
 | endpoint | Base URL，包含服务商要求的路径，例如官方 https://api.openai.com/v1；不追加 /responses 或 /chat/completions |
 | approved | 初始 false；核对服务、数据、限额后再由你改为 true |
 | dataScope | 本阶段固定 synthetic_non_sensitive，仅发送合成无敏感材料 |
-| maxRequests | 此授权累计最多请求数，含失败请求；禁自动重试 |
 | maxOutputTokens | 单次输出上限；Responses 至少 16 tokens |
 | httpIdleTimeoutMs | 等响应头或后续网络数据时的空闲上限；新模板 300000（5 分钟），持续有数据不按累计时间触发 |
 | timeoutMs | 同一个 LLM 请求的独立总上限（等待响应及生成都计入）；新模板 1800000（30 分钟），可配置到 86400000（24 小时）；这是产品限制，不是 Pi 空闲默认值 |
@@ -121,7 +120,7 @@ httpIdleTimeoutMs 测量宿主等待响应头或下一段非空网络数据的�
 
 timeoutMs 是另一个独立限制：从单次请求开始等待到最终生成都受它约束，宿主从派发计时加5秒启动余量。持续生成仍可能触及这个显式总上限；如果需要更长生成，应明确调整该字段，而不是增加空闲超时。Worker ready 5秒、取消及清理期限独立保留。
 
-历史配置没有 httpIdleTimeoutMs 时，以原 timeoutMs 作为空闲兼容值，同时保留原总上限；不静默延长已有授权。本轮此前已用完4/4的配置仍保留原值。变更任一时间字段都需明确策略修订，次数/预留继续累计，不能为长生成重置账本。
+历史配置没有 httpIdleTimeoutMs 时，以原 timeoutMs 作为空闲兼容值，同时保留原总上限；不静默延长已有授权。历史M1验证时已用完4/4的配置当时保留原值；2026-09-30取消次数上限后，通过本文末节的独立修订移除次数限制。变更任一时间字段都需明确策略修订，次数/预留继续累计，不能为长生成重置账本。
 
 
 续验入口在读取凭据/启动宿主前检查已开始的 attempt 与现有锁：`resume_attempt_already_started` 要求查看原结果及产品账本；`resume_validation_locked` 表示另一个或中断的驱动器占用该 profile。不要删结果、自动抢锁或重发请求。先核实原驱动器和宿主是否仍运行；若已退出，用正常宿主恢复对账并保留原失败/中断记录，再决定后续明确授权。自动化不提供强制解锁/自动续跑。
@@ -133,16 +132,15 @@ timeoutMs 是另一个独立限制：从单次请求开始等待到最终生成�
 ```json
 "fileTools": {
   "maxOperations": 8,
-  "maxModelRequests": 4,
   "operationTimeoutMs": 300000
 }
 ```
 
-maxOperations是每Run最多1–16个宿主文件操作，maxModelRequests是每Run最多1–20次模型请求；顶层maxRequests/费用仍按整个授权跨Run累计。operationTimeoutMs范围100–3600000ms，包含逐操作人工等待及执行，审批页显示截止。模型请求总期限每次独立计时，等待审批不消耗HTTP空闲期限；Run外围期限按各阶段的批准上限推导，详见 [契约](ssot/m2-file-agent-contract.md)。
+maxOperations是每Run最多1–16个宿主文件操作，maxModelRequests默认不填写，每Run续轮次数不限；1–20仅保留有限模式，null亦表示不限；顶层maxRequests默认也不填写，累计次数不限，费用继续按整个授权跨Run累计。operationTimeoutMs范围100–3600000ms，包含逐操作人工等待及执行，审批页显示截止。模型请求总期限每次独立计时，等待审批不消耗HTTP空闲期限；Run外围期限在有限模式按次数推导；次数不限时按费用上限/单次保守预留推导能够支付的阶段总时间（只用于外围时间包络，不另加次数准入），详见 [契约](ssot/m2-file-agent-contract.md)。
 
 文件范围仅宿主批准workspace中的相对规范 `.md`，有效UTF-8、无NUL、最多16000字节；read也必须审批。批准绑定目标、参数、原版本、资源lock、Run身份及期限。文件正文/工具结果可能进入后续模型请求，因此仍只允许合成无敏感材料。Bash、任意Provider工具、图片及未知扩展均未启用。HTTP输入24000字节上限仍保留，达到上限即阻断。
 
-不能通过旧授权的timeout修订添加fileTools或提高工具限额，也不能重置旧4/4消费。先完成 [新真实验收计划](planning/NEXT_STEPS.md) 的明确授权；本轮没有修改本机真实配置/凭据，没有新增真实调用。M1的validate:model-live/resume脚本不是M2验收驱动；M2自动检查只运行test:product-file-agent和test:desktop-file-agent。交互演示运行demo:file-agent，始终明确标记SYNTHETIC。
+不能通过旧授权的timeout修订添加fileTools或提高工具限额，也不能重置旧4/4消费。先完成 [新真实验收计划](planning/NEXT_STEPS.md) 的明确授权；历史M2离线实施时未修改本机配置；2026-09-30次数/期限修订另行记录，不读凭据，不调用模型。M1的validate:model-live/resume脚本不是M2验收驱动；M2自动检查只运行test:product-file-agent和test:desktop-file-agent。交互演示运行demo:file-agent，始终明确标记SYNTHETIC。
 
 
 ## 显式启用受限Bash（Agent Shell）
@@ -158,3 +156,21 @@ maxOperations是每Run最多1–16个宿主文件操作，maxModelRequests是每
 ```
 
 这是字段片段，不是完整配置或已批准预算。maxCommands必须不大于fileTools.maxOperations；文件与Bash共享每Run操作上限，后续LLM请求仍逐次消费全局授权。Bash会读写批准workspace任意类型文件；每条命令显示实际cwd/文本/期限并单独批准，结果可能发给配置的模型端点。其网络与环境仍受Mac profile限制。只修订timeout的model:policy命令不能添加该权限。实际使用与范围见 [Agent Shell契约](ssot/agent-shell-contract.md)。本轮未读取/改写用户配置或凭据，也未新增真实调用。
+
+
+## 不限制请求次数
+
+2026-09-30用户明确“不限制llm请求的数量”。产品模板不生成maxRequests，也不要求用户配置请求次数；缺省即不限次数。4次/8次等测试限制只在历史兼容字段和明确标记SYNTHETIC的测试配置/旧验收驱动中保留，不是产品默认。已有配置通过显式修订，保留authorizationId、全部请求/预留记录、费用/输出/数据范围。工具模式同样默认不配置fileTools.maxModelRequests；null兼容表示不限次数。不使用0、极大整数或字符串假装无限。没有fileTools时不会自动添加工具权限。
+
+授权累计次数和每Run续轮均可以不限，但每次HTTP仍由宿主预留费用、绑定身份并持久记账。费用不足、取消、操作拒绝、未知副作用和期限仍会阻断。30分钟单LLM总期限、5分钟网络空闲独立于次数；不限次数不等于无限费用或自动重试。
+
+已有配置须在应用关闭、无活动/unknown Run时保留原文件，再制作仅移除这两个次数字段的候选文件，运行：
+
+```bash
+npm run model:policy -- check-requests previous.json candidate.json request-count-approved
+npm run model:policy -- apply-approved-requests previous.json candidate.json request-count-approved
+```
+
+完成后将candidate保存为应用model.json再重启。修订命令只登记策略，不覆盖配置，也不读auth.json、不调用模型；同revision-id幂等。旧check/apply-approved仍仅允许期限修订，不能借它解除次数或新增工具；请求次数修订也不能改费用、身份、期限或工具权限。改期限另作一次已批准的期限修订。历史文件验收方案固定8次/每Run4次，驱动继续拒绝不限次数配置，不能把它冒充当前Agent Shell任务入口。
+
+[次数缺省、本机期限修订与限定离线回归证据](validation/request-defaults-2026-09-30.md)。

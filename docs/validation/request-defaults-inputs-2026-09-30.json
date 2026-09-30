@@ -1,0 +1,154 @@
+{
+  "baseline": "9333c850278bbf8ebfe437eaeba0fc38dd8779d0",
+  "implementationCommit": "3181a5271d9817d5257fcc205270e2b3c8c00534",
+  "uiTestCorrectionCommit": "52f0585cb75541680be4ea17dc146d96d4e00dc7",
+  "realModelCalls": 0,
+  "platform": "darwin-arm64",
+  "node": "24.21.0",
+  "commands": [
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "seconds": 1.88,
+      "commit": "3181a5271d9817d5257fcc205270e2b3c8c00534",
+      "logSha256": "22df5d47848ff6e1f3c0926a3aa3f05da31fb2c76601187b826c3ad4d7870689"
+    },
+    {
+      "command": "npm run test:model-resume",
+      "exitCode": 0,
+      "seconds": 2.36,
+      "commit": "3181a5271d9817d5257fcc205270e2b3c8c00534",
+      "logSha256": "0ba4c5028e1bee3838bcdfc76a687211782eb34dc65fe9146825863e4ef39115",
+      "tests": 13
+    },
+    {
+      "command": "npm run test:product-model-shell",
+      "exitCode": 0,
+      "seconds": 10.6,
+      "commit": "3181a5271d9817d5257fcc205270e2b3c8c00534",
+      "logSha256": "e24d2fa5439da05bba692401e59cc448cd8e0f9770faff6a1b3ef486f05ca75b",
+      "tests": 17
+    },
+    {
+      "command": "npm run test:model-integration-offline",
+      "exitCode": 0,
+      "seconds": 27.8,
+      "commit": "3181a5271d9817d5257fcc205270e2b3c8c00534",
+      "logSha256": "f7a2374aa64b919de6f5a9036f343dc6c43971e47e726c8dbd331d76c3d0ed7b",
+      "tests": 44
+    },
+    {
+      "command": "npm run test:product-file-agent",
+      "exitCode": 0,
+      "seconds": 24.62,
+      "commit": "3181a5271d9817d5257fcc205270e2b3c8c00534",
+      "logSha256": "771c106ea2013b70714371b2e36c8c3b8b4b8c60c2d84d24053a2dc9fa60f2d3",
+      "tests": 34
+    },
+    {
+      "command": "npm run test:product-worker",
+      "exitCode": 0,
+      "seconds": 31.36,
+      "commit": "3181a5271d9817d5257fcc205270e2b3c8c00534",
+      "logSha256": "e58b9254d5079b7b19e36f615b2c7ce71cdcb212c8b9fdd6bbeb7dfac8396821",
+      "tests": 51
+    },
+    {
+      "command": "npm run test:product-shell",
+      "exitCode": 0,
+      "seconds": 17.41,
+      "commit": "3181a5271d9817d5257fcc205270e2b3c8c00534",
+      "logSha256": "b8abea37844380a51c4bafb7b15886e4c8544e4212cc29461c16036ea2850610",
+      "tests": 28
+    },
+    {
+      "command": "npm run test:model-network",
+      "exitCode": 0,
+      "seconds": 0.61,
+      "commit": "3181a5271d9817d5257fcc205270e2b3c8c00534",
+      "logSha256": "ba5472059f8ce897c12d82cbbc1f46ef480af64adb537831fc033e2c3c1bcbb5"
+    },
+    {
+      "command": "npm run test:desktop",
+      "exitCode": 0,
+      "seconds": 12.83,
+      "commit": "3181a5271d9817d5257fcc205270e2b3c8c00534",
+      "logSha256": "6d453743a8e14795831a024f595d903c5525669569ea4ca6b7820b339a0d9527",
+      "tests": 20
+    },
+    {
+      "command": "npm run test:model-config",
+      "exitCode": 0,
+      "seconds": 8.86,
+      "commit": "3181a5271d9817d5257fcc205270e2b3c8c00534",
+      "logSha256": "0cbb2b20da067fe2ba8d1b7d0cf446375daee7ee1d1ee15fcfd8da945f1e27eb"
+    },
+    {
+      "command": "npm run test:desktop-agent-shell",
+      "exitCode": 1,
+      "seconds": 19.04,
+      "commit": "3181a5271d9817d5257fcc205270e2b3c8c00534",
+      "logSha256": "5604a5afe01f74c765d32ce2ea1c38b9e87e80b40706a051f9303ec6f23f4d88"
+    },
+    {
+      "command": "npm run test:file-acceptance",
+      "exitCode": 0,
+      "seconds": 5.94,
+      "commit": "3181a5271d9817d5257fcc205270e2b3c8c00534",
+      "logSha256": "2d80d829533631f22303ff36f16bfe101ffdb837ee4f4a6dc4e2dc098277d226",
+      "tests": 25
+    },
+    {
+      "command": "npm run typecheck",
+      "commit": "52f0585cb75541680be4ea17dc146d96d4e00dc7",
+      "exitCode": 0,
+      "logSha256": "22df5d47848ff6e1f3c0926a3aa3f05da31fb2c76601187b826c3ad4d7870689"
+    },
+    {
+      "command": "npm run test:desktop-agent-shell",
+      "commit": "52f0585cb75541680be4ea17dc146d96d4e00dc7",
+      "exitCode": 0,
+      "logSha256": "8cfc3ca8da07d2d02e7ddcfdb1278f827aa8be2e7d5d072cb68818811122cf5c"
+    }
+  ],
+  "localConfiguration": {
+    "configurationUpdated": true,
+    "requestCountFieldPresent": false,
+    "timeoutMs": 1800000,
+    "httpIdleTimeoutMs": 300000,
+    "feeLimitUnchanged": true,
+    "authorizationIdUnchanged": true,
+    "historicalRequests": 4,
+    "reservedUsd": 0.137024,
+    "historicalPoliciesRecognized": true,
+    "legacyMigrationIdsVerified": true,
+    "schema": 9,
+    "currentRevisionMatches": true,
+    "credentialsRead": false,
+    "realModelCalls": 0,
+    "initialCheck": "Policy/config writes completed, then SELECT * ledger hash comparison failed because existing v7 ledger migrated to v9 with request_id/request_seq columns. Follow-up read-only verification checked four legacy IDs, recognized historical policy digests, unchanged authorization and final configuration. No byte-identical pre/post ledger claim."
+  },
+  "limits": [
+    "SYNTHETIC Provider only; no live model task",
+    "file-acceptance CLI dirty-tree guard exercised; not a clean-checkout prepare replay",
+    "no fresh clone, initialization or other-platform rerun"
+  ],
+  "documentationChecks": [
+    {
+      "command": ".venv/bin/python scripts/check-ssot.py",
+      "exitCode": 0
+    },
+    {
+      "command": ".venv/bin/python scripts/test-tools.py",
+      "exitCode": 0
+    },
+    {
+      "command": ".venv/bin/python scripts/check-docs.py --structural-only",
+      "exitCode": 0
+    },
+    {
+      "command": ".venv/bin/python scripts/check-docs.py --typecheck",
+      "exitCode": 0
+    }
+  ]
+}

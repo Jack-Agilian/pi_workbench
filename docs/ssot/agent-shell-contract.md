@@ -36,4 +36,4 @@ Bash成功不自动登记成果，也不扫描整个目录假定无副作用；M
 
 `test:product-model-shell` 使用实际Pi、Worker、guardian、Bash、SQLite和文件，模型响应为明确合成的OpenAI Chat Completions/Responses SSE。`test:desktop-agent-shell` 使用实际Electron及Pi工具，Provider与原生dialog选择结果为合成输入。`demo:agent-shell` 是可复用产品链路的离线演示，不能冒充真实模型自主决策。
 
-本轮没有真实模型请求。受限模式只支持已验证Mac arm64/固定Node；无PTY、Windows、任意恶意逃逸/脱组后代保证。Shell记录缺失或不可对账仍阻断，不提供强制释放按钮。初始化、新克隆、人工中文输入法/读屏及真实长流未由本轮测试证明。真实模型任务仍需独立的数据/目录/工具/请求数和费用授权，不复用已耗尽的4/4授权。
+本轮没有真实模型请求。受限模式只支持已验证Mac arm64/固定Node；无PTY、Windows、任意恶意逃逸/脱组后代保证。Shell记录缺失或不可对账仍阻断，不提供强制释放按钮。初始化、新克隆、人工中文输入法/读屏及真实长流未由本轮测试证明。真实模型任务须核定数据/目录/工具和费用范围。2026-09-30用户已取消累计/单Run的LLM请求次数上限；旧4次消费保留，费用仍累计，不能据此自动启用Bash或扩大目录。

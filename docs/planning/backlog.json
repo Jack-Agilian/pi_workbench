@@ -1787,7 +1787,7 @@
           "evidenceRefs": []
         }
       ],
-      "statusReason": "M2-A/B及复审、验收驱动已在当前Agent Shell功能分支集成，A01–A04沿用各自限定离线证据；A05真实文件任务仍缺新授权/证据。后续Bash主功能登记MODEL-04，不完成M0-Pi。旧4/4额度耗尽，当前次序以NEXT_STEPS顶部为准。"
+      "statusReason": "M2-A/B及复审、验收驱动已在当前Agent Shell功能分支集成，A01–A04沿用各自限定离线证据；A05真实文件任务仍缺新授权/证据。后续Bash主功能登记MODEL-04，不完成M0-Pi。2026-09-30已取消请求次数上限，默认无次数字段，费用与工具范围保留，当前次序以NEXT_STEPS顶部为准。"
     },
     {
       "id": "MODEL-04",
@@ -1826,7 +1826,8 @@
           ],
           "evidenceRefs": [
             "EV-AGENT-SHELL-SDK-20260930",
-            "EV-AGENT-SHELL-MAC-20260930"
+            "EV-AGENT-SHELL-MAC-20260930",
+            "EV-REQUEST-DEFAULTS-20260930"
           ]
         },
         {
@@ -1862,7 +1863,7 @@
           "evidenceRefs": []
         }
       ],
-      "statusReason": "P0-A/B/C已限定离线验证：15项实际Pi/命令/进程恢复、20项桌面宿主及真实Electron6组尺寸检查；普通非零继续、拒绝/未知阻断。A04/P0-D真实任务缺新授权/证据，旧4/4耗尽；不完成M0-Pi或通用沙箱。"
+      "statusReason": "P0-A/B/C已限定离线验证：15项实际Pi/命令/进程恢复、20项桌面宿主及真实Electron6组尺寸检查；普通非零继续、拒绝/未知阻断。A04/P0-D真实任务缺新授权/证据，2026-09-30已取消次数上限，默认无次数字段，保留历史账本；不完成M0-Pi或通用沙箱。"
     }
   ],
   "decisionSource": "../ssot/README.md",

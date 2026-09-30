@@ -195,7 +195,7 @@
         "ModelRuntime.registerProvider"
       ],
       "reuse": "Provider、目录、登录/刷新复用",
-      "productDelta": "M1 OpenAI Responses/Chat Completions 与原有 Anthropic；Pi 原生 Provider/公开 registerProvider 元数据接入；应用专用 auth.json 字面量 key 读取和临时原生文件选择；系统 Keychain/OAuth 未完成；0.87.1目录模型只覆盖批准baseUrl，真实首条、原会话恢复及活跃取消已限定验证；追加规范化策略/旧账本兼容和显式timeout修订，真实授权累计4/4，取消实际计费未知；httpIdleTimeoutMs空闲期限与timeoutMs单请求总期限独立，长流使用缩时合成回归；30分钟单LLM总上限已获用户确认，原4/4耗尽授权不变；M2每次HTTP预留独立宿主身份/序号和预算、关闭ACK后允许后续调用；Pi继续负责SSE与Provider；同Run用量汇总，fileTools显式授权且旧timeout修订不能扩权；无新增真实调用；fauxToolCall只在明确合成测试驱动中使用",
+      "productDelta": "M1 OpenAI Responses/Chat Completions 与原有 Anthropic；Pi 原生 Provider/公开 registerProvider 元数据接入；应用专用 auth.json 字面量 key 读取和临时原生文件选择；系统 Keychain/OAuth 未完成；0.87.1目录模型只覆盖批准baseUrl，真实首条、原会话恢复及活跃取消已限定验证；追加规范化策略/旧账本兼容和显式timeout修订，真实授权累计4/4，取消实际计费未知；httpIdleTimeoutMs空闲期限与timeoutMs单请求总期限独立，长流使用缩时合成回归；30分钟单LLM总上限已获用户确认，原4/4耗尽授权不变；M2每次HTTP预留独立宿主身份/序号和预算、关闭ACK后允许后续调用；Pi继续负责SSE与Provider；同Run用量汇总，fileTools显式授权且旧timeout修订不能扩权；无新增真实调用；fauxToolCall只在明确合成测试驱动中使用；2026-09-30产品默认无请求次数字段，旧数字限制仅历史/测试兼容；用户取消次数上限，旧请求/费用保留，独立修订禁止顺带扩权",
       "acceptanceGate": "secret 不进Renderer/日志/子进程env",
       "implementationState": "in_progress",
       "adoption": {
@@ -300,7 +300,8 @@
           "EV-M1-CLOSEOUT-20260929",
           "EV-M2-SDK-20260929",
           "EV-M2-MAC-20260929",
-          "EV-AGENT-SHELL-SDK-20260930"
+          "EV-AGENT-SHELL-SDK-20260930",
+          "EV-REQUEST-DEFAULTS-20260930"
         ]
       }
     },
@@ -978,7 +979,7 @@
       ],
       "upstreamSymbolsOrPaths": [],
       "reuse": "复用Pi原生任务执行，不重写",
-      "productDelta": "ProductCore持久Run/Operation/Approval、v2启动日志及v3原生落盘标记；Supervisor冷恢复先失效旧epoch授权，再按清理证据结算；C沿用同一核心，v4仅增有限展示缓存；D1复用产品取消与既有恢复，在宿主关闭时结算活动/排队工作并保留审计；D2-S SQL v5增加Shell意图/结果投影，取消与命令副作用分开，崩溃只对账原Operation；M1 SQL v6请求预留/模型结果及v7显式策略修订；语义摘要/旧账本证明、预算跨重开修订保留、独立HTTP清理及无工具结算；累计4/4真实请求；M2 SQL v8多请求预算/宿主文件意图，IPC v6逐HTTP关闭ACK和逐工具settlement；前成功后失败独立保留，真实文件和清理证据对账；guardian/supervisor关闭即拒绝排队消息；SQL v9逐Shell启动/恢复记录与可信Workspace选择，旧Thread绑定不变",
+      "productDelta": "ProductCore持久Run/Operation/Approval、v2启动日志及v3原生落盘标记；Supervisor冷恢复先失效旧epoch授权，再按清理证据结算；C沿用同一核心，v4仅增有限展示缓存；D1复用产品取消与既有恢复，在宿主关闭时结算活动/排队工作并保留审计；D2-S SQL v5增加Shell意图/结果投影，取消与命令副作用分开，崩溃只对账原Operation；M1 SQL v6请求预留/模型结果及v7显式策略修订；语义摘要/旧账本证明、预算跨重开修订保留、独立HTTP清理及无工具结算；累计4/4真实请求；M2 SQL v8多请求预算/宿主文件意图，IPC v6逐HTTP关闭ACK和逐工具settlement；前成功后失败独立保留，真实文件和清理证据对账；guardian/supervisor关闭即拒绝排队消息；SQL v9逐Shell启动/恢复记录与可信Workspace选择，旧Thread绑定不变；2026-09-30产品默认无请求次数字段，旧数字限制仅历史/测试兼容；用户取消次数上限，旧请求/费用保留，独立修订禁止顺带扩权",
       "acceptanceGate": "幂等/绑定/取消/unknown；P0同Workspace写Run串行并覆盖等待审批与清理阶段",
       "implementationState": "in_progress",
       "adoption": {
@@ -1027,7 +1028,8 @@
           "EV-M2-SDK-20260929",
           "EV-M2-MAC-20260929",
           "EV-AGENT-SHELL-SDK-20260930",
-          "EV-AGENT-SHELL-MAC-20260930"
+          "EV-AGENT-SHELL-MAC-20260930",
+          "EV-REQUEST-DEFAULTS-20260930"
         ]
       }
     },
@@ -2490,6 +2492,18 @@
         "darwin"
       ],
       "locator": "docs/validation/agent-shell-2026-09-30.md"
+    },
+    {
+      "id": "EV-REQUEST-DEFAULTS-20260930",
+      "kind": "sdk",
+      "result": "passed",
+      "scope": "3181a52请求次数缺省不限、独立修订/历史费用保留、实际Pi/Worker六次SYNTHETIC响应及费用拒绝；初轮UI失败和仅测试修订后的重跑见报告，不是model证据。",
+      "commit": "3181a5271d9817d5257fcc205270e2b3c8c00534",
+      "recordedAt": "2026-09-30T03:18:25.550535+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/request-defaults-2026-09-30.md"
     }
   ]
 }

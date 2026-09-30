@@ -128,3 +128,7 @@ M2 实机复审：[两处正确性修正与 Mac 回归](../validation/review-m2-
 
 
 2026-09-30更新：[Agent Shell限定离线证据](../validation/agent-shell-2026-09-30.md)。MODEL-04限定实现继续in_progress，M0-Pi仍blocked；实际下一步以NEXT_STEPS顶部为准。
+
+2026-09-30授权更新：用户取消LLM累计/单Run请求次数上限；历史4次与费用预留保留，费用/数据/工具权限未扩大。[配置与修订](../MODEL_CONFIGURATION.md#不限制请求次数)。旧4/4不再是次数阻塞依据；没有新增真实模型证据。
+
+[次数缺省、本机期限修订与限定离线回归证据](../validation/request-defaults-2026-09-30.md)。
