@@ -25,10 +25,11 @@
 | P09 | [实验 server](https://github.com/earendil-works/pi/blob/466db0fecdc20996a553116984d18c0d362b035a/packages/server/README.md) | 完整读取：experimental、多 presentation 路由；应用负责 Session 管理及认证政策。 |
 | P10 | [实验 client](https://github.com/earendil-works/pi/blob/466db0fecdc20996a553116984d18c0d362b035a/packages/client/README.md) | 完整读取：experimental、服务订阅/快照衔接、重连不自动重放操作。 |
 | P11 | [Chord](https://github.com/earendil-works/pi/blob/466db0fecdc20996a553116984d18c0d362b035a/packages/chord/README.md) | 读取 1–105 行；服务、facet、复制状态与传输无关边界。未安装/实测。 |
-| P12 | [Pi durable](https://github.com/earendil-works/pi/blob/466db0fecdc20996a553116984d18c0d362b035a/packages/durable/README.md) | 完整读取；当前 README 提及记录契约及 MemoryStorage，不视作已完成磁盘存储。 |
+| P12 | [Pi durable](https://github.com/earendil-works/pi/blob/466db0fecdc20996a553116984d18c0d362b035a/packages/durable/README.md) | 历史466db0快照读取；当时README提及记录契约及MemoryStorage。后续磁盘实现核对见P16，不能沿用为当前仅内存结论。 |
 | P13 | [Pi RPC 文档](https://github.com/earendil-works/pi/blob/466db0fecdc20996a553116984d18c0d362b035a/packages/coding-agent/docs/rpc.md) | 官方网页读取；只作为现有流与队列语义参考，SDK 实际事件需版本探针。 |
 | P14 | [ModelRuntime](https://github.com/earendil-works/pi/blob/466db0fecdc20996a553116984d18c0d362b035a/packages/coding-agent/src/core/model-runtime.ts) | 读取 1–175 行：credentials?: CredentialStore、配置存储、初始化网络刷新选项。 |
 | P15 | [Pi package manifest](https://github.com/earendil-works/pi/blob/466db0fecdc20996a553116984d18c0d362b035a/packages/coding-agent/package.json) | 完整读取：名称、0.86.1、exports、Node >=22.19.0、MIT；不是 npm 发布状态证明。 |
+| P16 | [durable固定新快照](https://github.com/earendil-works/pi/tree/1b347794e2a630e4359f2584f4eea388145d0ddf/packages/durable) | 2026-09-30复核README/package.json/Node SQLite源码；已有磁盘实现，仍Experimental，具体输入和限制见文末P16。 |
 
 P04/P05/P06/P07/P13 的固定源码链接是复查入口，不声称逐字核验了该 commit 对应整个文件。动态文档与源码冲突时，以所选发行包及测试为准，更新本证据表，不选择对当前方案有利的一边。
 
@@ -122,3 +123,15 @@ Context7 用于定位官方文档，最终核对安装包 docs/providers.md 的 
 ## M1 续验与时间语义（2026-09-29）
 
 [原会话恢复/活跃取消](../validation/review-develop-m1-2026-09-29.md) 已在同一0.87.1发行包完成限定真实验证；不抹去此前30秒超时。5分钟 HTTP 空闲参考所安装版本的官方 settings.md，30分钟单LLM总上限是用户确认的产品策略；[离线长流证据](../validation/m1-stream-timeout-2026-09-29.md)与[收口对账](../validation/m1-closeout-2026-09-29.md)分别记录实现和证据同步，不是30分钟外部服务实测。
+
+## P16：durable 固定源码复核（2026-09-30）
+
+输入固定为 `1b347794e2a630e4359f2584f4eea388145d0ddf`：
+
+- [README](https://github.com/earendil-works/pi/blob/1b347794e2a630e4359f2584f4eea388145d0ddf/packages/durable/README.md) 已说明SQLite/JSONL存储、恢复、requestId与安全重放，标注Experimental/API不稳定。
+- [package.json](https://github.com/earendil-works/pi/blob/1b347794e2a630e4359f2584f4eea388145d0ddf/packages/durable/package.json) 源码版本0.99.1及存储导出；这不是registry/发行完整性验证。
+- [Node SQLite实现](https://github.com/earendil-works/pi/blob/1b347794e2a630e4359f2584f4eea388145d0ddf/packages/durable/src/storage/sqlite/node.ts) 确有磁盘实现；其Harness/Chord/pi-ai组合不是已验证的coding-agent Session替换件。
+
+继续evaluate，未安装或导入，不更改Pi0.87.1锁。候选采用前仍需实际发行/类型/运行时入口、Session迁移、审批一次领取、进程清理、未知副作用不重发、预算及故障恢复兼容证明。修正旧理由不等于上述能力已通过。
+
+[官方TanStack Query v5无限查询](https://tanstack.com/query/latest/docs/framework/react/guides/infinite-queries)经Context7与官方页面核对：失效后顺序读取缓存页，maxPages限制保留页。故本次定向读取先复用现有小适配，不为消除F01直接添加缓存库；没有候选库运行时实测。

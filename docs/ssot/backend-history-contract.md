@@ -33,6 +33,7 @@ Home 的 workspace 条目追加可选 `status: ready | invalid`，供前端显�
 
 | 方法 | 返回 | 读取范围 |
 |---|---|---|
+| `historyEntry(threadId, runId)` | `{item: HistoryItem, snapshotSeq}` | 指定Thread内单Run的同一安全展示投影，只读 |
 | `historyPage(threadId, page?)` | `HistoryPage` | Run、输入、既有安全正文投影、模型结果 |
 | `operationPage(runId, page?)` | `OperationPage` | 指定Run的工具记录与已脱敏有界结果 |
 | `artifactPage(threadId, page?)` | `ArtifactPage` | 真实成果ID、来源Run/Operation、路径、版本、digest/bytes |
@@ -58,3 +59,13 @@ npm run demo:agent-shell -- --dev-profile=frontend
 路径固定在各自工作树 `.artifacts/desktop-profiles/<name>`，name只允许小写字母开头及小写字母/数字/连字符。浏览器userData、Host SQLite、Pi sessions、leases、资源与home/tmp都沿用这一个profile。只允许离线/合成模式；与 `--model`、`--model-config`、smoke选项组合拒绝。正式用户profile和smoke临时profile行为不变。
 
 node_modules/.venv/dist各工作树独立。Node固定可执行文件及已校验的只读下载缓存可复用，不共享可变安装目录、不复制真实模型费用库。GUI检查串行协调；两份Host并发测试不冒充两个完整GUI窗口的人工验收。
+
+## F01 定向刷新补充（2026-09-30）
+
+`history-entry`是本项目产品查询，不是Pi API。仅接受type/threadId/runId，单个有界标识符，不接受路径、SQL、ID数组或执行参数；宿主在同一读取事务核对Run归属，再复用historyPage相同投影。完整响应沿用256000字节预算，超限明确报错。单Run入口避免批量部分成功/拆包协议；多Run变更逐个去重查询，次数随变化实体增长。
+
+Renderer按当前已知事件失效：display.replaced和model结果只读对应已加载Run；run状态同时刷新该Run工具（取消/隔离可直接撤销工具）；approval/operation/shell只刷新对应工具；artifact.recorded只补成果头部。session/observation/model.request_reserved不改变这三类展示。未知事件重新同步全部已读范围，不静默忽略。
+
+新run.queued从首屏补到已知头部，保留旧尾游标；大于一页的新插入不漏项。未加载旧Run的正文变化不会自动装载全部历史。只在整批查询成功后发布新视图并推进到已收到的最后事件；后读snapshotSeq不得跳过128条批次。失败保留完整旧视图和水位；会话切换停止未发出的查询，迟到结果不发布。重连/无效页位置从新首屏重新建立已浏览范围；这些读取不会执行产品命令。
+
+历史R03“前端切换之前”的描述只记录当时阶段；当前Renderer已分页并采用上述定向入口。仍没有home目录分页、虚拟列表或原生完整正文补载。

@@ -2,11 +2,11 @@
 
 当前依据：[SSOT](../ssot/README.md)、[任务账本](backlog.json)。以下当前事项优先于后文历史阶段的“下一步”。
 
-## 唯一当前事项：集成版本的真实桌面人工使用测试
+## 唯一当前事项：F01/F02修正交付复审与develop集成准备
 
 2026-09-30按用户授权，将前端 `codex/ui-history-artifacts@c0e99c2` 和后端 `codex/backend-history-safety@feaa3f4` 合入develop，组合代码提交 `169df60a51fc1d394d6cc45c335e54eddbc9cef7`。双方证据ID保留，分页与后端边界现在位于同一分支；集成检查与当前可测范围见 [收口报告](../validation/ui-p2-merged-2026-09-30.md)。
 
-接下来只做这一条完整流程的人工使用检查：
+F01定向刷新与F02复用依据修正已在 `codex/ui-targeted-refresh` 的代码提交 `e7764e46df3cb8bc3fcdcddc992246ebccfde95c` 限定验证，见 [实际结果与限制](../validation/ui-targeted-refresh-2026-09-30.md)。64/256条已加载历史的纯正文更新均为2次查询，原一致性/IPC与四套Electron离线命令通过；历史另一工作树UI超时根因仍未定位。没有新依赖、真实模型调用或自动合并。本轮先完成该修正的复审与集成，再进入以下完整流程的人工使用检查：
 
 1. 在macOS arm64用 `npm run model:config -- check` 核对原配置，再运行 `npm run desktop:model`；保持单一真实profile、凭据与费用账本。本轮没有实际调用模型或修改配置。
 2. 只在现有授权的合成无敏感项目中检查真实对话/原会话继续、读取/写入/修改Markdown、逐项批准或拒绝受限Bash、活跃停止、重启恢复和成果预览。先验证完整工作流程，再集中修问题，不用付费请求逐行调试。

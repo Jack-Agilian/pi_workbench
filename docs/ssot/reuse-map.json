@@ -975,21 +975,26 @@
       "id": "durable",
       "mode": "evaluate",
       "evidence": [
-        "P12"
+        "P12",
+        "P16"
       ],
       "upstreamSymbolsOrPaths": [
-        "MemoryStorage"
+        "packages/durable/README.md",
+        "packages/durable/package.json",
+        "packages/durable/src/storage/sqlite/node.ts"
       ],
-      "reuse": "不可假定已完成磁盘持久化",
-      "productDelta": "产品磁盘恢复和索引",
-      "acceptanceGate": "公开持久后端/迁移/恢复实测后晋级",
+      "reuse": "新固定源码已有SQLite/JSONL存储与恢复；仍Experimental，发行/产品兼容待验证",
+      "productDelta": "核对coding-agent原生Session、审批一次领取、清理、未知副作用、预算与迁移差距；不另造通用持久框架",
+      "acceptanceGate": "实际发行/公开入口、产品所有权/恢复语义及Session迁移回归后才考虑采用",
       "implementationState": "not_implemented",
       "adoption": {
         "status": "candidate",
         "imports": [],
-        "selectedSourceCommit": null,
+        "selectedSourceCommit": "1b347794e2a630e4359f2584f4eea388145d0ddf",
         "verificationStatus": "source_reviewed",
-        "testEvidence": []
+        "testEvidence": [
+          "EV-DURABLE-REVIEW-20260930"
+        ]
       }
     },
     {
@@ -1001,7 +1006,7 @@
       ],
       "upstreamSymbolsOrPaths": [],
       "reuse": "复用Pi原生任务执行，不重写",
-      "productDelta": "ProductCore持久Run/Operation/Approval、v2启动日志及v3原生落盘标记；Supervisor冷恢复先失效旧epoch授权，再按清理证据结算；C沿用同一核心，v4仅增有限展示缓存；D1复用产品取消与既有恢复，在宿主关闭时结算活动/排队工作并保留审计；D2-S SQL v5增加Shell意图/结果投影，取消与命令副作用分开，崩溃只对账原Operation；M1 SQL v6请求预留/模型结果及v7显式策略修订；语义摘要/旧账本证明、预算跨重开修订保留、独立HTTP清理及无工具结算；累计4/4真实请求；M2 SQL v8多请求预算/宿主文件意图，IPC v6逐HTTP关闭ACK和逐工具settlement；前成功后失败独立保留，真实文件和清理证据对账；guardian/supervisor关闭即拒绝排队消息；SQL v9逐Shell启动/恢复记录与可信Workspace选择，旧Thread绑定不变；2026-09-30产品默认无请求次数字段，旧数字限制仅历史/测试兼容；用户取消次数上限，旧请求/费用保留，独立修订禁止顺带扩权；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开；2026-09-30后端工作区重新准入、展示消息与控制去重分离、固定SQLite分页/独立活动快照及工作树离线profile，Renderer消费尚待UI-P2，不重写原生Session",
+      "productDelta": "ProductCore持久Run/Operation/Approval、v2启动日志及v3原生落盘标记；Supervisor冷恢复先失效旧epoch授权，再按清理证据结算；C沿用同一核心，v4仅增有限展示缓存；D1复用产品取消与既有恢复，在宿主关闭时结算活动/排队工作并保留审计；D2-S SQL v5增加Shell意图/结果投影，取消与命令副作用分开，崩溃只对账原Operation；M1 SQL v6请求预留/模型结果及v7显式策略修订；语义摘要/旧账本证明、预算跨重开修订保留、独立HTTP清理及无工具结算；累计4/4真实请求；M2 SQL v8多请求预算/宿主文件意图，IPC v6逐HTTP关闭ACK和逐工具settlement；前成功后失败独立保留，真实文件和清理证据对账；guardian/supervisor关闭即拒绝排队消息；SQL v9逐Shell启动/恢复记录与可信Workspace选择，旧Thread绑定不变；2026-09-30产品默认无请求次数字段，旧数字限制仅历史/测试兼容；用户取消次数上限，旧请求/费用保留，独立修订禁止顺带扩权；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开；2026-09-30后端工作区重新准入、展示消息与控制去重分离、固定SQLite分页/独立活动快照及工作树离线profile，Renderer消费尚待UI-P2，不重写原生Session；F01新增Thread内单Run安全historyEntry只读查询，Renderer按事件定向刷新，头部桥接与旧尾游标分离，整批成功发布/切换停止后续读取",
       "acceptanceGate": "幂等/绑定/取消/unknown；P0同Workspace写Run串行并覆盖等待审批与清理阶段",
       "implementationState": "in_progress",
       "adoption": {
@@ -1056,7 +1061,10 @@
           "EV-AGENT-TASK-MAC-20260930",
           "EV-BACKEND-HISTORY-MAC-20260930",
           "EV-BACKEND-HISTORY-PAGES-20260930",
-          "EV-BACKEND-HISTORY-SDK-20260930"
+          "EV-BACKEND-HISTORY-SDK-20260930",
+          "EV-UI-TARGETED-MOCK-20260930",
+          "EV-UI-TARGETED-MAC-20260930",
+          "EV-UI-TARGETED-REGRESSION-20260930"
         ]
       }
     },
@@ -1130,7 +1138,7 @@
         "esbuild build"
       ],
       "reuse": "Electron公开窗口/沙盒/IPC，React渲染和esbuild构建；复用既有产品与Pi Worker链路",
-      "productDelta": "闭合产品桥、Thread/Run视图、审批/取消/成果与有界纯文本投影；显式无模型驱动；关闭结果/重连接管分离，未确认命令按意图保留身份并显式重试；D1正常退出/信号统一结算，关闭失败后原窗口显式恢复，候选新宿主不迟到发布；D2-S展示固定命令审批/profile/期限及stdout/stderr有界完成快照，交互终端尚未接入；M1正文流/最终快照、应用专用持久凭据加载及原生临时选择、策略待确认/预算耗尽准入和双时间限制显示；仅产品DTO；M2已有视图增加逐read/write/edit审批、有限版本/参数摘要、后续模型轮流式正文与重连展示；显式SYNTHETIC离线入口，不由Renderer选择工具或worker代码；原生目录选择无自由路径Renderer入口，实际cwd/阶段/逐命令有界结果、三尺寸核心动作核查；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开；UI-P2前端右栏折叠/三档宽度、常驻审批/停止、Thread滚动锚点、按需成果核验展示；现采用正式historyPage/operationPage/artifactPage和独立ThreadActivity；Renderer的thread-pages.ts维护只读已加载范围、事件衔接与重连，首屏错误也保留正确活动身份",
+      "productDelta": "闭合产品桥、Thread/Run视图、审批/取消/成果与有界纯文本投影；显式无模型驱动；关闭结果/重连接管分离，未确认命令按意图保留身份并显式重试；D1正常退出/信号统一结算，关闭失败后原窗口显式恢复，候选新宿主不迟到发布；D2-S展示固定命令审批/profile/期限及stdout/stderr有界完成快照，交互终端尚未接入；M1正文流/最终快照、应用专用持久凭据加载及原生临时选择、策略待确认/预算耗尽准入和双时间限制显示；仅产品DTO；M2已有视图增加逐read/write/edit审批、有限版本/参数摘要、后续模型轮流式正文与重连展示；显式SYNTHETIC离线入口，不由Renderer选择工具或worker代码；原生目录选择无自由路径Renderer入口，实际cwd/阶段/逐命令有界结果、三尺寸核心动作核查；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开；UI-P2前端右栏折叠/三档宽度、常驻审批/停止、Thread滚动锚点、按需成果核验展示；现采用正式historyPage/operationPage/artifactPage和独立ThreadActivity；Renderer的thread-pages.ts维护只读已加载范围、事件衔接与重连，首屏错误也保留正确活动身份；F01新增Thread内单Run安全historyEntry只读查询，Renderer按事件定向刷新，头部桥接与旧尾游标分离，整批成功发布/切换停止后续读取",
       "acceptanceGate": "真实桌面进程/来源/CSP、Thread隔离、审批/取消/恢复；平台/模型/Gate分别验收；确认丢失/交错重试、异常关闭与受证据约束的恢复",
       "implementationState": "in_progress",
       "adoption": {
@@ -1275,7 +1283,10 @@
           "EV-BACKEND-MERGE-PASSED-20260930",
           "EV-UI-P2-MERGED-REGRESSION-20260930",
           "EV-UI-P2-MERGED-MODE-MAC-20260930",
-          "EV-UI-P2-MERGED-UI-MAC-20260930"
+          "EV-UI-P2-MERGED-UI-MAC-20260930",
+          "EV-UI-TARGETED-MOCK-20260930",
+          "EV-UI-TARGETED-MAC-20260930",
+          "EV-UI-TARGETED-REGRESSION-20260930"
         ]
       }
     }
@@ -2828,6 +2839,54 @@
         "darwin"
       ],
       "locator": "docs/validation/ui-p2-merged-2026-09-30.md"
+    },
+    {
+      "id": "EV-UI-TARGETED-MOCK-20260930",
+      "kind": "mock",
+      "result": "passed",
+      "scope": "合成查询端口验证64/256已加载历史纯正文更新均为2次查询、多页前插、工具/成果独立刷新、300事件、失败整批回滚、旧游标重同步及切换停止；不是IPC延迟/LLM次数。",
+      "commit": "e7764e46df3cb8bc3fcdcddc992246ebccfde95c",
+      "recordedAt": "2026-09-30T09:25:42.527274+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/ui-targeted-refresh-2026-09-30.md"
+    },
+    {
+      "id": "EV-UI-TARGETED-MAC-20260930",
+      "kind": "platform",
+      "result": "passed",
+      "scope": "macOS27 arm64实际SQLite/HostClient定向读取与Thread归属；真实Electron四套离线模式通过，三尺寸/锚点/定向正文/审批取消/分页重连。Provider为合成，非真实模型人工验收。历史其他工作树超时仍未定位。",
+      "commit": "e7764e46df3cb8bc3fcdcddc992246ebccfde95c",
+      "recordedAt": "2026-09-30T09:25:42.527274+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/ui-targeted-refresh-2026-09-30.md"
+    },
+    {
+      "id": "EV-UI-TARGETED-REGRESSION-20260930",
+      "kind": "static",
+      "result": "passed",
+      "scope": "e7764e4上typecheck、desktop32、backend-history15、product-core20、product-sdk5和四套Electron离线命令通过；文档维护检查另记文档差异。未重跑全部A1-A4/退出矩阵。",
+      "commit": "e7764e46df3cb8bc3fcdcddc992246ebccfde95c",
+      "recordedAt": "2026-09-30T09:25:42.527274+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/ui-targeted-refresh-2026-09-30.md"
+    },
+    {
+      "id": "EV-DURABLE-REVIEW-20260930",
+      "kind": "review",
+      "result": "passed",
+      "scope": "复核固定1b347794源码已有SQLite/JSONL存储，纠正旧仅内存理由；源码0.99.1非发行验证，未安装/兼容测试，durable保持evaluate。",
+      "commit": "e7764e46df3cb8bc3fcdcddc992246ebccfde95c",
+      "recordedAt": "2026-09-30T09:25:42.527274+00:00",
+      "platforms": [
+        "not_applicable"
+      ],
+      "locator": "docs/validation/ui-targeted-refresh-2026-09-30.md"
     }
   ]
 }

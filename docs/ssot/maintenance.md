@@ -105,3 +105,5 @@ Agent Shell [真实任务补证](../validation/agent-task-live-2026-09-30.md)将
 
 UI-P2[分页组合报告](../validation/ui-p2-pages-2026-09-30.md)分开记录主实现SHA的集中回归与仅Renderer身份修正SHA的受影响检查。合成显示故障、持久合成生命周期和真实Worker/宿主终止分别描述；造历史时的hostClean不能成为清理证据。分页通过不宣称无限历史或扩大Gate；未提交开发失败注明基础SHA及差异状态，不伪造被测提交。
 UI-P2的[后端前置报告](../validation/backend-history-2026-09-30.md)区分真实SQLite/IPC/文件测试、合成历史与协议生产者、真实Pi工具+合成Provider、Electron程序化检查。代码先提交，证据引用实际被测SHA；后续文档只记录结果。分页接口存在不代表Renderer已使用，不把双Host隔离声称为双GUI验收，不因修复R01/R02或新增测试晋级完整任务/Gate。临时试测的fixture错误与最终代码回归分列；社区阅读结论不充当SDK实测。
+
+[F01/F02报告](../validation/ui-targeted-refresh-2026-09-30.md)将SYNTHETIC方法调用计数、真实SQLite/IPC和Electron离线平台验证分列。两次方法查询不是LLM次数或延迟证据；历史UI超时没有复现不等于根因已解决，固定durable源码复核也不等于实际发行或兼容采用。

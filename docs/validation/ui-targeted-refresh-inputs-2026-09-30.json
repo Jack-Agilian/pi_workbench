@@ -1,0 +1,135 @@
+{
+  "baseline": "96768a6293838f5c56395a5f1689672018bb1e28",
+  "testedCodeCommit": "e7764e46df3cb8bc3fcdcddc992246ebccfde95c",
+  "recordedAt": "2026-09-30T09:25:42.527274+00:00",
+  "platform": {
+    "os": "macOS 27.0",
+    "build": "26A428",
+    "arch": "arm64",
+    "node": "24.21.0",
+    "electron": "44.4.5",
+    "pi": "0.87.1"
+  },
+  "realModelCalls": 0,
+  "commands": [
+    {
+      "command": "npm run typecheck",
+      "exit": 0,
+      "seconds": 5.56,
+      "log": "typecheck.log",
+      "sha256": "22df5d47848ff6e1f3c0926a3aa3f05da31fb2c76601187b826c3ad4d7870689"
+    },
+    {
+      "command": "npm run test:desktop",
+      "exit": 0,
+      "seconds": 20.02,
+      "log": "test-desktop.log",
+      "sha256": "8a2e6a6be615c427749476c033b03c9d7122566f1910f07924c9e2eef75f2949"
+    },
+    {
+      "command": "npm run test:backend-history",
+      "exit": 0,
+      "seconds": 11.06,
+      "log": "test-backend-history.log",
+      "sha256": "e1987ca877a70442503677c203cc8490ff6bc8990ec9d4c778526f218c1e8bd8"
+    },
+    {
+      "command": "npm run test:product-core",
+      "exit": 0,
+      "seconds": 1.26,
+      "log": "test-product-core.log",
+      "sha256": "4b872a88702d0d624e2bd4b36092e7691919c4ee5248b2566ae2758d7aea398a"
+    },
+    {
+      "command": "npm run test:product-sdk",
+      "exit": 0,
+      "seconds": 1.96,
+      "log": "test-product-sdk.log",
+      "sha256": "93a4759e36a155848238f7db290b6aeb603ca2968675203f203d9da3f90f22ac"
+    },
+    {
+      "command": "npm run test:desktop-ui",
+      "exit": 0,
+      "seconds": 31.41,
+      "log": "test-desktop-ui.log",
+      "sha256": "a96b6b13c8891615d059c7dbd7a7b59416bf4bbd354f53a7b5671c39b2a4cfef"
+    },
+    {
+      "command": "npm run test:desktop-agent-shell",
+      "exit": 0,
+      "seconds": 6.91,
+      "log": "test-desktop-agent-shell.log",
+      "sha256": "07b5268ebe7aee640b8e69be6522c1f030f8bee336e9459d6d66519952373d51"
+    },
+    {
+      "command": "npm run test:desktop-file-agent",
+      "exit": 0,
+      "seconds": 7.3,
+      "log": "test-desktop-file-agent.log",
+      "sha256": "5256b14604bfd9bda02d693ee925f45d123af439945fd27a96fc2e1046da0703"
+    },
+    {
+      "command": "npm run test:desktop-model",
+      "exit": 0,
+      "seconds": 6.05,
+      "log": "test-desktop-model.log",
+      "sha256": "8fbf83b307d1c7011a7f81449537362510d2951cf4c2f2985585ec7224788624"
+    }
+  ],
+  "queryCounts": {
+    "scope": "SYNTHETIC method counts, excludes independent home/activity polls; not latency or provider requests",
+    "64": {
+      "before": 74,
+      "after": 2
+    },
+    "256": {
+      "before": 290,
+      "after": 2
+    },
+    "afterBreakdown": {
+      "events": 1,
+      "historyEntry": 1,
+      "historyPage": 0,
+      "operationPage": 0,
+      "artifactPage": 0
+    }
+  },
+  "sourceReview": {
+    "durable": "1b347794e2a630e4359f2584f4eea388145d0ddf",
+    "installed": false,
+    "registryVerified": false
+  },
+  "documentationChecks": {
+    "tree": "e7764e4 plus accompanying documentation changes; AGENTS.md user edit excluded from commits",
+    "results": [
+      {
+        "command": ".venv/bin/python scripts/check-ssot.py",
+        "exit": 0,
+        "seconds": 0.18,
+        "log": "ssot.log",
+        "sha256": "669804c9643dce4ac49f9c1b41f99057b5dfa7e4c7e85064a99c8db2c8874bfe"
+      },
+      {
+        "command": ".venv/bin/python scripts/test-tools.py",
+        "exit": 0,
+        "seconds": 0.11,
+        "log": "tools.log",
+        "sha256": "64b537cdf9f277c72c136fc73fab53f9b176aab1b8c676bea7ff5484cdbb1ac0"
+      },
+      {
+        "command": ".venv/bin/python scripts/check-docs.py --structural-only",
+        "exit": 0,
+        "seconds": 0.18,
+        "log": "docs-structural.log",
+        "sha256": "bdddec244a41013cbe02456522c9ce33dceb5fcc0a15d58bde818fd028f23a8c"
+      },
+      {
+        "command": ".venv/bin/python scripts/check-docs.py --typecheck",
+        "exit": 0,
+        "seconds": 0.66,
+        "log": "docs-typecheck.log",
+        "sha256": "953887190d1181c15c81cf95edb125fa4c5972f3fa2b502badd990fa7bd2622e"
+      }
+    ]
+  }
+}

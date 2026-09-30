@@ -101,7 +101,7 @@ Pi 根入口导出的 `AssistantMessageComponent`、`ToolExecutionComponent` 等
 
 - `pi-server` / `pi-client` 自称 experimental，提供路由、附件绑定与服务订阅。先探测能否减少自有传输代码；默认 SDK 主路径不切换。服务发现/会话管理仍由应用提供，Unix transport 不实现 peer authentication。不能把该组合称为可直接替代产品 App Server 的成品。
 - Chord 已提供服务、生命周期与复制状态，不应自研一个同功能插件总线或状态复制框架。M0 若普通模块调用和现成 IPC 足够，不必主动引入整个 Chord；出现通用需求时先评估公开 API。
-- `pi-durable` README 当前仅承诺 durable 记录契约和脱离进程的内存存储实现。不能因此删掉磁盘恢复/SQLite需求，或假定已是可直接生产使用的桌面持久化层。
+- `pi-durable` 的“仅内存”判断仅对应旧466db0快照[P12]。2026-09-30复核固定源码1b347794，已有SQLite/JSONL存储与恢复实现[P16]，仍为Experimental。源码存在不等于已核验发行包、与当前coding-agent Session兼容或满足产品审批/清理/未知副作用/预算语义；继续evaluate，不以旧理由拒绝，也不据此迁移ProductCore或升级Pi。
 
 E 类评估失败时记录具体缺口，不派生一套模仿 Pi 的新平台。只在有真正产品需求的地方补最小接口。
 
@@ -142,3 +142,5 @@ App Server 是产品 coordinator，不拥有模型轮询、重试器、Prompt �
 ## M1 真实模型接入范围
 
 Pi AgentSession、ModelRuntime、pi-ai Provider 和 CredentialStore 继续为主路径，不自建多 Provider 模型业务网关或第二条模型/工具循环。可复用的网络出口组件仅负责目标限制与传输边界；候选库须有发行/许可与平台证据后才采用。M1 无工具、M2 有限文件先于交互 PTY；[当前顺序](../planning/NEXT_STEPS.md) 与 [术语](glossary.md) 为准。
+
+2026-09-30前端复用决策：保留ThreadPages的有限产品实体刷新，新增只读historyEntry接缝，不引入通用缓存框架。TanStack Query v5无限查询默认顺序重取缓存页，仅换useInfiniteQuery不能消除查询放大；maxPages会裁掉保留页，不等于本产品的实体失效策略。若通用缓存职责继续扩大再评估；滚动仍只有现有控制者，本次不引入虚拟列表。
