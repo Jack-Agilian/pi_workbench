@@ -151,3 +151,9 @@ M2 实机复审：[两处正确性修正与 Mac 回归](../validation/review-m2-
 ## UI-P2 后端前置（2026-09-30）
 
 [运行边界/分页契约](backend-history-contract.md) · [前端交接](../planning/BACKEND_HISTORY_HANDOFF.md) · [代码与验证范围](../validation/backend-history-2026-09-30.md)。基于develop@58d3130，只增加宿主工作区重新准入、展示消息水位、已有SQLite上的有界分页和工作树离线profile。复用Pi原生Session/工具、SQLite查询模式、Electron用户数据目录，不新建Harness或引入分页框架。Renderer尚未接入，旧全量读取上限仍存在；当前唯一事项继续UI-P2，CORE-03/SEC-02/UI-01/ART-01保持in_progress，既有Gate不扩大。
+
+## 双线合并收口（2026-09-30）
+
+用户授权后，前端c0e99c2和后端feaa3f4已合入develop@169df60；[组合检查、UI等待失败与真实使用范围](../validation/ui-p2-merged-2026-09-30.md)。前面的“尚未集成”描述各自交付当时状态；当前以NEXT_STEPS和此集成记录为准。类型/后端/桌面及三套模型模式离线Electron通过，总UI在集成树两次超时不记通过。任务/Gate不扩大，下一步是限定真实桌面人工使用测试。
+
+同一169df60已在用户指定前端工作树补跑完整UI并通过；集成树两次超时仍保留，未定位工作树/运行环境差异。实际分列证据见上述集成报告。

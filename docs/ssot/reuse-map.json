@@ -1272,7 +1272,10 @@
           "EV-UI-P2-PAGES-REGRESSION-20260930",
           "EV-BACKEND-HISTORY-MAC-20260930",
           "EV-BACKEND-HISTORY-PAGES-20260930",
-          "EV-BACKEND-MERGE-PASSED-20260930"
+          "EV-BACKEND-MERGE-PASSED-20260930",
+          "EV-UI-P2-MERGED-REGRESSION-20260930",
+          "EV-UI-P2-MERGED-MODE-MAC-20260930",
+          "EV-UI-P2-MERGED-UI-MAC-20260930"
         ]
       }
     }
@@ -2777,6 +2780,54 @@
         "darwin"
       ],
       "locator": "docs/validation/backend-history-2026-09-30.md"
+    },
+    {
+      "id": "EV-UI-P2-MERGED-REGRESSION-20260930",
+      "kind": "static",
+      "result": "passed",
+      "scope": "双分支组合SHA的严格类型、后端13/桌面24项通过；双方既有证据保留，未声明总UI套件通过。",
+      "commit": "169df60a51fc1d394d6cc45c335e54eddbc9cef7",
+      "recordedAt": "2026-09-30T08:00:42.263239+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/ui-p2-merged-2026-09-30.md"
+    },
+    {
+      "id": "EV-UI-P2-MERGED-MODE-MAC-20260930",
+      "kind": "platform",
+      "result": "passed",
+      "scope": "组合SHA实际Electron Shell/文件/模型三套离线链路通过；Pi及工具真实，Provider合成、真实模型0。",
+      "commit": "169df60a51fc1d394d6cc45c335e54eddbc9cef7",
+      "recordedAt": "2026-09-30T08:00:42.263239+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/ui-p2-merged-2026-09-30.md"
+    },
+    {
+      "id": "EV-UI-P2-MERGED-UI-TIMEOUT-20260930",
+      "kind": "platform",
+      "result": "failed",
+      "scope": "组合SHA在集成工作树两次test:desktop-ui均120秒超时退出1，UI-P2完整标记缺失；未定位原因，不被其他套件通过覆盖。",
+      "commit": "169df60a51fc1d394d6cc45c335e54eddbc9cef7",
+      "recordedAt": "2026-09-30T08:00:42.263239+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/ui-p2-merged-2026-09-30.md"
+    },
+    {
+      "id": "EV-UI-P2-MERGED-UI-MAC-20260930",
+      "kind": "platform",
+      "result": "passed",
+      "scope": "同一合并SHA在用户指定前端工作树完整test:desktop-ui通过：持久分页/真实Worker审批取消/重连/三尺寸及原关闭和确认丢失；集成树两次超时保留，原因未定位。",
+      "commit": "169df60a51fc1d394d6cc45c335e54eddbc9cef7",
+      "recordedAt": "2026-09-30T08:02:04.495904+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/ui-p2-merged-2026-09-30.md"
     }
   ]
 }

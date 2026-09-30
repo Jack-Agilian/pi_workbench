@@ -2,19 +2,17 @@
 
 当前依据：[SSOT](../ssot/README.md)、[任务账本](backlog.json)。以下当前事项优先于后文历史阶段的“下一步”。
 
-## 唯一当前事项：UI-P2 复审与集成收口
+## 唯一当前事项：集成版本的真实桌面人工使用测试
 
-2026-09-30：用户授权后，develop 从 `148022b05250cfda824725778e9a056d00cd6830` 快进合入 `codex/agent-shell-mvp` 的20个提交，集成代码与证据基线为 `34ed62e3fc875c56059eb19c1f02781d72c78bfc`。M2、审核修复、Agent Shell、请求次数缺省不限与Pi strict schema修正现已进入同一集成分支；[本次集成检查](../validation/develop-integration-2026-09-30.md)。
+2026-09-30按用户授权，将前端 `codex/ui-history-artifacts@c0e99c2` 和后端 `codex/backend-history-safety@feaa3f4` 合入develop，组合代码提交 `169df60a51fc1d394d6cc45c335e54eddbc9cef7`。双方证据ID保留，分页与后端边界现在位于同一分支；集成检查与当前可测范围见 [收口报告](../validation/ui-p2-merged-2026-09-30.md)。
 
-2026-09-30：用户授权后，develop 从 `58d3130d9ed480e283434c749e285efd6ba2092d` 快进合入前端分支的3个提交，集成代码/证据基线 `6884e278bb2d9057a78fa5b74b513a1d0798320e`。右栏收起/宽度、常驻审批与停止、草稿/滚动位置及成果核验展示已进入develop；[集成记录](../validation/ui-p2-integration-2026-09-30.md)。
+接下来只做这一条完整流程的人工使用检查：
 
-接下来只有一条推进顺序：
+1. 在macOS arm64用 `npm run model:config -- check` 核对原配置，再运行 `npm run desktop:model`；保持单一真实profile、凭据与费用账本。本轮没有实际调用模型或修改配置。
+2. 只在现有授权的合成无敏感项目中检查真实对话/原会话继续、读取/写入/修改Markdown、逐项批准或拒绝受限Bash、活跃停止、重启恢复和成果预览。先验证完整工作流程，再集中修问题，不用付费请求逐行调试。
+3. 当前配置输出512 token、每次执行最多8个文件/Bash操作，其中Bash最多6次/每条30秒；LLM次数不限，费用累计仍生效，单LLM总期限30分钟/网络空闲5分钟。扩大数据/工具/费用范围或输出上限另作明确配置修订，不自动改写旧策略或账本。
 
-1. 前端分支已采用后端已提交的R01/R02与分页契约（45e45a5、8e1b598），实现历史/工具/成果分页和独立活动快照，完成限定macOS无模型组合验证。具体被测SHA、失败与范围见 [分页报告](../validation/ui-p2-pages-2026-09-30.md)。这部分尚未合入develop。
-2. 复核分页一致性、慢页/错误/重连、工作区失效、当前审批与停止，以及后端线自身的证据补齐；确认后将同一组合提交集成develop。保留未提交工作，不把两条线各自的通过直接当成集成完成。
-3. 集成后集中复核桌面主链路；真实模型人工体验单独安排，不使用付费请求调试小改动，不自动开始市场、PTY或生产发行。
-
-边界见 [前端交接](UI_P2_FRONTEND_HANDOFF.md) 和 [后端共享契约](../ssot/backend-history-contract.md)。R03旧全量响应超限已在新Renderer分页路径中限定解决；home目录未分页、无虚拟列表、原生全部正文未补载。UI-01/02、ART-01继续in_progress，既有M0 Gate范围不扩大。
+[前端交接](UI_P2_FRONTEND_HANDOFF.md)、[后端契约](../ssot/backend-history-contract.md)保留范围。R03旧全量响应超限已由Renderer正式分页路径限定解决；home目录未分页、无虚拟列表、原生全部正文未补载。UI-01/02、ART-01继续in_progress，既有M0 Gate不因合并扩大；完整人工体验、Windows、PTY、市场与生产发行后置。
 
 已有真实任务代码 `688150f070797405250bb16ad3dc837bb0ddc64d`；[真实结果与首次失败](../validation/agent-task-live-2026-09-30.md)、[脱敏输入](../validation/agent-task-live-inputs-2026-09-30.json)、[实际模型生成报告](../validation/agent-task-result-2026-09-30.md)。本次集成没有新增真实请求，以下仍为该次任务的历史消费与验证范围。
 
