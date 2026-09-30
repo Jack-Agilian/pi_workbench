@@ -899,11 +899,14 @@
             "EV-M1-SDK-20260928",
             "EV-M1-MAC-20260928",
             "EV-UI-P2-FRONTEND-MOCK-20260930",
-            "EV-UI-P2-FRONTEND-MAC-20260930"
+            "EV-UI-P2-FRONTEND-MAC-20260930",
+            "EV-UI-P2-PAGES-MOCK-20260930",
+            "EV-UI-P2-PAGES-MAC-20260930",
+            "EV-UI-P2-PAGES-REGRESSION-20260930"
           ]
         }
       ],
-      "statusReason": "UI-P2前端已于2026-09-30集成develop，实现右栏收起/宽度、审批与停止常驻入口、草稿/焦点及按Thread滚动位置、成果核验展示；采用既有产品DTO。长历史传输分页仍待后端共享契约接入，R03未解决，保持in_progress；不扩大既有Gate或人工体验声明。"
+      "statusReason": "2026-09-30前端分支采用已提交后端共享契约，历史/工具/成果分页、独立活动/审批、页错误与重连已限定Mac无模型组合验证；超过旧传输上限的60条持久合成Run可浏览，实际新Worker执行取消后61条不重放。本分页组合尚未合入develop；虚拟列表、原生全部正文、完整人工体验及另存为未完成，保持in_progress，不扩大Gate。"
     },
     {
       "id": "UI-02",
@@ -955,11 +958,14 @@
             "EV-M1-SDK-20260928",
             "EV-M1-MAC-20260928",
             "EV-UI-P2-FRONTEND-MOCK-20260930",
-            "EV-UI-P2-FRONTEND-MAC-20260930"
+            "EV-UI-P2-FRONTEND-MAC-20260930",
+            "EV-UI-P2-PAGES-MOCK-20260930",
+            "EV-UI-P2-PAGES-MAC-20260930",
+            "EV-UI-P2-PAGES-REGRESSION-20260930"
           ]
         }
       ],
-      "statusReason": "UI-P2前端已于2026-09-30集成develop，实现右栏收起/宽度、审批与停止常驻入口、草稿/焦点及按Thread滚动位置、成果核验展示；采用既有产品DTO。长历史传输分页仍待后端共享契约接入，R03未解决，保持in_progress；不扩大既有Gate或人工体验声明。"
+      "statusReason": "2026-09-30前端分支采用已提交后端共享契约，历史/工具/成果分页、独立活动/审批、页错误与重连已限定Mac无模型组合验证；超过旧传输上限的60条持久合成Run可浏览，实际新Worker执行取消后61条不重放。本分页组合尚未合入develop；虚拟列表、原生全部正文、完整人工体验及另存为未完成，保持in_progress，不扩大Gate。"
     },
     {
       "id": "GIT-01",
@@ -1032,7 +1038,10 @@
             "EV-REVIEW-B-IPC-MAC-20260923",
             "EV-REVIEW-B-IPC-REGRESSION-20260923",
             "EV-C-SDK-20260923",
-            "EV-C-MAC-20260923"
+            "EV-C-MAC-20260923",
+            "EV-UI-P2-PAGES-MOCK-20260930",
+            "EV-UI-P2-PAGES-MAC-20260930",
+            "EV-UI-P2-PAGES-REGRESSION-20260930"
           ]
         },
         {
@@ -1049,7 +1058,7 @@
           ]
         }
       ],
-      "statusReason": "2026-09-30集成develop的前端增量补文件名/来源/版本及按需preview核验状态，显示上次核验时间而非推断当前可用。真实成果索引仍由宿主管理；成果分页、另存为/其他格式未完成，保持in_progress。"
+      "statusReason": "2026-09-30前端分支采用已提交后端共享契约，历史/工具/成果分页、独立活动/审批、页错误与重连已限定Mac无模型组合验证；超过旧传输上限的60条持久合成Run可浏览，实际新Worker执行取消后61条不重放。本分页组合尚未合入develop；虚拟列表、原生全部正文、完整人工体验及另存为未完成，保持in_progress，不扩大Gate。"
     },
     {
       "id": "SKL-01",

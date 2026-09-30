@@ -1,0 +1,176 @@
+{
+  "platform": "macOS 27.0 arm64",
+  "node": "24.21.0",
+  "npm": "11.19.0",
+  "pi": "0.87.1",
+  "electron": "44.4.5",
+  "realModelCalls": 0,
+  "commands": [
+    {
+      "command": "npm run typecheck",
+      "commit": "8870351d79de614498146f80748513dc35fbbb0a",
+      "startedAt": "2026-09-30T07:41:45.161649+00:00",
+      "exitCode": 0,
+      "log": "typecheck.log",
+      "rawLogSha256": "22df5d47848ff6e1f3c0926a3aa3f05da31fb2c76601187b826c3ad4d7870689"
+    },
+    {
+      "command": "npm run test:backend-history",
+      "commit": "8870351d79de614498146f80748513dc35fbbb0a",
+      "startedAt": "2026-09-30T07:41:47.551305+00:00",
+      "exitCode": 0,
+      "log": "test-backend-history.log",
+      "rawLogSha256": "105223caef62a8f364e3f961cb2609e87c3c11951c6acfbf5137a9c0229db243"
+    },
+    {
+      "command": "npm run test:desktop",
+      "commit": "8870351d79de614498146f80748513dc35fbbb0a",
+      "startedAt": "2026-09-30T07:41:54.073341+00:00",
+      "exitCode": 0,
+      "log": "test-desktop.log",
+      "rawLogSha256": "9503b9fce83ad00156b40178ef7f1320a08a4531391af7224706a7831ac4947a"
+    },
+    {
+      "command": "npm run test:pi-probe",
+      "commit": "8870351d79de614498146f80748513dc35fbbb0a",
+      "startedAt": "2026-09-30T07:42:07.616935+00:00",
+      "exitCode": 0,
+      "log": "test-pi-probe.log",
+      "rawLogSha256": "8967c0154026dd38b3ff6777c14b65f2065f8c1ff1bd4695f0f1e5402b25dbcb"
+    },
+    {
+      "command": "npm run test:pi-tools",
+      "commit": "8870351d79de614498146f80748513dc35fbbb0a",
+      "startedAt": "2026-09-30T07:42:08.610579+00:00",
+      "exitCode": 0,
+      "log": "test-pi-tools.log",
+      "rawLogSha256": "edf7f38e6d7dbea3319b251149b04d312bb1dd66a48f8e55f0dd7b7494de1476"
+    },
+    {
+      "command": "npm run test:pi-shell",
+      "commit": "8870351d79de614498146f80748513dc35fbbb0a",
+      "startedAt": "2026-09-30T07:42:09.793682+00:00",
+      "exitCode": 0,
+      "log": "test-pi-shell.log",
+      "rawLogSha256": "63154bdb4cf024200b4c5e8545b05147aa12b0f4fc5e3d4a41441344c5c9b80f"
+    },
+    {
+      "command": "npm run test:pi-resources",
+      "commit": "8870351d79de614498146f80748513dc35fbbb0a",
+      "startedAt": "2026-09-30T07:42:10.994096+00:00",
+      "exitCode": 0,
+      "log": "test-pi-resources.log",
+      "rawLogSha256": "ab423096b46701f0e36036c270e12587bbda705eb0ac3fc044750ceb8c993354"
+    },
+    {
+      "command": "npm run test:pi-auth",
+      "commit": "8870351d79de614498146f80748513dc35fbbb0a",
+      "startedAt": "2026-09-30T07:42:12.021999+00:00",
+      "exitCode": 0,
+      "log": "test-pi-auth.log",
+      "rawLogSha256": "d8c61761b3b063ab5138e29e5905f53d5d58fc88900e923f47f4e23d4b527a5a"
+    },
+    {
+      "command": "npm run test:product-core",
+      "commit": "8870351d79de614498146f80748513dc35fbbb0a",
+      "startedAt": "2026-09-30T07:42:12.983423+00:00",
+      "exitCode": 0,
+      "log": "test-product-core.log",
+      "rawLogSha256": "0fcd8c61ae149715fa9a1f0f45e40965ca99e3074d8afc93c616635739b7a04d"
+    },
+    {
+      "command": "npm run test:product-sdk",
+      "commit": "8870351d79de614498146f80748513dc35fbbb0a",
+      "startedAt": "2026-09-30T07:42:13.758803+00:00",
+      "exitCode": 0,
+      "log": "test-product-sdk.log",
+      "rawLogSha256": "d8b8d7132196d292f12be75dc6c8526198e14b79f5e99e5dac5eaeb55612ddb7"
+    },
+    {
+      "command": "npm run test:product-worker",
+      "commit": "8870351d79de614498146f80748513dc35fbbb0a",
+      "startedAt": "2026-09-30T07:42:14.914317+00:00",
+      "exitCode": 0,
+      "log": "test-product-worker.log",
+      "rawLogSha256": "c8c13e48fa163bf0d835f80a66825a3635a37e67607746404ccf365f1f550ba4"
+    },
+    {
+      "command": "npm run test:product-shell",
+      "commit": "8870351d79de614498146f80748513dc35fbbb0a",
+      "startedAt": "2026-09-30T07:42:48.551341+00:00",
+      "exitCode": 0,
+      "log": "test-product-shell.log",
+      "rawLogSha256": "70df812c3456f0d5b99f5c3ab65c7007a2396deed504f5b9fd2dfc17b752fe8a"
+    },
+    {
+      "command": "npm run test:model-integration-offline",
+      "commit": "8870351d79de614498146f80748513dc35fbbb0a",
+      "startedAt": "2026-09-30T07:43:06.849217+00:00",
+      "exitCode": 0,
+      "log": "test-model-integration-offline.log",
+      "rawLogSha256": "7687ca9353bb850c1629adb5baaa98824d59dad9dac5247fb777cae53a95ae65"
+    },
+    {
+      "command": "npm run test:product-file-agent",
+      "commit": "8870351d79de614498146f80748513dc35fbbb0a",
+      "startedAt": "2026-09-30T07:43:35.522227+00:00",
+      "exitCode": 0,
+      "log": "test-product-file-agent.log",
+      "rawLogSha256": "fcb8c7700ecffbdf7db12e68d971a26e2fdf821b0a3c88802e688b3492bb7d76"
+    },
+    {
+      "command": "npm run test:product-model-shell",
+      "commit": "8870351d79de614498146f80748513dc35fbbb0a",
+      "startedAt": "2026-09-30T07:44:00.728694+00:00",
+      "exitCode": 0,
+      "log": "test-product-model-shell.log",
+      "rawLogSha256": "497a7e49416bc41a9a49a558b6510bc414016a0a490c7d5abbb5898b615613c2"
+    },
+    {
+      "command": "npm run test:desktop-ui",
+      "commit": "8870351d79de614498146f80748513dc35fbbb0a",
+      "startedAt": "2026-09-30T07:41:45.161648+00:00",
+      "exitCode": 0,
+      "log": "test-desktop-ui.log",
+      "rawLogSha256": "d376103999242a71a679eef11e6854103a020c25e972e219493011e2192ca3f4"
+    },
+    {
+      "command": "npm run test:desktop-agent-shell",
+      "commit": "8870351d79de614498146f80748513dc35fbbb0a",
+      "startedAt": "2026-09-30T07:42:08.088650+00:00",
+      "exitCode": 0,
+      "log": "test-desktop-agent-shell.log",
+      "rawLogSha256": "65379e561bda20919a804de394329c11757be41abc3ed7e4baa8ad323304fe49"
+    },
+    {
+      "command": "npm run test:desktop-file-agent",
+      "commit": "8870351d79de614498146f80748513dc35fbbb0a",
+      "startedAt": "2026-09-30T07:42:13.454386+00:00",
+      "exitCode": 0,
+      "log": "test-desktop-file-agent.log",
+      "rawLogSha256": "896c98af03b0b84e038a6ea426c81148002bec8d6f9063ae3c16d1d90d2a6baf"
+    },
+    {
+      "command": "npm run test:desktop-model",
+      "commit": "8870351d79de614498146f80748513dc35fbbb0a",
+      "startedAt": "2026-09-30T07:42:19.024455+00:00",
+      "exitCode": 0,
+      "log": "test-desktop-model.log",
+      "rawLogSha256": "8fbf83b307d1c7011a7f81449537362510d2951cf4c2f2985585ec7224788624"
+    },
+    {
+      "command": "npm run typecheck",
+      "commit": "0a60b245b97d07633fa0b10ce67312fd674d1645",
+      "exitCode": 0,
+      "log": "typecheck-activity.log",
+      "rawLogSha256": "22df5d47848ff6e1f3c0926a3aa3f05da31fb2c76601187b826c3ad4d7870689"
+    },
+    {
+      "command": "npm run test:desktop-ui",
+      "commit": "0a60b245b97d07633fa0b10ce67312fd674d1645",
+      "exitCode": 0,
+      "log": "ui-activity.log",
+      "rawLogSha256": "4f99ab7d84a793c66cfac72fefa0c7c3c44bc3aa0d40a6a1d26a7f8141f8864c"
+    }
+  ]
+}
