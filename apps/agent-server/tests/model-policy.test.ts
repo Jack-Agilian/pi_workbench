@@ -123,3 +123,20 @@ test('count null is explicit; malformed caps fail; cost-derived Run envelope doe
  assert.throws(()=>fileRunDuration(files,1800000,{total:1,perRequest:0}),/budget/);
  assert.equal(fileRunDuration(files,1800000,{total:1,perRequest:0.01}),5000+100*1801000+8*2000);
 });
+
+test('explicit tool scope reuses consumed authorization; cannot expand cost, counts, identity or timeout',()=>{
+ const dir=mkdtempSync(join(tmpdir(),'model-tool-policy-')),path=join(dir,'db');let core=new ProductCore(path,[{id:'ws',path:dir}]);
+ const previous={...config,maxRequests:undefined};
+ const candidate=parseModelConfiguration({...previous,fileTools:{maxOperations:8,operationTimeoutMs:300000},shellTools:{maxCommands:6,timeoutMs:10000,profile:'restricted-bash-v1'}});
+ try{
+  const threadId=core.handle({type:'threads.create',requestId:'t',workspaceId:'ws',title:'SYNTHETIC'}).id;
+  core.handle({type:'runs.start',requestId:'r',threadId,input:'SYNTHETIC'});const b=core.dispatchNext()!;core.markRunning(b);
+  core.reserveConfiguredModelRequest(b,previous,0.125);core.settle(b,'completed',{piIdle:true,hostClean:true});
+  for(const scope of ['timeout','request-count'] as const)assert.throws(()=>core.reviseModelPolicy(previous,candidate,'wrong-'+scope,scope),/scope/);
+  for(const bad of [{...candidate,maxEstimatedCostUsd:2},{...candidate,timeoutMs:1800000},{...candidate,authorizationId:'new'},{...candidate,maxRequests:4},{...candidate,fileTools:{...candidate.fileTools!,maxModelRequests:4}}])assert.throws(()=>core.reviseModelPolicy(previous,bad,'wrong-tools','tools'),/scope/);
+  assert.equal(core.modelAdmission(candidate,0.125).status,'policy_required');
+  core.reviseModelPolicy(previous,candidate,'tools-approved','tools');core.reviseModelPolicy(previous,candidate,'tools-approved','tools');
+  core.close();core=new ProductCore(path,[]);assert.deepEqual(core.modelAdmission(candidate,0.125),{status:'ready',used:1,reserved:0.125});
+  core.reviseModelPolicy(candidate,previous,'tools-revoked','tools');assert.deepEqual(core.modelAdmission(previous,0.125),{status:'ready',used:1,reserved:0.125});
+ }finally{core.close();rmSync(dir,{recursive:true,force:true});}
+});

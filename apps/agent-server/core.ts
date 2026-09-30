@@ -1,6 +1,6 @@
 import type { ModelShellOperation } from '../../packages/app-contracts/model-shell.ts';
 import type { FileOperationPlan } from '../../packages/app-contracts/file-tools.ts';
-import { policyDigest, policyText, legacyPolicyDigest, assertTimeoutRevision, assertRequestCountRevision } from './model-policy.ts';
+import { policyDigest, policyText, legacyPolicyDigest, assertTimeoutRevision, assertRequestCountRevision, assertToolScopeRevision } from './model-policy.ts';
 import { type ModelConfiguration, parseModelOutcome, type ModelOutcome } from '../../packages/app-contracts/model.ts';
 import { parseShellIntent, parseShellOutcome, type ShellIntent, type ShellOutcome, type ShellView } from '../../packages/app-contracts/shell.ts';
 // Product intents/indexes and disposable display projections; Pi owns authoritative messages and the Session tree.
@@ -240,9 +240,9 @@ export class ProductCore {
     return {status,used,reserved};
   }
   /** Explicit local maintenance, never a Renderer/Worker command. Only the explicitly selected policy scope may change. */
-  reviseModelPolicy(previous:ModelConfiguration, candidate:ModelConfiguration, revisionId:string,scope:'timeout'|'request-count'='timeout'):void {
+  reviseModelPolicy(previous:ModelConfiguration, candidate:ModelConfiguration, revisionId:string,scope:'timeout'|'request-count'|'tools'='timeout'):void {
     identifier(revisionId);
-    if(scope==='request-count')assertRequestCountRevision(previous,candidate);else if(scope==='timeout')assertTimeoutRevision(previous,candidate);else throw new Error('model_revision_scope');
+    if(scope==='tools')assertToolScopeRevision(previous,candidate);else if(scope==='request-count')assertRequestCountRevision(previous,candidate);else if(scope==='timeout')assertTimeoutRevision(previous,candidate);else throw new Error('model_revision_scope');
     this.mutate(()=>{
       const digest=policyDigest(candidate),old=policyDigest(previous),legacy=legacyPolicyDigest(previous);
       const existing=this.get<{previous_digest:string;digest:string;legacy_digest:string}>('SELECT previous_digest,digest,legacy_digest FROM model_policy_revisions WHERE revision_id=?',revisionId);

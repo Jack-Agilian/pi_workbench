@@ -50,7 +50,8 @@
     "test:file-acceptance": "node scripts/test-file-acceptance.mjs",
     "test:product-model-shell": "node scripts/run-product-worker.mjs --model-shell",
     "demo:agent-shell": "node scripts/launch-desktop.mjs --model-shell-offline",
-    "test:desktop-agent-shell": "node scripts/launch-desktop.mjs --model-shell-offline --model-smoke-test"
+    "test:desktop-agent-shell": "node scripts/launch-desktop.mjs --model-shell-offline --model-smoke-test",
+    "validate:agent-shell": "node scripts/validate-agent-shell.mjs"
   },
   "dependencies": {
     "@earendil-works/pi-ai": "0.87.1",

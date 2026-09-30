@@ -24,3 +24,11 @@ export function assertRequestCountRevision(previous:ModelConfiguration,candidate
   const expected={...previous,maxRequests:undefined,...(previous.fileTools?{fileTools:{...previous.fileTools,maxModelRequests:undefined}}:{})};
   if(!candidate.approved || policyText(expected)!==policyText(candidate))throw new Error('model_revision_scope');
 }
+
+/** Trusted, explicitly approved tool-scope change; never resets cost or request history. */
+export function assertToolScopeRevision(previous:ModelConfiguration,candidate:ModelConfiguration):void {
+  const expected={...previous};delete expected.fileTools;delete expected.shellTools;
+  if(candidate.fileTools)expected.fileTools=candidate.fileTools;
+  if(candidate.shellTools)expected.shellTools=candidate.shellTools;
+  if(!candidate.approved || (previous.fileTools?.maxModelRequests??null)!==(candidate.fileTools?.maxModelRequests??null) || policyText(expected)!==policyText(candidate))throw new Error('model_revision_scope');
+}
