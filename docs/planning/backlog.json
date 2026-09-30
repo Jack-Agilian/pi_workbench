@@ -604,7 +604,8 @@
             "EV-D2S-V4-20260928",
             "EV-D2S-S01-REVIEW-20260928",
             "EV-D2S-S01-MAC-20260928",
-            "EV-D2S-S01-REGRESSION-20260928"
+            "EV-D2S-S01-REGRESSION-20260928",
+            "EV-AGENT-SHELL-SDK-20260930"
           ]
         },
         {
@@ -641,11 +642,13 @@
             "EV-D2S-V4-20260928",
             "EV-D2S-S01-REVIEW-20260928",
             "EV-D2S-S01-MAC-20260928",
-            "EV-D2S-S01-REGRESSION-20260928"
+            "EV-D2S-S01-REGRESSION-20260928",
+            "EV-AGENT-SHELL-SDK-20260930",
+            "EV-AGENT-SHELL-MAC-20260930"
           ]
         }
       ],
-      "statusReason": "B-IPC实际Worker内复用Pi write/edit与既有Operations，拒绝/版本/期限/取消通过；原子写入约束、完整Shell产品路径与其他平台仍未完成。 D2-S限定Mac非交互Bash产品链路通过；独立组/命令结果与副作用分开，D2-T、Windows及完整Gate仍未完成。 S01输出/收据字节预算修正后Mac产品与退出回归通过；仍不完成终端、其他平台或M0 Gate。"
+      "statusReason": "B-IPC实际Worker内复用Pi write/edit与既有Operations，拒绝/版本/期限/取消通过；原子写入约束、完整Shell产品路径与其他平台仍未完成。 D2-S限定Mac非交互Bash产品链路通过；独立组/命令结果与副作用分开，D2-T、Windows及完整Gate仍未完成。 S01输出/收据字节预算修正后Mac产品与退出回归通过；仍不完成终端、其他平台或M0 Gate。 Agent Shell显式动态Bash复用公开定义/Operations及原guardian，逐命令独立收据、普通非零结果/未知恢复已离线验证；真实任务待新授权。"
     },
     {
       "id": "SEC-01",
@@ -1784,12 +1787,87 @@
           "evidenceRefs": []
         }
       ],
-      "statusReason": "M2-A/B有限Markdown Agent、多请求账本、逐操作审批/结果及Mac实际进程/桌面链路已离线验证；A05真实模型工具任务尚未验收，当前唯一事项M2-C新计划与授权准备。原4/4耗尽，本轮0次真实调用；不完成M0-Pi。 远程Mac复审两处正确性修正及四条新增回归通过；独立审核分支待集成，真实M2驱动与新授权按验收方案继续，A05未完成。"
+      "statusReason": "M2-A/B及复审、验收驱动已在当前Agent Shell功能分支集成，A01–A04沿用各自限定离线证据；A05真实文件任务仍缺新授权/证据。后续Bash主功能登记MODEL-04，不完成M0-Pi。旧4/4额度耗尽，当前次序以NEXT_STEPS顶部为准。"
+    },
+    {
+      "id": "MODEL-04",
+      "priority": "P0",
+      "ownerRole": "Tech Lead",
+      "state": "in_progress",
+      "githubIssueNumber": null,
+      "dependencies": [
+        "MODEL-03"
+      ],
+      "sourceDependencyText": "2026-09-29用户要求优先模型动态Bash与工作目录主功能；复用M2模块，不等待其真实Gate完成才实现离线接缝。",
+      "workAndAcceptance": "Pi原生循环中显式Bash权限、逐命令审批/启动日志/独立收据、非零返回、拒绝取消/故障恢复，以及可信目录选择/桌面状态；集中离线后获新授权真实任务。",
+      "reuseRefs": [
+        "agent-session",
+        "models-auth",
+        "shell",
+        "product-coordination",
+        "desktop-ui"
+      ],
+      "implementationStatus": "in_progress",
+      "githubIssueUrl": null,
+      "issueVerificationStatus": "not_checked",
+      "issueEvidence": [],
+      "acceptanceDependencies": [],
+      "requiredEvidenceKinds": [
+        "model",
+        "platform"
+      ],
+      "acceptanceCriteria": [
+        {
+          "id": "MODEL-04-A01",
+          "requirement": "显式Bash策略复用公开定义/Operations，同Run逐命令审批/领取/持久启动及独立收据",
+          "plannedChecks": [
+            "agent-shell-sequential",
+            "agent-shell-policy-fences"
+          ],
+          "evidenceRefs": [
+            "EV-AGENT-SHELL-SDK-20260930",
+            "EV-AGENT-SHELL-MAC-20260930"
+          ]
+        },
+        {
+          "id": "MODEL-04-A02",
+          "requirement": "已知非零退出返回Pi，拒绝/超时/取消/未知阻断；真实宿主/Worker故障后只对账不重放",
+          "plannedChecks": [
+            "agent-shell-nonzero",
+            "agent-shell-real-process-recovery"
+          ],
+          "evidenceRefs": [
+            "EV-AGENT-SHELL-SDK-20260930",
+            "EV-AGENT-SHELL-MAC-20260930"
+          ]
+        },
+        {
+          "id": "MODEL-04-A03",
+          "requirement": "原生目录选择经可信宿主登记，旧Thread不改目录，桌面显示阶段/命令结果且核心动作可见",
+          "plannedChecks": [
+            "agent-shell-workspace",
+            "agent-shell-desktop-layout"
+          ],
+          "evidenceRefs": [
+            "EV-AGENT-SHELL-UI-20260930",
+            "EV-AGENT-SHELL-MAC-20260930"
+          ]
+        },
+        {
+          "id": "MODEL-04-A04",
+          "requirement": "新授权下真实模型自主完成有限项目任务，记录逐请求/命令/批准/副作用及恢复证据",
+          "plannedChecks": [
+            "agent-shell-live-task"
+          ],
+          "evidenceRefs": []
+        }
+      ],
+      "statusReason": "P0-A/B/C已限定离线验证：15项实际Pi/命令/进程恢复、20项桌面宿主及真实Electron6组尺寸检查；普通非零继续、拒绝/未知阻断。A04/P0-D真实任务缺新授权/证据，旧4/4耗尽；不完成M0-Pi或通用沙箱。"
     }
   ],
   "decisionSource": "../ssot/README.md",
   "historicalSource": "../startup/docs/08-delivery-and-references.md",
-  "updatedOn": "2026-09-29",
+  "updatedOn": "2026-09-30",
   "milestones": [
     {
       "id": "M0-UI",

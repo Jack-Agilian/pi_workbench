@@ -53,3 +53,8 @@ MODEL-03-A01至A04有离线SDK/平台限定证据，A05仍缺真实模型证据�
 ## 实机复审补充：2026-09-29
 
 [复审证据](../validation/review-m2-2026-09-29.md) 明确：有效 UTF-8 Markdown 的 BOM 也属于文件字节身份，宿主预演与 Pi 实际输入必须一致；不能把已剥离 BOM 的显示文本用于原字节摘要。已确认清理后，未知 read 不因当前文件已变成超大/非法 UTF-8 而阻塞恢复，结算 failed 不表示它从未读取。write/edit 仍严格核验副作用。M2-C 按 [新授权方案](../planning/M2_C_ACCEPTANCE_PLAN.md) 准备，MODEL-03 与 M0-Pi 不由此晋级。
+
+
+## 后续接缝：Agent Shell（2026-09-30）
+
+M2本身的Markdown边界保留。新增显式shellTools、普通非零命令继续、目录选择及SQL v9/IPC v7由 [独立契约](agent-shell-contract.md)定义；前述“失败操作阻断续轮”对文件操作仍成立，普通已知非零Bash是新模式的限定例外。旧M2真实验证驱动仅验收文件权限，拒绝带shellTools的配置，不能据它验收Bash。

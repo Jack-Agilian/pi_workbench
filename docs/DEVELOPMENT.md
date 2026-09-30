@@ -265,7 +265,7 @@ npm run test:desktop-ui
 
 桌面入口不隐式下载。prepare 只支持本轮实测的 macOS arm64，核验官方归档 SHA-256 后用系统 ditto 解包；npm scripts 仍禁用，不调用第三方 lifecycle。默认文档 bootstrap 不变；`--app --offline` 之后须再次运行 `prepare:desktop -- --offline`。Electron/React/esbuild 版本与实际 ABI 见 [C 报告](validation/c-desktop-2026-09-23.md) 和 [完整性记录](validation/c-desktop-inputs.json)。
 
-`npm run desktop` 固定选择 --demo，所有 Assistant 都标记合成、无模型。演示库/工作区/Session/浏览器状态仅保存在项目 `.artifacts/desktop-demo/`，实际 Pi write 在批准后写 Markdown。关闭等待宿主/Worker 清理；unknown 时先核验，不自动重跑。它不会打开真实用户目录或读取账户。暂不提供自由目录选择、登录或生产启动模式。
+`npm run desktop` 固定选择 --demo，所有 Assistant 都标记合成、无模型。演示库/工作区/Session/浏览器状态仅保存在项目 `.artifacts/desktop-demo/`，实际 Pi write 在批准后写 Markdown。关闭等待宿主/Worker 清理；unknown 时先核验，不自动重跑。它不会打开真实用户目录或读取账户。C历史阶段未提供目录选择；当前受信任目录入口见下方Agent Shell说明。登录和生产发行仍未完成。
 
 `test:desktop` 使用独立临时 workspace/profile 和禁网 SDK；`test:desktop-ui` 启动真正 Electron 窗口，走 UI/受限 IPC/真实 Worker 的允许、拒绝、取消、宿主强杀恢复四场景，并检查文本注入、脱敏、文件变化、线程/草稿隔离。测试截图及日志放 `.artifacts/c-desktop/`，临时 profile 在测试后移除。窗口测试可在锁屏下执行，但不能据此声称人工/原生输入法/读屏验收。
 
@@ -324,3 +324,16 @@ npm run demo:file-agent
 前两套新测试分别覆盖实际SDK/受限Worker/宿主HTTP接缝的合成OpenAI响应，以及实际Electron/Host/Pi工具的fauxProvider桌面演示；都不访问真实服务。显式 `--model-files-offline` 是本机开发组合入口，Renderer无法选择worker代码或合成故障。演示profile与model-profile分离，自动测试使用临时目录及隔离环境。
 
 正常模型配置只有显式fileTools才注册read/write/edit；SQL v8迁移保留旧预算，IPC v6增加逐工具结算与逐HTTP关闭确认。有限文件/计时/恢复范围和当前未测项见 [契约](ssot/m2-file-agent-contract.md)、[报告](validation/m2-file-agent-2026-09-29.md)。本轮未运行新的初始化/新克隆，也未改变历史声明补丁；不要把历史初始化证据改成当前SHA实测。
+
+
+## Agent Shell：目录选择与逐命令执行
+
+```bash
+npm run test:product-model-shell
+npm run test:desktop-agent-shell
+npm run demo:agent-shell
+```
+
+使用已安装的固定Node/Pi/Electron，不自动下载。演示采用专用offline-shell-profile、明确SYNTHETIC的Provider，实际执行Pi Bash。可选择独立工作目录并创建新会话，每条命令须批准；非零退出回到Pi，下一条命令仍单独审批。Bash能改变该目录内任意类型文件，停止不回滚；它不自动登记成果。建议用专门的无敏感测试目录体验，勿选择包含凭据的目录。
+
+真实模式继续使用 `npm run desktop:model` 与仓库外现有model.json/auth.json入口；需要显式shellTools及新的授权，旧配置不会自动启用。限额、SQL v9/IPC v7、恢复清单和已测平台见 [契约](ssot/agent-shell-contract.md)。受保护的应用profile/配置目录及其祖先或子目录不能成为自选workspace，活动任务期间不能切换；已存在会话保持原目录。此前章节的旧schema/协议数字描述各历史增量。

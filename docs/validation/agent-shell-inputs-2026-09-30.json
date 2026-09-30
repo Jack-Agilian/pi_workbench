@@ -1,0 +1,921 @@
+{
+  "scope": "Actual macOS Pi/Electron/files/processes, explicitly synthetic Provider only; zero real model calls. Code trees match listed commits; documentation edits remained uncommitted during code tests.",
+  "recordedAt": "2026-09-30T01:53:59.392951+00:00",
+  "baseline": "51ea53462eacdc4ed8ffc3fb48b260b87631b5a2",
+  "develop": "148022b05250cfda824725778e9a056d00cd6830",
+  "environment": {
+    "recordedAt": "2026-09-30T01:49:51.056207+00:00",
+    "macOS": "27.0",
+    "machine": "arm64",
+    "node": "{\"version\":\"v24.21.0\",\"arch\":\"arm64\"}",
+    "rosetta": "0"
+  },
+  "runs": [
+    {
+      "commit": "6cd011a2cc57a6a5e9eb7a73e7f4f994291de9d3",
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "seconds": 2.07,
+      "rawLogSha256": "22df5d47848ff6e1f3c0926a3aa3f05da31fb2c76601187b826c3ad4d7870689",
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "6cd011a2cc57a6a5e9eb7a73e7f4f994291de9d3",
+      "command": "npm run test:pi-types",
+      "exitCode": 0,
+      "seconds": 2.67,
+      "rawLogSha256": "2da678b4f0cdcf3aa1c0290def01d74d573081b6d8c17dcb7c9a23d5ad523e8c",
+      "tests": 10,
+      "passed": 10,
+      "failed": 0,
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "6cd011a2cc57a6a5e9eb7a73e7f4f994291de9d3",
+      "command": "npm run test:pi-probe",
+      "exitCode": 0,
+      "seconds": 1.28,
+      "rawLogSha256": "4ae9b8c0b6a870a48f9b3d44c221944c9d9c7c75070724ecabddc98b25f05a16",
+      "tests": 15,
+      "passed": 15,
+      "failed": 0,
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "6cd011a2cc57a6a5e9eb7a73e7f4f994291de9d3",
+      "command": "npm run test:pi-tools",
+      "exitCode": 0,
+      "seconds": 0.99,
+      "rawLogSha256": "3989977bd36abd104e675d1ce652f7f47e965bb06a626a8fe4cf8d4f71635fcb",
+      "tests": 19,
+      "passed": 19,
+      "failed": 0,
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "6cd011a2cc57a6a5e9eb7a73e7f4f994291de9d3",
+      "command": "npm run test:pi-shell",
+      "exitCode": 0,
+      "seconds": 1.11,
+      "rawLogSha256": "4b62c8e55178b239e52e5c42d517c2bbe63d9b0ad4028f6df05dc2cc850957be",
+      "tests": 4,
+      "passed": 4,
+      "failed": 0,
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "6cd011a2cc57a6a5e9eb7a73e7f4f994291de9d3",
+      "command": "npm run test:pi-resources",
+      "exitCode": 0,
+      "seconds": 0.99,
+      "rawLogSha256": "8e307451f9ff43e608a7033c49ba40381e63c31bd7de66fa58760b3da0f34dff",
+      "tests": 12,
+      "passed": 12,
+      "failed": 0,
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "6cd011a2cc57a6a5e9eb7a73e7f4f994291de9d3",
+      "command": "npm run test:pi-auth",
+      "exitCode": 0,
+      "seconds": 0.95,
+      "rawLogSha256": "500fcd2b2db69804ff6c9f62efcf0545da515291b290502c2084d799c72440b3",
+      "tests": 18,
+      "passed": 18,
+      "failed": 0,
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "6cd011a2cc57a6a5e9eb7a73e7f4f994291de9d3",
+      "command": "npm run test:pi-packages",
+      "exitCode": 1,
+      "seconds": 0.13,
+      "rawLogSha256": "5751c20e19b8f55ebc8c02287e9694608e7d82d6e68c001ec11f18f348564c28",
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "6cd011a2cc57a6a5e9eb7a73e7f4f994291de9d3",
+      "command": "npm run test:product-core",
+      "exitCode": 0,
+      "seconds": 0.73,
+      "rawLogSha256": "b8b6ef5a3329df9eadd1a158c5df2c12f0df78d373c6fa83b54f76117687d353",
+      "tests": 20,
+      "passed": 20,
+      "failed": 0,
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "6cd011a2cc57a6a5e9eb7a73e7f4f994291de9d3",
+      "command": "npm run test:product-sdk",
+      "exitCode": 1,
+      "seconds": 1.0,
+      "rawLogSha256": "fb20c2399433de8d86842d3b1da1b96138f4cde46ee0eeb3bc7ecdc2ea368f5f",
+      "tests": 5,
+      "passed": 4,
+      "failed": 1,
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "6cd011a2cc57a6a5e9eb7a73e7f4f994291de9d3",
+      "command": "npm run test:product-worker",
+      "exitCode": 0,
+      "seconds": 31.69,
+      "rawLogSha256": "121967a0a6be0d9cfaaa75039e674c31e3c8c6159d1bd4b50a2df7a790f2e676",
+      "tests": 51,
+      "passed": 51,
+      "failed": 0,
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "6cd011a2cc57a6a5e9eb7a73e7f4f994291de9d3",
+      "command": "npm run test:product-shell",
+      "exitCode": 0,
+      "seconds": 17.71,
+      "rawLogSha256": "17b61433a704047c2c0c0c8d3bd3067fc125f0385ea4f4c309fa12219843e747",
+      "tests": 28,
+      "passed": 28,
+      "failed": 0,
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "6cd011a2cc57a6a5e9eb7a73e7f4f994291de9d3",
+      "command": "npm run test:model-integration-offline",
+      "exitCode": 0,
+      "seconds": 28.78,
+      "rawLogSha256": "caab5fbe7bdb708fd10b9263062c39d5ba2b6e127846134e02f4c6f240e4a102",
+      "tests": 42,
+      "passed": 42,
+      "failed": 0,
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "6cd011a2cc57a6a5e9eb7a73e7f4f994291de9d3",
+      "command": "npm run test:model-resume",
+      "exitCode": 0,
+      "seconds": 1.88,
+      "rawLogSha256": "2b78115fee2ba77edcf9799c320c02efebe7900f47531665bd2df1879f7f433c",
+      "tests": 11,
+      "passed": 11,
+      "failed": 0,
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "6cd011a2cc57a6a5e9eb7a73e7f4f994291de9d3",
+      "command": "npm run test:model-network",
+      "exitCode": 0,
+      "seconds": 0.74,
+      "rawLogSha256": "ba5472059f8ce897c12d82cbbc1f46ef480af64adb537831fc033e2c3c1bcbb5",
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "6cd011a2cc57a6a5e9eb7a73e7f4f994291de9d3",
+      "command": "npm run test:model-config",
+      "exitCode": 0,
+      "seconds": 9.18,
+      "rawLogSha256": "0cbb2b20da067fe2ba8d1b7d0cf446375daee7ee1d1ee15fcfd8da945f1e27eb",
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "6cd011a2cc57a6a5e9eb7a73e7f4f994291de9d3",
+      "command": "npm run test:product-file-agent",
+      "exitCode": 0,
+      "seconds": 24.91,
+      "rawLogSha256": "bb4d6f068547c962a5941e453be00a0421c69cb877bb2f4a165476e4d7f78774",
+      "tests": 34,
+      "passed": 34,
+      "failed": 0,
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "6cd011a2cc57a6a5e9eb7a73e7f4f994291de9d3",
+      "command": "npm run test:product-model-shell",
+      "exitCode": 0,
+      "seconds": 9.86,
+      "rawLogSha256": "d33fef23add60aadfa68d2213fd43498957eb8ab71adddea87890c7971e0c74c",
+      "tests": 15,
+      "passed": 15,
+      "failed": 0,
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "6cd011a2cc57a6a5e9eb7a73e7f4f994291de9d3",
+      "command": "npm run test:file-acceptance",
+      "exitCode": 1,
+      "seconds": 6.03,
+      "rawLogSha256": "bdfbf396c00463828cacdff4672800e0c04324d0c32d060b51d4c948be49d901",
+      "tests": 22,
+      "passed": 13,
+      "failed": 9,
+      "cliCleanGateOnly": true
+    },
+    {
+      "commit": "6cd011a2cc57a6a5e9eb7a73e7f4f994291de9d3",
+      "command": "npm run test:desktop",
+      "exitCode": 0,
+      "seconds": 13.21,
+      "rawLogSha256": "cadd5729379c92babb4cd3388447a33d3df2265db018bbe7ddfe7e12f9792038",
+      "tests": 20,
+      "passed": 20,
+      "failed": 0,
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "6cd011a2cc57a6a5e9eb7a73e7f4f994291de9d3",
+      "command": "npm run test:desktop-ui",
+      "exitCode": 0,
+      "seconds": 12.52,
+      "rawLogSha256": "dd88789897ad9ad91938110e92943fb845efe217e672040ac006fbe15a27240f",
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "6cd011a2cc57a6a5e9eb7a73e7f4f994291de9d3",
+      "command": "npm run test:desktop-shell",
+      "exitCode": 0,
+      "seconds": 4.87,
+      "rawLogSha256": "538b7045d50c8a3fc379b2f6ecf258a1aba9d51ac717e44395288b7b0c740738",
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "6cd011a2cc57a6a5e9eb7a73e7f4f994291de9d3",
+      "command": "npm run test:desktop-model",
+      "exitCode": 0,
+      "seconds": 4.43,
+      "rawLogSha256": "8fbf83b307d1c7011a7f81449537362510d2951cf4c2f2985585ec7224788624",
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "6cd011a2cc57a6a5e9eb7a73e7f4f994291de9d3",
+      "command": "npm run test:desktop-file-agent",
+      "exitCode": 0,
+      "seconds": 5.48,
+      "rawLogSha256": "7c7997842b752009e5039aa8ce7aea58dbeb5e943947008b5725c88ef5565f1d",
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "6cd011a2cc57a6a5e9eb7a73e7f4f994291de9d3",
+      "command": "npm run test:desktop-agent-shell",
+      "exitCode": 0,
+      "seconds": 5.27,
+      "rawLogSha256": "8cfc3ca8da07d2d02e7ddcfdb1278f827aa8be2e7d5d072cb68818811122cf5c",
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "6cd011a2cc57a6a5e9eb7a73e7f4f994291de9d3",
+      "command": "npm run test:desktop-shutdown",
+      "exitCode": 0,
+      "seconds": 49.65,
+      "rawLogSha256": "c656412630ec8934c704d7e49900c370b4511c442b64d89f747290c7520d477a",
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "0c28ed294ced615892f36b827f8d032a7161bc0b",
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "seconds": 2.04,
+      "rawLogSha256": "22df5d47848ff6e1f3c0926a3aa3f05da31fb2c76601187b826c3ad4d7870689",
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "0c28ed294ced615892f36b827f8d032a7161bc0b",
+      "command": "npm run test:pi-packages",
+      "exitCode": 0,
+      "seconds": 3.6,
+      "rawLogSha256": "b25292dc0154acc93e4c4d454b9586f486eac73e0660066098fcae040bebb8c8",
+      "tests": 8,
+      "passed": 8,
+      "failed": 0,
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "0c28ed294ced615892f36b827f8d032a7161bc0b",
+      "command": "npm run test:product-core",
+      "exitCode": 0,
+      "seconds": 0.73,
+      "rawLogSha256": "e114335d2fd5dbd70bb9036c55b7eedf9f462f65489465eb61a11d5286568680",
+      "tests": 20,
+      "passed": 20,
+      "failed": 0,
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "0c28ed294ced615892f36b827f8d032a7161bc0b",
+      "command": "npm run test:product-sdk",
+      "exitCode": 0,
+      "seconds": 1.06,
+      "rawLogSha256": "61f19fc0e449ce4860da0e3680503114042966870cd90de33c71e2ab24cf0fb0",
+      "tests": 5,
+      "passed": 5,
+      "failed": 0,
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "0c28ed294ced615892f36b827f8d032a7161bc0b",
+      "command": "npm run test:product-worker",
+      "exitCode": 0,
+      "seconds": 31.14,
+      "rawLogSha256": "9e34fbf3c7a32d0c20d7159d44cb096fd70ac5f1a2db5e64d961d967c13e9c24",
+      "tests": 51,
+      "passed": 51,
+      "failed": 0,
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "0c28ed294ced615892f36b827f8d032a7161bc0b",
+      "command": "npm run test:product-shell",
+      "exitCode": 0,
+      "seconds": 17.38,
+      "rawLogSha256": "7b27aa7920f8ab78f6886978a5e4d31b7cdec3411b56eed40c9895d118dacedf",
+      "tests": 28,
+      "passed": 28,
+      "failed": 0,
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "0c28ed294ced615892f36b827f8d032a7161bc0b",
+      "command": "npm run test:model-integration-offline",
+      "exitCode": 0,
+      "seconds": 27.75,
+      "rawLogSha256": "87114cf961822ddc83a7b6895ace1f2d472519549d56f4a290ed287379f3f1d6",
+      "tests": 42,
+      "passed": 42,
+      "failed": 0,
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "0c28ed294ced615892f36b827f8d032a7161bc0b",
+      "command": "npm run test:product-file-agent",
+      "exitCode": 0,
+      "seconds": 23.88,
+      "rawLogSha256": "81be57d10b8897cb8edd5b268dad34d7f3d8387a079d8515178beb4cecf2ab55",
+      "tests": 34,
+      "passed": 34,
+      "failed": 0,
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "0c28ed294ced615892f36b827f8d032a7161bc0b",
+      "command": "npm run test:product-model-shell",
+      "exitCode": 0,
+      "seconds": 9.45,
+      "rawLogSha256": "d0b0235c562582318e1773aaef21f3517c8334dad6d1769f3a2ac808e37dd537",
+      "tests": 15,
+      "passed": 15,
+      "failed": 0,
+      "cliCleanGateOnly": false
+    },
+    {
+      "commit": "0c28ed294ced615892f36b827f8d032a7161bc0b",
+      "command": "npm run test:file-acceptance",
+      "exitCode": 0,
+      "seconds": 5.81,
+      "rawLogSha256": "f2a7821a7d66ccf5c0836e974e71c48410daeed3c41ccbef0002ebe3dc7d6e85",
+      "tests": 23,
+      "passed": 23,
+      "failed": 0,
+      "cliCleanGateOnly": true
+    },
+    {
+      "commit": "0c28ed294ced615892f36b827f8d032a7161bc0b",
+      "command": "npm run test:desktop",
+      "exitCode": 0,
+      "seconds": 12.83,
+      "rawLogSha256": "680e707d528f30f626572e382ef300e57f509f9cbe3c7d8020c3ed170e94e8d2",
+      "tests": 20,
+      "passed": 20,
+      "failed": 0,
+      "cliCleanGateOnly": false
+    }
+  ],
+  "screenshots": [
+    {
+      "path": "docs/validation/agent-shell-expanded-820.png",
+      "commit": "6cd011a2cc57a6a5e9eb7a73e7f4f994291de9d3",
+      "sha256": "8818a6707d37bc6c7ccd4931213e903263affa40456625045b2ae50b3a19caaa",
+      "scope": "Actual Electron capture, synthetic temporary workspace path and Provider, synthetic native-dialog selection."
+    },
+    {
+      "path": "docs/validation/agent-shell-approval-1320.png",
+      "commit": "6cd011a2cc57a6a5e9eb7a73e7f4f994291de9d3",
+      "sha256": "75fc86b0f6d14d85f3ea03111991d5216ac1ed5503a44c41e73148fdea9d0869",
+      "scope": "Actual Electron capture, synthetic temporary workspace path and Provider, synthetic native-dialog selection."
+    }
+  ],
+  "limitations": [
+    "No real model, new request budget, manual IME/accessibility, Windows, PTY, arbitrary detached descendants, production sandbox, reinstall or fresh clone tested.",
+    "File acceptance suite during documentation edits tests dirty-code admission; clean-checkout CLI preparation is recorded separately after documentation commit."
+  ],
+  "layout": {
+    "agent-shell-approval": [
+      {
+        "viewport": {
+          "width": 1320,
+          "height": 860
+        },
+        "bodyOverflow": false,
+        "approvalActionable": true,
+        "stopVisible": true,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 208,
+          "height": 860,
+          "scrollHeight": 860,
+          "clientHeight": 860,
+          "visible": true
+        },
+        "header": {
+          "x": 208,
+          "y": 44,
+          "width": 1112,
+          "height": 86.390625,
+          "scrollHeight": 86,
+          "clientHeight": 86,
+          "visible": true
+        },
+        "timeline": {
+          "x": 208,
+          "y": 158.5859375,
+          "width": 806,
+          "height": 552.0234375,
+          "scrollHeight": 552,
+          "clientHeight": 552,
+          "visible": true
+        },
+        "composer": {
+          "x": 226,
+          "y": 710.609375,
+          "width": 770,
+          "height": 135.390625,
+          "scrollHeight": 133,
+          "clientHeight": 133,
+          "visible": true
+        },
+        "inspector": {
+          "x": 1014,
+          "y": 158.5859375,
+          "width": 306,
+          "height": 701.4140625,
+          "scrollHeight": 779,
+          "clientHeight": 701,
+          "visible": true
+        },
+        "approval": {
+          "x": 1029,
+          "y": 209.3828125,
+          "width": 262,
+          "height": 447.125,
+          "scrollHeight": 445,
+          "clientHeight": 445,
+          "visible": true
+        },
+        "approve": {
+          "x": 1194,
+          "y": 608.3125,
+          "width": 84,
+          "height": 35.1953125,
+          "scrollHeight": 33,
+          "clientHeight": 33,
+          "visible": true
+        },
+        "stop": {
+          "x": 938,
+          "y": 176.5859375,
+          "width": 54,
+          "height": 32,
+          "scrollHeight": 30,
+          "clientHeight": 30,
+          "visible": true
+        }
+      },
+      {
+        "viewport": {
+          "width": 1024,
+          "height": 720
+        },
+        "bodyOverflow": false,
+        "approvalActionable": true,
+        "stopVisible": true,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 180,
+          "height": 720,
+          "scrollHeight": 720,
+          "clientHeight": 720,
+          "visible": true
+        },
+        "header": {
+          "x": 180,
+          "y": 44,
+          "width": 844,
+          "height": 82.390625,
+          "scrollHeight": 82,
+          "clientHeight": 82,
+          "visible": true
+        },
+        "timeline": {
+          "x": 180,
+          "y": 181.78125,
+          "width": 580,
+          "height": 390.828125,
+          "scrollHeight": 391,
+          "clientHeight": 391,
+          "visible": true
+        },
+        "composer": {
+          "x": 194,
+          "y": 572.609375,
+          "width": 552,
+          "height": 135.390625,
+          "scrollHeight": 133,
+          "clientHeight": 133,
+          "visible": true
+        },
+        "inspector": {
+          "x": 760,
+          "y": 181.78125,
+          "width": 264,
+          "height": 538.21875,
+          "scrollHeight": 820,
+          "clientHeight": 538,
+          "visible": true
+        },
+        "approval": {
+          "x": 775,
+          "y": 232.578125,
+          "width": 220,
+          "height": 488.71875,
+          "scrollHeight": 487,
+          "clientHeight": 487,
+          "visible": true
+        },
+        "approve": {
+          "x": 898,
+          "y": 668.8046875,
+          "width": 84,
+          "height": 35.1953125,
+          "scrollHeight": 33,
+          "clientHeight": 33,
+          "visible": true
+        },
+        "stop": {
+          "x": 690,
+          "y": 197.78125,
+          "width": 54,
+          "height": 32,
+          "scrollHeight": 30,
+          "clientHeight": 30,
+          "visible": true
+        }
+      },
+      {
+        "viewport": {
+          "width": 820,
+          "height": 640
+        },
+        "bodyOverflow": false,
+        "approvalActionable": true,
+        "stopVisible": true,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 154,
+          "height": 640,
+          "scrollHeight": 640,
+          "clientHeight": 640,
+          "visible": true
+        },
+        "header": {
+          "x": 154,
+          "y": 44,
+          "width": 666,
+          "height": 78.390625,
+          "scrollHeight": 78,
+          "clientHeight": 78,
+          "visible": true
+        },
+        "timeline": {
+          "x": 154,
+          "y": 177.78125,
+          "width": 406,
+          "height": 316.828125,
+          "scrollHeight": 317,
+          "clientHeight": 317,
+          "visible": true
+        },
+        "composer": {
+          "x": 164,
+          "y": 494.609375,
+          "width": 386,
+          "height": 135.390625,
+          "scrollHeight": 133,
+          "clientHeight": 133,
+          "visible": true
+        },
+        "inspector": {
+          "x": 560,
+          "y": 177.78125,
+          "width": 260,
+          "height": 462.21875,
+          "scrollHeight": 796,
+          "clientHeight": 462,
+          "visible": true
+        },
+        "approval": {
+          "x": 571,
+          "y": 224.578125,
+          "width": 224,
+          "height": 467.921875,
+          "scrollHeight": 466,
+          "clientHeight": 466,
+          "visible": true
+        },
+        "approve": {
+          "x": 698,
+          "y": 592.8046875,
+          "width": 84,
+          "height": 35.1953125,
+          "scrollHeight": 33,
+          "clientHeight": 33,
+          "visible": true
+        },
+        "stop": {
+          "x": 492,
+          "y": 191.78125,
+          "width": 54,
+          "height": 32,
+          "scrollHeight": 30,
+          "clientHeight": 30,
+          "visible": true
+        }
+      }
+    ],
+    "agent-shell-expanded": [
+      {
+        "viewport": {
+          "width": 1320,
+          "height": 860
+        },
+        "bodyOverflow": false,
+        "approvalActionable": true,
+        "stopVisible": true,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 208,
+          "height": 860,
+          "scrollHeight": 860,
+          "clientHeight": 860,
+          "visible": true
+        },
+        "header": {
+          "x": 208,
+          "y": 44,
+          "width": 1112,
+          "height": 86.390625,
+          "scrollHeight": 86,
+          "clientHeight": 86,
+          "visible": true
+        },
+        "timeline": {
+          "x": 208,
+          "y": 158.5859375,
+          "width": 806,
+          "height": 552.0234375,
+          "scrollHeight": 552,
+          "clientHeight": 552,
+          "visible": true
+        },
+        "composer": {
+          "x": 226,
+          "y": 710.609375,
+          "width": 770,
+          "height": 135.390625,
+          "scrollHeight": 133,
+          "clientHeight": 133,
+          "visible": true
+        },
+        "inspector": {
+          "x": 1014,
+          "y": 158.5859375,
+          "width": 306,
+          "height": 701.4140625,
+          "scrollHeight": 854,
+          "clientHeight": 701,
+          "visible": true
+        },
+        "approval": {
+          "x": 1029,
+          "y": 209.3828125,
+          "width": 262,
+          "height": 523.109375,
+          "scrollHeight": 521,
+          "clientHeight": 521,
+          "visible": true
+        },
+        "approve": {
+          "x": 1194,
+          "y": 684.296875,
+          "width": 84,
+          "height": 35.1953125,
+          "scrollHeight": 33,
+          "clientHeight": 33,
+          "visible": true
+        },
+        "stop": {
+          "x": 938,
+          "y": 176.5859375,
+          "width": 54,
+          "height": 32,
+          "scrollHeight": 30,
+          "clientHeight": 30,
+          "visible": true
+        }
+      },
+      {
+        "viewport": {
+          "width": 1024,
+          "height": 720
+        },
+        "bodyOverflow": false,
+        "approvalActionable": true,
+        "stopVisible": true,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 180,
+          "height": 720,
+          "scrollHeight": 720,
+          "clientHeight": 720,
+          "visible": true
+        },
+        "header": {
+          "x": 180,
+          "y": 44,
+          "width": 844,
+          "height": 82.390625,
+          "scrollHeight": 82,
+          "clientHeight": 82,
+          "visible": true
+        },
+        "timeline": {
+          "x": 180,
+          "y": 181.78125,
+          "width": 580,
+          "height": 390.828125,
+          "scrollHeight": 391,
+          "clientHeight": 391,
+          "visible": true
+        },
+        "composer": {
+          "x": 194,
+          "y": 572.609375,
+          "width": 552,
+          "height": 135.390625,
+          "scrollHeight": 133,
+          "clientHeight": 133,
+          "visible": true
+        },
+        "inspector": {
+          "x": 760,
+          "y": 181.78125,
+          "width": 264,
+          "height": 538.21875,
+          "scrollHeight": 896,
+          "clientHeight": 538,
+          "visible": true
+        },
+        "approval": {
+          "x": 775,
+          "y": 232.578125,
+          "width": 220,
+          "height": 564.703125,
+          "scrollHeight": 563,
+          "clientHeight": 563,
+          "visible": true
+        },
+        "approve": {
+          "x": 898,
+          "y": 668.8046875,
+          "width": 84,
+          "height": 35.1953125,
+          "scrollHeight": 33,
+          "clientHeight": 33,
+          "visible": true
+        },
+        "stop": {
+          "x": 690,
+          "y": 197.78125,
+          "width": 54,
+          "height": 32,
+          "scrollHeight": 30,
+          "clientHeight": 30,
+          "visible": true
+        }
+      },
+      {
+        "viewport": {
+          "width": 820,
+          "height": 640
+        },
+        "bodyOverflow": false,
+        "approvalActionable": true,
+        "stopVisible": true,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 154,
+          "height": 640,
+          "scrollHeight": 640,
+          "clientHeight": 640,
+          "visible": true
+        },
+        "header": {
+          "x": 154,
+          "y": 44,
+          "width": 666,
+          "height": 78.390625,
+          "scrollHeight": 78,
+          "clientHeight": 78,
+          "visible": true
+        },
+        "timeline": {
+          "x": 154,
+          "y": 177.78125,
+          "width": 406,
+          "height": 316.828125,
+          "scrollHeight": 317,
+          "clientHeight": 317,
+          "visible": true
+        },
+        "composer": {
+          "x": 164,
+          "y": 494.609375,
+          "width": 386,
+          "height": 135.390625,
+          "scrollHeight": 133,
+          "clientHeight": 133,
+          "visible": true
+        },
+        "inspector": {
+          "x": 560,
+          "y": 177.78125,
+          "width": 260,
+          "height": 462.21875,
+          "scrollHeight": 872,
+          "clientHeight": 462,
+          "visible": true
+        },
+        "approval": {
+          "x": 571,
+          "y": 224.578125,
+          "width": 224,
+          "height": 543.90625,
+          "scrollHeight": 542,
+          "clientHeight": 542,
+          "visible": true
+        },
+        "approve": {
+          "x": 698,
+          "y": 592.8046875,
+          "width": 84,
+          "height": 35.1953125,
+          "scrollHeight": 33,
+          "clientHeight": 33,
+          "visible": true
+        },
+        "stop": {
+          "x": 492,
+          "y": 191.78125,
+          "width": 54,
+          "height": 32,
+          "scrollHeight": 30,
+          "clientHeight": 30,
+          "visible": true
+        }
+      }
+    ]
+  },
+  "documentationChecks": {
+    "codeCommit": "0c28ed294ced615892f36b827f8d032a7161bc0b",
+    "documentationDiff": "Agent Shell contract/report, reuse-map evidence, MODEL-04 and current next step; docs/startup unchanged",
+    "commands": [
+      {
+        "command": ".venv/bin/python scripts/check-ssot.py",
+        "exitCode": 0
+      },
+      {
+        "command": ".venv/bin/python scripts/test-tools.py",
+        "exitCode": 0
+      },
+      {
+        "command": ".venv/bin/python scripts/check-docs.py --structural-only",
+        "exitCode": 0
+      },
+      {
+        "command": ".venv/bin/python scripts/check-docs.py --typecheck",
+        "exitCode": 0
+      }
+    ]
+  }
+}

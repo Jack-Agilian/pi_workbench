@@ -93,3 +93,6 @@ D2-S 的 [Shell 记录](../validation/d2-shell-2026-09-28.md) 将完整回归实
 M1 的 [离线报告](../validation/m1-2026-09-28.md) 区分完整回归实现 SHA 与仅新增长流测试 SHA。合成 Provider/SSE 只登记 sdk/mock，不登记 model；实际 loopback/OS 限制不冒充外部 TLS。M0-UI/M0-SDK 按原条件逐项核对通过，M0-Pi 因真实模型/工具任务证据缺失 blocked；MODEL-01 的限定 done 不推进全部认证、权限或 SDK 大工作项。
 
 M1 的[收口核对](../validation/m1-closeout-2026-09-29.md)将历史实现事实与本次文档补齐分开：能力的采用说明、验收条件与 evidenceRefs 同步，既有证据沿用原被测 SHA；新增代码/测试另记实际提交。用户确认30分钟产品默认值是决策，不是新的模型或平台实测。历史失败、4/4累计消费、旧配置与未完成 Gate 不因同步文档消失。
+
+
+Agent Shell的[本地实施报告](../validation/agent-shell-2026-09-30.md)将实现SHA的26命令初轮（含3条失败）、兼容修正SHA的11条受影响回归和Electron截图分开登记。MODEL-04仅in_progress；合成Provider不得标成model证据。SQL/目录选择及每命令收据不是新消息树，真实模型预算未增加，旧4/4和各Gate不变。仅文件验收驱动明确拒绝shellTools，不能用其成功替代Bash真实验收。

@@ -124,4 +124,7 @@ M2 实机复审：[两处正确性修正与 Mac 回归](../validation/review-m2-
 
 ## 主功能优先与前端布局（2026-09-29）
 
-用户要求将下一主线明确为模型驱动的沙箱Bash任务闭环，前端改进配套推进，见 [主功能/UI计划](../planning/AGENT_MVP_UI_PLAN.md)。[本轮布局实拍](../validation/ui-layout-2026-09-29.md) 已修复小窗口审批首屏不可见并完成限定Mac回归。动态Bash代码修改被远程工具拦截、未实施，不以UI结果替代Agent或真实模型验收。原授权和所有Gate状态不变；现有验收驱动只作为工具，不继续扩大为主线。
+用户要求将下一主线明确为模型驱动的沙箱Bash任务闭环，前端改进配套推进，见 [主功能/UI计划](../planning/AGENT_MVP_UI_PLAN.md)。[本轮布局实拍](../validation/ui-layout-2026-09-29.md) 已修复小窗口审批首屏不可见并完成限定Mac回归。后续动态Bash和目录入口已接入，见 [Agent Shell契约](agent-shell-contract.md)；不以离线/UI结果替代真实模型验收。原授权和所有Gate状态不变；现有验收驱动只作为工具，不继续扩大为主线。
+
+
+2026-09-30更新：[Agent Shell限定离线证据](../validation/agent-shell-2026-09-30.md)。MODEL-04限定实现继续in_progress，M0-Pi仍blocked；实际下一步以NEXT_STEPS顶部为准。

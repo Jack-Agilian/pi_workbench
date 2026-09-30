@@ -150,10 +150,15 @@ schema v7 的 model_policy_revisions 记录同授权的显式时间修订，mode
 
 用户确认单个 LLM 请求总上限默认30分钟，网络空闲默认5分钟，二者独立；Worker启动、Run编排和进程清理另计，详见 [时间契约](m1-model-contract.md)。缩时合成测试不代表30分钟真实服务实测。当前4/4授权已耗尽；M2离线开发不授权新的真实请求，M0-Pi仍blocked。采用条目与证据的逐项核对见 [收口报告](../validation/m1-closeout-2026-09-29.md)。
 
-M1已集成develop `27806bc61e3d9ffc3322c4c558c81bde79ad1e10`；[M2最小实施契约](m2-file-agent-contract.md)已整理，当前唯一事项为其离线实现。多请求预算、逐操作授权/结果、独立时间边界和安全展示仍待编码及验收，MODEL-03保持proposed。
+M1收口已集成develop `148022b05250cfda824725778e9a056d00cd6830`；[M2最小实施契约](m2-file-agent-contract.md)的限定离线实现与审核已在功能分支完成，MODEL-03为in_progress，真实任务尚未验收。当前动态Bash与目录接缝见 [Agent Shell契约](agent-shell-contract.md)，唯一推进顺序由NEXT_STEPS顶部定义。
 
 ## M2 当前接缝补充
 
 [M2契约](m2-file-agent-contract.md) 与 [离线证据](../validation/m2-file-agent-2026-09-29.md) 覆盖 SQL v8/IPC v6。Pi原生循环决定后续请求；宿主给每次HTTP独立身份/预算/期限，在关闭确认前不接下一个请求。每个read/write/edit各自持久意图/批准/领取/结果和清理，Run最终ok不复制为所有操作成功。正常结束仍回收每Run的实际Worker；重开只引用Pi原生Session。
 
 文件模式显式启用，旧零工具策略不扩权。有限文件摘要、参数和期限通过产品DTO显示；不透传Pi对象或凭据。监督器和监护器停止时立即屏蔽后续排队消息，清理证据仍由真实句柄/收据核验。前述更广的工具、平台与资源管理计划不因此全部完成。
+
+
+## Agent Shell补充（2026-09-30）
+
+[逐命令契约](agent-shell-contract.md)延续宿主所有权：SQL v9保存命令意图/启动标记与目录选择；IPC v7增加有界shell-operation。guardian每命令独立收据和最终清单用于真实重开对账，未知副作用不重发。只有普通已知非零退出可回到Pi继续；它仍是failed Operation，不能改写为成功。目录来自Electron原生框，已有Thread不迁移；旧配置不自动开放Bash，模型额度不重置。

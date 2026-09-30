@@ -90,4 +90,7 @@ M2 最新复审：[修正与实机证据](validation/review-m2-2026-09-29.md) ·
 
 ## 主功能与前端（2026-09-29）
 
-[主功能优先及前端优化分期](planning/AGENT_MVP_UI_PLAN.md) · [真实截图审查、布局修正与Mac回归](validation/ui-layout-2026-09-29.md)。下一主功能是模型自主Bash，不是PTY或更多验收设施；本轮只落地已验证的UI改动，运行时代码待本地接手。历史阶段的“唯一下一项”不覆盖当前NEXT_STEPS顶部。
+[主功能优先及前端优化分期](planning/AGENT_MVP_UI_PLAN.md) · [真实截图审查、布局修正与Mac回归](validation/ui-layout-2026-09-29.md)。下一主功能是模型自主Bash，不是PTY或更多验收设施；前期落地UI布局，本轮动态Bash与工作目录入口已接入，见 [Agent Shell契约](ssot/agent-shell-contract.md)。历史阶段的“唯一下一项”不覆盖当前NEXT_STEPS顶部。
+
+
+2026-09-30更新：[Agent Shell实施与回归](validation/agent-shell-2026-09-30.md)。MODEL-04限定实现继续in_progress，M0-Pi仍blocked；实际下一步以NEXT_STEPS顶部为准。

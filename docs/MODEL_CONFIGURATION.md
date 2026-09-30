@@ -143,3 +143,18 @@ maxOperations是每Run最多1–16个宿主文件操作，maxModelRequests是每
 文件范围仅宿主批准workspace中的相对规范 `.md`，有效UTF-8、无NUL、最多16000字节；read也必须审批。批准绑定目标、参数、原版本、资源lock、Run身份及期限。文件正文/工具结果可能进入后续模型请求，因此仍只允许合成无敏感材料。Bash、任意Provider工具、图片及未知扩展均未启用。HTTP输入24000字节上限仍保留，达到上限即阻断。
 
 不能通过旧授权的timeout修订添加fileTools或提高工具限额，也不能重置旧4/4消费。先完成 [新真实验收计划](planning/NEXT_STEPS.md) 的明确授权；本轮没有修改本机真实配置/凭据，没有新增真实调用。M1的validate:model-live/resume脚本不是M2验收驱动；M2自动检查只运行test:product-file-agent和test:desktop-file-agent。交互演示运行demo:file-agent，始终明确标记SYNTHETIC。
+
+
+## 显式启用受限Bash（Agent Shell）
+
+已有fileTools的配置可在新授权中增加以下字段；缺省不开放Bash。不要修改已经耗尽或已消费的旧授权来获得额外额度。Bash执行上限与LLM 30分钟总请求期限是两个不同边界。
+
+```json
+"shellTools": {
+  "maxCommands": 4,
+  "timeoutMs": 10000,
+  "profile": "restricted-bash-v1"
+}
+```
+
+这是字段片段，不是完整配置或已批准预算。maxCommands必须不大于fileTools.maxOperations；文件与Bash共享每Run操作上限，后续LLM请求仍逐次消费全局授权。Bash会读写批准workspace任意类型文件；每条命令显示实际cwd/文本/期限并单独批准，结果可能发给配置的模型端点。其网络与环境仍受Mac profile限制。只修订timeout的model:policy命令不能添加该权限。实际使用与范围见 [Agent Shell契约](ssot/agent-shell-contract.md)。本轮未读取/改写用户配置或凭据，也未新增真实调用。

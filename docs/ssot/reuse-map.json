@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "decision": "reuse-first",
-  "reviewedOn": "2026-09-24",
+  "reviewedOn": "2026-09-30",
   "projectBaseCommit": "be9e1f0858e9188131c959d2438dede73c0e2215",
   "upstream": {
     "repository": "earendil-works/pi",
@@ -93,7 +93,8 @@
           "EV-M1-STREAM-IDLE-20260929",
           "EV-M1-CLOSEOUT-20260929",
           "EV-M2-SDK-20260929",
-          "EV-M2-MAC-20260929"
+          "EV-M2-MAC-20260929",
+          "EV-AGENT-SHELL-SDK-20260930"
         ]
       }
     },
@@ -298,7 +299,8 @@
           "EV-M1-STREAM-IDLE-20260929",
           "EV-M1-CLOSEOUT-20260929",
           "EV-M2-SDK-20260929",
-          "EV-M2-MAC-20260929"
+          "EV-M2-MAC-20260929",
+          "EV-AGENT-SHELL-SDK-20260930"
         ]
       }
     },
@@ -652,7 +654,7 @@
         "PowerShellOperations"
       ],
       "reuse": "保留Shell语义和工具结果",
-      "productDelta": "限定Mac非交互Bash接产品审批/Operation/IPC；公开Operations委托原guardian监督独立Shell组、空凭据/禁网OS限制、有界完成输出和持久收据，不复用文件摘要推导命令副作用；S01统一解码后输出预算，非法字节替换/安全截断不阻断有效清理收据",
+      "productDelta": "限定Mac非交互Bash接产品审批/Operation/IPC；公开Operations委托原guardian监督独立Shell组、空凭据/禁网OS限制、有界完成输出和持久收据，不复用文件摘要推导命令副作用；S01统一解码后输出预算，非法字节替换/安全截断不阻断有效清理收据；Agent Shell显式权限复用该工具接模型循环，逐命令审批/启动账本/独立收据与关闭清单，普通非零返回Pi、未知副作用阻断",
       "acceptanceGate": "保留定义/增量/取消；绑定操作、中文路径和受管理进程停止核验；残留可见",
       "implementationState": "in_progress",
       "adoption": {
@@ -693,7 +695,9 @@
           "EV-D2S-S01-MAC-20260928",
           "EV-D2S-S01-REGRESSION-20260928",
           "EV-PI0871-RELEASE-20260929",
-          "EV-PI0871-SDK-20260929"
+          "EV-PI0871-SDK-20260929",
+          "EV-AGENT-SHELL-SDK-20260930",
+          "EV-AGENT-SHELL-MAC-20260930"
         ]
       }
     },
@@ -974,7 +978,7 @@
       ],
       "upstreamSymbolsOrPaths": [],
       "reuse": "复用Pi原生任务执行，不重写",
-      "productDelta": "ProductCore持久Run/Operation/Approval、v2启动日志及v3原生落盘标记；Supervisor冷恢复先失效旧epoch授权，再按清理证据结算；C沿用同一核心，v4仅增有限展示缓存；D1复用产品取消与既有恢复，在宿主关闭时结算活动/排队工作并保留审计；D2-S SQL v5增加Shell意图/结果投影，取消与命令副作用分开，崩溃只对账原Operation；M1 SQL v6请求预留/模型结果及v7显式策略修订；语义摘要/旧账本证明、预算跨重开修订保留、独立HTTP清理及无工具结算；累计4/4真实请求；M2 SQL v8多请求预算/宿主文件意图，IPC v6逐HTTP关闭ACK和逐工具settlement；前成功后失败独立保留，真实文件和清理证据对账；guardian/supervisor关闭即拒绝排队消息",
+      "productDelta": "ProductCore持久Run/Operation/Approval、v2启动日志及v3原生落盘标记；Supervisor冷恢复先失效旧epoch授权，再按清理证据结算；C沿用同一核心，v4仅增有限展示缓存；D1复用产品取消与既有恢复，在宿主关闭时结算活动/排队工作并保留审计；D2-S SQL v5增加Shell意图/结果投影，取消与命令副作用分开，崩溃只对账原Operation；M1 SQL v6请求预留/模型结果及v7显式策略修订；语义摘要/旧账本证明、预算跨重开修订保留、独立HTTP清理及无工具结算；累计4/4真实请求；M2 SQL v8多请求预算/宿主文件意图，IPC v6逐HTTP关闭ACK和逐工具settlement；前成功后失败独立保留，真实文件和清理证据对账；guardian/supervisor关闭即拒绝排队消息；SQL v9逐Shell启动/恢复记录与可信Workspace选择，旧Thread绑定不变",
       "acceptanceGate": "幂等/绑定/取消/unknown；P0同Workspace写Run串行并覆盖等待审批与清理阶段",
       "implementationState": "in_progress",
       "adoption": {
@@ -1021,7 +1025,9 @@
           "EV-M1-STREAM-IDLE-20260929",
           "EV-M1-CLOSEOUT-20260929",
           "EV-M2-SDK-20260929",
-          "EV-M2-MAC-20260929"
+          "EV-M2-MAC-20260929",
+          "EV-AGENT-SHELL-SDK-20260930",
+          "EV-AGENT-SHELL-MAC-20260930"
         ]
       }
     },
@@ -1091,7 +1097,7 @@
         "esbuild build"
       ],
       "reuse": "Electron公开窗口/沙盒/IPC，React渲染和esbuild构建；复用既有产品与Pi Worker链路",
-      "productDelta": "闭合产品桥、Thread/Run视图、审批/取消/成果与有界纯文本投影；显式无模型驱动；关闭结果/重连接管分离，未确认命令按意图保留身份并显式重试；D1正常退出/信号统一结算，关闭失败后原窗口显式恢复，候选新宿主不迟到发布；D2-S展示固定命令审批/profile/期限及stdout/stderr有界完成快照，交互终端尚未接入；M1正文流/最终快照、应用专用持久凭据加载及原生临时选择、策略待确认/预算耗尽准入和双时间限制显示；仅产品DTO；M2已有视图增加逐read/write/edit审批、有限版本/参数摘要、后续模型轮流式正文与重连展示；显式SYNTHETIC离线入口，不由Renderer选择工具或worker代码",
+      "productDelta": "闭合产品桥、Thread/Run视图、审批/取消/成果与有界纯文本投影；显式无模型驱动；关闭结果/重连接管分离，未确认命令按意图保留身份并显式重试；D1正常退出/信号统一结算，关闭失败后原窗口显式恢复，候选新宿主不迟到发布；D2-S展示固定命令审批/profile/期限及stdout/stderr有界完成快照，交互终端尚未接入；M1正文流/最终快照、应用专用持久凭据加载及原生临时选择、策略待确认/预算耗尽准入和双时间限制显示；仅产品DTO；M2已有视图增加逐read/write/edit审批、有限版本/参数摘要、后续模型轮流式正文与重连展示；显式SYNTHETIC离线入口，不由Renderer选择工具或worker代码；原生目录选择无自由路径Renderer入口，实际cwd/阶段/逐命令有界结果、三尺寸核心动作核查",
       "acceptanceGate": "真实桌面进程/来源/CSP、Thread隔离、审批/取消/恢复；平台/模型/Gate分别验收；确认丢失/交错重试、异常关闭与受证据约束的恢复",
       "implementationState": "in_progress",
       "adoption": {
@@ -1218,7 +1224,8 @@
           "EV-M1-CLOSEOUT-20260929",
           "EV-M2-SDK-20260929",
           "EV-M2-MAC-20260929",
-          "EV-M2-MOCK-20260929"
+          "EV-M2-MOCK-20260929",
+          "EV-AGENT-SHELL-UI-20260930"
         ]
       }
     }
@@ -2411,6 +2418,66 @@
         "darwin"
       ],
       "locator": "docs/validation/review-m2-2026-09-29.md"
+    },
+    {
+      "id": "EV-AGENT-SHELL-SDK-20260930",
+      "kind": "sdk",
+      "result": "passed",
+      "scope": "Pi 0.87.1公开Bash定义/Operations和原生循环，合成OpenAI双协议，逐命令审批/非零续轮/隔离及迁移15项；另重跑ProductCore20、SDK5、Worker51、Shell28、模型42、文件Agent34。真实模型0，不代表任意任务/原子文件权限。",
+      "commit": "0c28ed294ced615892f36b827f8d032a7161bc0b",
+      "recordedAt": "2026-09-30T01:55:14.163369+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/agent-shell-2026-09-30.md"
+    },
+    {
+      "id": "EV-AGENT-SHELL-MAC-20260930",
+      "kind": "platform",
+      "result": "passed",
+      "scope": "macOS27 arm64/Node24.21.0真实宿主SIGKILL三位置、Worker及固定sleep后代退出、独立收据/清单和SQLite重开不重放；动态Bash SQLite合成宿主库读/创建拒绝。未知副作用保持unknown；不覆盖任意脱组后代/其他平台。",
+      "commit": "0c28ed294ced615892f36b827f8d032a7161bc0b",
+      "recordedAt": "2026-09-30T01:55:14.163369+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/agent-shell-2026-09-30.md"
+    },
+    {
+      "id": "EV-AGENT-SHELL-UI-20260930",
+      "kind": "platform",
+      "result": "passed",
+      "scope": "真实Electron/Pi Bash与合成Provider、原生dialog返回值；可信目录选择、阶段/输出展示、两个顺序命令、三尺寸折叠/展开共6次布局核查及重连不重放。旧UI/Shell/模型/文件/24退出场景通过；非人工输入法/读屏或真实模型。",
+      "commit": "6cd011a2cc57a6a5e9eb7a73e7f4f994291de9d3",
+      "recordedAt": "2026-09-30T01:55:14.163369+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/agent-shell-2026-09-30.md"
+    },
+    {
+      "id": "EV-AGENT-SHELL-REGRESSION-20260930",
+      "kind": "static",
+      "result": "passed",
+      "scope": "兼容修正后typecheck与文件验收23项通过，完整命令结果分SHA记录于报告；该次CLI子用例验证文档脏工作树拒绝，不冒称完整prepare或全部前序在此SHA重跑。A1–A4/UI通过记录保留实现SHA。",
+      "commit": "0c28ed294ced615892f36b827f8d032a7161bc0b",
+      "recordedAt": "2026-09-30T01:55:14.163369+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/agent-shell-2026-09-30.md"
+    },
+    {
+      "id": "EV-AGENT-SHELL-FIRST-20260930",
+      "kind": "static",
+      "result": "failed",
+      "scope": "首次集中26条命令中3条失败：缺少A3缓存、误扩大SDK denied结算条件、仅文件验收驱动不识别SQLv9。日志摘要与后续兼容修正分开保存；不支持完成声明。",
+      "commit": "6cd011a2cc57a6a5e9eb7a73e7f4f994291de9d3",
+      "recordedAt": "2026-09-30T01:55:14.163369+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/agent-shell-2026-09-30.md"
     }
   ]
 }
