@@ -1,0 +1,424 @@
+{
+  "commit": "688150f070797405250bb16ad3dc837bb0ddc64d",
+  "startedAt": "2026-09-30T04:06:36.308Z",
+  "finishedAt": "2026-09-30T04:11:42.283Z",
+  "newRequests": 10,
+  "totalRequests": 14,
+  "newReservedUsd": 0.34256,
+  "cumulativeReservedUsd": 0.479584,
+  "remainingReservedUsd": 0.520416,
+  "oldLedgerAndRevisionsUnchanged": true,
+  "hostClosed": true,
+  "activeRuns": 0,
+  "stages": [
+    {
+      "stage": "normal",
+      "state": "completed",
+      "passed": true,
+      "requests": 7,
+      "activeCancellation": false,
+      "operations": [
+        {
+          "tool": "bash",
+          "state": "failed",
+          "path": null,
+          "command": "pwd && rg --files -g '!report.md'",
+          "outcome": {
+            "exitCode": 127,
+            "signal": null,
+            "timedOut": false,
+            "stdout": "<synthetic-workspace>\n",
+            "stderr": "/bin/bash: rg: command not found\n",
+            "truncated": false,
+            "sideEffects": "possible"
+          }
+        },
+        {
+          "tool": "bash",
+          "state": "succeeded",
+          "path": null,
+          "command": "find . -maxdepth 3 -type f -print",
+          "outcome": {
+            "exitCode": 0,
+            "signal": null,
+            "timedOut": false,
+            "stdout": "./data.md\n./README.md\n./check.sh\n",
+            "stderr": "",
+            "truncated": false,
+            "sideEffects": "possible"
+          }
+        },
+        {
+          "tool": "read",
+          "state": "succeeded",
+          "path": "README.md"
+        },
+        {
+          "tool": "read",
+          "state": "succeeded",
+          "path": "data.md"
+        },
+        {
+          "tool": "bash",
+          "state": "succeeded",
+          "path": null,
+          "command": "bash ./check.sh",
+          "outcome": {
+            "exitCode": 0,
+            "signal": null,
+            "timedOut": false,
+            "stdout": "CHECK PASS count=3 sum=10 marker=cedar-shell-30\n",
+            "stderr": "",
+            "truncated": false,
+            "sideEffects": "possible"
+          }
+        },
+        {
+          "tool": "write",
+          "state": "succeeded",
+          "path": "report.md"
+        }
+      ],
+      "model": {
+        "reason": "stop",
+        "inputTokens": 38201,
+        "outputTokens": 472,
+        "estimatedCostUsd": 0.00156778,
+        "synthetic": false
+      },
+      "cleanup": {
+        "exited": true,
+        "groupGone": true
+      },
+      "assistant": "Ran `bash ./check.sh`: PASS, count 3, sum 10, synthetic marker `cedar-shell-30`. Recorded the actual result in [report.md](<synthetic-workspace>/report.md). Input files and check script were left unchanged.",
+      "decisions": [
+        {
+          "operationId": "d07de68a-59ad-4309-b6f2-641e503fe2d9",
+          "parametersDigest": "b55c7faf6350ae4fdd0cef00f6687e6903d25f5feabd3d9d930b71e9613741ed",
+          "choice": "allow"
+        },
+        {
+          "operationId": "8c898932-2b00-4c6b-a366-46260d50aaa1",
+          "parametersDigest": "83dc69fccbd2b62602b8eb8f04e16c02f46834406de00d23fad07f4091ac67fa",
+          "choice": "allow"
+        },
+        {
+          "operationId": "33484e4b-ed11-4119-a7f8-4abbb9aec52f",
+          "parametersDigest": "b8589ba0490fc5aed4f5926d3acad277815468c117492adbfb1f94b5f217d8c7",
+          "choice": "allow"
+        },
+        {
+          "operationId": "34f32ce5-a456-41f2-906d-3ed0673c99f2",
+          "parametersDigest": "363e0de649d53d481a529aaac740d61abde14f2fb2069114707e0c8a87a84daa",
+          "choice": "allow"
+        },
+        {
+          "operationId": "7c149ffa-bedd-46f0-973f-2a7645c3e220",
+          "parametersDigest": "47f5d51e0f3faa4673ed345f6f6c5b2d90d4839c7ad3a6f672c9c0cecb51f622",
+          "choice": "allow"
+        },
+        {
+          "operationId": "f7dd4ad1-ecba-4120-87f0-24226c98e5e5",
+          "parametersDigest": "0539baec1d4c5265b1c3e2c7de8c26d9874ff4afd08b3cd293d82dadb64b3f14",
+          "choice": "allow"
+        }
+      ],
+      "nativeSessionRefSha256": "5f42f5f85fd0edf44c8250bdd380bb8ff3e2d277a004a5c6fc872042b5a37562",
+      "receiptDigest": "e4a6773950d45fe63f980be1f25f5be585eaaaa2d8aea2f00278c81d4a1ee932",
+      "artifactCount": 1,
+      "requestSequences": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    {
+      "stage": "deny",
+      "state": "failed",
+      "passed": true,
+      "requests": 1,
+      "activeCancellation": false,
+      "operations": [
+        {
+          "tool": "bash",
+          "state": "denied",
+          "path": null,
+          "command": "printf '%s\\n' 'SYNTHETIC: refused request.' > refused.txt",
+          "outcome": null
+        }
+      ],
+      "model": {
+        "reason": "provider_error",
+        "inputTokens": 5027,
+        "outputTokens": 40,
+        "estimatedCostUsd": 0.0005227000000000001,
+        "synthetic": false
+      },
+      "cleanup": {
+        "exited": true,
+        "groupGone": true
+      },
+      "assistant": "",
+      "decisions": [
+        {
+          "operationId": "660ab205-c301-4ad9-87ad-1aff0c27ac4e",
+          "parametersDigest": "d9fdd06c8dcc708c70e64bb7e6981395c0b25a50a74794c3a827fa9e5a673e2a",
+          "choice": "deny"
+        }
+      ],
+      "nativeSessionRefSha256": "12be16cacf9f8f1d5e088f53d2adb2b5e5a4a3d19a4e79a3cf33d65101318555",
+      "receiptDigest": "a69a9f66c49a3407ba685c9ab2f48b7b748852a50b9a4f4f1e5f0f83082be551",
+      "artifactCount": 0,
+      "requestSequences": [
+        1
+      ]
+    },
+    {
+      "stage": "cancel",
+      "state": "cancelled",
+      "passed": true,
+      "requests": 1,
+      "activeCancellation": true,
+      "operations": [
+        {
+          "tool": "bash",
+          "state": "failed",
+          "path": null,
+          "command": "printf started > cancel-started.txt; sleep 20; printf late > cancel-late.txt",
+          "outcome": {
+            "exitCode": null,
+            "signal": "SIGTERM",
+            "timedOut": false,
+            "stdout": "",
+            "stderr": "",
+            "truncated": false,
+            "sideEffects": "possible"
+          }
+        }
+      ],
+      "model": {
+        "reason": "cancelled",
+        "inputTokens": 5049,
+        "outputTokens": 40,
+        "estimatedCostUsd": 0.0005249,
+        "synthetic": false
+      },
+      "cleanup": {
+        "exited": true,
+        "groupGone": true
+      },
+      "assistant": "",
+      "decisions": [
+        {
+          "operationId": "949e139f-a04b-4a8f-9dca-a1b0d4f9cc94",
+          "parametersDigest": "486b2699fcb74e470aad658a145c5bc44753765f465e5194b593e6d74485998e",
+          "choice": "allow"
+        }
+      ],
+      "nativeSessionRefSha256": "62968d6d0b5d96d293bd11e928f164573e244953f2f629777b17d0dd413d9897",
+      "receiptDigest": "3dc8aaa429fd59c2d9544cc40f29a439cfed6ba5efed95eed0e19d54bbf5f930",
+      "artifactCount": 0,
+      "requestSequences": [
+        1
+      ]
+    },
+    {
+      "stage": "resume",
+      "state": "completed",
+      "passed": true,
+      "requests": 1,
+      "activeCancellation": false,
+      "operations": [],
+      "model": {
+        "reason": "stop",
+        "inputTokens": 5844,
+        "outputTokens": 24,
+        "estimatedCostUsd": 8.952e-05,
+        "synthetic": false
+      },
+      "cleanup": {
+        "exited": true,
+        "groupGone": true
+      },
+      "assistant": "Count: 3; sum: 10; synthetic marker: `cedar-shell-30`.",
+      "decisions": [],
+      "nativeSessionRefSha256": "5f42f5f85fd0edf44c8250bdd380bb8ff3e2d277a004a5c6fc872042b5a37562",
+      "receiptDigest": "c6f8f5159acf69dfa955422a0410e666575edd7b30d8d2e4a7a148f218ef0068",
+      "artifactCount": 1,
+      "requestSequences": [
+        1
+      ]
+    }
+  ],
+  "billingNote": "Conservative reservation and Pi catalog usage estimates; actual provider billing is not verified.",
+  "model": "gpt-6-luna",
+  "provider": "openai",
+  "platform": {
+    "os": "macOS 27.0",
+    "machineArch": "arm64",
+    "nodeArch": "arm64",
+    "rosetta": false,
+    "node": "24.21.0",
+    "pi": "0.87.1"
+  },
+  "baseline": "83f2eb93e8a77fe014dcdeff7b2094603f3e3c40",
+  "branch": "codex/agent-shell-mvp",
+  "preflightFailure": {
+    "commit": "9488b70905f929d96a70671bafb6de4c2b41d19c",
+    "runState": "failed",
+    "newRequests": 0,
+    "hostClosed": true,
+    "cause": "Host compared strict Pi tool schema to original declaration; offline native-provider reproduction rejected model_tool_schema."
+  },
+  "publicApi": {
+    "package": "@earendil-works/pi-ai",
+    "version": "0.87.1",
+    "importFrom": "@earendil-works/pi-ai/api/constrained-sampling",
+    "runtimeExport": "makeStrictJsonSchema",
+    "exportPattern": "./api/*",
+    "declarationSha256": "891ec6f0d93b6988f46f4520eddfc405242653683c78a665d6605e6fd438c427",
+    "scope": "Exact Pi schema conversion for host comparison only; no custom schema converter or upstream modification."
+  },
+  "projectFiles": {
+    "README.md": "# SYNTHETIC offline sample\nThis project contains no private data. data.md has three numeric values and a synthetic marker. check.sh validates them using local shell utilities. Run the existing check, then record its actual result in report.md using the approved write tool. Preserve all inputs.\n",
+    "data.md": "alpha=2\nbeta=3\ngamma=5\nmarker=cedar-shell-30\n",
+    "check.sh": "#!/bin/bash\nset -eu\nawk -F= '$1==\"marker\" { marker=$2; next } { count++; total+=$2 } END { if (count!=3 || total!=10 || marker!=\"cedar-shell-30\") { print \"CHECK FAIL\"; exit 1 } printf \"CHECK PASS count=%d sum=%d marker=%s\\n\",count,total,marker }' data.md\n",
+    "report.md": "# Check Report\n\nResult: PASS\nCount: 3\nSum: 10\nSynthetic marker: cedar-shell-30\n\nCommand: `bash ./check.sh`\n"
+  },
+  "projectFileSha256": {
+    "README.md": "b7dd95f81af9c18491e66c656f1271bd23fb1f3d6df82123d5dac5b92f47d630",
+    "data.md": "232eacf9c9dd948ad3d157479d3f1f4657a2d819b4ce86d5787d57736292331f",
+    "check.sh": "5a2031921ec74d4e64bcadde43a56cae462403d02f26bc2440a856bfc2db91eb",
+    "report.md": "eabd7ce1918887773c5bacea98f3a30a145fb58744de71a36ebfe8771ff63070"
+  },
+  "negativeFiles": {
+    "refused.txt": false,
+    "cancel-started.txt": true,
+    "cancel-late.txt": false
+  },
+  "commands": [
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "commit": "9488b70905f929d96a70671bafb6de4c2b41d19c",
+      "logSha256": "22df5d47848ff6e1f3c0926a3aa3f05da31fb2c76601187b826c3ad4d7870689"
+    },
+    {
+      "command": "npm run test:model-resume",
+      "exitCode": 0,
+      "commit": "9488b70905f929d96a70671bafb6de4c2b41d19c",
+      "logSha256": "6fca3cf6a106e856902facb563c188fcfd7a63f3a4a8aebb1536bd4967789074",
+      "tests": 14
+    },
+    {
+      "command": "npm run test:product-core",
+      "exitCode": 0,
+      "commit": "9488b70905f929d96a70671bafb6de4c2b41d19c",
+      "logSha256": "b70081440e415dffb64b09b0b6354291a9c8e2ad0cb0348eeb4dfbfbb55953e1",
+      "tests": 20
+    },
+    {
+      "command": "npm run test:product-model-shell",
+      "exitCode": 0,
+      "commit": "9488b70905f929d96a70671bafb6de4c2b41d19c",
+      "logSha256": "efa811f5f1d851766368bd905e052e0ff1e2919809b141da5596131c7d715691",
+      "tests": 17
+    },
+    {
+      "command": "npm run test:desktop",
+      "exitCode": 0,
+      "commit": "9488b70905f929d96a70671bafb6de4c2b41d19c",
+      "logSha256": "195b7f0853b228bae73f0e00ded905748a761207e73d7f40f66a053d3d00b206",
+      "tests": 20
+    },
+    {
+      "command": ".venv/bin/python scripts/check-ssot.py",
+      "exitCode": 0,
+      "commit": "9488b70905f929d96a70671bafb6de4c2b41d19c",
+      "logSha256": "598d596f715620669477a2ec46279582a2a59190ae7ea4d0c39329c05c9c587e"
+    },
+    {
+      "command": ".venv/bin/python scripts/test-tools.py",
+      "exitCode": 0,
+      "commit": "9488b70905f929d96a70671bafb6de4c2b41d19c",
+      "logSha256": "49a20ccbf9e7b5bc4dde0392c7ae57434f1c6c86b409d41d1d1d6dc2e6f579ce"
+    },
+    {
+      "command": ".venv/bin/python scripts/check-docs.py --structural-only",
+      "exitCode": 0,
+      "commit": "9488b70905f929d96a70671bafb6de4c2b41d19c",
+      "logSha256": "4e4492c6dab353afc3df9625ed2fbfa08d07b76dec334e2f66cbbcd45fa35455"
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "commit": "688150f070797405250bb16ad3dc837bb0ddc64d",
+      "logSha256": "22df5d47848ff6e1f3c0926a3aa3f05da31fb2c76601187b826c3ad4d7870689"
+    },
+    {
+      "command": "npm run test:product-model-shell",
+      "exitCode": 0,
+      "commit": "688150f070797405250bb16ad3dc837bb0ddc64d",
+      "logSha256": "93b87d09388035eecde57485543757fb66c3e326626d9f981b9b82746ddcdc8e",
+      "tests": 18
+    },
+    {
+      "command": "npm run test:model-integration-offline",
+      "exitCode": 0,
+      "commit": "688150f070797405250bb16ad3dc837bb0ddc64d",
+      "logSha256": "7c286b530c65e78bed805db80e62baf701c8c1e1fda3dde806dfda7e955ec088",
+      "tests": 45
+    },
+    {
+      "command": "npm run test:product-file-agent",
+      "exitCode": 0,
+      "commit": "688150f070797405250bb16ad3dc837bb0ddc64d",
+      "logSha256": "ce8a907aec1712fa21ad250d4997a89c91b5f551e9e0b3a0fb0268f8dc2a57fe",
+      "tests": 34
+    },
+    {
+      "command": "npm run validate:agent-shell -- --execute-approved agent-task-20260930-b <synthetic-workspace>",
+      "commit": "688150f070797405250bb16ad3dc837bb0ddc64d",
+      "exitCode": 0,
+      "scope": "Interactive, exact operation decisions; real model with synthetic non-sensitive files; normal/deny/active cancel/native resume."
+    },
+    {
+      "command": ".venv/bin/python scripts/check-ssot.py",
+      "commit": "688150f070797405250bb16ad3dc837bb0ddc64d",
+      "exitCode": 0,
+      "scope": "Final documentation changes present; code identical to tested SHA.",
+      "logSha256": "2749bfddb4b74fa0ac35b8efc092c18a7d2d19cd089a9e60f90dda64d53cb84d"
+    },
+    {
+      "command": ".venv/bin/python scripts/test-tools.py",
+      "commit": "688150f070797405250bb16ad3dc837bb0ddc64d",
+      "exitCode": 0,
+      "scope": "Final documentation changes present; code identical to tested SHA.",
+      "logSha256": "01481f26c9044f35409fb09cb6e845c9e4941f0883f727125dfc94048448e9b7"
+    },
+    {
+      "command": ".venv/bin/python scripts/check-docs.py --structural-only",
+      "commit": "688150f070797405250bb16ad3dc837bb0ddc64d",
+      "exitCode": 0,
+      "scope": "Final documentation changes present; code identical to tested SHA.",
+      "logSha256": "8b30428e9c5e1a05e6fb5821ae1df4052cb4220287f89c0ac62a7567e0c864c5"
+    },
+    {
+      "command": ".venv/bin/python scripts/check-docs.py --typecheck",
+      "commit": "688150f070797405250bb16ad3dc837bb0ddc64d",
+      "exitCode": 0,
+      "scope": "Final documentation changes present; code identical to tested SHA.",
+      "logSha256": "4885d923f5e1b13f2757c58ec74c9f7747bbd4ccc1574d763de4e89253a81877"
+    }
+  ],
+  "scopeLimits": [
+    "No new Electron live-model UI run; existing UI evidence remains separately scoped.",
+    "No true-model edit tool selected in this task; read/write and Bash are live, edit retains offline SDK evidence.",
+    "No Windows, PTY, arbitrary malicious process sandbox or production release claim.",
+    "No initialization/fresh-clone rerun. No API backing service inspection."
+  ]
+}

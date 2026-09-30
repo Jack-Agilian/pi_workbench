@@ -40,7 +40,7 @@
         "AgentSession.abort"
       ],
       "reuse": "工具循环、原生重试/压缩保持上游",
-      "productDelta": "packages/pi-adapter/worker-runtime.ts采用公开SDK；apps/agent-server/worker-supervisor.ts负责进程监督和产品Run结算；M1通过公开prompt/subscribe/abort实现零工具流、原Session恢复及活跃取消；M2复用Pi原生Agent Loop、prompt/subscribe/abort，同Session零到多个顺序文件操作与后续模型请求；executionMode为公开ToolDefinition成员。30项真实SDK/合成模型接缝通过，真实工具任务待验收",
+      "productDelta": "packages/pi-adapter/worker-runtime.ts采用公开SDK；apps/agent-server/worker-supervisor.ts负责进程监督和产品Run结算；M1通过公开prompt/subscribe/abort实现零工具流、原Session恢复及活跃取消；M2复用Pi原生Agent Loop、prompt/subscribe/abort，同Session零到多个顺序文件操作与后续模型请求；executionMode为公开ToolDefinition成员。30项真实SDK/合成模型接缝通过，真实工具任务待验收；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开",
       "acceptanceGate": "原生 SDK 探针；运行绑定在派发时固定；同 Worker 迟到观察不归入新 Run",
       "implementationState": "in_progress",
       "adoption": {
@@ -94,7 +94,9 @@
           "EV-M1-CLOSEOUT-20260929",
           "EV-M2-SDK-20260929",
           "EV-M2-MAC-20260929",
-          "EV-AGENT-SHELL-SDK-20260930"
+          "EV-AGENT-SHELL-SDK-20260930",
+          "EV-AGENT-TASK-MODEL-20260930",
+          "EV-AGENT-TASK-MAC-20260930"
         ]
       }
     },
@@ -195,7 +197,7 @@
         "ModelRuntime.registerProvider"
       ],
       "reuse": "Provider、目录、登录/刷新复用",
-      "productDelta": "M1 OpenAI Responses/Chat Completions 与原有 Anthropic；Pi 原生 Provider/公开 registerProvider 元数据接入；应用专用 auth.json 字面量 key 读取和临时原生文件选择；系统 Keychain/OAuth 未完成；0.87.1目录模型只覆盖批准baseUrl，真实首条、原会话恢复及活跃取消已限定验证；追加规范化策略/旧账本兼容和显式timeout修订，真实授权累计4/4，取消实际计费未知；httpIdleTimeoutMs空闲期限与timeoutMs单请求总期限独立，长流使用缩时合成回归；30分钟单LLM总上限已获用户确认，原4/4耗尽授权不变；M2每次HTTP预留独立宿主身份/序号和预算、关闭ACK后允许后续调用；Pi继续负责SSE与Provider；同Run用量汇总，fileTools显式授权且旧timeout修订不能扩权；无新增真实调用；fauxToolCall只在明确合成测试驱动中使用；2026-09-30产品默认无请求次数字段，旧数字限制仅历史/测试兼容；用户取消次数上限，旧请求/费用保留，独立修订禁止顺带扩权",
+      "productDelta": "M1 OpenAI Responses/Chat Completions 与原有 Anthropic；Pi 原生 Provider/公开 registerProvider 元数据接入；应用专用 auth.json 字面量 key 读取和临时原生文件选择；系统 Keychain/OAuth 未完成；0.87.1目录模型只覆盖批准baseUrl，真实首条、原会话恢复及活跃取消已限定验证；追加规范化策略/旧账本兼容和显式timeout修订，真实授权累计4/4，取消实际计费未知；httpIdleTimeoutMs空闲期限与timeoutMs单请求总期限独立，长流使用缩时合成回归；30分钟单LLM总上限已获用户确认，原4/4耗尽授权不变；M2每次HTTP预留独立宿主身份/序号和预算、关闭ACK后允许后续调用；Pi继续负责SSE与Provider；同Run用量汇总，fileTools显式授权且旧timeout修订不能扩权；无新增真实调用；fauxToolCall只在明确合成测试驱动中使用；2026-09-30产品默认无请求次数字段，旧数字限制仅历史/测试兼容；用户取消次数上限，旧请求/费用保留，独立修订禁止顺带扩权；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开",
       "acceptanceGate": "secret 不进Renderer/日志/子进程env",
       "implementationState": "in_progress",
       "adoption": {
@@ -270,6 +272,17 @@
               }
             ],
             "selectedVersion": "0.87.1"
+          },
+          {
+            "package": "@earendil-works/pi-ai",
+            "importFrom": "@earendil-works/pi-ai/api/constrained-sampling",
+            "exports": [
+              {
+                "name": "makeStrictJsonSchema",
+                "kind": "runtime"
+              }
+            ],
+            "selectedVersion": "0.87.1"
           }
         ],
         "selectedSourceCommit": null,
@@ -301,7 +314,10 @@
           "EV-M2-SDK-20260929",
           "EV-M2-MAC-20260929",
           "EV-AGENT-SHELL-SDK-20260930",
-          "EV-REQUEST-DEFAULTS-20260930"
+          "EV-REQUEST-DEFAULTS-20260930",
+          "EV-AGENT-TASK-MODEL-20260930",
+          "EV-AGENT-TASK-MAC-20260930",
+          "EV-AGENT-TASK-SDK-20260930"
         ]
       }
     },
@@ -524,7 +540,7 @@
         "createLsToolDefinition"
       ],
       "reuse": "保留名称schema结果与裁剪",
-      "productDelta": "Operations和许可；M2仅公开read，有限Markdown/UTF-8/16000字节及每操作批准、版本检查；grep/find/ls未作为模型工具启用",
+      "productDelta": "Operations和许可；M2仅公开read，有限Markdown/UTF-8/16000字节及每操作批准、版本检查；grep/find/ls未作为模型工具启用；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开",
       "acceptanceGate": "保留完整 ToolDefinition、准备/校验一次；路径/辅助I/O/拒绝零执行",
       "implementationState": "in_progress",
       "adoption": {
@@ -558,7 +574,9 @@
           "EV-PI0871-RELEASE-20260929",
           "EV-PI0871-SDK-20260929",
           "EV-M2-SDK-20260929",
-          "EV-M2-MAC-20260929"
+          "EV-M2-MAC-20260929",
+          "EV-AGENT-TASK-MODEL-20260930",
+          "EV-AGENT-TASK-MAC-20260930"
         ]
       }
     },
@@ -580,7 +598,7 @@
         "ToolDefinition.executionMode"
       ],
       "reuse": "保留匹配/patch/文件级队列",
-      "productDelta": "操作context/许可/跨Worker锁；M2公开write/edit和Operations执行；宿主通过createEditTool加内存Operations计算期望摘要；逐项审批/结果/成果/故障对账，无自研编辑算法或原子CAS声明",
+      "productDelta": "操作context/许可/跨Worker锁；M2公开write/edit和Operations执行；宿主通过createEditTool加内存Operations计算期望摘要；逐项审批/结果/成果/故障对账，无自研编辑算法或原子CAS声明；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开",
       "acceptanceGate": "最终校验参数绑定审批；edits兼容/元数据不丢；并行context不串；读版本冲突提示而非原子CAS",
       "implementationState": "in_progress",
       "adoption": {
@@ -635,7 +653,9 @@
           "EV-PI0871-RELEASE-20260929",
           "EV-PI0871-SDK-20260929",
           "EV-M2-SDK-20260929",
-          "EV-M2-MAC-20260929"
+          "EV-M2-MAC-20260929",
+          "EV-AGENT-TASK-MODEL-20260930",
+          "EV-AGENT-TASK-MAC-20260930"
         ]
       }
     },
@@ -655,7 +675,7 @@
         "PowerShellOperations"
       ],
       "reuse": "保留Shell语义和工具结果",
-      "productDelta": "限定Mac非交互Bash接产品审批/Operation/IPC；公开Operations委托原guardian监督独立Shell组、空凭据/禁网OS限制、有界完成输出和持久收据，不复用文件摘要推导命令副作用；S01统一解码后输出预算，非法字节替换/安全截断不阻断有效清理收据；Agent Shell显式权限复用该工具接模型循环，逐命令审批/启动账本/独立收据与关闭清单，普通非零返回Pi、未知副作用阻断",
+      "productDelta": "限定Mac非交互Bash接产品审批/Operation/IPC；公开Operations委托原guardian监督独立Shell组、空凭据/禁网OS限制、有界完成输出和持久收据，不复用文件摘要推导命令副作用；S01统一解码后输出预算，非法字节替换/安全截断不阻断有效清理收据；Agent Shell显式权限复用该工具接模型循环，逐命令审批/启动账本/独立收据与关闭清单，普通非零返回Pi、未知副作用阻断；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开",
       "acceptanceGate": "保留定义/增量/取消；绑定操作、中文路径和受管理进程停止核验；残留可见",
       "implementationState": "in_progress",
       "adoption": {
@@ -698,7 +718,9 @@
           "EV-PI0871-RELEASE-20260929",
           "EV-PI0871-SDK-20260929",
           "EV-AGENT-SHELL-SDK-20260930",
-          "EV-AGENT-SHELL-MAC-20260930"
+          "EV-AGENT-SHELL-MAC-20260930",
+          "EV-AGENT-TASK-MODEL-20260930",
+          "EV-AGENT-TASK-MAC-20260930"
         ]
       }
     },
@@ -979,7 +1001,7 @@
       ],
       "upstreamSymbolsOrPaths": [],
       "reuse": "复用Pi原生任务执行，不重写",
-      "productDelta": "ProductCore持久Run/Operation/Approval、v2启动日志及v3原生落盘标记；Supervisor冷恢复先失效旧epoch授权，再按清理证据结算；C沿用同一核心，v4仅增有限展示缓存；D1复用产品取消与既有恢复，在宿主关闭时结算活动/排队工作并保留审计；D2-S SQL v5增加Shell意图/结果投影，取消与命令副作用分开，崩溃只对账原Operation；M1 SQL v6请求预留/模型结果及v7显式策略修订；语义摘要/旧账本证明、预算跨重开修订保留、独立HTTP清理及无工具结算；累计4/4真实请求；M2 SQL v8多请求预算/宿主文件意图，IPC v6逐HTTP关闭ACK和逐工具settlement；前成功后失败独立保留，真实文件和清理证据对账；guardian/supervisor关闭即拒绝排队消息；SQL v9逐Shell启动/恢复记录与可信Workspace选择，旧Thread绑定不变；2026-09-30产品默认无请求次数字段，旧数字限制仅历史/测试兼容；用户取消次数上限，旧请求/费用保留，独立修订禁止顺带扩权",
+      "productDelta": "ProductCore持久Run/Operation/Approval、v2启动日志及v3原生落盘标记；Supervisor冷恢复先失效旧epoch授权，再按清理证据结算；C沿用同一核心，v4仅增有限展示缓存；D1复用产品取消与既有恢复，在宿主关闭时结算活动/排队工作并保留审计；D2-S SQL v5增加Shell意图/结果投影，取消与命令副作用分开，崩溃只对账原Operation；M1 SQL v6请求预留/模型结果及v7显式策略修订；语义摘要/旧账本证明、预算跨重开修订保留、独立HTTP清理及无工具结算；累计4/4真实请求；M2 SQL v8多请求预算/宿主文件意图，IPC v6逐HTTP关闭ACK和逐工具settlement；前成功后失败独立保留，真实文件和清理证据对账；guardian/supervisor关闭即拒绝排队消息；SQL v9逐Shell启动/恢复记录与可信Workspace选择，旧Thread绑定不变；2026-09-30产品默认无请求次数字段，旧数字限制仅历史/测试兼容；用户取消次数上限，旧请求/费用保留，独立修订禁止顺带扩权；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开",
       "acceptanceGate": "幂等/绑定/取消/unknown；P0同Workspace写Run串行并覆盖等待审批与清理阶段",
       "implementationState": "in_progress",
       "adoption": {
@@ -1029,7 +1051,9 @@
           "EV-M2-MAC-20260929",
           "EV-AGENT-SHELL-SDK-20260930",
           "EV-AGENT-SHELL-MAC-20260930",
-          "EV-REQUEST-DEFAULTS-20260930"
+          "EV-REQUEST-DEFAULTS-20260930",
+          "EV-AGENT-TASK-MODEL-20260930",
+          "EV-AGENT-TASK-MAC-20260930"
         ]
       }
     },
@@ -1099,7 +1123,7 @@
         "esbuild build"
       ],
       "reuse": "Electron公开窗口/沙盒/IPC，React渲染和esbuild构建；复用既有产品与Pi Worker链路",
-      "productDelta": "闭合产品桥、Thread/Run视图、审批/取消/成果与有界纯文本投影；显式无模型驱动；关闭结果/重连接管分离，未确认命令按意图保留身份并显式重试；D1正常退出/信号统一结算，关闭失败后原窗口显式恢复，候选新宿主不迟到发布；D2-S展示固定命令审批/profile/期限及stdout/stderr有界完成快照，交互终端尚未接入；M1正文流/最终快照、应用专用持久凭据加载及原生临时选择、策略待确认/预算耗尽准入和双时间限制显示；仅产品DTO；M2已有视图增加逐read/write/edit审批、有限版本/参数摘要、后续模型轮流式正文与重连展示；显式SYNTHETIC离线入口，不由Renderer选择工具或worker代码；原生目录选择无自由路径Renderer入口，实际cwd/阶段/逐命令有界结果、三尺寸核心动作核查",
+      "productDelta": "闭合产品桥、Thread/Run视图、审批/取消/成果与有界纯文本投影；显式无模型驱动；关闭结果/重连接管分离，未确认命令按意图保留身份并显式重试；D1正常退出/信号统一结算，关闭失败后原窗口显式恢复，候选新宿主不迟到发布；D2-S展示固定命令审批/profile/期限及stdout/stderr有界完成快照，交互终端尚未接入；M1正文流/最终快照、应用专用持久凭据加载及原生临时选择、策略待确认/预算耗尽准入和双时间限制显示；仅产品DTO；M2已有视图增加逐read/write/edit审批、有限版本/参数摘要、后续模型轮流式正文与重连展示；显式SYNTHETIC离线入口，不由Renderer选择工具或worker代码；原生目录选择无自由路径Renderer入口，实际cwd/阶段/逐命令有界结果、三尺寸核心动作核查；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开",
       "acceptanceGate": "真实桌面进程/来源/CSP、Thread隔离、审批/取消/恢复；平台/模型/Gate分别验收；确认丢失/交错重试、异常关闭与受证据约束的恢复",
       "implementationState": "in_progress",
       "adoption": {
@@ -1227,7 +1251,9 @@
           "EV-M2-SDK-20260929",
           "EV-M2-MAC-20260929",
           "EV-M2-MOCK-20260929",
-          "EV-AGENT-SHELL-UI-20260930"
+          "EV-AGENT-SHELL-UI-20260930",
+          "EV-AGENT-TASK-MODEL-20260930",
+          "EV-AGENT-TASK-MAC-20260930"
         ]
       }
     }
@@ -2504,6 +2530,54 @@
         "darwin"
       ],
       "locator": "docs/validation/request-defaults-2026-09-30.md"
+    },
+    {
+      "id": "EV-AGENT-TASK-MODEL-20260930",
+      "kind": "model",
+      "result": "passed",
+      "scope": "gpt-6-luna真实10请求：自主read/Bash检查/write报告，非零命令后改用find，拒绝、活跃Shell取消和同Session恢复；仅合成无敏感输入，非真实edit/新Electron UI或实际账单证明。",
+      "commit": "688150f070797405250bb16ad3dc837bb0ddc64d",
+      "recordedAt": "2026-09-30T04:17:49.303742+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/agent-task-live-2026-09-30.md"
+    },
+    {
+      "id": "EV-AGENT-TASK-MAC-20260930",
+      "kind": "platform",
+      "result": "passed",
+      "scope": "macOS27 arm64实际DesktopHost/Worker/guardian、每项审批、报告Artifact、拒绝不写、SIGTERM停止固定命令组、迟到文件不存在及重开原Session不重写；CLI驱动不冒充本轮Electron UI。",
+      "commit": "688150f070797405250bb16ad3dc837bb0ddc64d",
+      "recordedAt": "2026-09-30T04:17:49.303742+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/agent-task-live-2026-09-30.md"
+    },
+    {
+      "id": "EV-AGENT-TASK-SDK-20260930",
+      "kind": "sdk",
+      "result": "passed",
+      "scope": "Pi0.87.1公开makeStrictJsonSchema实际导入、真实目录模型strict/null参数SDK回归18项及原模型45/文件34回归；strict前本机拒绝复现保留，非合成响应冒充真实模型。",
+      "commit": "688150f070797405250bb16ad3dc837bb0ddc64d",
+      "recordedAt": "2026-09-30T04:17:49.303742+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/agent-task-live-2026-09-30.md"
+    },
+    {
+      "id": "EV-AGENT-TASK-PREFLIGHT-20260930",
+      "kind": "sdk",
+      "result": "failed",
+      "scope": "首次真实入口被宿主strict schema比较拒绝，0新增请求/费用，Run failed且已清理；以锁定发行包原生Provider和synthetic fetch离线复现model_tool_schema。",
+      "commit": "9488b70905f929d96a70671bafb6de4c2b41d19c",
+      "recordedAt": "2026-09-30T04:17:49.303742+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/agent-task-live-2026-09-30.md"
     }
   ]
 }

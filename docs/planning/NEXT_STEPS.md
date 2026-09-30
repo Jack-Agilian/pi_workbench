@@ -2,22 +2,21 @@
 
 当前依据：[SSOT](../ssot/README.md)、[任务账本](backlog.json)。以下当前事项优先于后文历史阶段的“下一步”。
 
-## 唯一当前事项：Agent Shell交付复审与获授权的有限真实任务验收
+## 唯一当前事项：Agent Shell/M2交付复审与develop集成准备
 
-2026-09-30：在 `codex/agent-shell-mvp` 复用已有M2/审核/UI成果，接通动态Bash逐命令审批、真实受限执行、独立收据、崩溃恢复与原生工作目录选择。实施范围见 [Agent Shell契约](../ssot/agent-shell-contract.md)，[集中回归证据](../validation/agent-shell-2026-09-30.md)已按真实被测SHA登记。本功能分支尚未合入develop；develop基线仍为 `148022b05250cfda824725778e9a056d00cd6830`。
+2026-09-30：功能分支 `codex/agent-shell-mvp` 已完成限定真实项目任务。运行代码 `688150f070797405250bb16ad3dc837bb0ddc64d`；[真实结果与首次失败](../validation/agent-task-live-2026-09-30.md)、[脱敏输入](../validation/agent-task-live-inputs-2026-09-30.json)、[实际模型生成报告](../validation/agent-task-result-2026-09-30.md)。develop仍为 `148022b05250cfda824725778e9a056d00cd6830`，本轮没有合并。
 
 推进顺序只有一条：
 
-1. 审查本次代码、集中回归和持久证据，先使用 `npm run demo:agent-shell` 体验明确标记SYNTHETIC的目录选择/审批/命令结果流程；不把演示当真实模型证据。
-2. 核定一次真实任务的新授权：现有Provider/模型/endpoint不变，只用专用合成无敏感项目，明确Bash可改动该目录任意类型文件、禁网和逐命令审批，保留输出与总费用边界。2026-09-30用户明确“不限制llm请求的数量”，授权累计与单Run续轮均不再设次数上限；仍记账，不按4/4阻塞，也不按原8次提案重新索要次数授权。此决定没有新增工具/目录权限或提高费用；此前工具验收8次/$1方案其余范围仍须核定。不要改写旧请求或借新profile清零。
-3. 获授权后集中运行“检查专用项目、运行已有离线检查、整理真实结果”任务及必要的拒绝/取消/原Session恢复场景。复用现有产品入口和验收驱动，不另造Agent Loop或新的测试平台；真实服务不用于每次小改动的调试。
-4. 记录实际模型选择的命令、每条审批/结果、请求/费用与清理证据，逐项评估MODEL-03、MODEL-04和M0-Pi；未经另行指示不合并develop，不自动启动PTY、市场、Windows或发行。
+1. 复审本分支已有M2/Agent Shell增量及本轮工具策略修订、Pi strict schema修正。核对历史失败、各自被测SHA和真实/合成证据范围，处理确有依据的发现。
+2. 按集成授权将审定成果合入develop；当前仅准备集成，不自动合并。不要另外开启孤立功能分支或重跑已通过的真实任务作为小改动调试。
+3. 集成后再推进UI-P2的长历史/成果浏览体验；保持Pi循环、Provider、Session和审批所有权。PTY、Windows、市场和生产发行仍后置。
 
-单个LLM请求默认总上限30分钟，网络空闲5分钟；不等于整个Run期限。shellTools缺省关闭，添加它不是“仅改timeout”，也不会自动更改本机配置或扩展旧授权。
+限定MODEL-03/04逐项done；M0-Pi补齐真实模型任务及Mac审批/取消/恢复证据后passed。M0-UI/M0-SDK沿用原passed，均不等于完整产品/通用沙箱/生产发布。真实任务走CLI→同DesktopHost/Worker产品链路，本轮没有重新声明Electron真实模型UI通过。
 
-MODEL-03继续in_progress；MODEL-04登记Agent Shell限定实现与待完成真实验收。M0-UI/M0-SDK沿用原passed，M0-Pi仍blocked。请求次数修订见 [配置](../MODEL_CONFIGURATION.md#不限制请求次数)。本轮真实调用0次。旧阶段、分支和失败证据保留，但不得被理解为互相竞争的当前事项。
+本轮gpt-6-luna新增10次LLM请求（正常7、拒绝1、活跃Shell取消1、原Session恢复1）；累计14次。历史账本和授权身份保留，累计保守预留$0.479584/$1。请求次数缺省不限，单LLM总期限30分钟、网络空闲5分钟；费用/数据/逐工具批准仍分别生效。实际账单未核验。
 
-历史入口：[M2报告](../validation/m2-file-agent-2026-09-29.md)、[M2复审](../validation/review-m2-2026-09-29.md)、[M2-C原授权提案](M2_C_ACCEPTANCE_PLAN.md)、[前端布局报告](../validation/ui-layout-2026-09-29.md)、[主功能分期](AGENT_MVP_UI_PLAN.md)。
+旧M1“4/4耗尽”和8次验证提案属于历史；不再作为产品次数门槛。测试限制与产品默认继续分离。历史/阶段报告的“下一步”不得覆盖本节。
 
 以下仅为历史能力分解与阶段记录。
 

@@ -1,6 +1,6 @@
 # M2 有限文件 Agent：实施契约
 
-2026-09-29，状态：M2-A/B 运行代码和集中离线验收已完成，**真实模型工具验收尚未通过**。基线 develop `148022b05250cfda824725778e9a056d00cd6830`；实际被测代码及边界见 [M2报告](../validation/m2-file-agent-2026-09-29.md)。唯一当前顺序见 [NEXT_STEPS](../planning/NEXT_STEPS.md)，验收归 MODEL-03。
+2026-09-30更新：M2-A/B运行代码和集中离线验收已完成，[限定真实文件/Bash任务及拒绝/取消/恢复](../validation/agent-task-live-2026-09-30.md)已补证，MODEL-03限定done。本次真实任务选择read/write/Bash，edit沿用原SDK证据。基线 develop `148022b05250cfda824725778e9a056d00cd6830`；实际被测代码及边界见 [M2报告](../validation/m2-file-agent-2026-09-29.md)。唯一当前顺序见 [NEXT_STEPS](../planning/NEXT_STEPS.md)，验收归 MODEL-03。
 
 ## 复用与准入
 

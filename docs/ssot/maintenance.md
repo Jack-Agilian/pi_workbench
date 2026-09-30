@@ -99,3 +99,6 @@ Agent Shell的[本地实施报告](../validation/agent-shell-2026-09-30.md)将�
 
 
 2026-09-30请求限制纠正：产品模板不再携带验证次数，缺省不限LLM请求数量。历史验证配置/驱动可以保留显式有限次数；它们不能成为普通产品使用的默认值。用户授权变更、真实配置修订和SDK/合成证据分别记录，旧4次及费用不清零；不能把一次策略修订当成真实模型验收。
+
+
+Agent Shell [真实任务补证](../validation/agent-task-live-2026-09-30.md)将首次本机准入失败（0新增真实请求）、修正SHA上的SDK strict回归和真实四场景分开登记。model/platform证据可在逐项满足条件后推进MODEL-03/04和M0-Pi；必须单列CLI实际链路与历史Electron UI，不把未选择的edit、Windows或生产沙箱补成通过。

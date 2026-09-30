@@ -1697,7 +1697,7 @@
       "id": "MODEL-03",
       "priority": "P0",
       "ownerRole": "Tech Lead",
-      "state": "in_progress",
+      "state": "done",
       "githubIssueNumber": null,
       "dependencies": [
         "MODEL-02"
@@ -1712,7 +1712,7 @@
         "read-search",
         "edit-write"
       ],
-      "implementationStatus": "in_progress",
+      "implementationStatus": "implemented",
       "githubIssueUrl": null,
       "issueVerificationStatus": "not_checked",
       "issueEvidence": [],
@@ -1784,16 +1784,19 @@
           "plannedChecks": [
             "m2-live-file-agent"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-AGENT-TASK-MODEL-20260930",
+            "EV-AGENT-TASK-MAC-20260930"
+          ]
         }
       ],
-      "statusReason": "M2-A/B及复审、验收驱动已在当前Agent Shell功能分支集成，A01–A04沿用各自限定离线证据；A05真实文件任务仍缺新授权/证据。后续Bash主功能登记MODEL-04，不完成M0-Pi。2026-09-30已取消请求次数上限，默认无次数字段，费用与工具范围保留，当前次序以NEXT_STEPS顶部为准。"
+      "statusReason": "限定范围逐项完成：既有SDK/平台/UI证据保持原SHA；688150f补真实gpt-6-luna项目read/write/Bash、拒绝/活跃命令取消与原Session恢复，10新增请求、原请求/费用保留。真实edit与本轮Electron真实模型UI未宣称验证，不等于完整产品或生产沙箱。"
     },
     {
       "id": "MODEL-04",
       "priority": "P0",
       "ownerRole": "Tech Lead",
-      "state": "in_progress",
+      "state": "done",
       "githubIssueNumber": null,
       "dependencies": [
         "MODEL-03"
@@ -1807,7 +1810,7 @@
         "product-coordination",
         "desktop-ui"
       ],
-      "implementationStatus": "in_progress",
+      "implementationStatus": "implemented",
       "githubIssueUrl": null,
       "issueVerificationStatus": "not_checked",
       "issueEvidence": [],
@@ -1860,10 +1863,13 @@
           "plannedChecks": [
             "agent-shell-live-task"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-AGENT-TASK-MODEL-20260930",
+            "EV-AGENT-TASK-MAC-20260930"
+          ]
         }
       ],
-      "statusReason": "P0-A/B/C已限定离线验证：15项实际Pi/命令/进程恢复、20项桌面宿主及真实Electron6组尺寸检查；普通非零继续、拒绝/未知阻断。A04/P0-D真实任务缺新授权/证据，2026-09-30已取消次数上限，默认无次数字段，保留历史账本；不完成M0-Pi或通用沙箱。"
+      "statusReason": "限定范围逐项完成：既有SDK/平台/UI证据保持原SHA；688150f补真实gpt-6-luna项目read/write/Bash、拒绝/活跃命令取消与原Session恢复，10新增请求、原请求/费用保留。真实edit与本轮Electron真实模型UI未宣称验证，不等于完整产品或生产沙箱。"
     }
   ],
   "decisionSource": "../ssot/README.md",
@@ -1914,7 +1920,7 @@
     },
     {
       "id": "M0-Pi",
-      "state": "blocked",
+      "state": "passed",
       "requiredEvidenceKinds": [
         "model",
         "platform"
@@ -1926,9 +1932,12 @@
         "M0-UI",
         "M0-SDK"
       ],
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        "EV-AGENT-TASK-MODEL-20260930",
+        "EV-AGENT-TASK-MAC-20260930"
+      ],
       "acceptance": "授权真实模型任务及审批/取消/恢复Mac证据；不推导未测平台/沙箱",
-      "statusReason": "限定M1无工具真实文本/原会话恢复/活跃取消已验证；尚无真实模型工具审批任务闭环，不能由M1或测试数量自动完成M0-Pi。"
+      "statusReason": "按既定条件逐项补齐：M0-UI/M0-SDK沿用原passed，本轮真实模型任务经Mac产品Host/Worker链路完成审批、取消、原Session恢复；范围见agent-task-live报告。CLI真实链路与历史Electron UI证据分列，不推导其他平台、通用沙箱或发行。"
     }
   ]
 }

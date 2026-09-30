@@ -4,7 +4,7 @@
 
 Pi 本身也将 key 保存在 `~/.pi/agent/auth.json`，文件初建权限为 0600（仅本人读写）；自定义模型配置放在 `models.json`。见 [Pi 官方凭据说明](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/providers.md)。本仓库核对的是安装的 Pi 0.87.1 文档与公开 SDK。工作台采用其 `api_key` 凭据记录格式，但 `model.json` 是产品授权格式，不能直接当 Pi 的 `models.json` 使用。
 
-当前支持官方 OpenAI Responses、经用户批准的 OpenAI 兼容 Responses/Chat Completions，以及原有 Anthropic Messages。均已做真实 Pi/Worker 的合成响应测试，已限定完成真实无工具文本、原会话恢复及活跃取消；历史超时保留，真实工具任务仍未验收。限定 macOS arm64；没有新增 SDK 或重写 Provider。
+当前支持官方 OpenAI Responses、经用户批准的 OpenAI 兼容 Responses/Chat Completions，以及原有 Anthropic Messages。均已做真实 Pi/Worker 的合成响应测试，已限定完成真实无工具文本、原会话恢复及活跃取消；历史超时保留；2026-09-30已补限定真实read/write/Bash项目任务、拒绝、活跃取消与原Session恢复，见文末实测。限定 macOS arm64；没有新增 SDK 或重写 Provider。
 
 ## 初始化与填写
 
@@ -174,3 +174,10 @@ npm run model:policy -- apply-approved-requests previous.json candidate.json req
 完成后将candidate保存为应用model.json再重启。修订命令只登记策略，不覆盖配置，也不读auth.json、不调用模型；同revision-id幂等。旧check/apply-approved仍仅允许期限修订，不能借它解除次数或新增工具；请求次数修订也不能改费用、身份、期限或工具权限。改期限另作一次已批准的期限修订。历史文件验收方案固定8次/每Run4次，驱动继续拒绝不限次数配置，不能把它冒充当前Agent Shell任务入口。
 
 [次数缺省、本机期限修订与限定离线回归证据](validation/request-defaults-2026-09-30.md)。
+
+
+## 已批准的工具范围修订
+
+工具启用与LLM次数/费用是独立边界。已有授权需要启用文件/Bash时，不换authorizationId或重建profile；先制作只含已批准fileTools/shellTools变化的candidate，再执行 `model:policy check-tools` / `model:policy apply-approved-tools`，参数仍为previous.json、candidate.json、revision-id。修订保留原请求、费用、模型、期限和数据范围，禁止夹带LLM次数变化；完成登记后保存candidate为model.json。Renderer不能调用此维护入口。
+
+2026-09-30本机已启用批准的工具范围并用专用合成项目通过真实验收；不要求重新填写请求次数。独立手动入口 `npm run validate:agent-shell -- --execute-approved <attempt-id> <approved-synthetic-workspace>` 复用现有产品链路，逐操作终端审批；它是验收驱动，不是产品启动默认行为，正常使用仍是 `npm run desktop:model`。详见 [实测范围](validation/agent-task-live-2026-09-30.md)。

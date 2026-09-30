@@ -304,7 +304,7 @@ CLI 演示将审计/profile 留在 `.artifacts/shell-demos/`；crash 演示故�
 
 ## M1 配置与离线会话
 
-非秘密配置与本机凭据入口见 [模型配置](MODEL_CONFIGURATION.md)，接入范围见 [M1 契约](ssot/m1-model-contract.md)。新增 `model:config`、`desktop:model`、`test:model-integration-offline`、`test:model-network`、`test:model-config`、`test:desktop-model`；保持原 bootstrap/默认演示行为及唯一 npm 锁。真实无工具首次回复、原会话恢复和活跃取消已限定验收；真实工具任务仍未验收。只允许明确批准的配置和本机凭据，不读取全局 Pi auth；旧授权4/4耗尽。
+非秘密配置与本机凭据入口见 [模型配置](MODEL_CONFIGURATION.md)，接入范围见 [M1 契约](ssot/m1-model-contract.md)。新增 `model:config`、`desktop:model`、`test:model-integration-offline`、`test:model-network`、`test:model-config`、`test:desktop-model`；保持原 bootstrap/默认演示行为及唯一 npm 锁。真实无工具首次回复、原会话恢复和活跃取消已限定验收；限定真实工具任务已于2026-09-30补证，见文末Agent Shell入口。只允许明确批准的配置和本机凭据，不读取全局 Pi auth；历史4次消费保留；产品缺省不设请求次数上限。
 
 M1 续验修订的离线回归：`npm run test:model-resume`（合成 SQLite/客户端与隔离配置，不使用账户）。显式策略修订与真实续验入口见 [配置说明](MODEL_CONFIGURATION.md)。
 
@@ -337,3 +337,6 @@ npm run demo:agent-shell
 使用已安装的固定Node/Pi/Electron，不自动下载。演示采用专用offline-shell-profile、明确SYNTHETIC的Provider，实际执行Pi Bash。可选择独立工作目录并创建新会话，每条命令须批准；非零退出回到Pi，下一条命令仍单独审批。Bash能改变该目录内任意类型文件，停止不回滚；它不自动登记成果。建议用专门的无敏感测试目录体验，勿选择包含凭据的目录。
 
 真实模式继续使用 `npm run desktop:model` 与仓库外现有model.json/auth.json入口；需要显式shellTools及新的授权，旧配置不会自动启用。限额、SQL v9/IPC v7、恢复清单和已测平台见 [契约](ssot/agent-shell-contract.md)。受保护的应用profile/配置目录及其祖先或子目录不能成为自选workspace，活动任务期间不能切换；已存在会话保持原目录。此前章节的旧schema/协议数字描述各历史增量。
+
+
+Agent Shell手动真实验收入口：`npm run validate:agent-shell -- --execute-approved <attempt-id> <approved-synthetic-workspace>`。需要已配置并批准的工具范围、专用合成README.md/data.md/check.sh与交互终端；会产生真实模型费用且每条工具须人工决定，不属于自动测试或默认产品启动。实际案例、清理和失败边界见 [2026-09-30报告](validation/agent-task-live-2026-09-30.md)。

@@ -37,3 +37,8 @@ Bash成功不自动登记成果，也不扫描整个目录假定无副作用；M
 `test:product-model-shell` 使用实际Pi、Worker、guardian、Bash、SQLite和文件，模型响应为明确合成的OpenAI Chat Completions/Responses SSE。`test:desktop-agent-shell` 使用实际Electron及Pi工具，Provider与原生dialog选择结果为合成输入。`demo:agent-shell` 是可复用产品链路的离线演示，不能冒充真实模型自主决策。
 
 本轮没有真实模型请求。受限模式只支持已验证Mac arm64/固定Node；无PTY、Windows、任意恶意逃逸/脱组后代保证。Shell记录缺失或不可对账仍阻断，不提供强制释放按钮。初始化、新克隆、人工中文输入法/读屏及真实长流未由本轮测试证明。真实模型任务须核定数据/目录/工具和费用范围。2026-09-30用户已取消累计/单Run的LLM请求次数上限；旧4次消费保留，费用仍累计，不能据此自动启用Bash或扩大目录。
+
+
+## 2026-09-30真实任务补证
+
+[真实任务报告](../validation/agent-task-live-2026-09-30.md)补齐10次真实gpt-6-luna请求与Mac审批/取消/原Session恢复。旧“本轮没有真实模型请求”仅指上面的首次离线阶段。模型严格工具schema校验复用Pi0.87.1公开api/constrained-sampling下makeStrictJsonSchema；同名工具与参数结构仍精确校验，不禁用strict。工具范围通过独立宿主策略修订启用，旧身份/消费保留；本次CLI手动决定不等于Renderer自动批准。MODEL-04和M0-Pi仅按报告所列边界完成。

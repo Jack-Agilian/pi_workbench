@@ -132,3 +132,7 @@ M2 实机复审：[两处正确性修正与 Mac 回归](../validation/review-m2-
 2026-09-30授权更新：用户取消LLM累计/单Run请求次数上限；历史4次与费用预留保留，费用/数据/工具权限未扩大。[配置与修订](../MODEL_CONFIGURATION.md#不限制请求次数)。旧4/4不再是次数阻塞依据；没有新增真实模型证据。
 
 [次数缺省、本机期限修订与限定离线回归证据](../validation/request-defaults-2026-09-30.md)。
+
+## 限定真实项目任务（2026-09-30）
+
+[被测代码、首次拒绝和四场景证据](../validation/agent-task-live-2026-09-30.md)：gpt-6-luna真实read/write/Bash任务、拒绝、活跃Shell取消与原Session恢复通过，新增10请求、旧账本/身份保留。MODEL-03/04限定done，M0-Pi按既定条件passed；CLI真实产品链路与历史Electron UI证据分列。前面的待授权/blocked是历史，唯一当前事项以NEXT_STEPS顶部的交付复审与develop集成准备为准。

@@ -150,7 +150,7 @@ schema v7 的 model_policy_revisions 记录同授权的显式时间修订，mode
 
 用户确认单个 LLM 请求总上限默认30分钟，网络空闲默认5分钟，二者独立；Worker启动、Run编排和进程清理另计，详见 [时间契约](m1-model-contract.md)。缩时合成测试不代表30分钟真实服务实测。当前4/4授权已耗尽；M2离线开发不授权新的真实请求，M0-Pi仍blocked。采用条目与证据的逐项核对见 [收口报告](../validation/m1-closeout-2026-09-29.md)。
 
-M1收口已集成develop `148022b05250cfda824725778e9a056d00cd6830`；[M2最小实施契约](m2-file-agent-contract.md)的限定离线实现与审核已在功能分支完成，MODEL-03为in_progress，真实任务尚未验收。当前动态Bash与目录接缝见 [Agent Shell契约](agent-shell-contract.md)，唯一推进顺序由NEXT_STEPS顶部定义。
+M1收口已集成develop `148022b05250cfda824725778e9a056d00cd6830`；[M2最小实施契约](m2-file-agent-contract.md)的限定离线实现与审核已在功能分支完成，MODEL-03随后补齐限定真实任务证据，见下方2026-09-30记录。当前动态Bash与目录接缝见 [Agent Shell契约](agent-shell-contract.md)，唯一推进顺序由NEXT_STEPS顶部定义。
 
 ## M2 当前接缝补充
 
@@ -162,3 +162,8 @@ M1收口已集成develop `148022b05250cfda824725778e9a056d00cd6830`；[M2最小�
 ## Agent Shell补充（2026-09-30）
 
 [逐命令契约](agent-shell-contract.md)延续宿主所有权：SQL v9保存命令意图/启动标记与目录选择；IPC v7增加有界shell-operation。guardian每命令独立收据和最终清单用于真实重开对账，未知副作用不重发。只有普通已知非零退出可回到Pi继续；它仍是failed Operation，不能改写为成功。目录来自Electron原生框，已有Thread不迁移；旧配置不自动开放Bash，模型额度不重置。
+
+
+## Agent Shell真实任务与策略边界（2026-09-30）
+
+[真实任务证据](../validation/agent-task-live-2026-09-30.md)补齐10次gpt-6-luna调用，限定MODEL-03/04与M0-Pi按既定条件完成。原“4/4耗尽/blocked”仅为M1阶段历史；产品默认不配置次数限制，独立tools修订保留原授权/消费，不改变费用或时间。宿主复用Pi公开makeStrictJsonSchema核对strict工具声明，不放宽未知工具准入。真实CLI链路的Mac证据不冒充本轮Electron UI或其他平台；下一步以NEXT_STEPS交付复审与集成准备为准。
