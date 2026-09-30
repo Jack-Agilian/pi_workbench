@@ -410,7 +410,7 @@ export class ProductCore {
     this.mutate(() => {
       const run = this.bound(binding); this.requireSettled(run, evidence);
       if (run.state === 'starting' || (run.state === 'cancelling') !== (result === 'cancelled')) throw new Error('invalid_terminal_transition');
-      if (result === 'completed' && this.all<{id:string}>("SELECT id FROM operations WHERE run_id=? AND state IN ('failed','denied')", run.id).some(op=>!this.operationAllowsCompletion(op.id))) throw new Error('failed_operation');
+      if (result === 'completed' && this.all<{id:string}>("SELECT id FROM operations WHERE run_id=? AND state='failed'", run.id).some(op=>!this.operationAllowsCompletion(op.id))) throw new Error('failed_operation');
       this.setRun(run, result);
     });
   }

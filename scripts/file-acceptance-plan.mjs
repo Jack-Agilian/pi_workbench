@@ -32,7 +32,7 @@ export function auditLedger(profile, config, reserve) {
   try {
     db.exec('BEGIN');
     const version = db.prepare('PRAGMA user_version').get().user_version;
-    assert.ok([7, 8].includes(version), 'unsupported_validation_database');
+    assert.ok([7, 8, 9].includes(version), 'unsupported_validation_database');
     const all = db.prepare('SELECT * FROM model_requests ORDER BY rowid').all();
     const revisions = db.prepare('SELECT * FROM model_policy_revisions ORDER BY seq').all();
     const rows = all.filter(r => r.authorization_id === config.authorizationId);
@@ -58,6 +58,7 @@ export function buildPlan({ profile, attempt, config: raw, reserve, commit }) {
   if (!config.approved) blocked.push('authorization_not_approved');
   if (config.maxRequests !== 8 || config.maxOutputTokens > 512 || config.timeoutMs > 1800000 ||
       (config.httpIdleTimeoutMs ?? config.timeoutMs) > 300000) blocked.push('limits_outside_reviewed_plan');
+  if (config.shellTools) blocked.push('shell_outside_file_acceptance');
   const tools = config.fileTools;
   if (!tools || tools.maxOperations > 6 || tools.maxModelRequests > 4 || tools.operationTimeoutMs > 300000)
     blocked.push('file_scope_not_approved');
