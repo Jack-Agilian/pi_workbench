@@ -21,6 +21,10 @@ export async function captureLayout(window: BrowserWindow, label: string): Promi
     await new Promise(r => setTimeout(r, 180));
     // Wait for the resized Renderer to produce a frame before asking Chromium to copy it.
     await phase(`${label}:${width}:frame`, () => window.webContents.executeJavaScript('new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))'));
+    // Approval is now in its operation record. Navigate explicitly instead of
+    // depending on a permanently visible inspector or stealing passive readers' focus.
+    await window.webContents.executeJavaScript("document.querySelector('.show-approvals')?.click()");
+    await phase(`${label}:${width}:approval-frame`, () => window.webContents.executeJavaScript('new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))'));
     const metrics = await phase(`${label}:${width}:metrics`, () => window.webContents.executeJavaScript(`(() => {
       const actionable = selector => { const e=document.querySelector(selector); if(!e)return false; const b=e.getBoundingClientRect(); const top=document.elementFromPoint(b.x+b.width/2,b.y+b.height/2); return b.x>=0 && b.y>=0 && b.right<=innerWidth && b.bottom<=innerHeight && !!top && e.contains(top); };
       const box = selector => { const e = document.querySelector(selector); if (!e) return null;

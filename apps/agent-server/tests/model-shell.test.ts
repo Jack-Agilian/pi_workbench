@@ -16,7 +16,8 @@ test('automatic policy: actual Pi write/read/Bash, immutable Run mode and no rep
   f.supervisor.command({type:'threads.permissions',requestId:'auto',threadId:f.thread,mode:'auto',expectedRevision:0});
   const start={type:'runs.start',requestId:'auto-run',threadId:f.thread,input:'SYNTHETIC automatic tools',permissionRevision:1};
   const run=f.supervisor.command(start).id;
-  const done=f.supervisor.startNext(plan,entry,{...access,fetch:async()=>{
+  const done=f.supervisor.startNext(plan,entry,{...access,fetch:async(_url,options)=>{
+   const wire=String(options?.body);assert.match(wire,/Every operation requires host authorization/);assert.doesNotMatch(wire,/requires separate human approval/);
    calls++;
    if(calls===1)f.supervisor.command({type:'threads.permissions',requestId:'manual-next',threadId:f.thread,mode:'manual',expectedRevision:1});
    const tools=calls===1?[{tool:'write' as const,parameters:{path:'auto.md',content:'# SYNTHETIC automatic\n'}}]:calls===2?[{tool:'read' as const,parameters:{path:'auto.md'}}]:calls===3?[bash('printf once >> effect.txt; if printf forbidden > ../outside.txt 2>/dev/null; then exit 9; fi')]:[];
@@ -69,6 +70,7 @@ for(const api of ['chat-completions','responses'] as const)test(`model Bash ${ap
  try{
   const done=f.supervisor.startNext(plan,entry,{...access,fetch:async(_url,options)=>{
    bodies.push(String(options?.body));calls++;
+   assert.match(bodies.at(-1)!,/Every operation requires host authorization/);assert.doesNotMatch(bodies.at(-1)!,/requires separate human approval/);
    const tools=calls===1?[bash('printf SYNTHETIC-first; exit 7')]:calls===2?[bash('printf SYNTHETIC-second >> result.txt')]:[];
    return new Response(syntheticReply(api,calls,tools),{headers:{'content-type':'text/event-stream'}});
   }})!;

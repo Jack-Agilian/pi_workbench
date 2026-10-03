@@ -14,7 +14,7 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
   const wait = async (check: () => Promise<boolean>, label: string) => {
     console.log(`frontend wait: ${label}`);
     const end = Date.now() + 10000;
-    while (!await check()) { if (Date.now() > end) throw Error('frontend_timeout:' + label); await new Promise(r => setTimeout(r, 35)); }
+    while (!await check()) { if (Date.now() > end) { console.log('frontend timeout state',await js("(()=>{const t=document.querySelector('.timeline');return {top:t?.scrollTop,height:t?.scrollHeight,client:t?.clientHeight,focus:document.activeElement?.className,overlay:document.querySelector('.content-grid')?.dataset.overlay,inspectorHidden:document.querySelector('.inspector')?.hidden,runs:document.querySelectorAll('[data-run]').length}})()")); throw Error('frontend_timeout:' + label); } await new Promise(r => setTimeout(r, 35)); }
   };
   const click = async (selector: string) => {
     // Like smoke.ts: a published page does not mean the async button is ready.
@@ -89,11 +89,13 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
     await switchTo(chosen.title);
     await wait(() => js<boolean>("!!document.querySelector('.retry-pages') && document.querySelector('h1').textContent==='SYNTHETIC allow'"), 'failed_first_page_activity');
     await click('.show-approvals');
+    await wait(() => js<boolean>("document.activeElement.matches('.current-approvals .approval') && document.querySelectorAll('.approval').length===1"),'approval_without_history');
     const expectedWorkspace = home.workspaces.items.find(w => w.id === chosen.workspaceId)!.path;
     assert.equal(await js<string>("document.querySelector('.execution-summary span').title"), expectedWorkspace);
     assert.equal(await js<boolean>("!!document.querySelector('.view-toolbar .stop')"), true);
     alternateSelection = false; historyError = ''; await click('.retry-pages');
     await wait(() => js<boolean>("document.querySelectorAll('[data-run]').length===8"), 'first_page');
+    assert.equal(await js<boolean>("document.querySelectorAll('.approval').length===1 && document.querySelector('.approval').closest('[data-operation]').dataset.operation===document.querySelector('.approval').dataset.approval && !document.querySelector('.current-approvals')"),true);
     await wait(() => js<boolean>("!!document.querySelector('.load-operations')"), 'tools_first_page');
     operationError='page_item_too_large';await click('.load-operations');
     await wait(()=>js<boolean>("!!document.querySelector('.retry-pages')"),'query_tool_error');
@@ -105,7 +107,7 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
     await wait(async()=>Boolean(releaseOperation),'query_slow_tool');
     assert.equal(await js<boolean>("document.querySelector('.load-operations').disabled && !!document.querySelector('.view-toolbar .stop')"),true);
     releaseOperation!();
-    await wait(() => js<boolean>("document.querySelectorAll('.tool-card').length===16 && !document.querySelector('.load-operations')"), 'tools_more');
+    await wait(() => js<boolean>("document.querySelectorAll('.operation-record').length===16 && !document.querySelector('.load-operations')"), 'tools_more');
     for (const count of [16, 24, 32, 36]) {
       await click('.load-history');
       await wait(() => js<boolean>(`document.querySelectorAll('[data-run]').length===${count}`), 'older_page');
@@ -117,6 +119,7 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
     await new Promise(r => setTimeout(r, 500));
     assert.deepEqual(await js("[document.activeElement.id,document.querySelector('#composer').selectionStart,document.querySelector('#composer').selectionEnd]"), ['composer', 3, 7]);
     await captureLayout(window, 'ui-p2-approval');
+    await click('.inspector-toggle');
     const originalSize = window.getContentSize();
     const frame = () => js('new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))');
     const rail = (name: string) => `[role=separator][aria-label="${name}"]`;
@@ -164,8 +167,9 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
       assert.equal(await js<boolean>("document.querySelector('.inspector').hidden"), true);
       assert.equal(await js<string>("document.querySelector('.approval-indicator').textContent"), '1 项待审批');
       assert.equal(await js<boolean>("(()=>{const e=document.querySelector('.view-toolbar .stop');const b=e.getBoundingClientRect();return e.contains(document.elementFromPoint(b.x+b.width/2,b.y+b.height/2))})()"), true);
-      await click('.show-approvals');
-      assert.equal(await js<boolean>("document.querySelector('.inspector').hidden"), false);
+      await click('.show-approvals'); await frame();
+      assert.equal(await js<boolean>("document.querySelector('.inspector').hidden && document.activeElement.matches('.approval') && !document.querySelector('.inspector .approval')"), true);
+      await click('.inspector-toggle'); await frame();
       await click('.sidebar-toggle');
       assert.equal(await js<boolean>("document.querySelector('.sidebar').hidden && !document.querySelector('[aria-label=导航栏宽度]')"), true);
       await click('.sidebar-toggle');
@@ -202,8 +206,7 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
     await wait(() => js<boolean>("document.querySelector('.approval-indicator').textContent==='1 项待审批'"), 'approval_arrived_collapsed');
     assert.equal(await js<boolean>("document.querySelector('.inspector').hidden && document.activeElement.id==='composer'"), true);
     await click('.show-approvals');
-    // Opening the rail changes line wrapping. Capture the navigation baseline only
-    // after ResizeObserver/scroll handlers have seen the resulting rendered frame.
+    // Explicit approval navigation remains owned by the timeline scroll hook.
     await js('new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))');
     const saved = await js<number>("document.querySelector('.timeline').scrollTop");
     await switchTo(other.title); await wait(() => js<boolean>("document.querySelectorAll('[data-run]').length===1"), 'other');
@@ -211,9 +214,9 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
     const restored = await js<number>("document.querySelector('.timeline').scrollTop");
     assert.ok(Math.abs(restored - saved) < 3, `thread scroll changed: saved=${saved}, restored=${restored}`);
     assert.equal(await js<string>("document.querySelector('#composer').value"), 'SYNTHETIC 保留草稿');
-    await click('.return-latest');
+    if (await js<boolean>("!!document.querySelector('.return-latest')")) await click('.return-latest');
     await wait(() => js<boolean>("document.querySelector('.timeline').scrollHeight-document.querySelector('.timeline').clientHeight-document.querySelector('.timeline').scrollTop<3"), 'latest');
-    await click('.inspector-nav [data-panel=artifacts]');
+    await click('.inspector-toggle');
     assert.equal(await js<string>("document.querySelector('.artifact-status').dataset.status"), 'unchecked');
     for (const status of ['ready', 'changed', 'missing', 'unavailable'] as const) {
       previewStatus = status; await click('.artifact');
@@ -229,7 +232,8 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
       await click(`.artifact[data-artifact="${fixture.artifacts[index]!.id}"]`);
       await wait(() => js<boolean>("Boolean(document.querySelector('.preview pre'))"), 'nearby_preview_'+index);
       assert.equal(await js<boolean>(`(()=>{const p=document.querySelector('.preview');const b=p.getBoundingClientRect();const r=document.querySelector('.inspector').getBoundingClientRect();return p.previousElementSibling.dataset.artifact===${JSON.stringify(fixture.artifacts[index]!.id)} && p===document.activeElement && b.top>=r.top && b.top<r.bottom && p.querySelector('h3').textContent.includes('版本 ${index+1}');})()`), true);
-      assert.ok(Math.abs(await js<number>("document.querySelector('.timeline').scrollTop")-timelineTop)<3);
+      const afterPreviewTop=await js<number>("document.querySelector('.timeline').scrollTop");
+      assert.ok(Math.abs(afterPreviewTop-timelineTop)<3,`preview ${index} changed timeline ${timelineTop} -> ${afterPreviewTop}`);
       await click('.preview button[aria-label="关闭预览"]');
       assert.equal(await js<string>("document.activeElement.dataset.artifact"), fixture.artifacts[index]!.id);
     }
@@ -288,7 +292,7 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
     assert.equal(await js<boolean>("document.querySelector('.sidebar').hidden"),false);
     assert.equal(commands, 0, 'view interactions must not submit execution commands');
     const directory = join(app.getAppPath(), '../../.artifacts/ui-p2-frontend'); mkdirSync(directory, {recursive: true});
-    writeFileSync(join(directory, 'interaction-results.json'), JSON.stringify({scope: 'SYNTHETIC display fixtures in real Electron; no model calls or execution claims',metrics,anchorPreserved: true,threadScrollRestored: true,draftAndSelectionPreserved: true,latePreviewRejected: true,nativePaneDragging: true,keyboardResize: true,overlayFocus: true,preferenceReload: true,invalidPreferencesFallback: true,blurStopsDrag: true,previewStatuses: ['ready','changed','missing','unavailable'],commands}, null, 2));
+    writeFileSync(join(directory, 'interaction-results.json'), JSON.stringify({scope: 'SYNTHETIC display fixtures in real Electron; no model calls or execution claims',metrics,anchorPreserved: true,threadScrollRestored: true,draftAndSelectionPreserved: true,latePreviewRejected: true,inlineApprovalIdentity: true,approvalWithoutHistory: true,nativePaneDragging: true,keyboardResize: true,overlayFocus: true,preferenceReload: true,invalidPreferencesFallback: true,blurStopsDrag: true,previewStatuses: ['ready','changed','missing','unavailable'],commands}, null, 2));
     console.log('UI-P2 frontend: 3 sizes / native pointer + keyboard resize, overlay/collapse and approvals/stop, scroll anchor + thread restore, draft/focus, preview statuses and late response fencing passed (SYNTHETIC UI fixtures)');
   } finally { releaseHistory?.(); releasePreview?.(); host.request = request; }
 }

@@ -18,6 +18,7 @@ export async function runPaginationSmoke(window: BrowserWindow, host: HostClient
   await js(`[...document.querySelectorAll('.thread-link')].find(b=>b.getAttribute('aria-label')===${JSON.stringify(title)}).click()`);
   await wait("document.querySelectorAll('[data-run]').length===8 && document.querySelectorAll('[data-artifact]').length===8");
   assert.equal(await js<string>("document.querySelectorAll('[data-run] .user p')[7].textContent"), 'SYNTHETIC persisted history 59');
+  await click('.inspector-toggle');
   await click('.load-artifacts'); await wait("document.querySelectorAll('[data-artifact]').length===10");
   await click('.artifact'); await wait("!!document.querySelector('.preview pre')");
   assert.match(await js<string>("document.querySelector('.preview pre').textContent"), /SYNTHETIC file/);

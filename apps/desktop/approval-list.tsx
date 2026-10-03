@@ -1,7 +1,7 @@
 import type { Command, OperationView } from '../../packages/app-contracts/index.ts';
 
 export function ApprovalList({pending, workspacePath, modelMode, busy, disconnected, command}: {pending: OperationView[]; workspacePath: string; modelMode: boolean; busy: boolean; disconnected: boolean; command: (value: Command) => Promise<unknown>}) {
-  return <>{pending.map(op => <section className="approval" key={op.id} aria-label={op.shell ? '命令执行审批' : op.tool === 'read' ? '文件读取审批' : '文件写入审批'}>
+  return <>{pending.map(op => <section className="approval" key={op.id} data-approval={op.id} tabIndex={-1} aria-label={op.shell ? '命令执行审批' : op.tool === 'read' ? '文件读取审批' : '文件写入审批'}>
     <header><span className="approval-label">需要确认</span><h3>{op.shell ? '执行 Bash 命令' : op.tool === 'read' ? '读取 Markdown' : op.tool === 'edit' ? '修改 Markdown' : op.file?.fileVersion ? '替换 Markdown' : '新建 Markdown'}</h3></header>
     <div className="approval-body">
       <p className="field-label">执行目标</p><pre className="target">{op.shell ? op.shell.intent.command : op.artifactPath}</pre>

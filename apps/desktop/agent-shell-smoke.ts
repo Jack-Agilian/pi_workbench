@@ -28,6 +28,7 @@ export async function runAgentShellSmoke(window:BrowserWindow,host:HostClient){
    assert.equal(await js<boolean>("document.querySelector('.run-label').textContent.includes('等待你的批准')"),true);
    assert.equal(await js<boolean>(`document.querySelector('.approval').textContent.includes(${JSON.stringify(directory)}) && document.querySelector('.approval').textContent.includes('工具结果将发送给本次模型')`),true);
    if(i===0){await captureLayout(window,'agent-shell-approval');await js("document.querySelectorAll('.approval details').forEach(e=>e.open=true)");await captureLayout(window,'agent-shell-expanded');}
+   assert.equal(await js<boolean>("document.querySelector('.approval').closest('[data-operation]').dataset.operation===document.querySelector('.approval').dataset.approval && !document.querySelector('.inspector .approval')"),true);
    const approvedDigest=await js<string>("document.querySelector('.approval code').textContent");
    const pending=await host.request({type:'thread',threadId}) as DesktopThread;assert.equal(pending.operations[i]?.parametersDigest,approvedDigest);
    await click('.approval .primary');
@@ -103,6 +104,7 @@ export async function runAgentShellSmoke(window:BrowserWindow,host:HostClient){
   assert.equal(automatic.runs[0]!.permissionMode,'auto');assert.equal(automatic.operations.length,2);
   assert.ok(automatic.operations.every(op=>op.approvalSource==='workspace-tools-v1'));
   assert.equal(await js<number>("document.querySelectorAll('.approval .primary').length"),0);
+  assert.equal(await js<boolean>("!document.querySelector('.context-popover').textContent.includes('须逐项批准') && document.querySelector('.context-popover').textContent.includes('宿主授权')"),true);
   await host.reconnect();
   await new Promise<void>(resolve=>{window.webContents.once('did-finish-load',resolve);window.webContents.reload();});
   await wait(()=>js<boolean>("document.querySelector('.permission-picker summary')?.textContent==='权限：自动审批' && document.querySelectorAll('.approval-source').length===2"),'automatic-policy-restored');

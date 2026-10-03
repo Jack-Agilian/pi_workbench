@@ -105,7 +105,7 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
       assert.equal(await js<boolean>("document.querySelector('.run-conversation').getAttribute('aria-label') === '会话正文' && document.querySelector('.run-operations').getAttribute('aria-label') === '操作记录' && !document.querySelector('.run-conversation .tool-card') && !document.querySelector('.run-operations .message') && !document.querySelector('[aria-label=会话时间线]')"), true);
       const artifact = snapshot.artifacts[0]!; assert.ok(artifact); assert.ok(readFileSync(join(profile, 'workspace', artifact.path), 'utf8').includes(text));
       await wait(() => js<boolean>("Boolean(document.querySelector('.artifact'))"), 'artifact');
-      await js("document.querySelector('[data-panel=artifacts]').click()");
+      await js("document.querySelector('.inspector-toggle').click()");
       await js("document.querySelector('.artifact').click()");
       await wait(() => js<boolean>("Boolean(document.querySelector('.preview pre'))"), 'preview');
       assert.equal(await js<boolean>("Boolean(globalThis.injection) || !!document.querySelector('.preview img')"), false);
