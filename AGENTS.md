@@ -1,6 +1,6 @@
 # Repository working agreement
 
-本仓库已实现限定的 macOS 无模型桌面、Pi SDK/真实 Worker 接入、D1 退出与恢复闭环及限定的 D2-S 非交互 Bash 产品接入；具体基线、验证范围与未完成项以 `docs/ssot/` 和 `docs/planning/NEXT_STEPS.md` 为准。M1-A 无工具会话离线增量已限定验证；M1-B 已完成限定真实无工具文本、原会话恢复与活跃取消，30分钟单LLM总上限已获确认；M1收口已集成develop，M2/Agent Shell已限定通过真实gpt-6-luna项目read/write/Bash、逐操作审批、活跃取消与原Session恢复；MODEL-03/04限定done、M0-Pi限定passed。Agent Shell/M2已按授权集成develop；当前唯一事项以 `docs/planning/NEXT_STEPS.md` 顶部为准；请求次数缺省不限，历史请求和费用保留，证据见docs/validation/agent-task-live-2026-09-30.md；术语见 `docs/ssot/glossary.md`。交互 PTY、其他平台、完整真实模型桌面人工体验和生产发行尚未完成，不得将局部实现或历史报告扩大为完整产品或本轮实测。
+本仓库已实现限定的 macOS 无模型桌面、Pi SDK/真实 Worker 接入、D1 退出与恢复闭环及限定的 D2-S 非交互 Bash 产品接入；具体基线、验证范围与未完成项以 `docs/ssot/` 和 `docs/planning/NEXT_STEPS.md` 为准。M1-A 无工具会话离线增量已限定验证；M1-B 已完成限定真实无工具文本、原会话恢复与活跃取消，30分钟单LLM总超时与5分钟网络空闲检测已获确认（API检测，不属于用量额度）；M1收口已集成develop，M2/Agent Shell已限定通过真实gpt-6-luna项目read/write/Bash、逐操作审批、活跃取消与原Session恢复；MODEL-03/04限定done、M0-Pi限定passed。Agent Shell/M2已按授权集成develop；当前唯一事项以 `docs/planning/NEXT_STEPS.md` 顶部为准；请求次数及费用缺省不限，不推算剩余额度，可选有限配置仅兼容测试/显式设置；历史请求和费用记录保留，证据见docs/validation/agent-task-live-2026-09-30.md；术语见 `docs/ssot/glossary.md`。交互 PTY、其他平台、完整真实模型桌面人工体验和生产发行尚未完成，不得将局部实现或历史报告扩大为完整产品或本轮实测。
 
 ## 修改与验证
 
@@ -32,3 +32,5 @@ UI 只认识产品协议；App Server 管产品状态；Pi Worker 不直接写�
 ## 安全与发布
 
 密钥始终位于仓库外；禁止打印秘密。不要强制推送、重写已有远端历史或更改账户/分支保护。发布只有在远端 SHA 被独立读回确认后才算成功。
+
+产品默认不得混入验证额度：不设4/8次请求、累计$1、512输出token、8个操作、6条Bash或固定30秒Bash截止；有限测试值只属于显式合成测试/旧配置兼容，不能阻挡当前缺省产品使用。输出默认委托Pi/模型。

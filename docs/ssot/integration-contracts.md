@@ -1,5 +1,7 @@
 # 模块接入契约：只保留必要的解耦
 
+当前用量默认以[产品限制契约](model-limits-contract.md)为准：请求次数/累计费用不限，输出沿用Pi模型默认；30分钟请求总超时和5分钟网络空闲是API检测。下方按日期保留的有限验收阶段不构成当前门槛。
+
 状态：实施契约；已验证范围由各阶段报告单独登记，不能把整份契约视为已实现。服从[复用优先架构](reuse-first.md)。符号与源码依据见[证据表](upstream-evidence.md)。
 
 ## 1. 依赖与状态所有权
@@ -148,7 +150,7 @@ P0 的 CORE-03 必须保证同 Workspace 至多一个活动写 Run；M0 可先�
 
 schema v7 的 model_policy_revisions 记录同授权的显式时间修订，model_requests 的原请求数/预留不重置。配置摘要对字段顺序稳定，无法证明的旧策略保持阻断；Renderer 只收到策略待确认/预算耗尽等安全状态。恢复驱动复用原 Thread/Session 和稳定产品 requestId，已开始的 attempt 与中断锁不自动重跑。公开 SDK、原生历史和宿主唯一写库的所有权不变。
 
-用户确认单个 LLM 请求总上限默认30分钟，网络空闲默认5分钟，二者独立；Worker启动、Run编排和进程清理另计，详见 [时间契约](m1-model-contract.md)。缩时合成测试不代表30分钟真实服务实测。当前4/4授权已耗尽；M2离线开发不授权新的真实请求，M0-Pi仍blocked。采用条目与证据的逐项核对见 [收口报告](../validation/m1-closeout-2026-09-29.md)。
+用户确认单个 LLM 请求总上限默认30分钟，网络空闲默认5分钟，二者独立；Worker启动、Run编排和进程清理另计，详见 [时间契约](m1-model-contract.md)。缩时合成测试不代表30分钟真实服务实测。该历史收口时有限授权耗尽、M0-Pi仍blocked；当前不得据此阻挡，后续授权和验证见最新契约及NEXT_STEPS。采用条目与证据的逐项核对见 [收口报告](../validation/m1-closeout-2026-09-29.md)。
 
 M1收口已集成develop `148022b05250cfda824725778e9a056d00cd6830`；[M2最小实施契约](m2-file-agent-contract.md)的限定离线实现与审核已在功能分支完成，MODEL-03随后补齐限定真实任务证据，见下方2026-09-30记录。当前动态Bash与目录接缝见 [Agent Shell契约](agent-shell-contract.md)，唯一推进顺序由NEXT_STEPS顶部定义。
 
