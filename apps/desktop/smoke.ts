@@ -25,7 +25,7 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
     await js(`(() => { const b = [...document.querySelectorAll('button')].find(b => (b.textContent.trim() === ${JSON.stringify(text)} || b.getAttribute('aria-label') === ${JSON.stringify(text)})); if (!b || b.disabled) throw new Error('button_unavailable'); b.click(); })()`);
   };
   const fill = async (selector: string, value: string) => {
-    await js(`(() => { const e = document.querySelector(${JSON.stringify(selector)}); const proto = e instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype; Object.getOwnPropertyDescriptor(proto, 'value').set.call(e, ${JSON.stringify(value)}); e.dispatchEvent(new Event('input', { bubbles: true })); })()`);
+    await js(`(() => { const e = document.querySelector(${JSON.stringify(selector)}); const disclosure=e.closest('details'); if(disclosure)disclosure.open=true; const proto = e instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype; Object.getOwnPropertyDescriptor(proto, 'value').set.call(e, ${JSON.stringify(value)}); e.dispatchEvent(new Event('input', { bubbles: true })); })()`);
   };
   await wait(() => js<boolean>("Boolean(document.querySelector('.new-thread'))"), 'render');
   assert.equal(await js("typeof window.require + ':' + typeof window.process + ':' + typeof window.workbench.send"), 'undefined:undefined:undefined');
@@ -40,6 +40,7 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
     console.log(`desktopSmoke scenario: ${scenario}`);
     await fill('#title', `SYNTHETIC ${scenario}`); await click('＋ 新建会话');
     await wait(() => js<boolean>(`document.querySelector('h1')?.textContent === ${JSON.stringify(`SYNTHETIC ${scenario}`)}`), 'thread');
+    await wait(() => js<boolean>("document.querySelector('.inspector').hidden && document.querySelectorAll('h1').length === 1 && !document.querySelector('.topbar') && !document.querySelector('.context-details').open"), 'compact_empty_state');
     const text = `SYNTHETIC ${scenario} 中文任务 <img src=x onerror="globalThis.injection=true"> sk-syntheticSecret123456789`;
     await fill('#composer', text);
     // IME and Shift+Enter do not submit. Plain Enter does.
@@ -104,6 +105,7 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
       assert.equal(await js<boolean>("document.querySelector('.run-conversation').getAttribute('aria-label') === '会话正文' && document.querySelector('.run-operations').getAttribute('aria-label') === '操作记录' && !document.querySelector('.run-conversation .tool-card') && !document.querySelector('.run-operations .message') && !document.querySelector('[aria-label=会话时间线]')"), true);
       const artifact = snapshot.artifacts[0]!; assert.ok(artifact); assert.ok(readFileSync(join(profile, 'workspace', artifact.path), 'utf8').includes(text));
       await wait(() => js<boolean>("Boolean(document.querySelector('.artifact'))"), 'artifact');
+      await js("document.querySelector('[data-panel=artifacts]').click()");
       await js("document.querySelector('.artifact').click()");
       await wait(() => js<boolean>("Boolean(document.querySelector('.preview pre'))"), 'preview');
       assert.equal(await js<boolean>("Boolean(globalThis.injection) || !!document.querySelector('.preview img')"), false);

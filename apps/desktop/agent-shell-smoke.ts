@@ -41,6 +41,10 @@ export async function runAgentShellSmoke(window:BrowserWindow,host:HostClient){
   const expectedText=before.presentations[0]!.value.messages.filter(m=>m.role==='assistant'||m.role==='tool').map(m=>m.text);
   const grouped=()=>js<boolean>("document.querySelectorAll('.run-operations .tool-card').length===2 && document.querySelectorAll('.run-operations .shell-output').length===2 && !document.querySelector('.run-conversation .tool-card')");
   await wait(grouped,'grouped-tools-after-nonzero-continuation');
+  assert.equal(await js<number>("document.querySelectorAll('.shell-output[open]').length"),0);
+  await js("document.querySelector('.shell-output').open=true");
+  await new Promise(r=>setTimeout(r,800));
+  assert.equal(await js<number>("document.querySelectorAll('.shell-output[open]').length"),1);
   assert.deepEqual(await js<string[]>("[...document.querySelectorAll('.run-conversation .message.assistant p')].map(e=>e.textContent)"),expectedText);
   await host.reconnect();const after=await host.request({type:'thread',threadId}) as DesktopThread;
   assert.equal(after.cursor,before.cursor);assert.equal(statSync(result).mtimeMs,time);assert.equal((await host.request({type:'home'}) as DesktopHome).workspaces.selectedId,home.workspaces.selectedId);assert.equal(dialogs,1);

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { DesktopApi, DesktopThread, Preview } from '../../packages/app-contracts/desktop.ts';
 
 const statusLabels: Record<Preview['status'], string> = {
@@ -9,6 +9,13 @@ export function ArtifactPanel({thread, api, disconnected, hasMore, loading, load
   const [checks, setChecks] = useState<Record<string, {status: Preview['status']; at: string}>>({});
   const [preview, setPreview] = useState<{id: string; value?: Preview; error?: boolean} | null>(null);
   const generation = useRef(0);
+  const previewRef = useRef<HTMLElement>(null);
+  const opener = useRef<HTMLButtonElement | null>(null);
+  useLayoutEffect(() => {
+    if (!preview?.id) return;
+    previewRef.current?.focus({preventScroll: true});
+    previewRef.current?.scrollIntoView({block: 'nearest'});
+  }, [preview?.id]);
   useEffect(() => () => { generation.current++; }, []);
   async function inspect(id: string) {
     const current = ++generation.current;
@@ -23,25 +30,28 @@ export function ArtifactPanel({thread, api, disconnected, hasMore, loading, load
     }
   }
   return <>
-    <h3 className="artifacts-heading">成果文件 <span>{thread?.artifacts.length ?? 0}</span></h3>
+    <h3 className="artifacts-heading">成果版本 <span>{thread?.artifacts.length ?? 0}{hasMore ? '+' : ''}</span></h3>
     {!thread?.artifacts.length && <div className="artifact-empty"><span>▤</span><p>成果将在这里出现</p><small>只有核验过的真实文件才会登记。</small></div>}
     {thread?.artifacts.map(artifact => {
       const check = checks[artifact.id];
       const input = thread.inputs.find(item => item.id === artifact.runId)?.text;
-      return <button className={`artifact ${preview?.id === artifact.id ? 'selected-artifact' : ''}`} key={artifact.id} data-artifact={artifact.id} disabled={disconnected} onClick={() => void inspect(artifact.id)}>
+      return <Fragment key={artifact.id}><button className={`artifact ${preview?.id === artifact.id ? 'selected-artifact' : ''}`} data-artifact={artifact.id} disabled={disconnected} onClick={event => { opener.current = event.currentTarget; void inspect(artifact.id); }}>
         <span className="file-icon">M↓</span><div>
           <strong title={artifact.path}>{artifact.path.split('/').at(-1)}</strong>
-          <small className="artifact-path">{artifact.path}</small>
-          <small>来源：{input ? input.slice(0, 80) : `执行 ${artifact.runId.slice(0, 8)}`}</small>
-          <small title={`来源执行 ${artifact.runId}`}>执行 {artifact.runId.slice(0, 8)} · 版本 {artifact.version} · {artifact.bytes} B</small>
+          {artifact.path.includes('/') && <small className="artifact-path" title={artifact.path}>{artifact.path}</small>}
+          <small title={input ? `来源：${input.slice(0, 160)}` : `来源执行 ${artifact.runId}`}>执行 {artifact.runId.slice(0, 8)} · 版本 {artifact.version} · {artifact.bytes} B</small>
           <small className="artifact-status" data-status={check?.status ?? 'unchecked'}>{check ? `上次核验 ${check.at} · ${statusLabels[check.status]}` : '当前状态未核验 · 点击检查'}</small>
         </div>
-      </button>;
-    })}
-    {hasMore && <button className="load-artifacts" disabled={loading || disconnected} onClick={loadMore}>{loading ? '正在加载…' : '加载更多成果'}</button>}
-    {preview && <section className="preview" aria-label="成果预览"><div><h3>纯文本预览</h3><button aria-label="关闭预览" onClick={() => { generation.current++; setPreview(null); }}>×</button></div>
+      </button>
+    {preview?.id === artifact.id && <section className="preview" aria-label="成果预览" tabIndex={-1} ref={previewRef}><div><h3>{artifact.path.split('/').at(-1)} · 版本 {artifact.version}</h3><button aria-label="关闭预览" onClick={() => { generation.current++; setPreview(null); opener.current?.focus({preventScroll: true}); }}>×</button></div>
+      <p className="preview-identity">{artifact.path} · 纯文本预览</p>
+      {checks[artifact.id] && <p className="preview-check" role="status">上次核验 {checks[artifact.id]!.at} · {statusLabels[checks[artifact.id]!.status]}</p>}
       {preview.error ? <p role="status">核验请求未获确认，无法确定当前文件状态。</p> : !preview.value ? <p role="status">正在核验文件…</p> : preview.value.status === 'ready' ? <pre>{preview.value.text}</pre> : <p role="status">{preview.value.status === 'changed' ? '当前内容与此登记版本不同；历史记录保留，不展示不匹配的内容。' : preview.value.status === 'missing' ? '文件已不存在，历史成果记录仍保留。' : '当前无法安全读取此文件。'}</p>}
       <button disabled={disconnected || (!preview.value && !preview.error)} onClick={() => void inspect(preview.id)}>重新核验文件</button>
     </section>}
+      </Fragment>;
+    })}
+    {hasMore && <button className="load-artifacts" disabled={loading || disconnected} onClick={loadMore}>{loading ? '正在加载…' : '加载更多成果'}</button>}
+
   </>;
 }

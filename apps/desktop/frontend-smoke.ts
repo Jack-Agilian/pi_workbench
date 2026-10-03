@@ -34,6 +34,7 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
   fixture.runs.at(-1)!.id = originalRun.id; // Preserve the already-browsed real head identity in this UI-only projection.
   fixture.inputs = fixture.runs.map((r, i) => ({id: r.id, text: `SYNTHETIC history ${i}\n` + '可读的旧记录，不是真实模型输出。'.repeat(12)}));
   fixture.presentations = [];
+  fixture.artifacts = Array.from({length:30}, (_, i) => ({...original.artifacts[0]!, id:i===0?original.artifacts[0]!.id:`SYNTHETIC-artifact-${i}`, version:i+1}));
   fixture.operations = [{...original.operations[0]!, state: 'pending', runId: fixture.runs.at(-1)!.id, deadline: Date.now() + 120000}];
   fixture.operations.push(...Array.from({length:15},(_,i)=>({...fixture.operations[0]!,id:`SYNTHETIC-old-operation-${i}`,state:'succeeded' as const})));
   fixture.runs.at(-1)!.state = 'running';
@@ -75,7 +76,7 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
       return {items:structuredClone(items),hasMore,nextCursor:hasMore?String(offset+items.length):null,snapshotSeq:revision};
     }
     if (raw.type === 'events' && raw.threadId === chosen.id) return raw.cursor < revision ? [{seq: revision, runSeq: 1, threadId: chosen.id, runId: eventRun, kind: eventKind, entityId: chosen.id, eventType: null, sourceType: null}] : [];
-    if (raw.type === 'preview' && raw.artifactId === original.artifacts[0]!.id) {
+    if (raw.type === 'preview' && fixture.artifacts.some(a => a.id === raw.artifactId)) {
       if (delayPreview) await new Promise<void>(resolve => {releasePreview = resolve;});
       return {status: previewStatus, ...(previewStatus === 'ready' ? {text: 'SYNTHETIC <img onerror=unsafe()> UI preview'} : {})};
     }
@@ -87,6 +88,7 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
     await switchTo(other.title); await wait(() => js<boolean>("document.querySelectorAll('[data-run]').length===1"), 'before_failed_first_page');
     await switchTo(chosen.title);
     await wait(() => js<boolean>("!!document.querySelector('.retry-pages') && document.querySelector('h1').textContent==='SYNTHETIC allow'"), 'failed_first_page_activity');
+    await click('.show-approvals');
     const expectedWorkspace = home.workspaces.items.find(w => w.id === chosen.workspaceId)!.path;
     assert.equal(await js<string>("document.querySelector('.execution-summary span').title"), expectedWorkspace);
     assert.equal(await js<boolean>("!!document.querySelector('.view-toolbar .stop')"), true);
@@ -166,12 +168,25 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
     assert.equal(await js<string>("document.querySelector('#composer').value"), 'SYNTHETIC 保留草稿');
     await click('.return-latest');
     await wait(() => js<boolean>("document.querySelector('.timeline').scrollHeight-document.querySelector('.timeline').clientHeight-document.querySelector('.timeline').scrollTop<3"), 'latest');
+    await click('.inspector-nav [data-panel=artifacts]');
     assert.equal(await js<string>("document.querySelector('.artifact-status').dataset.status"), 'unchecked');
     for (const status of ['ready', 'changed', 'missing', 'unavailable'] as const) {
       previewStatus = status; await click('.artifact');
       await wait(() => js<boolean>(`document.querySelector('.artifact-status').dataset.status===${JSON.stringify(status)}`), status);
       assert.equal(await js<boolean>("!!document.querySelector('.preview img')"), false);
       assert.equal(await js<boolean>("!!document.querySelector('.preview pre')"), status === 'ready');
+    }
+    assert.equal(await js<string>("document.querySelector('.artifacts-heading').textContent.trim()"), '成果版本 30');
+    for (const index of [0, 14, 29]) {
+      previewStatus = 'ready';
+      await js(`document.querySelectorAll('.artifact')[${index}].scrollIntoView({block:'nearest'})`);
+      const timelineTop = await js<number>("document.querySelector('.timeline').scrollTop");
+      await click(`.artifact[data-artifact="${fixture.artifacts[index]!.id}"]`);
+      await wait(() => js<boolean>("Boolean(document.querySelector('.preview pre'))"), 'nearby_preview_'+index);
+      assert.equal(await js<boolean>(`(()=>{const p=document.querySelector('.preview');const b=p.getBoundingClientRect();const r=document.querySelector('.inspector').getBoundingClientRect();return p.previousElementSibling.dataset.artifact===${JSON.stringify(fixture.artifacts[index]!.id)} && p===document.activeElement && b.top>=r.top && b.top<r.bottom && p.querySelector('h3').textContent.includes('版本 ${index+1}');})()`), true);
+      assert.ok(Math.abs(await js<number>("document.querySelector('.timeline').scrollTop")-timelineTop)<3);
+      await click('.preview button[aria-label="关闭预览"]');
+      assert.equal(await js<string>("document.activeElement.dataset.artifact"), fixture.artifacts[index]!.id);
     }
     for (const code of ['page_cursor_invalid', 'page_item_too_large']) {
       historyError = code; revision++;
