@@ -46,7 +46,7 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
   const references = new Map<string, { resolve(): void; reject(error: Error): void }>();
   let reservedReference: string | null = null;
   let priorEntries = new Set<string>();
-  const send = (body: WireBody, requestId = `${body.type === 'observation' || body.type === 'presentation' ? body.type : 'worker'}-${++sequence}`) => sender.send({ version: 9, instanceId, runtimeBindingId, requestId, body } satisfies Envelope);
+  const send = (body: WireBody, requestId = `${body.type === 'observation' || body.type === 'presentation' ? body.type : 'worker'}-${++sequence}`) => sender.send({ version: 10, instanceId, runtimeBindingId, requestId, body } satisfies Envelope);
   const publish = () => runtime && started && !closed ? send({ type: 'presentation', projection: projectMessages(runtime.session.sessionManager.getBranch().filter(entry => !priorEntries.has(entry.id))) }) : Promise.resolve();
   function close(): Promise<void> {
     if (closing) return closing;
@@ -88,7 +88,7 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
     if (closed || resources.loaded?.id !== c.resources.id) throw new Error('resource_admission_blocked'); verifyContent(c.resources);
     tools = createControlledTools({ binding: { runId: c.binding.runId, runtimeBindingId, runtimeEpoch: 1, workspaceRef: c.workspace },
       deadline: () => c.model?.fileTools?Math.min(c.deadline??Infinity,Date.now()+c.model.fileTools.operationTimeoutMs):(c.deadline??Date.now()), bash: shellBackend, observe: () => {},
-      ...(c.model?.fileTools?{fileLimitBytes:16000,settle:async(operation:import('./controlled-tools.ts').ToolOperation,ok:boolean)=>{
+      ...(c.model?.fileTools?{relativeFilePaths:true,fileLimitBytes:16000,settle:async(operation:import('./controlled-tools.ts').ToolOperation,ok:boolean)=>{
         const operationId=fileClaims.get(operation.operationId);if(!operationId)return;
         await driver?.testOnly?.beforeFileResult?.();
         if(closed)throw new Error('worker_closed');

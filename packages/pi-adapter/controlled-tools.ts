@@ -48,6 +48,8 @@ export interface ControlledToolOptions {
   observe: (event: ToolObservation) => void;
   settle?: (operation:ToolOperation,ok:boolean)=>Promise<void>;
   fileLimitBytes?:number;
+  /** Product wire paths are workspace-relative; normalize before approval identity is computed. */
+  relativeFilePaths?:boolean;
 }
 
 function freeze(value: unknown): void {
@@ -121,6 +123,10 @@ export function createControlledTools(options: ControlledToolOptions) {
       async execute(toolCallId, params, inputSignal, onUpdate, ctx) {
         // Pi owns prepareArguments and schema validation before this entrypoint.
         const parameters = structuredClone(params);
+        if(options.relativeFilePaths && parameters && typeof parameters==='object' && 'path' in parameters){
+          const target=fileTarget(binding.workspaceRef,parameters);
+          if(target)parameters.path=relative(binding.workspaceRef,target);
+        }
         freeze(parameters);
         const operation: ToolOperation = Object.freeze({
           ...binding, toolCallId, tool: template.name, operationId: randomUUID(), parameters,

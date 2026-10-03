@@ -238,3 +238,20 @@ test('product Bash default has no forced 30-second timeout: real 31-second comma
   await done;assert.equal(f.core.snapshot(f.thread).runs[0]!.state,'completed');assert.equal(readFileSync(join(f.cwd,'beyond-30.txt'),'utf8'),'SYNTHETIC');
  }finally{await f.dispose();}
 });
+
+test('native absolute workspace Markdown paths normalize before approval; outside paths produce safe failure projection',async()=>{
+ const {f,access,plan}=setupShell('responses',true);let calls=0;
+ const file=join(f.cwd,'absolute.md');
+ try{
+  const done=f.supervisor.startNext(plan,entry,{...access,fetch:async()=>{
+   calls++;
+   const tools=calls===1?[{tool:'write' as const,parameters:{path:file,content:'# SYNTHETIC Draft'}}]:calls===2?[{tool:'edit' as const,parameters:{path:file,edits:[{oldText:'Draft',newText:'Verified'}]}}]:calls===3?[{tool:'read' as const,parameters:{path:file}}]:calls===4?[{tool:'write' as const,parameters:{path:join(f.root,'outside.md'),content:'FORBIDDEN'}}]:[];
+   return new Response(syntheticReply('responses',calls,tools),{headers:{'content-type':'text/event-stream'}});
+  }})!;
+  for(let i=0;i<3;i++){const op=await approveShell(f);assert.equal(op.artifactPath,'absolute.md');}
+  await done;assert.equal(readFileSync(file,'utf8'),'# SYNTHETIC Verified');assert.equal(existsSync(join(f.root,'outside.md')),false);
+  const snap=f.core.snapshot(f.thread);assert.deepEqual(snap.operations.map(o=>[o.tool,o.state]),[['write','succeeded'],['edit','succeeded'],['read','succeeded']]);
+  assert.ok(f.core.presentation(f.run).messages.some(m=>m.role==='tool' && m.text.includes('write 调用未成功')));
+  assert.ok(!JSON.stringify(f.core.presentation(f.run)).includes(f.root));
+ }finally{await f.dispose();}
+});

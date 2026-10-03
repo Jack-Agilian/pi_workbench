@@ -1,6 +1,6 @@
 // Disposable display DTOs; never a second native message history or an execution input.
 import { identifier } from './index.ts';
-export interface MessageView { id: string; role: 'user' | 'assistant'; text: string; truncated: boolean }
+export interface MessageView { id: string; role: 'user' | 'assistant' | 'tool'; text: string; truncated: boolean }
 export interface Presentation { messages: MessageView[]; omitted: boolean }
 /** Plain text only. Known credential forms/control characters are removed, not arbitrary semantic secrets. */
 export function displayText(value: string, limit = 2048): string {
@@ -22,7 +22,7 @@ export function parsePresentation(value: unknown): Presentation {
     const f = Object.getOwnPropertyDescriptors(raw);
     if (Reflect.ownKeys(f).length !== 4 || Object.keys(f).sort().join() !== 'id,role,text,truncated' || Object.values(f).some(v => !('value' in v))) throw new Error('invalid_message');
     const id = identifier(f.id!.value); const role: unknown = f.role!.value; const text: unknown = f.text!.value; const truncated: unknown = f.truncated!.value;
-    if (ids.has(id) || (role !== 'user' && role !== 'assistant') || typeof text !== 'string' || text.length > 2048 || typeof truncated !== 'boolean') throw new Error('invalid_message');
+    if (ids.has(id) || (role !== 'user' && role !== 'assistant' && role !== 'tool') || typeof text !== 'string' || text.length > 2048 || typeof truncated !== 'boolean') throw new Error('invalid_message');
     ids.add(id); size += text.length; if (size > 8000) throw new Error('presentation_limit');
     return { id, role, text: displayText(text), truncated };
   });
