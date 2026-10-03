@@ -7,7 +7,7 @@ import { ThreadPages, projectPages, type ThreadPagesView } from './thread-pages.
 import { RunHistory } from './run-history.tsx';
 import { PaneResizeHandle } from './pane-resize-handle.tsx';
 import { usePaneLayout } from './pane-layout.ts';
-import { ThreadNavigation } from './thread-navigation.tsx';
+import { ThreadDirectory } from './thread-directory.tsx';
 import { PermissionPicker } from './permission-picker.tsx';
 import { ApprovalList } from './approval-list.tsx';
 import { ArtifactPanel } from './artifact-panel.tsx';
@@ -266,8 +266,7 @@ function App() {
       <button className="choose-workspace" title={selectedWorkspace} disabled={busy||disconnected||!!pendingCreation.current||Boolean(home?.activeRuns.length)} onClick={()=>{setBusy(true);void api.selectWorkspace().then(()=>setTick(n=>n+1),failed).finally(()=>setBusy(false));}}><span>工作目录</span><strong>{selectedWorkspace.split('/').at(-1)}</strong><small>切换目录 ↗</small></button>
       <button className="new-thread primary" onClick={() => void createThread()} disabled={busy || disconnected}><span>＋</span> {pendingCreation.current ? '重试新建会话' : '新建会话'}</button>
       <details className="new-thread-options"><summary>自定义会话名称</summary><label className="sr-only" htmlFor="title">新会话名称</label><input id="title" placeholder="留空使用默认名称" maxLength={160} value={title} disabled={pendingCreation.current !== null} onChange={event => setTitle(event.target.value)} /></details>
-      <div className="section-label">最近会话 <span>{home?.threads.length ?? 0}</span></div>
-      <nav aria-label="会话列表">{home?.threads.map(item => <ThreadNavigation key={item.id} thread={item} workspace={home.workspaces.items.find(w=>w.id===item.workspaceId)?.path} active={home.activeRuns.some(run=>run.threadId===item.id)} selected={selected===item.id} select={()=>setSelected(item.id)} api={api} scope={home.queryScope ?? queryScope.current} disconnected={disconnected} changed={()=>setTick(n=>n+1)} />)}</nav>
+      <ThreadDirectory api={api} home={home} current={activity?.thread??null} selected={selected} select={setSelected} disconnected={disconnected} changed={()=>setTick(n=>n+1)} />
       <div className="sidebar-foot"><span className={`status-dot ${disconnected ? 'offline' : ''}`} />{disconnected ? '连接断开' : '本地连接'}</div>
     </aside>
     <main>

@@ -1,0 +1,47 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { mkdtempSync, mkdirSync, realpathSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { DesktopHost } from '../desktop-host.ts';
+import { parseDesktopRequest, type DesktopHome } from '../../../packages/app-contracts/desktop.ts';
+import type { ThreadDirectoryPage } from '../../../packages/app-contracts/thread-directory.ts';
+const fixture=(t:test.TestContext)=>{
+  const root=realpathSync(mkdtempSync(join(tmpdir(),'directory-')));let host=new DesktopHost(root);
+  t.after(async()=>{await host.close();rmSync(root,{recursive:true,force:true});});
+  return {root,get host(){return host;},reopen:async()=>{await host.close();host=new DesktopHost(root);}};
+};
+test('directory: 1200 actual SQLite Threads page once, home bounded, title/path search is whole-directory and read-only',async t=>{
+  const f=fixture(t),ids:string[]=[];
+  const other=join(f.root,'SYNTHETIC 项目B');mkdirSync(other);f.host.core.selectWorkspace(other);const otherId=f.host.core.workspaceSelection().selectedId;
+  for(let i=0;i<1200;i++)ids.push(f.host.core.handle({type:'threads.create',requestId:'SYNTHETIC-'+i,workspaceId:i%2?otherId:'demo-workspace',title:i===0?'SYNTHETIC 中文 Case_%':`SYNTHETIC 同名 ${'长'.repeat(120)}`}).id);
+  const before=f.host.core.eventsAfter(ids[0]!,0),home=f.host.request({type:'home'}) as DesktopHome;
+  assert.equal(home.threads.length,32);assert.equal(home.threadsHasMore,true);assert.equal(home.directoryRevision,1200);assert.ok(Buffer.byteLength(JSON.stringify(home))<32_000);
+  const all:string[]=[];let cursor:string|undefined;
+  do {const p=f.host.request({type:'thread-directory',search:{limit:32,...(cursor?{cursor}:{})}}) as ThreadDirectoryPage;assert.ok(p.items.length<=32);assert.ok(Buffer.byteLength(JSON.stringify(p))<256000);all.push(...p.items.map(i=>i.id));cursor=p.nextCursor??undefined;}while(cursor);
+  assert.deepEqual(all,ids.toReversed());assert.equal(new Set(all).size,1200);
+  const find=(query:string,workspaceId?:string)=>f.host.request({type:'thread-directory',search:{query,...(workspaceId?{workspaceId}:{})}}) as ThreadDirectoryPage;
+  assert.deepEqual(find('case_%').items.map(i=>i.id),[ids[0]]);assert.deepEqual(find('中文').items.map(i=>i.id),[ids[0]]);
+  assert.equal(find('SYNTHETIC 项目B').items.length,16);assert.equal(find('中文',otherId).items.length,0);
+  assert.equal(find("' OR 1=1 --").items.length,0);assert.equal(find('%').items.length,1);
+  assert.deepEqual(f.host.core.eventsAfter(ids[0]!,0),before);assert.equal(f.host.core.workerLaunches().length,0);
+  await f.reopen();assert.deepEqual(find('中文').items.map(i=>i.id),[ids[0]]);assert.equal(f.host.core.workerLaunches().length,0);
+});
+test('directory: malformed/cross-filter/stale positions fail; rename/new creation cannot silently splice pages',async t=>{
+  const f=fixture(t);const ids=[];
+  for(let i=0;i<35;i++)ids.push(f.host.core.handle({type:'threads.create',requestId:'t'+i,workspaceId:'demo-workspace',title:'SYNTHETIC match '+i}).id);
+  const read=(search:object)=>f.host.request({type:'thread-directory',search}) as ThreadDirectoryPage;
+  const first=read({query:'match',limit:8});assert.equal(first.hasMore,true);const cursor=first.nextCursor!;
+  assert.throws(()=>read({query:'other',cursor}),/page_cursor_invalid/);
+  assert.throws(()=>read({query:'match',workspaceId:'demo-workspace',cursor}),/page_cursor_invalid/);
+  const tampered=JSON.parse(Buffer.from(cursor,'base64url').toString());tampered.before=99999;
+  assert.throws(()=>read({query:'match',cursor:Buffer.from(JSON.stringify(tampered)).toString('base64url')}),/page_cursor_invalid/);
+  const rename={type:'threads.rename' as const,requestId:'rename',threadId:ids[0]!,title:'SYNTHETIC renamed',expectedRevision:0};
+  f.host.core.handle(rename);assert.throws(()=>read({query:'match',cursor}),/page_cursor_invalid/);
+  const revision=read({}).revision;f.host.core.handle(rename);assert.equal(read({}).revision,revision);
+  const fresh=read({query:'match',limit:8});f.host.core.handle({type:'threads.create',requestId:'new',workspaceId:'demo-workspace',title:'SYNTHETIC new'});
+  assert.throws(()=>read({query:'match',cursor:fresh.nextCursor}),/page_cursor_invalid/);
+  assert.deepEqual(read({query:'renamed'}).items.map(i=>i.id),[ids[0]]);
+  for(const search of [{query:'x'.repeat(161)},{query:'x\n'},{query:[]},{cursor:'x'.repeat(1025)},{limit:33},{limit:0},{path:'/tmp/anything'},{workspaceId:'../x'}])assert.throws(()=>parseDesktopRequest({type:'thread-directory',search}));
+  assert.throws(()=>parseDesktopRequest({type:'thread-directory',database:'/tmp/anything'}));
+});

@@ -6,9 +6,9 @@ import { shouldSubmit } from './composer-key.ts';
 type Rename = Extract<Command, {type: 'threads.rename'}>;
 /** Product title only; never sends a prompt or edits a Pi Session. Stable row identity
  * keeps an unconfirmed request when selecting another chat or reconnecting the host. */
-export function ThreadNavigation({thread, workspace, active, selected, select, api, scope, disconnected, changed}: {
+export function ThreadNavigation({thread, workspace, active, selected, select, api, scope, disconnected, changed, editingChanged}: {
   thread: ThreadView; workspace?: string; active: boolean; selected: boolean; select: () => void;
-  api: DesktopApi; scope: string; disconnected: boolean; changed: () => void;
+  api: DesktopApi; scope: string; disconnected: boolean; changed: () => void; editingChanged?: (editing:boolean)=>void;
 }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState('');
@@ -29,8 +29,8 @@ export function ThreadNavigation({thread, workspace, active, selected, select, a
     if (editing) { input.current?.focus(); input.current?.select(); }
     else if (restoreOpener.current) { restoreOpener.current = false; opener.current?.focus(); }
   }, [editing]);
-  function open() { setDraft(thread.title); setRevision(thread.titleRevision); setConflict(false); setProblem(''); setEditing(true); }
-  function cancel() { if (inFlight.current || intent.current) return; restoreOpener.current = true; setEditing(false); }
+  function open() { setDraft(thread.title); setRevision(thread.titleRevision); setConflict(false); setProblem(''); setEditing(true); editingChanged?.(true); }
+  function cancel() { if (inFlight.current || intent.current) return; restoreOpener.current = true; setEditing(false); editingChanged?.(false); }
   async function save() {
     if (disconnected || inFlight.current || conflict || !draft.trim()) return;
     const command = intent.current ?? {type:'threads.rename', requestId:crypto.randomUUID(), threadId:thread.id, title:draft.trim(), expectedRevision:revision};
@@ -40,7 +40,7 @@ export function ThreadNavigation({thread, workspace, active, selected, select, a
       await api.command(command);
       if (generation.current !== current) return;
       restoreOpener.current = form.current?.contains(document.activeElement) ?? false;
-      intent.current = null; setEditing(false); changed();
+      intent.current = null; setEditing(false); editingChanged?.(false); changed();
     } catch (error) {
       if (generation.current !== current) return;
       if (error instanceof Error && error.message === 'title_changed') {

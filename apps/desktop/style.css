@@ -264,3 +264,15 @@ h1 { font-size: 17px; font-weight: 600; line-height: 1.4; overflow: hidden; text
 .native-reading { margin: 10px 0; }
 .native-reading > button, .native-reading section > button { font-size: 12px; }
 .native-reading section { border-left: 2px solid var(--line); padding: 8px 12px; }
+
+/* Directory queries do not own the active conversation or its draft. */
+.thread-search { display:flex; flex-direction:column; gap:6px; padding:8px 6px 0; }
+.thread-search label { font-size:11px; color:var(--muted); }
+.thread-search > div { display:flex; gap:4px; }
+.thread-search input { min-width:0; width:100%; padding:6px; }
+.thread-search button { flex-shrink:0; padding:5px 7px; font-size:11px; }
+.thread-search select { min-width:0; width:100%; padding:5px; font-size:11px; }
+.directory-status { padding:6px 8px; color:var(--muted); font-size:11px; }
+.directory-status button { margin-top:6px; font-size:11px; }
+.directory-context { display:block; padding:6px 8px 2px; }
+.load-threads { margin:4px 6px; font-size:11px; }

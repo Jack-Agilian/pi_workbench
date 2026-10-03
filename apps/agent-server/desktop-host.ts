@@ -76,7 +76,7 @@ export class DesktopHost {
   }
   private recover() { try { this.supervisor.recover(); this.blocked = false; } catch { this.blocked = true; } }
   private home(): DesktopHome {
-    const threads = this.core.listThreads();
+    const directory = this.core.threadDirectory({limit:32});
     const config = this.modelMode?.configuration;
     const model: DesktopHome['model'] = !this.modelMode ? undefined : {
       status: this.modelMode.mode === 'offline' ? 'ready' : !config?.approved ? 'not_configured' : this.modelKey ? this.core.modelAdmission(config,this.modelMode.reserveCostUsd ?? 0).status : 'key_required',
@@ -91,7 +91,7 @@ export class DesktopHost {
         catch{return {...w,status:'invalid' as const};}
       })},
       mode: this.modelMode ? this.modelMode.mode === 'offline' ? 'model-offline' : 'model' : 'synthetic',
-      ...(model ? { model } : {}), threads: threads.map(t => ({ ...t, title: displayText(t.title, 160) })),
+      ...(model ? { model } : {}), threads: directory.items, threadsHasMore:directory.hasMore, directoryRevision:directory.revision,
       recovery: this.blocked ? 'blocked' : 'ready',
       activeRuns: this.core.activeRuns(),
     };
@@ -100,6 +100,7 @@ export class DesktopHost {
     if (this.closing) throw new Error('host_closing');
     const request = parseDesktopRequest(raw);
     switch (request.type) {
+      case 'thread-directory':return this.core.threadDirectory(request.search);
       case 'native-text':{
         const source=this.core.nativeTextSource(request.threadId,request.runId);
         if(!source)return {status:'unavailable'};

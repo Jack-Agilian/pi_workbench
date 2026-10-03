@@ -1,3 +1,4 @@
+import type { ThreadDirectoryPage } from '../../packages/app-contracts/thread-directory.ts';
 import type { NativeTextPage } from '../../packages/app-contracts/native-text.ts';
 import type { HistoryPage, HistoryEntry, OperationPage, ArtifactPage, ThreadActivity } from '../../packages/app-contracts/desktop-pages.ts';
 import { contextBridge, ipcRenderer } from 'electron';
@@ -9,6 +10,7 @@ async function request<T>(payload: DesktopRequest, queryScope?: string): Promise
   return reply.value as T;
 }
 const api: DesktopApi = {
+  threadDirectory:(search,scope)=>request<ThreadDirectoryPage>({type:'thread-directory',...(search?{search}:{})},scope),
   queryScope: async () => {
     const scope: unknown = await ipcRenderer.invoke('workbench:query-scope');
     if (typeof scope !== 'string') throw Error('disconnected');

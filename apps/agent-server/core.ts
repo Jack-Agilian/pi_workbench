@@ -1,3 +1,5 @@
+import { readThreadDirectory } from './thread-directory.ts';
+import type { ThreadSearch } from '../../packages/app-contracts/thread-directory.ts';
 import type { NativeTextSource } from '../../packages/app-contracts/native-text.ts';
 import { readDesktopPage, row, runRow, artifactRow, displayOperation } from './desktop-pages.ts';
 import { DESKTOP_PAGE_BYTES, type HistoryEntry, type HistoryItem, type PageOptions, type HistoryPage, type OperationPage, type ArtifactPage } from '../../packages/app-contracts/desktop-pages.ts';
@@ -271,6 +273,7 @@ export class ProductCore {
   workspacePath(id: string): string { return this.one<{path:string}>('SELECT path FROM workspaces WHERE id=?', id).path; }
   runPermission(runId:string): RunView['permissionMode'] { return this.run(runId).permissionMode; }
   activeRuns():RunView[] { return this.all(`SELECT id,thread_id AS threadId,state,permission_mode AS permissionMode,permission_revision AS permissionRevision FROM runs WHERE state IN ${active} ORDER BY rowid`); }
+  threadDirectory(search:ThreadSearch={}) { return this.transaction(()=>readThreadDirectory(this.db,search),false); }
   listThreads(): ThreadView[] { return this.all('SELECT id,workspace_id AS workspaceId,title,title_revision AS titleRevision,permission_mode AS permissionMode,permission_revision AS permissionRevision FROM threads ORDER BY rowid DESC'); }
   /** Trusted host scheduling only. Renderer cannot select an executable or plan. */
   nextQueuedIntent(): { id: string; input: string; threadId:string } | undefined { return this.get("SELECT id,input,thread_id AS threadId FROM runs WHERE state='queued' ORDER BY rowid LIMIT 1"); }

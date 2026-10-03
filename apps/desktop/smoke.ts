@@ -239,6 +239,8 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
   const allCreations = attempts.filter(c => c.type === 'threads.create' && c.title === a.title);
   assert.equal(allCreations.length, 3); assert.notEqual(allCreations[1]!.requestId, allCreations[2]!.requestId);
   host.request = request;
+  const {runThreadDirectorySmoke}=await import('./thread-directory-smoke.ts');
+  await runThreadDirectorySmoke(window,host,b.id);
 
   // Actual main before-quit path: a failed guardian receipt must reach the warning branch.
   // Capture the native dialog invocation rather than requiring a human to dismiss it.
