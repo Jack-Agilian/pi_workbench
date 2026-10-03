@@ -141,3 +141,7 @@ React事件及清理经Context7查询 [DOM事件](https://react.dev/reference/re
 ## 会话目录采用（2026-10-04）
 
 完整“本项目模块→固定参考/API→采用→边界”见[目录契约](thread-directory-contract.md)。复读C03固定163054227d370a49d09099c61eb65798481294ac的sidebar.tsx，仅借鉴选中会话独立、编辑目标保留行为，没有新增社区片段。Query 5.104.0根级运行时useInfiniteQuery已核对声明和实际ESM，与QueryClient共同管理新目录页；Context7 main文档仅辅助理解，不当作发行依据。宿主沿用已有SQLite keyset/字节约束，Renderer不建全库镜像、Session索引或第二套分页缓存；证据见[报告](../validation/thread-directory-2026-10-04.md)。
+
+## 阅读操作采用（2026-10-04）
+
+[逐模块映射](reading-actions-contract.md)核对C03固定message-markdown/timeline-item/file-editor-pane：仅借鉴就地复制/预览动作，固定上游没有可直接采用的消息/代码复制组件。沿用react-markdown10.1.0公开pre/node和Electron44.4.5异步clipboard.writeText；声明/实际运行核验与Context7 main资料分开。主进程只写纯文本窄桥不开放读取权限、任意文件或通用IPC；版本只用原宿主核验及本会话已加载元数据。无新依赖/社区片段，见[验证](../validation/reading-actions-2026-10-04.md)。
