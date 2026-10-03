@@ -173,7 +173,7 @@ test('expired approval cannot execute and requires cleanup/reconciliation before
 test('Renderer cannot inject Worker envelopes; an unrelated IPC child cannot route messages by copied identity', async t => {
   const f = fixture(t); const pending = f.start(); await until(() => f.core.snapshot(f.thread).operations.length === 1, 'approval');
   const before = f.core.snapshot(f.thread); const journal = JSON.parse(f.core.workerLaunches()[0]!.record);
-  const forged = { version: 7, instanceId: journal.spec.instanceId, runtimeBindingId: journal.binding.runtimeBindingId, requestId: 'foreign', body: { type: 'done', ok: true } };
+  const forged = { version: 8, instanceId: journal.spec.instanceId, runtimeBindingId: journal.binding.runtimeBindingId, requestId: 'foreign', body: { type: 'done', ok: true } };
   assert.throws(() => f.supervisor.command(forged), /unknown_command/);
   const foreign = spawn(process.execPath, ['-e', 'process.send(JSON.parse(process.argv[1])); process.disconnect();', JSON.stringify(forged)],
     { env: sterileEnvironment(join(f.root, 'foreign')), stdio: ['ignore','ignore','ignore','ipc'] });

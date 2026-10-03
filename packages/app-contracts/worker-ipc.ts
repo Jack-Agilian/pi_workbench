@@ -5,7 +5,7 @@ import { parseModelSelection, parseModelOutcome, type ModelSelection, type Model
 import { parseShellOutcome, type ShellOutcome } from './shell.ts';
 import { identifier, toolCallIdentity, sha256, type Dispatch } from './index.ts';
 import { parsePresentation, type Presentation } from './presentation.ts';
-export const IPC_VERSION = 7;
+export const IPC_VERSION = 8;
 export const MAX_MESSAGE_BYTES = 65_536;
 export interface ResourceSelection { root: string; id: string; files: readonly { path: string; sha256: string }[]; expectedSkillNames: readonly string[] }
 export interface WorkerInit { binding: Dispatch; workspace: string; agentDir: string; sessions: string; resources: ResourceSelection; deadline: number; model?: ModelSelection }
@@ -38,7 +38,7 @@ export type WireBody =
   | { type: 'done'; ok: boolean }
   | { type: 'closed'; nativeRef: string | null }
   | { type: 'fault'; code: 'initialization_failed' | 'execution_failed' | 'protocol_failed' };
-export interface Envelope { version: 7; instanceId: string; runtimeBindingId: string; requestId: string; body: WireBody }
+export interface Envelope { version: 8; instanceId: string; runtimeBindingId: string; requestId: string; body: WireBody }
 export function record(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value) || ![Object.prototype, null].includes(Object.getPrototypeOf(value))) throw new Error('invalid_record');
   const fields = Object.getOwnPropertyDescriptors(value);

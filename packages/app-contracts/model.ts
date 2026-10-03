@@ -1,3 +1,4 @@
+import { parseModelError, type ModelError } from './model-error.ts';
 import { parseModelShellPolicy, type ModelShellPolicy } from './model-shell.ts';
 import { parseFileToolPolicy, type FileToolPolicy } from './file-tools.ts';
 // Workbench policy/observations, never Pi provider objects or credentials.
@@ -7,7 +8,7 @@ export interface OpenAIConnection { api: 'responses' | 'chat-completions'; conte
 export interface ModelSelection { mode: 'offline' | 'live'; provider: string; model: string; endpoint: string; maxOutputTokens: number; timeoutMs: number; openai?: OpenAIConnection; fileTools?: FileToolPolicy; shellTools?: ModelShellPolicy }
 // maxRequests is optional legacy/validation compatibility, never emitted by product templates.
 export interface ModelConfiguration { version: 1; authorizationId: string; approved: boolean; dataScope: 'synthetic_non_sensitive'; provider: string; model: string; endpoint: string; maxRequests?: number | null; maxOutputTokens: number; timeoutMs: number; maxEstimatedCostUsd: number; httpIdleTimeoutMs?: number; openai?: OpenAIConnection; fileTools?: FileToolPolicy; shellTools?: ModelShellPolicy }
-export interface ModelOutcome { reason: 'stop' | 'length' | 'cancelled' | 'provider_error' | 'budget' | 'protocol'; inputTokens: number; outputTokens: number; estimatedCostUsd: number; synthetic: boolean }
+export interface ModelOutcome { error?: ModelError; reason: 'stop' | 'length' | 'cancelled' | 'provider_error' | 'budget' | 'protocol'; inputTokens: number; outputTokens: number; estimatedCostUsd: number; synthetic: boolean }
 export function parseModelSelection(value: unknown): ModelSelection {
   const r = exact(value, ['mode','provider','model','endpoint','maxOutputTokens','timeoutMs',...(Object.hasOwn(Object(value),'openai')?['openai']:[]),...(Object.hasOwn(Object(value),'fileTools')?['fileTools']:[]),...(Object.hasOwn(Object(value),'shellTools')?['shellTools']:[])]);
   if (typeof r.mode !== 'string' || !['offline','live'].includes(r.mode)) throw new Error('model_mode');
@@ -32,8 +33,9 @@ export function parseModelConfiguration(value: unknown): ModelConfiguration {
   return r as unknown as ModelConfiguration;
 }
 export function parseModelOutcome(value: unknown): ModelOutcome {
-  const r = exact(value, ['reason','inputTokens','outputTokens','estimatedCostUsd','synthetic']);
+  const r = exact(value, ['reason','inputTokens','outputTokens','estimatedCostUsd','synthetic',...(Object.hasOwn(Object(value),'error')?['error']:[])]);
   if (typeof r.reason !== 'string' || !['stop','length','cancelled','provider_error','budget','protocol'].includes(r.reason) || typeof r.synthetic !== 'boolean') throw new Error('model_outcome');
+  if (Object.hasOwn(r, 'error')) { if (r.reason !== 'provider_error') throw new Error('model_error_reason'); parseModelError(r.error); }
   for (const k of ['inputTokens','outputTokens','estimatedCostUsd']) if (typeof r[k] !== 'number' || !Number.isFinite(r[k]) || r[k] < 0 || r[k] > 1e9) throw new Error('model_usage');
   return r as unknown as ModelOutcome;
 }

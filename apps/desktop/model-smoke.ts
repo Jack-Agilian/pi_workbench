@@ -54,5 +54,9 @@ export async function runModelSmoke(window:BrowserWindow,host:HostClient){
  await wait(()=>js<boolean>("!!document.querySelector('[data-state=cancelled]')"),'cancelled');
  state=await host.request({type:'thread',threadId}) as DesktopThread;assert.equal(state.runs.length,3);assert.equal(state.operations.length,0);
  assert.equal(await js<boolean>("!document.body.textContent.includes('新建任务') && document.body.textContent.includes('新建会话')"),true);
- console.log('desktop model offline: stream, native resume, cancel and terminology passed');
+ await click('.new-thread');await wait(()=>js<boolean>("!document.querySelector('#composer').disabled"),'error-thread');
+ await fill('[error]');await wait(()=>js<boolean>("!document.querySelector('button[type=submit]').disabled"),'error-send');await js("document.querySelector('form.composer').requestSubmit()");
+ await wait(()=>js<boolean>("!!document.querySelector('[data-state=failed] .model-error[role=alert]')"),'safe-error');
+ assert.equal(await js<boolean>("document.querySelector('.model-error').textContent.includes('原始错误正文未保存') && !document.body.textContent.includes('SYNTHETIC_PROVIDER_FAILURE')"),true);
+ console.log('desktop model offline: stream, native resume, cancel, safe error and terminology passed');
 }

@@ -1,3 +1,4 @@
+import { providerErrorCode } from '../../packages/app-contracts/model-error.ts';
 import type { WireBody } from '../../packages/app-contracts/worker-ipc.ts';
 /** One host-owned HTTP request. Pi retains the provider wire protocol and SSE parsing. */
 export class ModelHttp {
@@ -18,6 +19,28 @@ export class ModelHttp {
       timer=setTimeout(()=>{reject(new Error('model_http_idle_timeout'));this.controller.abort();void this.reader?.cancel().catch(()=>{});},this.idleTimeoutMs);
     })]);}finally{if(timer)clearTimeout(timer);}
   }
+  private async safeErrorBody(response: Response): Promise<string> {
+    // Bound both bytes and total inspection time; slow error bodies cannot delay a known HTTP failure.
+    if (!response.body) return JSON.stringify({ error: { message: 'Provider request failed' } });
+    const reader = this.reader = response.body.getReader();
+    const chunks: Uint8Array[] = []; let size = 0; let code: ReturnType<typeof providerErrorCode>;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    try {
+      await Promise.race([(async () => {
+        for (;;) {
+          const next = await reader.read();
+          if (next.done) break;
+          size += next.value.byteLength;
+          if (size > 16384) return;
+          chunks.push(next.value);
+        }
+        const raw: unknown = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+        if (raw && typeof raw === 'object' && 'error' in raw && raw.error && typeof raw.error === 'object' && 'code' in raw.error) code = providerErrorCode(raw.error.code);
+      })(), new Promise<void>(resolve => { timer = setTimeout(resolve, Math.min(this.idleTimeoutMs, 1000)); })]);
+    } catch { /* Unknown/HTML/malformed bodies are intentionally withheld. */ }
+    finally { if (timer) clearTimeout(timer); await reader.cancel().catch(() => {}); }
+    return JSON.stringify({ error: { ...(code ? { code } : {}), message: 'Provider request failed' } });
+  }
   receive(body:WireBody,reply:(body:WireBody)=>Promise<void>): void {
     if(this.stopped)throw new Error('model_http_closed');
     if(body.type==='model-http') {
@@ -28,14 +51,13 @@ export class ModelHttp {
           if(this.controller.signal.aborted){await response.body?.cancel();throw new Error('model_http_closed');}return response;
         }));
         if(this.stopped){await response.body?.cancel();return;}
-        if(!response.body)throw new Error('model_http_no_body');
         if (!response.ok) {
-          // Provider errors may echo headers/input. Never feed those bytes into native history.
-          await response.body.cancel();
-          this.reader = new Response(JSON.stringify({error:{type:'api_error',message:'Provider request failed'}})).body!.getReader();
-        } else this.reader=response.body.getReader();
+          const safeBody = await this.safeErrorBody(response);
+          if (this.stopped) return;
+          this.reader = new Response(safeBody).body!.getReader();
+        } else { if (!response.body) throw new Error('model_http_no_body'); this.reader=response.body.getReader(); }
         // No headers/cookies/provider error strings are logged or persisted.
-        await reply({type:'model-http-head',status:response.status,headers:{'content-type':response.headers.get('content-type')??'application/octet-stream'}});
+        await reply({type:'model-http-head',status:response.status,headers:{'content-type':response.ok ? response.headers.get('content-type')??'application/octet-stream' : 'application/json'}});
       })().catch(async()=>{if(!this.stopped)await reply({type:'model-http-error'});});
       void this.request.catch(()=>this.close()); return;
     }

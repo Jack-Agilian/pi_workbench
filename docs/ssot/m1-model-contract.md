@@ -14,7 +14,7 @@ Pi ProviderRequestOptions.fetch 是公开的 HTTP 传输注入点，不覆盖 We
 
 候选一：直接给 Worker 放行网络。拒绝原因：会扩大当前已验证网络隔离，并让资源/扩展具有额外出口。候选二：引入 sandbox-runtime 提供网络代理。已通过 Context7 阅读候选的 SandboxManager/wrapWithSandbox 文档，但未做发行、Mac 集成或后代验证；本轮不采用、不安装，不把阅读当实测。候选三：使用 Pi 原生 Provider 的公开 fetch seam，通过已有 Node IPC 委托宿主。选择第三项：无需 HTTP 服务、代理 daemon 或新 Agent 框架，保持当前 Worker 沙箱与 Shell 禁网。
 
-Worker 的模型消息是本项目 IPC v5；基于实际 guardian/child 连接绑定，校验 instance/runtimeBinding/requestId。HTTP 不进入可重放事件或请求缓存，避免头部密钥持久化。宿主按批准配置核实 URL、POST、模型 ID、stream、对应 API 的唯一输出 token 上限、零 tools、期限和 Run 状态；禁 Host/Cookie/Proxy-Authorization 头，重定向使用 Node fetch `redirect:error`。每 Run 仅一请求，递增 read 身份，单个待处理 read，16 KiB 分片，响应 1 MiB、请求 24 KB 上限。非 2xx 正文在进入 Pi 前替换为固定错误，不把服务商可能反射的密钥写进原生历史。
+Worker 的模型消息是本项目 IPC v5；基于实际 guardian/child 连接绑定，校验 instance/runtimeBinding/requestId。HTTP 不进入可重放事件或请求缓存，避免头部密钥持久化。宿主按批准配置核实 URL、POST、模型 ID、stream、对应 API 的唯一输出 token 上限、零 tools、期限和 Run 状态；禁 Host/Cookie/Proxy-Authorization 头，重定向使用 Node fetch `redirect:error`。每 Run 仅一请求，递增 read 身份，单个待处理 read，16 KiB 分片，响应 1 MiB、请求 24 KB 上限。非 2xx 正文按[错误展示契约](model-error-contract.md)在进入 Pi 前收敛为固定说明和已识别代码；HTTP 状态保留，流内错误同样在原生历史落盘前收敛，不透传可能反射的密钥。
 
 这不是通用出网沙箱：信任固定 Node fetch/TLS 与用户批准的单一 endpoint，不接受 Worker 指定其他 URL。Worker 仍沿用 Mac OS 文件/网络 profile；固定安全测试移除 JS tripwire 后实测 SQLite 读/建库和直连本机端口被 OS 拒绝。Node --permission 不作为 SQLite 隔离证明。测试的 loopback HTTP 只是 transport/redirect 用例，不是外部 TLS/真实模型证明。
 

@@ -1,3 +1,4 @@
+import { safeModelStream, modelErrorFromMessage } from './model-errors.ts';
 import { configureOpenAI, supportedModelApis } from './model-catalog.ts';
 import { InMemoryCredentialStore, InMemoryModelsStore, type Provider, type FetchFunction } from '@earendil-works/pi-ai';
 import { ModelRuntime, SettingsManager } from '@earendil-works/pi-coding-agent';
@@ -18,7 +19,13 @@ export async function modelServices(options: { cwd: string; agentDir: string }, 
   runtime.registerNativeProvider({ ...provider,
     getModels: () => [model],
     stream: () => { throw new Error('raw_model_stream_not_admitted'); },
-    streamSimple: (m, c, o) => { const cap=selection.fileTools ? selection.fileTools.maxModelRequests : 1; if (++calls > (cap ?? Infinity)) throw new Error('model_request_budget'); return provider.streamSimple(m, c, { ...o, ...limits }); },
+    streamSimple: (m, c, o) => {
+      const cap = selection.fileTools ? selection.fileTools.maxModelRequests : 1;
+      if (++calls > (cap ?? Infinity)) throw new Error('model_request_budget');
+      let status: number | undefined;
+      const observedFetch: FetchFunction = async (input, init) => { const response = await fetch(input, init); status = response.status; return response; };
+      return safeModelStream(provider.streamSimple(m, c, { ...o, ...limits, fetch: observedFetch }), () => status, m);
+    },
   });
   await runtime.setRuntimeApiKey(selection.provider, key);
   return { model, services: { ...options, modelRuntime: runtime, settingsManager: SettingsManager.inMemory({
@@ -29,6 +36,6 @@ export async function modelServices(options: { cwd: string; agentDir: string }, 
 export function modelOutcome(session: AgentSession, synthetic: boolean, cancelled: boolean, firstMessage=0): ModelOutcome {
   const messages=session.messages.slice(firstMessage).filter(m=>m.role==='assistant');
   const last=messages.at(-1);
-  return { reason: cancelled ? 'cancelled' : last?.stopReason === 'stop' ? 'stop' : last?.stopReason === 'length' ? 'length' : 'provider_error',
+  return { ...(!cancelled && last?.stopReason !== 'stop' && last?.stopReason !== 'length' ? { error: modelErrorFromMessage(last?.errorMessage) } : {}), reason: cancelled ? 'cancelled' : last?.stopReason === 'stop' ? 'stop' : last?.stopReason === 'length' ? 'length' : 'provider_error',
     inputTokens: messages.reduce((n,m)=>n+m.usage.input+m.usage.cacheRead+m.usage.cacheWrite,0), outputTokens: messages.reduce((n,m)=>n+m.usage.output,0), estimatedCostUsd: messages.reduce((n,m)=>n+m.usage.cost.total,0), synthetic };
 }

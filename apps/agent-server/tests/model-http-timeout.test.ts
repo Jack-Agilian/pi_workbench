@@ -63,3 +63,24 @@ test('completed stream does not become a timeout after the former idle deadline'
   assert.equal(replies.at(-1)?.type,'model-http-chunk');assert.ok(replies.every(r=>r.type!=='model-http-error'));
  }finally{worker.close();await host.close();}
 });
+
+for(const shape of ['html','unknown-code','type-only','oversize','malformed','split-json','no-body'] as const)test(`HTTP error inspection ${shape} preserves status, withholds arbitrary text and bounds input`,async()=>{
+ const privateText='SYNTHETIC_PRIVATE_ERROR_CANARY';let cancelled=false;
+ const body=shape==='html'?'<h1>'+privateText+'</h1>':shape==='unknown-code'?JSON.stringify({error:{code:privateText,message:privateText}}):shape==='type-only'?JSON.stringify({error:{type:'invalid_api_key',message:privateText}}):shape==='oversize'?JSON.stringify({error:{code:'permission_denied',message:privateText+'x'.repeat(17000)}}):shape==='malformed'?'{"error":':JSON.stringify({error:{code:'permission_denied',message:privateText}});
+ const b=bridge(async()=>new Response(shape==='no-body'?null:new ReadableStream<Uint8Array>({start(c){
+  if(shape==='split-json'){const data=new TextEncoder().encode(body);for(let i=0;i<data.length;i+=5)c.enqueue(data.slice(i,i+5));}else c.enqueue(new TextEncoder().encode(body));
+  if(shape!=='oversize')c.close();
+ },cancel(){cancelled=true;}}),{status:403,headers:{'content-type':'text/html'}}));
+ try{const r=await b.worker.fetch(url,{method:'POST',body:'{}'});assert.equal(r.status,403);assert.equal(r.headers.get('content-type'),'application/json');const safe=await r.text();assert.equal(safe.includes(privateText),false);assert.deepEqual(JSON.parse(safe),{error:{...(shape==='split-json'?{code:'permission_denied'}:{}),message:'Provider request failed'}});if(shape==='oversize')assert.equal(cancelled,true);}finally{await b.close();}
+});
+test('HTTP error inspection stops a never-ending body and retains HTTP status',async()=>{
+ let cancelled=false;const b=bridge(async()=>new Response(new ReadableStream<Uint8Array>({cancel(){cancelled=true;}}),{status:401}),40);
+ try{const r=await b.worker.fetch(url,{method:'POST',body:'{}'});assert.equal(r.status,401);assert.deepEqual(await r.json(),{error:{message:'Provider request failed'}});assert.equal(cancelled,true);}finally{await b.close();}
+});
+test('close during HTTP error inspection publishes no late head or body',async()=>{
+ let reading=false,cancelled=false;const replies:WireBody[]=[];
+ const host=new ModelHttp(url,()=>{},async()=>new Response(new ReadableStream<Uint8Array>({pull(){reading=true;},cancel(){cancelled=true;}}),{status:403}));
+ host.receive({type:'model-http',url,method:'POST',headers:{},body:'{}'},async reply=>{replies.push(reply);});
+ while(!reading)await new Promise<void>(r=>setImmediate(r));
+ const closing=host.close();assert.equal(host.close(),closing);await closing;assert.equal(cancelled,true);assert.deepEqual(replies,[]);
+});

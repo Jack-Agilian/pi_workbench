@@ -316,3 +316,15 @@ test('workspace selection is trusted host-only, durable and never remaps an exis
   assert.equal(host.core.snapshot(thread).thread.workspaceId,home.workspaces.selectedId);
  }finally{await host.close();rmSync(profile,{recursive:true,force:true});rmSync(selected,{recursive:true,force:true});}
 });
+
+import { modelErrorText } from './model-error-view.ts';
+import { parseModelOutcome } from '../../packages/app-contracts/model.ts';
+test('model error display uses only closed status/code, distinguishes legacy and does not invent upstream codes',()=>{
+ const legacy={reason:'provider_error',inputTokens:0,outputTokens:0,estimatedCostUsd:0,synthetic:true};
+ assert.deepEqual(parseModelOutcome(legacy),legacy);assert.match(modelErrorText(undefined),/未保存错误详情/);
+ assert.match(modelErrorText({httpStatus:403}),/HTTP 403.*具体原因未确认/);assert.doesNotMatch(modelErrorText({httpStatus:401}),/invalid_api_key/);
+ assert.match(modelErrorText({httpStatus:429,code:'insufficient_quota'}),/HTTP 429.*上游错误码 insufficient_quota.*额度/);
+ assert.match(modelErrorText({code:'server_error'}),/上游错误码 server_error/);assert.doesNotMatch(modelErrorText({code:'server_error'}),/HTTP/);
+ for(const error of [{httpStatus:200},{httpStatus:'403'},{code:'secret-canary'},{message:'<script>bad</script>'},{code:['invalid_api_key']},{httpStatus:403,raw:'secret'}])assert.throws(()=>parseModelOutcome({...legacy,error}));
+ assert.throws(()=>parseModelOutcome({...legacy,reason:'stop',error:{}}));
+});

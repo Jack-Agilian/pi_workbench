@@ -118,7 +118,7 @@ export class WorkerSupervisor {
   private send(active: Active, body: WireBody, requestId = `host-${++this.sequence}`): Promise<void> {
     if(active.stopping)return Promise.reject(new Error('worker_stopping'));
     const { spec } = active.journal;
-    return active.sender.send({ version: 7, instanceId: spec.instanceId, runtimeBindingId: spec.runtimeBindingId, requestId, body } satisfies Envelope);
+    return active.sender.send({ version: 8, instanceId: spec.instanceId, runtimeBindingId: spec.runtimeBindingId, requestId, body } satisfies Envelope);
   }
   private receive(active: Active, raw: unknown) {
     if (this.active !== active || active.stopping) return; // owned channel, fenced synchronously before disconnect

@@ -69,7 +69,7 @@ test('OpenAI closed policy rejects ambiguous caps, tools, unknown metadata and u
 
 import { parseEnvelope } from '../../../packages/app-contracts/worker-ipc.ts';
 test('HTTP header tokens accept native session_id but reject separators and newlines',()=>{
- const envelope=(headers:unknown)=>({version:7,instanceId:'worker',runtimeBindingId:'binding',requestId:'http-1',body:{type:'model-http',url:'https://example.invalid',method:'POST',headers,body:'{}'}});
+ const envelope=(headers:unknown)=>({version:8,instanceId:'worker',runtimeBindingId:'binding',requestId:'http-1',body:{type:'model-http',url:'https://example.invalid',method:'POST',headers,body:'{}'}});
  assert.doesNotThrow(()=>parseEnvelope(envelope({session_id:'synthetic-session'})));
  for(const headers of [{'bad header':'x'},{'bad:header':'x'},{session_id:'x\r\nInjected: true'}])assert.throws(()=>parseEnvelope(envelope(headers)));
 });
@@ -87,4 +87,38 @@ test('Pi 0.87.1 bundled GPT-6 Luna survives public endpoint override with capabi
  const s=selection('catalog-override');configureOpenAI(runtime,s);const after=runtime.getModel('openai','gpt-6-luna');assert.ok(after);
  assert.deepEqual({...after,baseUrl:before.baseUrl},before);assert.equal(after.baseUrl,s.endpoint);
  const info=await describeModel('openai','gpt-6-luna',64,s);assert.equal(info.requestUrl,s.endpoint+'/responses');assert.match(info.priceSource,/0\.87\.1 bundled/);
+});
+
+// SYNTHETIC failures, real Pi HTTP parser, Worker, SQLite and native Session persistence.
+for (const scenario of ['http-401', 'http-403', 'http-429', 'http-unknown', 'stream-error', 'response-failed', 'stream-unknown'] as const) test(`safe diagnostic ${scenario} persists across actual host reopen without raw error text`, async () => {
+ const f=createScenario();const s=selection('responses');const catalog=await describeModel(s.provider,s.model,64,s);
+ const configuration=parseModelConfiguration({version:1,authorizationId:'synthetic-errors',approved:true,dataScope:'synthetic_non_sensitive',provider:s.provider,model:s.model,endpoint:s.endpoint,maxOutputTokens:64,timeoutMs:5000,maxEstimatedCostUsd:1,openai:s.openai});
+ const raw='SYNTHETIC_PRIVATE_ERROR <script>throw 1</script> '+key+' '+Buffer.from(key).toString('base64');
+ const code=scenario==='http-401'?'invalid_api_key':scenario==='http-403'?'permission_denied':scenario==='http-429'?'insufficient_quota':scenario==='stream-error'?'rate_limit_exceeded':scenario==='response-failed'?'server_error':raw;
+ const httpStatus=scenario.startsWith('http-')?(scenario==='http-unknown'?403:Number(scenario.slice(5))):undefined;
+ let calls=0;
+ const access={key,configuration,requestUrl:catalog.requestUrl,reserveCostUsd:catalog.reserveCostUsd,fetch:async()=>{
+  if(++calls===1)return new Response(response('responses','resp_synthetic_before_error'),{headers:{'content-type':'text/event-stream'}});
+  if(httpStatus)return new Response(JSON.stringify({error:{code,message:raw,type:raw,param:raw},debug:raw}),{status:httpStatus,headers:{'content-type':'application/json','x-secret':raw}});
+  const event=scenario==='response-failed'?{type:'response.failed',response:{status:'failed',error:{code,message:raw}}}:{type:'error',code,message:raw};
+  return new Response(`event: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`,{headers:{'content-type':'text/event-stream'}});
+ }};
+ try{
+  await f.supervisor.startNext({tool:'none',model:s,deadline:Date.now()+10000},entry,access);
+  assert.equal(f.core.snapshot(f.thread).runs[0]!.state,'completed');
+  const run=f.supervisor.command({type:'runs.start',requestId:'fail-once',threadId:f.thread,input:'SYNTHETIC fail after persisted reply'}).id;
+  await f.supervisor.startNext({tool:'none',model:s,deadline:Date.now()+10000},entry,access);
+  assert.equal(calls,2);assert.equal(f.core.snapshot(f.thread).runs.find(r=>r.id===run)!.state,'failed');
+  const outcome=f.core.modelOutcome(run)!;assert.equal(outcome.reason,'provider_error');
+  assert.deepEqual(outcome.error,{...(httpStatus?{httpStatus}:{}),...(!scenario.endsWith('unknown')?{code}:{})});
+  assert.equal(f.core.snapshot(f.thread).operations.length,0);
+  const ref=f.core.nativeSessionReference(f.thread);assert.equal(ref.persisted,true);
+  const native=readFileSync(ref.reference!,'utf8');assert.match(native,/Provider request failed/);
+  await f.supervisor.close();f.reopen();f.supervisor.recover();
+  assert.deepEqual(f.core.modelOutcome(run),outcome);assert.deepEqual(f.core.historyEntry(f.thread,run).item.modelOutcome,outcome);
+  for(const text of [native,readFileSync(f.database).toString(),JSON.stringify(f.core.historyEntry(f.thread,run)),JSON.stringify(f.core.workerLaunches())]){
+   for(const secret of [key,Buffer.from(key).toString('base64'),'SYNTHETIC_PRIVATE_ERROR'])assert.equal(text.includes(secret),false);
+  }
+  assert.equal(calls,2,'reopen never retries failed request');
+ }finally{await f.dispose();}
 });
