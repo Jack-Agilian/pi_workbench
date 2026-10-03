@@ -5,6 +5,7 @@ import type { DesktopApi, DesktopHome } from '../../packages/app-contracts/deskt
 import type { ThreadActivity } from '../../packages/app-contracts/desktop-pages.ts';
 import { ThreadPages, projectPages, type ThreadPagesView } from './thread-pages.ts';
 import { RunHistory } from './run-history.tsx';
+import { PermissionPicker } from './permission-picker.tsx';
 import { ApprovalList } from './approval-list.tsx';
 import { ArtifactPanel } from './artifact-panel.tsx';
 import { useTimelineScroll } from './timeline-scroll.ts';
@@ -36,6 +37,7 @@ function App() {
   const pageEpoch = useRef(0);
   const [drafts, setDrafts] = useState<Record<string, string>>({}); const [title, setTitle] = useState('');
   const [problem, setProblem] = useState<{ kind: 'connection' | 'request'; text: string } | null>(null); const [disconnected, setDisconnected] = useState(false);
+  const [permissionPending, setPermissionPending] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [busy, setBusy] = useState(false); const [tick, setTick] = useState(0);
   const generation = useRef(0); const commandPending = useRef(false);
@@ -145,7 +147,13 @@ function App() {
   async function command(value: Command) {
     if (commandPending.current) return;
     commandPending.current = true; setBusy(true); setProblem(null);
-    try { return await api.command(value); } catch (error) { failed(error); return; }
+    try { return await api.command(value); } catch (error) {
+      if (value.type === 'runs.start' && error instanceof Error && error.message === 'permission_changed') {
+        if (pendingRuns.current.get(value.threadId) === value) pendingRuns.current.delete(value.threadId);
+        setProblem({kind: 'request', text: '权限模式已变化，此次任务尚未接收。请核对输入区的模式后重新发送，草稿已保留。'}); setTick(n => n + 1);
+      } else failed(error);
+      return;
+    }
     finally { commandPending.current = false; setBusy(false); }
   }
   async function createThread() {
@@ -156,9 +164,9 @@ function App() {
     if (response && pendingCreation.current === intent) { pendingCreation.current = null; setTitle(''); setSelected(response.id); setTick(n => n + 1); }
   }
   async function submit() {
-    if (!selected || !draft.trim() || commandPending.current || busy || disconnected || !canSend) return;
+    if (!selected || !draft.trim() || commandPending.current || busy || disconnected || permissionPending || !activity || !canSend) return;
     const current = selected;
-    const intent = pendingRuns.current.get(current) ?? { type: 'runs.start', requestId: id(), threadId: current, input: draft };
+    const intent = pendingRuns.current.get(current) ?? { type: 'runs.start', requestId: id(), threadId: current, input: draft, permissionRevision: activity.thread.permissionRevision ?? 0 };
     pendingRuns.current.set(current, intent);
     const response = await command(intent);
     if (response && pendingRuns.current.get(current) === intent) {
@@ -238,7 +246,7 @@ function App() {
           {scroll.browsing && <button className="return-latest" onClick={scroll.returnLatest}>返回最新 ↓</button>}
           {!modelMode && !currentRuns.length && <details className="demo-options"><summary>命令演示</summary><div className="suggestions"><button disabled={!selected || !!unconfirmedRun || busy || disconnected} onClick={() => setDrafts(all => ({ ...all, [selected]: '/demo-shell' }))}>填入只读命令演示</button><button disabled={!selected || !!unconfirmedRun || busy || disconnected} onClick={() => setDrafts(all => ({ ...all, [selected]: '/demo-shell-wait' }))}>填入可停止命令演示</button></div></details>}<form className="composer" onSubmit={event => { event.preventDefault(); void submit(); }}>
             <label className="sr-only" htmlFor="composer">你的消息</label><textarea id="composer" placeholder={selected ? '描述你想完成的工作…' : '新建会话后，在这里描述你的目标…'} disabled={!selected || !!unconfirmedRun} value={draft} maxLength={16384} onChange={event => setDrafts(all => ({ ...all, [selected]: event.target.value }))} onKeyDown={event => { if (shouldSubmit(event.nativeEvent)) { event.preventDefault(); void submit(); } }} />
-            <div className="composer-footer"><span>{modelMode?(shellTools?'Pi · 文件与 Bash':home?.model?.limits?.fileTools?'Pi · 文件工具':'Pi · 无工具'):'无模型演示'}</span><button className="primary" type="submit" disabled={!selected || !draft.trim() || busy || disconnected || !canSend}>{unconfirmedRun ? '重试未确认请求' : isWorking ? '加入队列' : '发送'} <span>↑</span></button></div>
+            <div className="composer-footer">{activity && <PermissionPicker key={`${selected}:${queryScope.current}`} thread={activity.thread} api={api} disabled={disconnected || !!unconfirmedRun} changed={() => setTick(n => n + 1)} pending={setPermissionPending} />}<span>{modelMode?(shellTools?'Pi · 文件与 Bash':home?.model?.limits?.fileTools?'Pi · 文件工具':'Pi · 无工具'):'无模型演示'}</span><button className="primary" type="submit" disabled={!selected || !draft.trim() || busy || disconnected || permissionPending || !activity || !canSend}>{unconfirmedRun ? '重试未确认请求' : isWorking ? '加入队列' : '发送'} <span>↑</span></button></div>
             {unconfirmedRun && <p role="status">尚未收到确认；重试会核对同一次提交，原内容已保留。</p>}
           </form><p className="composer-hint">Enter 发送 · Shift + Enter 换行</p>
         </section>

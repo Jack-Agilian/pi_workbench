@@ -28,6 +28,81 @@ function approve(core: ProductCore, binding: Binding, call = 'call') {
   return op;
 }
 
+test('permission policy: host snapshot, durable idempotency and stale UI never expand a queued run', t => {
+  const f = fixture(t); const first = f.start();
+  const policy = {type:'threads.permissions', requestId:'policy', threadId:f.thread, mode:'auto', expectedRevision:0};
+  f.core.handle(policy); const cursor = f.core.snapshot(f.thread).cursor;
+  f.core.handle(policy); assert.equal(f.core.snapshot(f.thread).cursor, cursor);
+  const start = {type:'runs.start', requestId:'automatic', threadId:f.thread, input:'SYNTHETIC', permissionRevision:1};
+  const auto = f.core.handle(start).id;
+  assert.equal(f.core.snapshot(f.thread).runs.find(r=>r.id===first)!.permissionMode, 'manual');
+  assert.equal(f.core.snapshot(f.thread).runs.find(r=>r.id===auto)!.permissionMode, 'auto');
+  assert.throws(()=>f.core.handle({...start, requestId:'stale', permissionRevision:0}), /permission_changed/);
+  assert.throws(()=>f.core.handle({...policy,requestId:'stale-policy'}), /permission_changed/);
+  const legacy = f.start('legacy');
+  assert.equal(f.core.snapshot(f.thread).runs.find(r=>r.id===legacy)!.permissionMode, 'manual');
+  f.core.handle({...policy,requestId:'manual',mode:'manual',expectedRevision:1});
+  // A lost acknowledgement must still resolve to the original Run after a mode change.
+  assert.equal(f.core.handle(start).id, auto);
+  f.core.close(); const reopened = new ProductCore(f.path, f.workspaces); t.after(()=>reopened.close());
+  assert.equal(reopened.listThreads()[0]!.permissionRevision, 2);
+  assert.equal(reopened.snapshot(f.thread).runs.find(r=>r.id===auto)!.permissionMode, 'auto');
+  assert.equal(reopened.handle(start).id, auto);
+});
+
+test('automatic approval is a host rule: one claim, audit source, cancellation and unknown tools stay bounded', t => {
+  const f = fixture(t);
+  f.core.handle({type:'threads.permissions',requestId:'policy',threadId:f.thread,mode:'auto',expectedRevision:0});
+  const run=f.core.handle({type:'runs.start',requestId:'start',threadId:f.thread,input:'SYNTHETIC',permissionRevision:1}).id;
+  const binding=f.core.dispatchNext()!;f.core.markRunning(binding);
+  const intent={tool:'write',toolCallId:'write',parametersDigest:hash,artifactPath:'auto.md',deadline:Date.now()+60000};
+  const op=f.core.requestOperation(binding,intent);
+  assert.equal(op.state,'approved');assert.equal(op.approvalSource,'workspace-tools-v1');
+  assert.equal(f.core.requestOperation(binding,intent).id,op.id);
+  assert.equal(f.core.eventsAfter(f.thread,0).filter(e=>e.kind==='approval.automatic').length,1);
+  f.core.claimOperation(binding,op.id,hash);
+  assert.throws(()=>f.core.claimOperation(binding,op.id,hash),/operation_not_authorized/);
+  f.core.finishOperation(binding,op.id,'failed');
+  const unknown=f.core.requestOperation(binding,{tool:'unregistered',toolCallId:'unknown',parametersDigest:hash,deadline:Date.now()+60000});
+  assert.equal(unknown.state,'pending');assert.equal(unknown.approvalSource,'manual');
+  f.core.handle({type:'approvals.resolve',requestId:'deny-unknown',operationId:unknown.id,parametersDigest:hash,decision:'deny'});
+  const cancelled=f.core.requestOperation(binding,{...intent,toolCallId:'cancelled'});
+  f.core.handle({type:'runs.cancel',requestId:'cancel',runId:run});
+  assert.throws(()=>f.core.claimOperation(binding,cancelled.id,hash),/operation_not_authorized/);
+  assert.equal(f.core.snapshot(f.thread).operations.find(o=>o.id===cancelled.id)!.state,'denied');
+});
+
+test('switching to automatic never resolves an existing manual approval', t => {
+  const f=fixture(t);const binding=f.running();
+  const op=f.core.requestOperation(binding,{tool:'write',toolCallId:'pending',parametersDigest:hash,artifactPath:'report.md',deadline:Date.now()+60000});
+  f.core.handle({type:'threads.permissions',requestId:'mode',threadId:f.thread,mode:'auto',expectedRevision:0});
+  assert.equal(f.core.snapshot(f.thread).operations[0]!.state,'pending');
+  assert.throws(()=>f.core.claimOperation(binding,op.id,hash),/operation_not_authorized/);
+  assert.equal(f.core.snapshot(f.thread).runs[0]!.permissionMode,'manual');
+});
+
+test('permission commands cannot claim full access, supply authority, or use invalid revisions', () => {
+  const policy={type:'threads.permissions',requestId:'permission',threadId:'thread',mode:'auto',expectedRevision:0};
+  assert.deepEqual(parseCommand(policy),policy);
+  for(const invalid of [{...policy,mode:'full'},{...policy,source:'workspace-tools-v1'},{...policy,expectedRevision:-1},{...policy,expectedRevision:0.5},{...policy,workspace:'/tmp'},{...policy,expectedRevision:Number.MAX_SAFE_INTEGER}])assert.throws(()=>parseCommand(invalid));
+});
+
+test('automatic grants still expire and schema v9 migration never changes historical authority', t => {
+  const f=fixture(t);const run=f.start();const original=f.core.snapshot(f.thread);
+  f.core.close();const old=new DatabaseSync(f.path);
+  old.exec('ALTER TABLE threads DROP COLUMN permission_mode; ALTER TABLE threads DROP COLUMN permission_revision; ALTER TABLE runs DROP COLUMN permission_mode; ALTER TABLE runs DROP COLUMN permission_revision; ALTER TABLE approvals DROP COLUMN source; PRAGMA user_version=9;');old.close();
+  const migrated=new ProductCore(f.path,f.workspaces);t.after(()=>migrated.close());
+  assert.deepEqual(migrated.snapshot(f.thread),original);
+  migrated.handle({type:'runs.cancel',requestId:'cancel-old',runId:run});
+  migrated.handle({type:'threads.permissions',requestId:'auto',threadId:f.thread,mode:'auto',expectedRevision:0});
+  migrated.handle({type:'runs.start',requestId:'auto-run',threadId:f.thread,input:'SYNTHETIC',permissionRevision:1});
+  const binding=migrated.dispatchNext()!;migrated.markRunning(binding);
+  const deadline=Date.now()+1000;
+  const op=migrated.requestOperation(binding,{tool:'write',toolCallId:'expired',parametersDigest:hash,artifactPath:'x.md',deadline});
+  t.mock.method(Date,'now',()=>deadline+1);
+  assert.throws(()=>migrated.claimOperation(binding,op.id,hash),/operation_not_authorized/);
+});
+
 test('product commands reject unknown authority, functions, accessors and unsupported intents', () => {
   const valid = { type: 'runs.start', requestId: 'request', threadId: 'thread', input: 'SYNTHETIC' };
   assert.deepEqual(parseCommand(valid), valid);

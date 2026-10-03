@@ -4,7 +4,7 @@ import type { DesktopApi } from '../../packages/app-contracts/desktop.ts';
 import type { DesktopPage, HistoryItem, PageOptions } from '../../packages/app-contracts/desktop-pages.ts';
 import type { ProductEvent } from '../../packages/app-contracts/index.ts';
 import { ThreadPages } from './thread-pages.ts';
-const record = (id: number): HistoryItem => ({run:{id:String(id),threadId:'thread',state:'completed'},input:`SYNTHETIC ${id}`,presentation:{messages:[],omitted:false},modelOutcome:null});
+const record = (id: number): HistoryItem => ({run:{id:String(id),threadId:'thread',state:'completed',permissionMode:'manual',permissionRevision:0},input:`SYNTHETIC ${id}`,presentation:{messages:[],omitted:false},modelOutcome:null});
 function fixture() {
   let items = Array.from({length:21},(_,i)=>record(21-i)); let seq=1; let events: ProductEvent[]=[];
   const cursors:number[]=[]; let failure=false; let release:(()=>void)|undefined;
@@ -109,7 +109,7 @@ test('targeted: multi-page new head preserves old tail cursor; unloaded old chan
 });
 test('targeted: operation paging, cancellation invalidation and artifact versions are independent',async()=>{
   const f=targetedFixture(8);
-  f.operations.set('8',Array.from({length:12},(_,i)=>({id:String(12-i),runId:'8',toolCallId:'s',tool:'write',artifactPath:null,parametersDigest:'0'.repeat(64),deadline:1,state:'pending'})));
+  f.operations.set('8',Array.from({length:12},(_,i)=>({id:String(12-i),runId:'8',approvalSource:'manual' as const,toolCallId:'s',tool:'write',artifactPath:null,parametersDigest:'0'.repeat(64),deadline:1,state:'pending'})));
   await f.load();await f.reader.more('8');f.calls.length=0;
   f.operations.set('8',f.operations.get('8')!.map(op=>({...op,state:'denied'})));f.emit('run.cancelling');
   let v=await f.reader.poll();assert.equal(v.operations.get('8')!.items.length,12);assert.ok(v.operations.get('8')!.items.every(op=>op.state==='denied'));
@@ -145,7 +145,7 @@ test('targeted: switch fences in-flight and queued work, no next request or part
 
 test('query migration: later tool read failure preserves the entire published batch and retries dirty runs', async()=>{
   const f=targetedFixture(8);await f.load();const old=f.reader.view();
-  const op={id:'1',runId:'8',toolCallId:'synthetic',tool:'write' as const,artifactPath:null,parametersDigest:'0'.repeat(64),deadline:1,state:'denied' as const};
+  const op={id:'1',runId:'8',approvalSource:'manual' as const,toolCallId:'synthetic',tool:'write' as const,artifactPath:null,parametersDigest:'0'.repeat(64),deadline:1,state:'denied' as const};
   f.operations.set('8',[op]);f.emit('operation.failed','8');f.emit('operation.failed','7');f.fail('operation:7');
   await assert.rejects(f.reader.poll(),/disconnected/);
   assert.deepEqual(f.reader.view(),old);assert.equal(f.reader.tools.error(),'disconnected');
@@ -165,7 +165,7 @@ test('query migration: many dirty Runs retain sequential IPC backpressure',async
 
 test('query migration: replacement restores browsed positions with fresh data and no old Query cache',async()=>{
   const f=targetedFixture(24);
-  f.operations.set('24',Array.from({length:12},(_,i)=>({id:String(12-i),runId:'24',toolCallId:'s',tool:'write',artifactPath:null,parametersDigest:'0'.repeat(64),deadline:1,state:'denied'})));
+  f.operations.set('24',Array.from({length:12},(_,i)=>({id:String(12-i),runId:'24',approvalSource:'manual' as const,toolCallId:'s',tool:'write',artifactPath:null,parametersDigest:'0'.repeat(64),deadline:1,state:'denied'})));
   await f.reader.refresh();await f.reader.more('history');await f.reader.more('24');
   const positions=f.reader.browsePositions();f.reader.dispose();f.insert(3);
   const replacement=new ThreadPages(f.api,'thread','new-host',positions);

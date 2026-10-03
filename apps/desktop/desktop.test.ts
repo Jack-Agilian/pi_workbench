@@ -29,6 +29,31 @@ function fixture() {
   const snapshot = () => host.request({ type: 'thread', threadId: thread }) as DesktopThread;
   return { root, host, thread, start, snapshot, dispose: async () => { await host.close(); rmSync(root, { recursive: true, force: true }); } };
 }
+test('desktop permission policy persists; automatic write uses the real Worker once and manual denial still prevents writes', async () => {
+  const f=fixture();let reopened:DesktopHost|undefined;
+  try {
+    const policy={type:'threads.permissions',requestId:'auto',threadId:f.thread,mode:'auto',expectedRevision:0};
+    f.host.request({type:'command',command:policy});
+    const start={...f.start,permissionRevision:1};
+    const ack=f.host.request({type:'command',command:start}) as Ack;
+    assert.deepEqual(f.host.request({type:'command',command:start}),ack);
+    await until(()=>f.snapshot().runs[0]?.state==='completed','automatic-write');
+    const snap=f.snapshot();assert.equal(snap.operations.length,1);assert.equal(snap.operations[0]!.approvalSource,'workspace-tools-v1');
+    assert.equal(snap.operations[0]!.state,'succeeded');assert.equal(snap.artifacts.length,1);
+    const path=join(f.root,'workspace',snap.artifacts[0]!.path);const modified=statSync(path).mtimeMs;
+    await f.host.close();reopened=new DesktopHost(f.root);
+    assert.equal((reopened.request({type:'home'}) as DesktopHome).threads[0]!.permissionMode,'auto');
+    assert.deepEqual(reopened.request({type:'command',command:start}),ack);assert.equal(statSync(path).mtimeMs,modified);
+    reopened.request({type:'command',command:{...policy,requestId:'manual',mode:'manual',expectedRevision:1}});
+    reopened.request({type:'command',command:{...f.start,requestId:'denied',permissionRevision:2}});
+    const thread=()=>reopened!.request({type:'thread',threadId:f.thread}) as DesktopThread;
+    await until(()=>thread().operations.some(o=>o.state==='pending'),'manual-after-auto');
+    const op=thread().operations.find(o=>o.state==='pending')!;
+    reopened.request({type:'command',command:{type:'approvals.resolve',requestId:'deny',operationId:op.id,parametersDigest:op.parametersDigest,decision:'deny'}});
+    await until(()=>thread().runs.at(-1)?.state==='failed','denied-after-auto');
+    assert.equal(existsSync(join(f.root,'workspace',op.artifactPath!)),false);
+  } finally { await reopened?.close();await f.dispose(); }
+});
 test('desktop request whitelist rejects authority, accessors, oversize and arbitrary channels', () => {
   for (const value of [{ type: 'execute', script: 'x' }, { type: 'home', database: 'x' }, { type: 'thread', threadId: ['x'] },
     { type: 'events', threadId: 'x', cursor: -1 }, { type: 'command', command: { type: 'runs.start', requestId: 'x', threadId: 'x', input: 'a'.repeat(17000) } },
@@ -226,7 +251,7 @@ test('schema v3 forward migration preserves the pre-Assistant product intent and
     // DesktopHost.close now intentionally cancels queued work, which is not this fixture.
     f.host.core.close();
     const db = new DatabaseSync(join(f.root, 'host/product.sqlite'));
-    db.exec('DROP TABLE desktop_workspace; DROP TABLE model_shell_operations; DROP TABLE file_operations; DROP TABLE model_policy_revisions; DROP TABLE model_requests; DROP TABLE model_outcomes; DROP TABLE shell_display; DROP TABLE run_display; PRAGMA user_version=3;'); db.close();
+    db.exec('ALTER TABLE threads DROP COLUMN permission_mode; ALTER TABLE threads DROP COLUMN permission_revision; ALTER TABLE runs DROP COLUMN permission_mode; ALTER TABLE runs DROP COLUMN permission_revision; ALTER TABLE approvals DROP COLUMN source; DROP TABLE desktop_workspace; DROP TABLE model_shell_operations; DROP TABLE file_operations; DROP TABLE model_policy_revisions; DROP TABLE model_requests; DROP TABLE model_outcomes; DROP TABLE shell_display; DROP TABLE run_display; PRAGMA user_version=3;'); db.close();
     const reopened = new DesktopHost(f.root);
     try {
       const restored = reopened.request({ type: 'thread', threadId: f.thread }) as DesktopThread;

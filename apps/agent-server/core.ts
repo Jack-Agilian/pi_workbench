@@ -15,11 +15,12 @@ import { artifactPath, inspectMarkdown } from './artifact.ts';
 import { displayText, parsePresentation, type Presentation } from '../../packages/app-contracts/presentation.ts';
 
 type Run = RunView & { input: string; runtimeBindingId: string | null; workerEpoch: string | null; sessionGeneration: string | null };
-type Operation = OperationView & { runtimeBindingId: string; contentDigest: string | null };
+type Operation = Omit<OperationView, 'approvalSource'> & { runtimeBindingId: string; contentDigest: string | null };
 const active = "('starting','running','cancelling','unknown')";
 const outstanding = "('pending','approved','executing','unknown')";
 const terminal = new Set(['completed', 'failed', 'cancelled']);
-const runColumns = 'id, thread_id AS threadId, state, input, binding_id AS runtimeBindingId, worker_epoch AS workerEpoch, session_generation AS sessionGeneration';
+const permissionColumns = 'permission_mode AS permissionMode,permission_revision AS permissionRevision';
+const runColumns = 'id, thread_id AS threadId, state, permission_mode AS permissionMode,permission_revision AS permissionRevision, input, binding_id AS runtimeBindingId, worker_epoch AS workerEpoch, session_generation AS sessionGeneration';
 const operationColumns = 'id, run_id AS runId, tool_call_id AS toolCallId, tool, digest AS parametersDigest, artifact_path AS artifactPath, deadline, state, binding_id AS runtimeBindingId, content_digest AS contentDigest';
 const artifactColumns = 'id, run_id AS runId, operation_id AS operationId, path, version, digest, bytes';
 const eventColumns = 'seq, run_seq AS runSeq, thread_id AS threadId, run_id AS runId, kind, entity_id AS entityId, event_type AS eventType, source_type AS sourceType';
@@ -36,7 +37,7 @@ export class ProductCore {
       if (path !== ':memory:') chmodSync(path, 0o600);
       this.db.exec('PRAGMA busy_timeout=1000; PRAGMA synchronous=FULL;');
       const version = this.one<{ user_version: number }>('PRAGMA user_version').user_version;
-      if (![0, 1, 2, 3, 4, 5, 6, 7, 8, 9].includes(version)) throw new Error('unsupported_database_version');
+      if (![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].includes(version)) throw new Error('unsupported_database_version');
       if (version === 0) {
         this.db.exec(`BEGIN IMMEDIATE;
           CREATE TABLE workspaces(id TEXT PRIMARY KEY, path TEXT NOT NULL UNIQUE) STRICT;
@@ -91,6 +92,13 @@ export class ProductCore {
         CREATE TABLE model_shell_operations(operation_id TEXT PRIMARY KEY REFERENCES operations(id), plan TEXT NOT NULL, launched INTEGER NOT NULL DEFAULT 0 CHECK(launched IN (0,1))) STRICT;
         CREATE TABLE desktop_workspace(singleton INTEGER PRIMARY KEY CHECK(singleton=1), workspace_id TEXT NOT NULL REFERENCES workspaces(id)) STRICT;
         PRAGMA user_version=9; COMMIT;`);
+      if (version < 10) this.db.exec(`BEGIN IMMEDIATE;
+        ALTER TABLE threads ADD COLUMN permission_mode TEXT NOT NULL DEFAULT 'manual' CHECK(permission_mode IN ('manual','auto'));
+        ALTER TABLE threads ADD COLUMN permission_revision INTEGER NOT NULL DEFAULT 0;
+        ALTER TABLE runs ADD COLUMN permission_mode TEXT NOT NULL DEFAULT 'manual' CHECK(permission_mode IN ('manual','auto'));
+        ALTER TABLE runs ADD COLUMN permission_revision INTEGER NOT NULL DEFAULT 0;
+        ALTER TABLE approvals ADD COLUMN source TEXT NOT NULL DEFAULT 'manual' CHECK(source IN ('manual','workspace-tools-v1'));
+        PRAGMA user_version=10; COMMIT;`);
       this.transaction(() => {
         for (const workspace of workspaces) {
           identifier(workspace.id); const canonical = realpathSync(workspace.path);
@@ -157,10 +165,23 @@ export class ProductCore {
           this.one('SELECT id FROM workspaces WHERE id=?', command.workspaceId); id = randomUUID();
           this.db.prepare('INSERT INTO threads(id,workspace_id,title) VALUES (?,?,?)').run(id, command.workspaceId, command.title);
           this.event(id, '', 'thread.created', id); break;
-        case 'runs.start':
-          this.one('SELECT id FROM threads WHERE id=?', command.threadId); id = randomUUID();
-          this.db.prepare("INSERT INTO runs(id,thread_id,input,state) VALUES (?,?,?,'queued')").run(id, command.threadId, command.input);
+        case 'threads.permissions': {
+          const thread = this.one<Pick<ThreadView, 'id' | 'permissionMode' | 'permissionRevision'>>(`SELECT id,${permissionColumns} FROM threads WHERE id=?`, command.threadId);
+          if (thread.permissionRevision !== command.expectedRevision) throw new Error('permission_changed');
+          id = thread.id;
+          this.db.prepare('UPDATE threads SET permission_mode=?,permission_revision=permission_revision+1 WHERE id=?').run(command.mode, id);
+          this.event(id, '', 'permission.' + command.mode, id); break;
+        }
+        case 'runs.start': {
+          const thread = this.one<Pick<ThreadView, 'id' | 'permissionMode' | 'permissionRevision'>>(`SELECT id,${permissionColumns} FROM threads WHERE id=?`, command.threadId);
+          if (command.permissionRevision !== undefined && command.permissionRevision !== thread.permissionRevision) throw new Error('permission_changed');
+          // Old callers cannot accidentally inherit a more permissive desktop choice.
+          const mode = command.permissionRevision === undefined ? 'manual' : thread.permissionMode;
+          const revision = command.permissionRevision === undefined ? 0 : thread.permissionRevision;
+          id = randomUUID();
+          this.db.prepare("INSERT INTO runs(id,thread_id,input,state,permission_mode,permission_revision) VALUES (?,?,?,'queued',?,?)").run(id, command.threadId, command.input, mode, revision);
           this.event(command.threadId, id, 'run.queued', id); break;
+        }
         case 'runs.cancel': {
           const run = this.run(command.runId); id = run.id;
           if (terminal.has(run.state) || run.state === 'cancelling') break;
@@ -217,8 +238,8 @@ export class ProductCore {
     return {selectedId:this.one<{id:string}>('SELECT workspace_id AS id FROM desktop_workspace WHERE singleton=1').id,items:this.all('SELECT id,path FROM workspaces ORDER BY rowid')};
   }
   workspacePath(id: string): string { return this.one<{path:string}>('SELECT path FROM workspaces WHERE id=?', id).path; }
-  activeRuns():RunView[] { return this.all(`SELECT id,thread_id AS threadId,state FROM runs WHERE state IN ${active} ORDER BY rowid`); }
-  listThreads(): ThreadView[] { return this.all('SELECT id,workspace_id AS workspaceId,title FROM threads ORDER BY rowid DESC'); }
+  activeRuns():RunView[] { return this.all(`SELECT id,thread_id AS threadId,state,permission_mode AS permissionMode,permission_revision AS permissionRevision FROM runs WHERE state IN ${active} ORDER BY rowid`); }
+  listThreads(): ThreadView[] { return this.all('SELECT id,workspace_id AS workspaceId,title,permission_mode AS permissionMode,permission_revision AS permissionRevision FROM threads ORDER BY rowid DESC'); }
   /** Trusted host scheduling only. Renderer cannot select an executable or plan. */
   nextQueuedIntent(): { id: string; input: string; threadId:string } | undefined { return this.get("SELECT id,input,thread_id AS threadId FROM runs WHERE state='queued' ORDER BY rowid LIMIT 1"); }
   threadWorkspace(threadId:string): {id:string;path:string} { return this.one('SELECT w.id,w.path FROM workspaces w JOIN threads t ON t.workspace_id=w.id WHERE t.id=?',threadId); }
@@ -362,8 +383,13 @@ export class ProductCore {
       if (intent.modelShell) this.db.prepare('INSERT INTO model_shell_operations(operation_id,plan) VALUES (?,?)').run(id,JSON.stringify(intent.modelShell));
       if (intent.file) this.db.prepare('INSERT INTO file_operations VALUES (?,?)').run(id,JSON.stringify(intent.file));
       if (intent.shell) this.db.prepare('INSERT INTO shell_display VALUES (?,?,NULL)').run(id, JSON.stringify(intent.shell));
-      this.db.prepare("INSERT INTO approvals VALUES (?,'pending')").run(id);
-      this.event(run.threadId, run.id, 'approval.requested', id);
+      // A fixed host rule covers only existing admitted tools. No command parsing or model classifier.
+      // Native file/version/resource checks and the guardian still gate actual execution.
+      const automatic = run.permissionMode === 'auto' &&
+        (['read','write','edit'].includes(intent.tool) && target !== null || intent.tool === 'bash' && intent.shell !== undefined);
+      this.db.prepare('INSERT INTO approvals(operation_id,decision,source) VALUES (?,?,?)').run(id, automatic ? 'allow' : 'pending', automatic ? 'workspace-tools-v1' : 'manual');
+      if (automatic) this.db.prepare("UPDATE operations SET state='approved' WHERE id=?").run(id);
+      this.event(run.threadId, run.id, automatic ? 'approval.automatic' : 'approval.requested', id);
       return this.operationView(this.operation(id));
     });
   }
@@ -509,7 +535,8 @@ export class ProductCore {
     const row = this.get<{ intent: string; outcome: string | null }>('SELECT intent,outcome FROM shell_display WHERE operation_id=?', id);
     const shell: ShellView | undefined = row ? { intent: parseShellIntent(JSON.parse(row.intent)), outcome: row.outcome ? parseShellOutcome(JSON.parse(row.outcome)) : null } : undefined;
     const file=this.fileOperation(id);
-    return { id, runId, toolCallId, tool, parametersDigest, artifactPath, deadline, state, ...(shell ? { shell } : {}), ...(file?{file:{fileVersion:file.fileVersion,resourceLock:file.resourceLock,preview:displayText(file.request.tool==='write'?file.request.parameters.content:file.request.tool==='edit'?file.request.parameters.edits.map(e=>`${e.oldText}\n→\n${e.newText}`).join('\n\n'):`从第 ${file.request.parameters.offset??1} 行读取，${file.request.parameters.limit===undefined?'使用 Pi 默认截断':'最多 '+file.request.parameters.limit+' 行'}`,2048),summary:tool==='read'?'读取批准版本的 Markdown':tool==='write'?'写入 Markdown（内容与摘要绑定）':'使用 Pi 原生 edit 修改 Markdown'}}:{}) };
+    const {source} = this.one<{source: NonNullable<OperationView['approvalSource']>}>('SELECT source FROM approvals WHERE operation_id=?', id);
+    return { id, runId, toolCallId, tool, parametersDigest, artifactPath, deadline, state, approvalSource: source, ...(shell ? { shell } : {}), ...(file?{file:{fileVersion:file.fileVersion,resourceLock:file.resourceLock,preview:displayText(file.request.tool==='write'?file.request.parameters.content:file.request.tool==='edit'?file.request.parameters.edits.map(e=>`${e.oldText}\n→\n${e.newText}`).join('\n\n'):`从第 ${file.request.parameters.offset??1} 行读取，${file.request.parameters.limit===undefined?'使用 Pi 默认截断':'最多 '+file.request.parameters.limit+' 行'}`,2048),summary:tool==='read'?'读取批准版本的 Markdown':tool==='write'?'写入 Markdown（内容与摘要绑定）':'使用 Pi 原生 edit 修改 Markdown'}}:{}) };
   }
   recordShellOutcome(binding: Binding, id: string, value: ShellOutcome): void {
     const outcome = parseShellOutcome(value);
@@ -522,8 +549,8 @@ export class ProductCore {
   snapshot(threadId: string): Snapshot {
     return this.transaction(() => ({
       cursor: this.one<{ cursor: number }>('SELECT coalesce(max(seq),0) AS cursor FROM events').cursor,
-      thread: this.one<ThreadView>('SELECT id,workspace_id AS workspaceId,title FROM threads WHERE id=?', threadId),
-      runs: this.all<RunView>('SELECT id,thread_id AS threadId,state FROM runs WHERE thread_id=? ORDER BY rowid', threadId),
+      thread: this.one<ThreadView>('SELECT id,workspace_id AS workspaceId,title,permission_mode AS permissionMode,permission_revision AS permissionRevision FROM threads WHERE id=?', threadId),
+      runs: this.all<RunView>('SELECT id,thread_id AS threadId,state,permission_mode AS permissionMode,permission_revision AS permissionRevision FROM runs WHERE thread_id=? ORDER BY rowid', threadId),
       operations: this.all<Operation>(`SELECT ${operationColumns} FROM operations WHERE run_id IN (SELECT id FROM runs WHERE thread_id=?) ORDER BY rowid`, threadId).map(op => this.operationView(op)),
       artifacts: this.all<ArtifactView>(`SELECT ${artifactColumns} FROM artifacts WHERE run_id IN (SELECT id FROM runs WHERE thread_id=?) ORDER BY rowid`, threadId),
     }), false);
@@ -556,8 +583,8 @@ export class ProductCore {
   }
   threadActivity(threadId:string) {
     return this.transaction(()=>{
-      const thread=this.one<ThreadView>('SELECT id,workspace_id AS workspaceId,title FROM threads WHERE id=?',threadId);
-      const run=this.get<RunView>(`SELECT id,thread_id AS threadId,state FROM runs WHERE thread_id=? AND state IN ${active} LIMIT 1`,threadId);
+      const thread=this.one<ThreadView>('SELECT id,workspace_id AS workspaceId,title,permission_mode AS permissionMode,permission_revision AS permissionRevision FROM threads WHERE id=?',threadId);
+      const run=this.get<RunView>(`SELECT id,thread_id AS threadId,state,permission_mode AS permissionMode,permission_revision AS permissionRevision FROM runs WHERE thread_id=? AND state IN ${active} LIMIT 1`,threadId);
       // At most 16 operations are admitted; expose current actions independently of history pages.
       const operations=run?this.all<Operation>(`SELECT ${operationColumns} FROM operations WHERE run_id=? AND state IN ('pending','approved','executing') ORDER BY rowid LIMIT 16`,run.id).map(op=>this.operationView(op)):[];
       return {thread:{...thread,title:displayText(thread.title,160)},activeRun:run??null,operations,

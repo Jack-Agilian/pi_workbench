@@ -3,15 +3,19 @@ import type { ShellView } from './shell.ts';
 // Product-only JSON contracts. No Pi, Node or Electron types cross this boundary.
 export type RunState = 'queued' | 'starting' | 'running' | 'cancelling' | 'unknown' | 'completed' | 'failed' | 'cancelled';
 export type OperationState = 'pending' | 'approved' | 'executing' | 'unknown' | 'succeeded' | 'failed' | 'denied';
+export type PermissionMode = 'manual' | 'auto';
+/** Persisted host policy; old databases migrate to manual revision zero. */
+export interface PermissionView { permissionMode: PermissionMode; permissionRevision: number }
 export type Command =
   | { type: 'threads.create'; requestId: string; workspaceId: string; title: string }
-  | { type: 'runs.start'; requestId: string; threadId: string; input: string }
+  | { type: 'threads.permissions'; requestId: string; threadId: string; mode: PermissionMode; expectedRevision: number }
+  | { type: 'runs.start'; requestId: string; threadId: string; input: string; permissionRevision?: number }
   | { type: 'runs.cancel'; requestId: string; runId: string }
   | { type: 'approvals.resolve'; requestId: string; operationId: string; parametersDigest: string; decision: 'allow' | 'deny' };
 export interface Ack { accepted: true; id: string }
-export interface ThreadView { id: string; workspaceId: string; title: string }
-export interface RunView { id: string; threadId: string; state: RunState }
-export interface OperationView { file?:FileOperationView; shell?: ShellView; id: string; runId: string; toolCallId: string; tool: string; parametersDigest: string; artifactPath: string | null; deadline: number; state: OperationState }
+export interface ThreadView extends PermissionView { id: string; workspaceId: string; title: string }
+export interface RunView extends PermissionView { id: string; threadId: string; state: RunState }
+export interface OperationView { approvalSource: 'manual' | 'workspace-tools-v1'; file?:FileOperationView; shell?: ShellView; id: string; runId: string; toolCallId: string; tool: string; parametersDigest: string; artifactPath: string | null; deadline: number; state: OperationState }
 export interface ArtifactView { id: string; runId: string; operationId: string; path: string; version: number; digest: string; bytes: number }
 export interface RuntimeObservation { kind: 'activity' | 'idle' | 'diagnostic'; eventType: string; sourceType: string | null }
 export interface ProductEvent { seq: number; runSeq: number; threadId: string; runId: string; kind: string; entityId: string; eventType: string | null; sourceType: string | null }
@@ -34,6 +38,10 @@ function text(value: unknown, limit: number): string {
   if (typeof value !== 'string' || !value.trim() || value.length > limit || value.includes('\0')) throw new Error('invalid_text');
   return value;
 }
+function revision(value: unknown): number {
+  if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < 0 || value >= Number.MAX_SAFE_INTEGER) throw new Error('invalid_permission_revision');
+  return value;
+}
 /** Normalize into a new object: fixed field order for durable idempotency, reject unknown authority fields. */
 export function parseCommand(value: unknown): Command {
   if (!value || typeof value !== 'object' || Array.isArray(value) ||
@@ -45,7 +53,10 @@ export function parseCommand(value: unknown): Command {
   let result: Command;
   switch (command.type) {
     case 'threads.create': result = { type: command.type, requestId, workspaceId: identifier(command.workspaceId), title: text(command.title, 160) }; break;
-    case 'runs.start': result = { type: command.type, requestId, threadId: identifier(command.threadId), input: text(command.input, 16_384) }; break;
+    case 'threads.permissions':
+      if (command.mode !== 'manual' && command.mode !== 'auto') throw new Error('unsupported_permission_mode');
+      result = { type: command.type, requestId, threadId: identifier(command.threadId), mode: command.mode, expectedRevision: revision(command.expectedRevision) }; break;
+    case 'runs.start': result = { type: command.type, requestId, threadId: identifier(command.threadId), input: text(command.input, 16_384), ...(Object.hasOwn(command, 'permissionRevision') ? {permissionRevision: revision(command.permissionRevision)} : {}) }; break;
     case 'runs.cancel': result = { type: command.type, requestId, runId: identifier(command.runId) }; break;
     case 'approvals.resolve':
       if (command.decision !== 'allow' && command.decision !== 'deny') throw new Error('invalid_decision');

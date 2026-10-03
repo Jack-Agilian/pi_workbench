@@ -171,7 +171,7 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
   const submit = async (text: string, lost: boolean) => {
     await fill('#composer', text); if (lost) loseAck = 'runs.start';
     await js("document.querySelector('.composer').requestSubmit()");
-    await wait(() => js<boolean>(lost ? "document.querySelector('.composer button').textContent.includes('重试未确认请求') && !!document.querySelector('.notice.error')" : "document.querySelector('#composer').value === ''"), 'submit_ack_result');
+    await wait(() => js<boolean>(lost ? "document.querySelector('.composer button[type=submit]').textContent.includes('重试未确认请求') && !!document.querySelector('.notice.error')" : "document.querySelector('#composer').value === ''"), 'submit_ack_result');
   };
   const b = await create('SYNTHETIC retry B');
   loseAck = 'threads.create'; await fill('#title', 'SYNTHETIC retry A'); await click('＋ 新建会话');
@@ -191,7 +191,7 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
   await wait(() => js<boolean>("document.querySelector('h1')?.textContent === 'SYNTHETIC retry B'"), 'select_B');
   await submit('SYNTHETIC successful B', false);
   await click(a.title);
-  await wait(() => js<boolean>("document.querySelector('h1')?.textContent === 'SYNTHETIC retry A' && document.querySelector('.composer button').textContent.includes('重试未确认请求')"), 'restore_A_intent');
+  await wait(() => js<boolean>("document.querySelector('h1')?.textContent === 'SYNTHETIC retry A' && document.querySelector('.composer button[type=submit]').textContent.includes('重试未确认请求')"), 'restore_A_intent');
   assert.equal(attempts.filter(c => c.type === 'runs.start' && c.threadId === a.id).length, 1); // No reconnect/selection replay.
   await click('重试未确认请求 ↑');
   await wait(() => js<boolean>("document.querySelector('#composer').value === ''"), 'A_retry_ack');
@@ -204,7 +204,7 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
   await submit(repeatedText, true);
   const refreshPid = host.processId; const beforeRefreshAttempts = attempts.length;
   await click('刷新状态');
-  await wait(() => js<boolean>("!document.querySelector('.notice.error') && !document.querySelector('.composer button').disabled"), 'unconfirmed_read_refresh');
+  await wait(() => js<boolean>("!document.querySelector('.notice.error') && !document.querySelector('.composer button[type=submit]').disabled"), 'unconfirmed_read_refresh');
   assert.equal(host.processId, refreshPid); assert.equal(attempts.length, beforeRefreshAttempts);
   assert.equal(await js<string>("document.querySelector('#composer').value"), repeatedText);
   await click('重试未确认请求 ↑'); await wait(() => js<boolean>("document.querySelector('#composer').value === ''"), 'B_retry_ack');

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { join } from 'node:path';
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { setupShell, approveShell, entry } from './model-shell-fixture.ts';
 import { syntheticReply } from './file-agent-fixture.ts';
 import { until } from './scenario.ts';
@@ -9,6 +9,61 @@ import { parseModelConfiguration } from '../../../packages/app-contracts/model.t
 import { parseBashParameters } from '../../../packages/app-contracts/model-shell.ts';
 import { assertTimeoutRevision, policyDigest } from '../model-policy.ts';
 const bash=(command:string)=>({tool:'bash' as const,parameters:{command}});
+test('automatic policy: actual Pi write/read/Bash, immutable Run mode and no replay after reopen',async()=>{
+ const {f,access,plan}=setupShell('responses');let calls=0;
+ try{
+  f.supervisor.command({type:'runs.cancel',requestId:'cancel-fixture',runId:f.run});
+  f.supervisor.command({type:'threads.permissions',requestId:'auto',threadId:f.thread,mode:'auto',expectedRevision:0});
+  const start={type:'runs.start',requestId:'auto-run',threadId:f.thread,input:'SYNTHETIC automatic tools',permissionRevision:1};
+  const run=f.supervisor.command(start).id;
+  const done=f.supervisor.startNext(plan,entry,{...access,fetch:async()=>{
+   calls++;
+   if(calls===1)f.supervisor.command({type:'threads.permissions',requestId:'manual-next',threadId:f.thread,mode:'manual',expectedRevision:1});
+   const tools=calls===1?[{tool:'write' as const,parameters:{path:'auto.md',content:'# SYNTHETIC automatic\n'}}]:calls===2?[{tool:'read' as const,parameters:{path:'auto.md'}}]:calls===3?[bash('printf once >> effect.txt; if printf forbidden > ../outside.txt 2>/dev/null; then exit 9; fi')]:[];
+   return new Response(syntheticReply('responses',calls,tools),{headers:{'content-type':'text/event-stream'}});
+  }})!;
+  await done;
+  const snapshot=f.core.snapshot(f.thread);assert.equal(snapshot.runs.find(r=>r.id===run)!.state,'completed');
+  assert.equal(snapshot.thread.permissionMode,'manual');assert.equal(snapshot.runs.find(r=>r.id===run)!.permissionMode,'auto');
+  assert.deepEqual(snapshot.operations.map(o=>o.approvalSource),Array(3).fill('workspace-tools-v1'));
+  assert.deepEqual(snapshot.operations.map(o=>o.state),Array(3).fill('succeeded'));
+  assert.equal(calls,4);assert.equal(readFileSync(join(f.cwd,'effect.txt'),'utf8'),'once');assert.equal(existsSync(join(f.root,'outside.txt')),false);
+  const modified=statSync(join(f.cwd,'effect.txt')).mtimeMs;
+  f.reopen();f.supervisor.recover();assert.equal(f.supervisor.command(start).id,run);
+  assert.equal(f.core.snapshot(f.thread).operations.length,3);assert.equal(statSync(join(f.cwd,'effect.txt')).mtimeMs,modified);
+ }finally{await f.dispose();}
+});
+
+test('automatic Bash still supports active cancellation and fixed descendant cleanup',async()=>{
+ const {f,access,plan}=setupShell('responses');
+ try{
+  f.supervisor.command({type:'runs.cancel',requestId:'cancel-fixture',runId:f.run});
+  f.supervisor.command({type:'threads.permissions',requestId:'auto',threadId:f.thread,mode:'auto',expectedRevision:0});
+  const run=f.supervisor.command({type:'runs.start',requestId:'auto-run',threadId:f.thread,input:'SYNTHETIC cancellation',permissionRevision:1}).id;
+  const done=f.supervisor.startNext(plan,entry,{...access,fetch:async()=>new Response(syntheticReply('responses',1,[bash('sleep 20 & echo $! > child.pid; wait; printf late > late.txt')]),{headers:{'content-type':'text/event-stream'}})})!;
+  await until(()=>existsSync(join(f.cwd,'child.pid')),'auto-child');const child=Number(readFileSync(join(f.cwd,'child.pid'),'utf8'));
+  f.supervisor.command({type:'runs.cancel',requestId:'stop-auto',runId:run});await done;
+  assert.equal(f.core.snapshot(f.thread).runs.find(r=>r.id===run)!.state,'cancelled');assert.equal(existsSync(join(f.cwd,'late.txt')),false);assert.throws(()=>process.kill(child,0));
+ }finally{await f.dispose();}
+});
+for(const drift of ['file','resources'] as const)test(`automatic approval cannot bypass ${drift} change before claim`,async()=>{
+ const {f,access,plan}=setupShell('responses');
+ try{
+  writeFileSync(join(f.cwd,'auto.md'),'# SYNTHETIC original\n');
+  f.supervisor.command({type:'runs.cancel',requestId:'cancel-fixture',runId:f.run});
+  f.supervisor.command({type:'threads.permissions',requestId:'auto',threadId:f.thread,mode:'auto',expectedRevision:0});
+  const run=f.supervisor.command({type:'runs.start',requestId:'auto-run',threadId:f.thread,input:'SYNTHETIC drift',permissionRevision:1}).id;
+  // Synchronous host subscription introduces real file drift after persistence, before the supervisor grants.
+  const subscription=f.core.subscribe(f.thread,f.core.snapshot(f.thread).cursor,event=>{
+   if(event.kind==='approval.automatic')writeFileSync(drift==='file'?join(f.cwd,'auto.md'):join(f.resources.root,'package.json'),drift==='file'?'# SYNTHETIC external\n':'{}');
+  });
+  const done=f.supervisor.startNext(plan,entry,{...access,fetch:async()=>new Response(syntheticReply('responses',1,[{tool:'write',parameters:{path:'auto.md',content:'# SYNTHETIC should not write\n'}}]),{headers:{'content-type':'text/event-stream'}})})!;
+  await done;subscription.unsubscribe();
+  assert.notEqual(f.core.snapshot(f.thread).runs.find(r=>r.id===run)!.state,'completed');
+  assert.equal(readFileSync(join(f.cwd,'auto.md'),'utf8'),drift==='file'?'# SYNTHETIC external\n':'# SYNTHETIC original\n');
+  assert.equal(f.core.snapshot(f.thread).operations[0]!.state,'denied');
+ }finally{await f.dispose();}
+});
 for(const api of ['chat-completions','responses'] as const)test(`model Bash ${api}: separate approvals and receipts; nonzero returns to Pi then succeeds`,async()=>{
  const {f,access,plan}=setupShell(api);let calls=0;const bodies:string[]=[];
  try{
@@ -112,9 +167,9 @@ test('v8 migration preserves existing Run/Operation/model records; shell and wor
   const done=f.supervisor.startNext(plan,entry,{...access,fetch:async()=>{calls++;return new Response(syntheticReply('chat-completions',calls,calls===1?[{tool:'write',parameters:{path:'migration.md',content:'# SYNTHETIC migration'}}]:[]),{headers:{'content-type':'text/event-stream'}});}})!;
   await approveShell(f);await done;const admission=f.core.modelAdmission(access.configuration,0.01);
   const before=f.core.snapshot(f.thread);f.core.close();
-  const old=new DatabaseSync(f.database);old.exec('DROP TABLE desktop_workspace; DROP TABLE model_shell_operations; PRAGMA user_version=8;');old.close();
+  const old=new DatabaseSync(f.database);old.exec('ALTER TABLE threads DROP COLUMN permission_mode; ALTER TABLE threads DROP COLUMN permission_revision; ALTER TABLE runs DROP COLUMN permission_mode; ALTER TABLE runs DROP COLUMN permission_revision; ALTER TABLE approvals DROP COLUMN source; DROP TABLE desktop_workspace; DROP TABLE model_shell_operations; PRAGMA user_version=8;');old.close();
   f.reopen();assert.deepEqual(f.core.snapshot(f.thread),before);assert.deepEqual(f.core.modelAdmission(access.configuration,0.01),admission);
-  const db=new DatabaseSync(f.database,{readOnly:true});try{assert.equal(db.prepare('PRAGMA user_version').get()?.user_version,9);assert.equal(db.prepare('SELECT count(*) AS count FROM model_shell_operations').get()?.count,0);}finally{db.close();}
+  const db=new DatabaseSync(f.database,{readOnly:true});try{assert.equal(db.prepare('PRAGMA user_version').get()?.user_version,10);assert.equal(db.prepare('SELECT count(*) AS count FROM model_shell_operations').get()?.count,0);}finally{db.close();}
  }finally{await f.dispose();}
 });
 test('dynamic shell IPC has a closed argument set and preserves version/identity/size fences',()=>{

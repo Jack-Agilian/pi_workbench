@@ -17,7 +17,7 @@ export type DesktopRequest =
   | { type: 'thread'; threadId: string } | { type: 'events'; threadId: string; cursor: number }
   | { type: 'preview'; artifactId: string } | { type: 'command'; command: Command };
 export type DesktopValue = HistoryEntry | HistoryPage | OperationPage | ArtifactPage | ThreadActivity | DesktopHome | DesktopThread | Preview | Ack | ProductEvent[];
-export type DesktopReply = { ok: true; value: DesktopValue } | { ok: false; code: 'invalid_request' | 'request_rejected' | 'disconnected' | 'busy' | 'workspace_invalid' | 'page_cursor_invalid' | 'page_item_too_large' };
+export type DesktopReply = { ok: true; value: DesktopValue } | { ok: false; code: 'invalid_request' | 'permission_changed' | 'request_rejected' | 'disconnected' | 'busy' | 'workspace_invalid' | 'page_cursor_invalid' | 'page_item_too_large' };
 export function parseDesktopRequest(raw: unknown): DesktopRequest {
   const r = record(raw); let result: DesktopRequest;
   switch (r.type) {
@@ -58,5 +58,5 @@ export interface DesktopApi {
 
 export function desktopErrorCode(error:unknown):Extract<DesktopReply,{ok:false}>['code'] {
   const code=error instanceof Error?error.message:'';
-  return code==='disconnected'||code==='busy'||code==='workspace_invalid'||code==='page_cursor_invalid'||code==='page_item_too_large'?code:'request_rejected';
+  return code==='permission_changed'||code==='disconnected'||code==='busy'||code==='workspace_invalid'||code==='page_cursor_invalid'||code==='page_item_too_large'?code:'request_rejected';
 }

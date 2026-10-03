@@ -151,7 +151,7 @@ test('native Pi reference survives Worker recycling; product subscription reconn
 test('schema v1 upgrade preserves durable queued intent and adds host launch/reference metadata', async t => {
   const f = fixture(t); f.core.close();
   // SYNTHETIC old-schema fixture: remove v2–v4 additions while the sole host connection is closed.
-  const previous = new DatabaseSync(f.database); previous.exec('DROP TABLE desktop_workspace; DROP TABLE model_shell_operations; DROP TABLE file_operations; DROP TABLE model_policy_revisions; DROP TABLE model_requests; DROP TABLE model_outcomes; DROP TABLE shell_display; DROP TABLE run_display; DROP TABLE worker_launches; ALTER TABLE threads DROP COLUMN native_persisted; PRAGMA user_version=1;'); previous.close();
+  const previous = new DatabaseSync(f.database); previous.exec('ALTER TABLE threads DROP COLUMN permission_mode; ALTER TABLE threads DROP COLUMN permission_revision; ALTER TABLE runs DROP COLUMN permission_mode; ALTER TABLE runs DROP COLUMN permission_revision; ALTER TABLE approvals DROP COLUMN source; DROP TABLE desktop_workspace; DROP TABLE model_shell_operations; DROP TABLE file_operations; DROP TABLE model_policy_revisions; DROP TABLE model_requests; DROP TABLE model_outcomes; DROP TABLE shell_display; DROP TABLE run_display; DROP TABLE worker_launches; ALTER TABLE threads DROP COLUMN native_persisted; PRAGMA user_version=1;'); previous.close();
   f.reopen(); assert.equal(f.core.snapshot(f.thread).runs[0]!.id, f.run); assert.equal(f.core.workerLaunches().length, 0);
   const pending = f.start(); await f.approval(); await pending; assert.equal(f.core.snapshot(f.thread).runs[0]!.state, 'completed');
 });

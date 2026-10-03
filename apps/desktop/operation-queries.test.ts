@@ -4,7 +4,7 @@ import { focusManager, onlineManager, QueryObserver } from '@tanstack/react-quer
 import { OperationQueries } from './operation-queries.ts';
 import type { OperationPage } from '../../packages/app-contracts/desktop-pages.ts';
 
-const page = (id: string, more = false): OperationPage => ({items: [{id, runId: 'run', toolCallId: 'SYNTHETIC',
+const page = (id: string, more = false): OperationPage => ({items: [{id, runId: 'run', approvalSource:'manual' as const,toolCallId: 'SYNTHETIC',
   tool: 'write', artifactPath: null, parametersDigest: '0'.repeat(64), deadline: 1, state: 'denied'}],
   snapshotSeq: 1, hasMore: more, nextCursor: more ? 'opaque-position' : null});
 const tick = () => new Promise<void>(r => setImmediate(r));

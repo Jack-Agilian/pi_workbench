@@ -35,11 +35,11 @@ export function RunHistory({thread, mode, busy, disconnected, command, operation
         {operations.map(op => <div className="tool-card" key={op.id}>
           <div><strong>{op.shell ? 'Bash' : op.tool === 'read' ? '读取 Markdown' : op.tool === 'edit' ? '修改 Markdown' : '写入 Markdown'}</strong><span>{op.shell ? op.shell.intent.command : op.artifactPath}</span>
             {op.shell?.outcome && <details className="shell-output"><summary>命令结果 · 退出码 {op.shell.outcome.exitCode ?? op.shell.outcome.signal ?? '未启动'}</summary><p>{op.shell.outcome.timedOut ? '已超时 · ' : ''}{op.shell.outcome.sideEffects === 'possible' ? '可能已有文件改动，不代表回滚。' : '命令未启动。'}{op.shell.outcome.truncated && '输出超过上限，已截断。'}</p><strong>stdout</strong><pre>{op.shell.outcome.stdout}</pre><strong>stderr</strong><pre>{op.shell.outcome.stderr}</pre></details>}
-          </div><span className="tool-status">{(op.shell ? shellLabels : operationLabels)[op.state] ?? '未知操作'}</span>
+          </div><span className="tool-status">{op.approvalSource === 'workspace-tools-v1' && <small className="approval-source">自动批准 · </small>}{(op.shell ? shellLabels : operationLabels)[op.state] ?? '未知操作'}</span>
         </div>)}
         {hasMore && <button className="load-operations" disabled={loading || disconnected} onClick={() => loadMore(run.id)}>加载更早工具记录</button>}
       </section>}
-      {outcome && <details className="run-meta"><summary>运行信息</summary><p>模型状态：{{stop:'回答结束',length:'达到输出上限',cancelled:'已停止',provider_error:'模型流程未完成',budget:'预算不足',protocol:'协议异常'}[outcome.reason]} · 输入 {outcome.inputTokens} / 输出 {outcome.outputTokens} token</p></details>}
+      {outcome && <details className="run-meta"><summary>运行信息</summary><p>本次权限：{run.permissionMode === 'auto' ? '自动审批（工作目录）' : '人工审批'}</p><p>模型状态：{{stop:'回答结束',length:'达到输出上限',cancelled:'已停止',provider_error:'模型流程未完成',budget:'预算不足',protocol:'协议异常'}[outcome.reason]} · 输入 {outcome.inputTokens} / 输出 {outcome.outputTokens} token</p></details>}
       {outcome?.reason === 'provider_error' && <p className="run-note model-error" role="alert">{modelErrorText(outcome.error)}</p>}
       {run.state === 'unknown' && <p className="run-note">不能确认此次执行的最终结果。完成对账后再继续，不会自动重新执行。</p>}
       {run.state === 'cancelled' && <p className="run-note">{modelMode ? '本次执行与清理已结束；服务端已发生的费用不会因此撤销。' : '执行与清理已结束；已经发生的文件改动不会自动回滚。'}</p>}

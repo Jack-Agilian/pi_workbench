@@ -223,3 +223,11 @@ h1 { font-size: 17px; font-weight: 600; line-height: 1.4; overflow: hidden; text
   .empty h2 { font-size: 21px; }
   .empty p { font-size: 12px; }
 }
+.permission-picker { position: relative; font-size: 12px; }
+.permission-picker > summary { cursor: pointer; padding: 6px 0; white-space: nowrap; }
+.permission-options { position: absolute; bottom: 100%; left: 0; z-index: 5; width: min(320px, 65vw); padding: 14px; background: var(--surface, #fff); border: 1px solid #d9ded8; border-radius: 12px; box-shadow: 0 6px 24px #0002; }
+.permission-options p { margin: 6px 0 12px; line-height: 1.5; }
+.permission-options button { display: block; width: 100%; text-align: left; margin: 6px 0; }
+.permission-options button[aria-pressed="true"] { border-color: #2d604c; background: #edf3ed; }
+.permission-options small { display: block; white-space: normal; font-weight: 400; margin-top: 4px; line-height: 1.5; }
+.approval-source { white-space: nowrap; }

@@ -37,7 +37,7 @@ export function readDesktopPage<T>(db:DatabaseSync,kind:PageKind,owner:string,op
 export function row<T>(db:DatabaseSync,sql:string,...values:SQLInputValue[]):T {
   const result=db.prepare(sql).get(...values);if(!result)throw new Error('not_found');return result as T;
 }
-export const runQuery='SELECT id,thread_id AS threadId,state FROM runs WHERE id=?';
+export const runQuery='SELECT id,thread_id AS threadId,state,permission_mode AS permissionMode,permission_revision AS permissionRevision FROM runs WHERE id=?';
 export const artifactQuery='SELECT id,run_id AS runId,operation_id AS operationId,path,version,digest,bytes FROM artifacts WHERE id=?';
 export const runRow=(db:DatabaseSync,id:string)=>row<RunView>(db,runQuery,id);
 export const artifactRow=(db:DatabaseSync,id:string)=>row<ArtifactView>(db,artifactQuery,id);
