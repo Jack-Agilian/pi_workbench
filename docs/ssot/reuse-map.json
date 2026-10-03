@@ -1253,7 +1253,7 @@
         "esbuild build"
       ],
       "reuse": "Electron公开窗口/沙盒/IPC，React渲染和esbuild构建；复用既有产品与Pi Worker链路",
-      "productDelta": "闭合产品桥、Thread/Run视图、审批/取消/成果与有界纯文本投影；显式无模型驱动；关闭结果/重连接管分离，未确认命令按意图保留身份并显式重试；D1正常退出/信号统一结算，关闭失败后原窗口显式恢复，候选新宿主不迟到发布；D2-S展示固定命令审批/profile/期限及stdout/stderr有界完成快照，交互终端尚未接入；M1正文流/最终快照、应用专用持久凭据加载及原生临时选择、策略待确认/预算耗尽准入和双时间限制显示；仅产品DTO；M2已有视图增加逐read/write/edit审批、有限版本/参数摘要、后续模型轮流式正文与重连展示；显式SYNTHETIC离线入口，不由Renderer选择工具或worker代码；原生目录选择无自由路径Renderer入口，实际cwd/阶段/逐命令有界结果、三尺寸核心动作核查；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开；UI-P2前端右栏折叠/三档宽度、常驻审批/停止、Thread滚动锚点、按需成果核验展示；现采用正式historyPage/operationPage/artifactPage和独立ThreadActivity；Renderer的thread-pages.ts维护只读已加载范围、事件衔接与重连，首屏错误也保留正确活动身份；F01新增Thread内单Run安全historyEntry只读查询，Renderer按事件定向刷新，头部桥接与旧尾游标分离，整批成功发布/切换停止后续读取；按reference-implementations.md对照pi-gui时间线/viewport/layout，Q1 operationPage已由Query 5.104.0承接缓存/异步状态/去重，原工具LoadedRange移除，产品仅存发布引用；queryScope绑定宿主连接，重连按位置重读，工具错误手动重试；后续Q2历史/成果未迁移，有实测布局瓶颈后采用Virtual，不并存两套缓存/滚动控制；2026-10-03已知模型错误码/HTTP状态经闭合产品DTO安全展示，未知正文不透传，原生错误落盘前收敛；IPC v8，旧结果JSON兼容，具体限定验证见model-errors-2026-10-03报告 2026-10-03默认及本机用量额度清理，API总超时/空闲独立保留；Pi模型默认输出，目录内绝对路径规范化与安全工具失败投影；限定实测见product-defaults-desktop报告，不扩大Gate。 2026-10-03真实Electron四场景限定补证：工具/审批/成果/取消/原Session恢复通过，代理操作与未覆盖范围分列，不晋级全部P0。 2026-10-03整体重构导航/会话/输入/审批与成果页及CSS；错误区分只读刷新/重连，成果版本就近预览和连接失效。该UI重构批次权限三档仅完成官方对照；后续接入见下句。 2026-10-03后续SQL v10和桌面权限入口：持久人工/工作目录自动审批、Run接收时固定模式、来源审计与确认丢失重试；原工具/清理复用。完全访问仍未实现。 2026-10-03局部适配C03固定提交的PaneResizeHandle；左右拖动/键盘/收起，本机宽度偏好和窄窗覆盖。单一布局与滚动所有者、原产品DTO/权限保留；审批仍在详情页，行内收口待做。 2026-10-03审批按Operation放入会话，历史失败用活动快照兜底且不重复；右栏只成果预览并默认关闭，Run固定模式与输入新模式分开；轮询不强制滚动，定位等待布局并过滤自身滚动。限定证据见inline-approval报告。 2026-10-04限定Mac full模式贯通宿主固定Run、私有保护集、Pi目录外UTF-8工具/Bash IP策略及真实库重开核验；外部文件不自动登记workspace成果，详见full-access-product报告。 2026-10-04会话持久命名：SQL v12名称修订/幂等事务、侧栏草稿/冲突与原请求确认、重连旧回调隔离；改名不派发Worker或双写Pi历史，Worker IPC仍v11。见thread-naming契约及报告。 2026-10-04安全正文阅读：SQL v13/Worker IPC v12只存Run原生起止引用；Pi公开解析/内存分支、安全Markdown、用户主动分段补读及连接隔离。旧Run缺范围/8MiB上限/原生过滤与未完成项见safe-reading契约，不复制消息树或扩大权限。 2026-10-04工作流复审/恢复：连接健康、只读错误、命令未确认分开；读取代次和重连旧轮询隔离、审批控件移除后的条件焦点接续。24退出/恢复及两套Electron限定回归通过，目录查找/复制/最终体验仍未完成，见workflow-review报告。 2026-10-04会话查找：宿主名称/工作目录全目录只读检索、创建倒序和revision游标；home Thread首32条，其他集合未全部分页。侧栏Query页链及当前/编辑身份独立，过滤/失败/重连不丢审批或草稿。限定验证见thread-directory契约及报告。 2026-10-04正文/代码复制和成果操作：公开Markdown pre/node及Electron只写剪贴板窄桥，部分加载/失败/迟到隔离；同路径已加载版本、登记摘要/来源与核验预览复制，不开放自由文件或历史快照，限定实测见reading-actions报告。",
+      "productDelta": "闭合产品桥、Thread/Run视图、审批/取消/成果与有界纯文本投影；显式无模型驱动；关闭结果/重连接管分离，未确认命令按意图保留身份并显式重试；D1正常退出/信号统一结算，关闭失败后原窗口显式恢复，候选新宿主不迟到发布；D2-S展示固定命令审批/profile/期限及stdout/stderr有界完成快照，交互终端尚未接入；M1正文流/最终快照、应用专用持久凭据加载及原生临时选择、策略待确认/预算耗尽准入和双时间限制显示；仅产品DTO；M2已有视图增加逐read/write/edit审批、有限版本/参数摘要、后续模型轮流式正文与重连展示；显式SYNTHETIC离线入口，不由Renderer选择工具或worker代码；原生目录选择无自由路径Renderer入口，实际cwd/阶段/逐命令有界结果、三尺寸核心动作核查；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开；UI-P2前端右栏折叠/三档宽度、常驻审批/停止、Thread滚动锚点、按需成果核验展示；现采用正式historyPage/operationPage/artifactPage和独立ThreadActivity；Renderer的thread-pages.ts维护只读已加载范围、事件衔接与重连，首屏错误也保留正确活动身份；F01新增Thread内单Run安全historyEntry只读查询，Renderer按事件定向刷新，头部桥接与旧尾游标分离，整批成功发布/切换停止后续读取；按reference-implementations.md对照pi-gui时间线/viewport/layout，Q1 operationPage已由Query 5.104.0承接缓存/异步状态/去重，原工具LoadedRange移除，产品仅存发布引用；queryScope绑定宿主连接，重连按位置重读，工具错误手动重试；后续Q2历史/成果未迁移，有实测布局瓶颈后采用Virtual，不并存两套缓存/滚动控制；2026-10-03已知模型错误码/HTTP状态经闭合产品DTO安全展示，未知正文不透传，原生错误落盘前收敛；IPC v8，旧结果JSON兼容，具体限定验证见model-errors-2026-10-03报告 2026-10-03默认及本机用量额度清理，API总超时/空闲独立保留；Pi模型默认输出，目录内绝对路径规范化与安全工具失败投影；限定实测见product-defaults-desktop报告，不扩大Gate。 2026-10-03真实Electron四场景限定补证：工具/审批/成果/取消/原Session恢复通过，代理操作与未覆盖范围分列，不晋级全部P0。 2026-10-03整体重构导航/会话/输入/审批与成果页及CSS；错误区分只读刷新/重连，成果版本就近预览和连接失效。该UI重构批次权限三档仅完成官方对照；后续接入见下句。 2026-10-03后续SQL v10和桌面权限入口：持久人工/工作目录自动审批、Run接收时固定模式、来源审计与确认丢失重试；原工具/清理复用。完全访问仍未实现。 2026-10-03局部适配C03固定提交的PaneResizeHandle；左右拖动/键盘/收起，本机宽度偏好和窄窗覆盖。单一布局与滚动所有者、原产品DTO/权限保留；审批仍在详情页，行内收口待做。 2026-10-03审批按Operation放入会话，历史失败用活动快照兜底且不重复；右栏只成果预览并默认关闭，Run固定模式与输入新模式分开；轮询不强制滚动，定位等待布局并过滤自身滚动。限定证据见inline-approval报告。 2026-10-04限定Mac full模式贯通宿主固定Run、私有保护集、Pi目录外UTF-8工具/Bash IP策略及真实库重开核验；外部文件不自动登记workspace成果，详见full-access-product报告。 2026-10-04会话持久命名：SQL v12名称修订/幂等事务、侧栏草稿/冲突与原请求确认、重连旧回调隔离；改名不派发Worker或双写Pi历史，Worker IPC仍v11。见thread-naming契约及报告。 2026-10-04安全正文阅读：SQL v13/Worker IPC v12只存Run原生起止引用；Pi公开解析/内存分支、安全Markdown、用户主动分段补读及连接隔离。旧Run缺范围/8MiB上限/原生过滤与未完成项见safe-reading契约，不复制消息树或扩大权限。 2026-10-04工作流复审/恢复：连接健康、只读错误、命令未确认分开；读取代次和重连旧轮询隔离、审批控件移除后的条件焦点接续。24退出/恢复及两套Electron限定回归通过，目录查找/复制/最终体验仍未完成，见workflow-review报告。 2026-10-04会话查找：宿主名称/工作目录全目录只读检索、创建倒序和revision游标；home Thread首32条，其他集合未全部分页。侧栏Query页链及当前/编辑身份独立，过滤/失败/重连不丢审批或草稿。限定验证见thread-directory契约及报告。 2026-10-04正文/代码复制和成果操作：公开Markdown pre/node及Electron只写剪贴板窄桥，部分加载/失败/迟到隔离；同路径已加载版本、登记摘要/来源与核验预览复制，不开放自由文件或历史快照，限定实测见reading-actions报告。 2026-10-04日常体验复审：侧栏密度/当前行优先、窄窗覆盖导航及200%可达、真实键盘返回、宿主观察终态通知；10组文字对比度和AX结构限定通过，VoiceOver/完整人工使用仍未验证。见experience-review报告。",
       "acceptanceGate": "真实桌面进程/来源/CSP、Thread隔离、审批/取消/恢复；平台/模型/Gate分别验收；确认丢失/交错重试、异常关闭与受证据约束的恢复；Q1还须验证环境/连接缓存隔离、无网络本地读取、显式重试/焦点策略、IPC背压与整批一致性，删除被替代旧机制",
       "implementationState": "in_progress",
       "adoption": {
@@ -1515,7 +1515,10 @@
           "EV-THREAD-DIRECTORY-MOCK-20261004",
           "EV-READING-ACTIONS-STATIC-20261004",
           "EV-READING-ACTIONS-MAC-20261004",
-          "EV-READING-ACTIONS-IDENTITY-20261004"
+          "EV-READING-ACTIONS-IDENTITY-20261004",
+          "EV-EXPERIENCE-STATIC-20261004",
+          "EV-EXPERIENCE-MAC-20261004",
+          "EV-EXPERIENCE-MOCK-20261004"
         ]
       }
     }
@@ -3872,6 +3875,42 @@
       ],
       "locator": "docs/validation/reading-actions-2026-10-04.md",
       "scope": "新增部分复制不含未加载尾部；平台写入合成阻塞期间拒绝并发，关闭/重开正文后旧反馈不发布。实际IPC完整Electron及typecheck重跑通过，产品代码未变。"
+    },
+    {
+      "id": "EV-EXPERIENCE-STATIC-20261004",
+      "kind": "static",
+      "result": "passed",
+      "commit": "d4d50e01e026e04f8cb4a7052c2d6973bcaff1cd",
+      "recordedAt": "2026-10-03T19:33:46.057269+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/experience-review-2026-10-04.md",
+      "scope": "严格typecheck和44项desktop回归通过；新键盘helper类型失败经收窄后修正，无any/ts-ignore。未变依赖/schema/Worker协议。"
+    },
+    {
+      "id": "EV-EXPERIENCE-MAC-20261004",
+      "kind": "platform",
+      "result": "passed",
+      "commit": "d4d50e01e026e04f8cb4a7052c2d6973bcaff1cd",
+      "recordedAt": "2026-10-03T19:33:46.057269+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/experience-review-2026-10-04.md",
+      "scope": "真实Electron四组100%/200%窗口、导航Tab/ShiftTab/Escape、审批和停止可达、10组文字对比度及Chromium AX名称通过；完整UI/真实文件工具/Bash回归通过。零模型，非VoiceOver/完整人工体验。"
+    },
+    {
+      "id": "EV-EXPERIENCE-MOCK-20261004",
+      "kind": "mock",
+      "result": "passed",
+      "commit": "d4d50e01e026e04f8cb4a7052c2d6973bcaff1cd",
+      "recordedAt": "2026-10-03T19:33:46.057269+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/experience-review-2026-10-04.md",
+      "scope": "显式合成历史/Provider；宿主终态提示、重连不重播及既有读取/复制/目录/审批/恢复场景通过。未将Pi空闲或activeRun消失作为完成证据。"
     }
   ]
 }

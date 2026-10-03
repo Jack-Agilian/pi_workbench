@@ -8,7 +8,7 @@
 
 当前设计不再把 Pi 已提供的 Session、工具、模型、技能解析和包管理列为自研引擎；自有实现聚焦产品治理和桌面体验。`ssot/` 指定的替代范围优先于原始快照。
 
-当前 UI：[复制与成果操作](ssot/reading-actions-contract.md) · [本批验证](validation/reading-actions-2026-10-04.md) · [会话查找契约](ssot/thread-directory-contract.md) · [目录实测](validation/thread-directory-2026-10-04.md) · [工作流复审与恢复](validation/workflow-review-2026-10-04.md) · [安全正文阅读](ssot/safe-reading-contract.md) · [阅读实测](validation/safe-reading-2026-10-04.md) · [会话持久命名](ssot/thread-naming-contract.md) · [整体重构与验证](validation/ui-refactor-2026-10-03.md) · [界面与权限模式边界](ssot/ui-experience-contract.md)。
+当前 UI：[布局缩放与日常体验复审](validation/experience-review-2026-10-04.md) · [复制与成果操作](ssot/reading-actions-contract.md) · [复制/成果验证](validation/reading-actions-2026-10-04.md) · [会话查找契约](ssot/thread-directory-contract.md) · [目录实测](validation/thread-directory-2026-10-04.md) · [工作流复审与恢复](validation/workflow-review-2026-10-04.md) · [安全正文阅读](ssot/safe-reading-contract.md) · [阅读实测](validation/safe-reading-2026-10-04.md) · [会话持久命名](ssot/thread-naming-contract.md) · [整体重构与验证](validation/ui-refactor-2026-10-03.md) · [界面与权限模式边界](ssot/ui-experience-contract.md)。
 
 2026-10-03 UI 首轮交付复审（历史）：[社区前端布局研究与开源复用建议](validation/desktop-ui-research-2026-10-03.md) · [当前布局审核、交叉质疑与建议顺序](validation/ui-layout-review-2026-10-03.md)。仅研究/审核，未实施新布局。
 

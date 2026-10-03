@@ -145,3 +145,9 @@ React事件及清理经Context7查询 [DOM事件](https://react.dev/reference/re
 ## 阅读操作采用（2026-10-04）
 
 [逐模块映射](reading-actions-contract.md)核对C03固定message-markdown/timeline-item/file-editor-pane：仅借鉴就地复制/预览动作，固定上游没有可直接采用的消息/代码复制组件。沿用react-markdown10.1.0公开pre/node和Electron44.4.5异步clipboard.writeText；声明/实际运行核验与Context7 main资料分开。主进程只写纯文本窄桥不开放读取权限、任意文件或通用IPC；版本只用原宿主核验及本会话已加载元数据。无新依赖/社区片段，见[验证](../validation/reading-actions-2026-10-04.md)。
+
+## 窄窗导航与最终状态（2026-10-04）
+
+`pane-layout/renderer/thread-directory` → C03固定pi-gui `sidebar.tsx`、`conversation-timeline.tsx` → 选择身份独立、条件焦点、栏宽限制和唯一阅读所有者 → 保留宿主目录/权限/确认，不复制DnD/driver。覆盖导航另按WAI APG dialog模式处理inert/Tab/Escape/返回焦点。`run-status-notice`只读取产品宿主Run终态变化，不从Pi或界面空闲推测完成。
+
+Electron44.4.5的webContents缩放/键盘/debugger实例方法仅用于真实窗口测试，未新增Renderer权限。所查来源、实测SHA、失败和VoiceOver限制见[报告](../validation/experience-review-2026-10-04.md)；没有新增社区组件或依赖。
