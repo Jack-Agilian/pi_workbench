@@ -113,3 +113,11 @@ Q1_PLAN_REVIEW复核补充：真实使用优先，不把全应用统一Query当�
 本项目 `pane-resize-handle.tsx` 局部适配其指针捕获、键盘、双击逻辑，宽度由布局所有者传入，移除第二套DOM测量，补取消/窗口失焦清理。`pane-layout.ts`只拥有宽度和本机显示偏好；会话数据、Pi Session、审批宿主与timeline-scroll单一滚动所有者均保留。Composer仍固定于旧C01提交，未偷偷更新来源。许可已补THIRD_PARTY_NOTICES.md，无新增依赖。
 
 React事件及清理经Context7查询 [DOM事件](https://react.dev/reference/react-dom/components/common) 与 [Effect清理](https://react.dev/reference/react/useEffect)。本次不复用上游完整应用或会话驱动，实际证据见[三栏报告](../validation/pane-layout-2026-10-03.md)。
+
+## 2026-10-03 会话内审批与阅读意图
+
+实施前复读C03固定 `163054227d370a49d09099c61eb65798481294ac` 的timeline-item：按callId绑定工具卡片和展开状态。本项目沿用同一思路但身份是产品Operation，复用已有ApprovalList/宿主resolve/claim，不复制上游driver或假定Pi含本产品审批API。右栏只承担成果预览；历史失败时活动快照直接提供待决卡片。
+
+滚动故障后重新读取同提交 `hooks/use-timeline-viewport.ts`：其“render不是scroll请求”和expectedScrollTop区分自身滚动的规则适用于本项目。只收敛已有timeline-scroll的恢复触发与自身事件识别，不移植虚拟化、估高或第二套滚动状态机。React key/refs/Effect经Context7核对。
+
+`model-services.ts`仍经已安装Pi0.87.1公开ResourceLoader/getSystemPrompt接入（发行包docs/sdk.md与实际类型已核对），文案改为宿主人工/自动授权；不新增模式推断、工具或授权旁路。模块边界及实际被测SHA见[本批报告](../validation/inline-approval-2026-10-03.md)。
