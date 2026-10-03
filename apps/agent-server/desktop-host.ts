@@ -1,3 +1,4 @@
+import { readNativeText } from '../../packages/pi-adapter/native-text.ts';
 import type { ModelShellPolicy } from '../../packages/app-contracts/model-shell.ts';
 import { fileRunDuration, type FileToolPolicy } from '../../packages/app-contracts/file-tools.ts';
 import { parseModelConfiguration, type ModelConfiguration } from '../../packages/app-contracts/model.ts';
@@ -20,6 +21,7 @@ import { repository } from './worker-launcher.ts';
 export class DesktopHost {
   readonly core: ProductCore;
   readonly supervisor: WorkerSupervisor;
+  private readonly nativeRoot:string;
   private blocked = false;
   private closing = false;
   private closeResult?: Promise<void>;
@@ -33,6 +35,7 @@ export class DesktopHost {
     this.modelMode=model;
     if(model?.configuration)parseModelConfiguration(model.configuration);
     mkdirSync(profile, { recursive: true, mode: 0o700 }); const root = realpathSync(profile);
+    this.nativeRoot=join(root,'state','sessions');
     this.credentialRootsFile=join(root,'host','credential-directories.json');
     const saved:unknown=existsSync(this.credentialRootsFile)?JSON.parse(readFileSync(this.credentialRootsFile,'utf8')):[];
     if(!Array.isArray(saved)||saved.length>16||saved.some(p=>typeof p!=='string'||p.length>4096))throw new Error('credential_roots_invalid');
@@ -97,6 +100,13 @@ export class DesktopHost {
     if (this.closing) throw new Error('host_closing');
     const request = parseDesktopRequest(raw);
     switch (request.type) {
+      case 'native-text':{
+        const source=this.core.nativeTextSource(request.threadId,request.runId);
+        if(!source)return {status:'unavailable'};
+        const state=this.core.historyEntry(request.threadId,request.runId).item.run.state;
+        if(!source.finished)return {status:['queued','starting','running','cancelling'].includes(state)?'pending':'unavailable'};
+        return readNativeText(source,join(this.nativeRoot,request.threadId),this.core.threadWorkspace(request.threadId).path,request.runId,request.cursor);
+      }
       case 'history-entry':return this.core.historyEntry(request.threadId,request.runId);
       case 'history-page':return this.core.historyPage(request.threadId,request.page);
       case 'operation-page':return this.core.operationPage(request.runId,request.page);

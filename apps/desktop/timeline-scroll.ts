@@ -60,6 +60,11 @@ export function useTimelineScroll(threadId: string, snapshot: DesktopThread | nu
     observer.observe(element); observer.observe(inner);
     return () => observer.disconnect();
   }, [threadId, loaded]);
+  const holdReading = () => {
+    capturePosition();
+    const position = positions.current.get(threadId);
+    if (position) { position.following = false; setBrowsing(true); }
+  };
   const returnLatest = () => {
     userIntentUntil.current = 0;
     positions.current.set(threadId, {top: 0, following: true, offset: 0});
@@ -80,5 +85,5 @@ export function useTimelineScroll(threadId: string, snapshot: DesktopThread | nu
     // Commit the reading affordance before measuring: its height is part of the viewport.
     userIntentUntil.current = 0; setBrowsing(true); setNavigation({threadId, operationId});
   };
-  return {viewport, content, onScroll, onUserScroll, browsing, returnLatest, revealApproval};
+  return {viewport, content, onScroll, onUserScroll, browsing, holdReading, returnLatest, revealApproval};
 }

@@ -1,3 +1,4 @@
+import { seedNativeText } from './native-text-fixture.ts';
 // Trusted offline test setup, before the App Server starts. Never imported by Renderer/preload.
 // These are explicitly synthetic product lifecycle records, not model or Worker evidence.
 import assert from 'node:assert/strict';
@@ -21,6 +22,7 @@ export async function seedPaginationFixture(profile: string) {
         writeFileSync(join(profile,'workspace',path),text);
         host.core.finishOperation(binding,op.id,'succeeded',hash); host.core.recordArtifact(binding,op.id,path);
       }
+      if(i===59)seedNativeText(host.core,profile,binding,`SYNTHETIC persisted history ${i}`);
       host.core.settle(binding,'completed',{piIdle:true,hostClean:true});
     }
     assert.ok(Buffer.byteLength(JSON.stringify(host.request({type:'thread',threadId}))) > 1_200_000);

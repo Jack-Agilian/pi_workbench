@@ -1,3 +1,4 @@
+import type { NativeTextPage } from '../../packages/app-contracts/native-text.ts';
 import type { HistoryPage, HistoryEntry, OperationPage, ArtifactPage, ThreadActivity } from '../../packages/app-contracts/desktop-pages.ts';
 import { contextBridge, ipcRenderer } from 'electron';
 import type { Ack, Command, ProductEvent } from '../../packages/app-contracts/index.ts';
@@ -13,6 +14,7 @@ const api: DesktopApi = {
     if (typeof scope !== 'string') throw Error('disconnected');
     return scope;
   },
+  nativeText:(threadId,runId,cursor,queryScope)=>request<NativeTextPage>({type:'native-text',threadId,runId,...(cursor?{cursor}:{})},queryScope),
   historyEntry:(threadId,runId)=>request<HistoryEntry>({type:'history-entry',threadId,runId}),
   historyPage:(threadId,page)=>request<HistoryPage>({type:'history-page',threadId,...(page?{page}:{})}),
   operationPage:(runId,page,queryScope)=>request<OperationPage>({type:'operation-page',runId,...(page?{page}:{})},queryScope),

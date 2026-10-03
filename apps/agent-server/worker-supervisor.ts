@@ -129,7 +129,7 @@ export class WorkerSupervisor {
   private send(active: Active, body: WireBody, requestId = `host-${++this.sequence}`): Promise<void> {
     if(active.stopping)return Promise.reject(new Error('worker_stopping'));
     const { spec } = active.journal;
-    return active.sender.send({ version: 11, instanceId: spec.instanceId, runtimeBindingId: spec.runtimeBindingId, requestId, body } satisfies Envelope);
+    return active.sender.send({ version: 12, instanceId: spec.instanceId, runtimeBindingId: spec.runtimeBindingId, requestId, body } satisfies Envelope);
   }
   private receive(active: Active, raw: unknown) {
     if (this.active !== active || active.stopping) return; // owned channel, fenced synchronously before disconnect
@@ -184,6 +184,9 @@ export class WorkerSupervisor {
     }
     active.requests.set(requestId, serialized); // Per-Run audit/replay state is released with this Worker.
     switch (body.type) {
+      case 'native-range':
+        if(!active.ready||active.closed||active.result!==undefined||!active.nativeRef)throw new Error('unexpected_native_range');
+        this.core.recordNativeRange(binding,active.nativeRef,body.phase,body.entryId);break;
       case 'hello':
         if (active.hello || body.pid !== active.pid) throw new Error('unexpected_worker'); active.hello = true;
         void (async()=>{if(plan.tool==='none')await this.send(active,{type:'model-key',key:active.modelAccess?.key ?? 'SYNTHETIC_OFFLINE_KEY'});await this.send(active,{type:'init',config});})().catch(() => this.stop(active)); break;

@@ -1,3 +1,6 @@
+import { MessageMarkdown } from './message-markdown.tsx';
+import { NativeText } from './native-text.tsx';
+import type { DesktopApi } from '../../packages/app-contracts/desktop.ts';
 import { ApprovalList } from './approval-list.tsx';
 import { modelErrorText } from './model-error-view.ts';
 import type { OperationPage } from '../../packages/app-contracts/desktop-pages.ts';
@@ -7,7 +10,7 @@ const labels: Record<RunState, string> = { queued: '等待执行', starting: '�
 const operationLabels: Record<string, string> = { pending: '等待你的批准', approved: '已批准', executing: '操作执行中', unknown: '副作用待核实', succeeded: '结果已核实', failed: '操作失败', denied: '已拒绝或撤销' };
 const shellLabels: Record<string,string> = { pending: '等待批准', approved: '已批准', executing: '命令执行中', unknown: '执行结果待核实', succeeded: '命令已结束', failed: '命令未成功', denied: '已拒绝或撤销' };
 
-export function RunHistory({thread, pending, workspacePath, mode, busy, disconnected, command, operationPages, loading, loadMore}: {pending: OperationView[]; workspacePath: string; operationPages?: ReadonlyMap<string, OperationPage>; loading: boolean; loadMore: (runId: string) => void; thread: DesktopThread; mode: DesktopHome['mode'] | undefined; busy: boolean; disconnected: boolean; command: (value: Command) => Promise<unknown>}) {
+export function RunHistory({api,scope,onRead,thread, pending, workspacePath, mode, busy, disconnected, command, operationPages, loading, loadMore}: {onRead:()=>void;api:DesktopApi;scope:string;pending: OperationView[]; workspacePath: string; operationPages?: ReadonlyMap<string, OperationPage>; loading: boolean; loadMore: (runId: string) => void; thread: DesktopThread; mode: DesktopHome['mode'] | undefined; busy: boolean; disconnected: boolean; command: (value: Command) => Promise<unknown>}) {
   const modelMode = mode === 'model' || mode === 'model-offline';
   const id = () => crypto.randomUUID();
   const runLabel=(run:NonNullable<typeof thread>['runs'][number])=>{
@@ -29,9 +32,11 @@ export function RunHistory({thread, pending, workspacePath, mode, busy, disconne
         {run.state === 'queued' && <button className="stop" disabled={busy || disconnected} onClick={() => void command({type:'runs.cancel', requestId:id(), runId:run.id})}>取消排队</button>}
       </div>
       <section className="run-conversation" aria-label="会话正文"><h3 className="run-section-title">会话正文</h3>
-        <div className="message user"><div><small>你</small><p>{thread.inputs.find(input => input.id === run.id)?.text}</p></div></div>
-        {presentation?.messages.filter(message => message.role === 'assistant' || message.role === 'tool').map(message => <div className="message assistant" key={message.id}><div><small>{message.role === 'tool' ? '工具执行提示' : mode === 'model' ? 'Pi' : 'Pi · 合成演示记录'}</small><p>{message.text}</p>{message.truncated && <small>正文已截断或脱敏</small>}</div></div>)}
+        <NativeText onRead={onRead} key={`${thread.thread.id}:${run.id}:${scope}`} api={api} threadId={thread.thread.id} runId={run.id} scope={scope} disconnected={disconnected}>
+        <div className="message user"><div><small>你</small><MessageMarkdown text={thread.inputs.find(input => input.id === run.id)?.text ?? ''}/></div></div>
+        {presentation?.messages.filter(message => message.role === 'assistant' || message.role === 'tool').map(message => <div className="message assistant" key={message.id}><div><small>{message.role === 'tool' ? '工具执行提示' : mode === 'model' ? 'Pi' : 'Pi · 合成演示记录'}</small><MessageMarkdown text={message.text}/>{message.truncated && <small>正文已截断或脱敏</small>}</div></div>)}
         {presentation?.omitted && <p className="run-note">部分消息超出展示上限；此处仅显示有限摘要。</p>}
+        </NativeText>
       </section>
       {(operations.length > 0 || hasMore) && <section className="run-operations" aria-label="操作记录"><h3 className="run-section-title" title="独立的操作列表，不表示与正文的先后关系">操作记录 · {operations.length}{hasMore ? '+' : ''}</h3>
         {operations.map(op => <div className="operation-record" key={op.id} data-operation={op.id}>

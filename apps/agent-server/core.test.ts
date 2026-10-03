@@ -90,7 +90,7 @@ test('permission commands cannot claim full access, supply authority, or use inv
 test('automatic grants still expire and schema v9 migration never changes historical authority', t => {
   const f=fixture(t);const run=f.start();const original=f.core.snapshot(f.thread);
   f.core.close();const old=new DatabaseSync(f.path);
-  old.exec('ALTER TABLE threads DROP COLUMN title_revision; ALTER TABLE threads DROP COLUMN permission_mode; ALTER TABLE threads DROP COLUMN permission_revision; ALTER TABLE runs DROP COLUMN permission_mode; ALTER TABLE runs DROP COLUMN permission_revision; ALTER TABLE approvals DROP COLUMN source; PRAGMA user_version=9;');old.close();
+  old.exec('DROP TABLE run_native_ranges; ALTER TABLE threads DROP COLUMN title_revision; ALTER TABLE threads DROP COLUMN permission_mode; ALTER TABLE threads DROP COLUMN permission_revision; ALTER TABLE runs DROP COLUMN permission_mode; ALTER TABLE runs DROP COLUMN permission_revision; ALTER TABLE approvals DROP COLUMN source; PRAGMA user_version=9;');old.close();
   const migrated=new ProductCore(f.path,f.workspaces);t.after(()=>migrated.close());
   assert.deepEqual(migrated.snapshot(f.thread),original);
   migrated.handle({type:'runs.cancel',requestId:'cancel-old',runId:run});
@@ -385,12 +385,12 @@ test('thread rename is durable, revision-bound and idempotent; does not alter Ru
 
 test('v11 title migration preserves rows and native references; rename rejects unsafe names and authority fields', t => {
   const f=fixture(t);const before=f.core.snapshot(f.thread);f.core.close();
-  const old=new DatabaseSync(f.path);old.exec('ALTER TABLE threads DROP COLUMN title_revision; PRAGMA user_version=11;');old.close();
+  const old=new DatabaseSync(f.path);old.exec('DROP TABLE run_native_ranges; ALTER TABLE threads DROP COLUMN title_revision; PRAGMA user_version=11;');old.close();
   const core=new ProductCore(f.path,f.workspaces);t.after(()=>core.close());assert.deepEqual(core.snapshot(f.thread),before);
   const cmd={type:'threads.rename',requestId:'rename',threadId:f.thread,title:'SYNTHETIC',expectedRevision:0};
   for(const title of ['', '  ', 'x'.repeat(161),'line\nbreak','bad\u202eorder','\0'])assert.throws(()=>core.handle({...cmd,title}),/invalid_title/);
   assert.throws(()=>core.handle({...cmd,expectedRevision:-1}),/invalid_title_revision/);
   assert.throws(()=>core.handle({...cmd,nativeSessionRef:'forged'}),/unknown_field/);
   assert.equal(core.snapshot(f.thread).cursor,before.cursor);assert.equal(core.workerLaunches().length,0);
-  const verify=new DatabaseSync(f.path);assert.equal(verify.prepare('PRAGMA user_version').get()!.user_version,12);assert.deepEqual(verify.prepare('PRAGMA foreign_key_check').all(),[]);verify.close();
+  const verify=new DatabaseSync(f.path);assert.equal(verify.prepare('PRAGMA user_version').get()!.user_version,13);assert.deepEqual(verify.prepare('PRAGMA foreign_key_check').all(),[]);verify.close();
 });

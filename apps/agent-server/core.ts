@@ -1,3 +1,4 @@
+import type { NativeTextSource } from '../../packages/app-contracts/native-text.ts';
 import { readDesktopPage, row, runRow, artifactRow, displayOperation } from './desktop-pages.ts';
 import { DESKTOP_PAGE_BYTES, type HistoryEntry, type HistoryItem, type PageOptions, type HistoryPage, type OperationPage, type ArtifactPage } from '../../packages/app-contracts/desktop-pages.ts';
 import type { ModelShellOperation } from '../../packages/app-contracts/model-shell.ts';
@@ -37,7 +38,7 @@ export class ProductCore {
       if (path !== ':memory:') chmodSync(path, 0o600);
       this.db.exec('PRAGMA busy_timeout=1000; PRAGMA synchronous=FULL;');
       const version = this.one<{ user_version: number }>('PRAGMA user_version').user_version;
-      if (![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].includes(version)) throw new Error('unsupported_database_version');
+      if (![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].includes(version)) throw new Error('unsupported_database_version');
       if (version === 0) {
         this.db.exec(`BEGIN IMMEDIATE;
           CREATE TABLE workspaces(id TEXT PRIMARY KEY, path TEXT NOT NULL UNIQUE) STRICT;
@@ -116,6 +117,9 @@ export class ProductCore {
       if (version < 12) this.db.exec(`BEGIN IMMEDIATE;
         ALTER TABLE threads ADD COLUMN title_revision INTEGER NOT NULL DEFAULT 0 CHECK(title_revision >= 0);
         PRAGMA user_version=12; COMMIT;`);
+      if(version<13)this.db.exec(`BEGIN IMMEDIATE;
+        CREATE TABLE run_native_ranges(run_id TEXT PRIMARY KEY REFERENCES runs(id),native_ref TEXT NOT NULL,start_entry TEXT,end_entry TEXT,finished INTEGER NOT NULL DEFAULT 0 CHECK(finished IN (0,1))) STRICT;
+        PRAGMA user_version=13; COMMIT;`);
       this.transaction(() => {
         for (const workspace of workspaces) {
           identifier(workspace.id); const canonical = realpathSync(workspace.path);
@@ -347,6 +351,28 @@ export class ProductCore {
     this.mutate(() => { const run = this.bound(binding); if (run.state !== 'starting') throw new Error('not_starting'); this.setRun(run, 'running'); });
   }
   /** Host-only reference metadata, never a message/tree or a Renderer path. */
+  recordNativeRange(binding:Binding,reference:string,phase:'start'|'end',entryId:string|null):void {
+    this.mutate(()=>{
+      const run=this.bound(binding);
+      if(this.nativeSessionReference(run.threadId).reference!==reference)throw new Error('native_range_reference');
+      if(phase==='start'){
+        if(run.state!=='running'||this.get('SELECT 1 FROM run_native_ranges WHERE run_id=?',run.id))throw new Error('native_range_started');
+        this.db.prepare('INSERT INTO run_native_ranges(run_id,native_ref,start_entry) VALUES (?,?,?)').run(run.id,reference,entryId);
+      }else{
+        const source=this.one<{native_ref:string;finished:number}>('SELECT native_ref,finished FROM run_native_ranges WHERE run_id=?',run.id);
+        if(source.native_ref!==reference||source.finished)throw new Error('native_range_finished');
+        this.db.prepare('UPDATE run_native_ranges SET end_entry=?,finished=1 WHERE run_id=?').run(entryId,run.id);
+      }
+      this.event(run.threadId,run.id,'session.range',run.id);
+    });
+  }
+  nativeTextSource(threadId:string,runId:string):NativeTextSource|null {
+    return this.transaction(()=>{
+      if(this.run(runId).threadId!==threadId)throw new Error('not_found');
+      const source=this.get<{reference:string;start:string|null;end:string|null;finished:number}>('SELECT native_ref AS reference,start_entry AS start,end_entry AS end,finished FROM run_native_ranges WHERE run_id=?',runId);
+      return source?{...source,finished:source.finished===1}:null;
+    },false);
+  }
   nativeSessionReference(threadId: string): { reference: string | null; persisted: boolean } {
     const row = this.one<{ reference: string | null; persisted: number }>('SELECT native_ref AS reference,native_persisted AS persisted FROM threads WHERE id=?', threadId);
     return { reference: row.reference, persisted: row.reference !== null && row.persisted === 1 };

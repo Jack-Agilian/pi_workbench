@@ -169,9 +169,9 @@ test('v8 migration preserves existing Run/Operation/model records; shell and wor
   const done=f.supervisor.startNext(plan,entry,{...access,fetch:async()=>{calls++;return new Response(syntheticReply('chat-completions',calls,calls===1?[{tool:'write',parameters:{path:'migration.md',content:'# SYNTHETIC migration'}}]:[]),{headers:{'content-type':'text/event-stream'}});}})!;
   await approveShell(f);await done;const admission=f.core.modelAdmission(access.configuration,0.01);
   const before=f.core.snapshot(f.thread);f.core.close();
-  const old=new DatabaseSync(f.database);old.exec('ALTER TABLE threads DROP COLUMN title_revision; ALTER TABLE threads DROP COLUMN permission_mode; ALTER TABLE threads DROP COLUMN permission_revision; ALTER TABLE runs DROP COLUMN permission_mode; ALTER TABLE runs DROP COLUMN permission_revision; ALTER TABLE approvals DROP COLUMN source; DROP TABLE desktop_workspace; DROP TABLE model_shell_operations; PRAGMA user_version=8;');old.close();
+  const old=new DatabaseSync(f.database);old.exec('DROP TABLE run_native_ranges; ALTER TABLE threads DROP COLUMN title_revision; ALTER TABLE threads DROP COLUMN permission_mode; ALTER TABLE threads DROP COLUMN permission_revision; ALTER TABLE runs DROP COLUMN permission_mode; ALTER TABLE runs DROP COLUMN permission_revision; ALTER TABLE approvals DROP COLUMN source; DROP TABLE desktop_workspace; DROP TABLE model_shell_operations; PRAGMA user_version=8;');old.close();
   f.reopen();assert.deepEqual(f.core.snapshot(f.thread),before);assert.deepEqual(f.core.modelAdmission(access.configuration,0.01),admission);
-  const db=new DatabaseSync(f.database,{readOnly:true});try{assert.equal(db.prepare('PRAGMA user_version').get()?.user_version,12);assert.equal(db.prepare('SELECT count(*) AS count FROM model_shell_operations').get()?.count,0);}finally{db.close();}
+  const db=new DatabaseSync(f.database,{readOnly:true});try{assert.equal(db.prepare('PRAGMA user_version').get()?.user_version,13);assert.equal(db.prepare('SELECT count(*) AS count FROM model_shell_operations').get()?.count,0);}finally{db.close();}
  }finally{await f.dispose();}
 });
 test('dynamic shell IPC has a closed argument set and preserves version/identity/size fences',()=>{

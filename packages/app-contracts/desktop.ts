@@ -1,3 +1,4 @@
+import type { NativeTextPage } from './native-text.ts';
 import { parsePageOptions, type PageOptions, type HistoryPage, type HistoryEntry, type OperationPage, type ArtifactPage, type ThreadActivity } from './desktop-pages.ts';
 import type { ModelShellPolicy } from './model-shell.ts';
 import type { FileToolPolicy } from './file-tools.ts';
@@ -9,6 +10,7 @@ export interface DesktopThread extends Snapshot { modelOutcomes?: {runId:string;
 export interface DesktopHome { queryScope?: string; workspaces: {selectedId:string;items:{id:string;path:string;status?:'ready'|'invalid'}[]}; mode: 'synthetic' | 'model-offline' | 'model'; model?: {status:'not_configured'|'key_required'|'ready'|'policy_required'|'budget_exhausted';provider:string;model:string;limits?:{endpoint:string;requests:number|null;estimatedUsd:number|null;outputTokens:number|null;timeoutMs?:number;httpIdleTimeoutMs?:number;fileTools?:FileToolPolicy;shellTools?:ModelShellPolicy}}; threads: ThreadView[]; activeRuns: RunView[]; recovery: 'ready' | 'blocked' }
 export type Preview = { status: 'ready' | 'changed' | 'missing' | 'unavailable'; text?: string };
 export type DesktopRequest =
+  | { type:'native-text'; threadId:string; runId:string; cursor?:string }
   | { type:'history-entry'; threadId:string; runId:string }
   | { type:'history-page'|'artifact-page'; threadId:string; page?:PageOptions }
   | { type:'operation-page'; runId:string; page?:PageOptions }
@@ -16,11 +18,15 @@ export type DesktopRequest =
   | { type: 'home' } | { type: 'recover' }
   | { type: 'thread'; threadId: string } | { type: 'events'; threadId: string; cursor: number }
   | { type: 'preview'; artifactId: string } | { type: 'command'; command: Command };
-export type DesktopValue = HistoryEntry | HistoryPage | OperationPage | ArtifactPage | ThreadActivity | DesktopHome | DesktopThread | Preview | Ack | ProductEvent[];
+export type DesktopValue = NativeTextPage | HistoryEntry | HistoryPage | OperationPage | ArtifactPage | ThreadActivity | DesktopHome | DesktopThread | Preview | Ack | ProductEvent[];
 export type DesktopReply = { ok: true; value: DesktopValue } | { ok: false; code: 'invalid_request' | 'title_changed' | 'invalid_title' | 'permission_changed' | 'request_rejected' | 'disconnected' | 'busy' | 'workspace_invalid' | 'page_cursor_invalid' | 'page_item_too_large' };
 export function parseDesktopRequest(raw: unknown): DesktopRequest {
   const r = record(raw); let result: DesktopRequest;
   switch (r.type) {
+    case 'native-text':
+      exact(r,['type','threadId','runId',...(Object.hasOwn(r,'cursor')?['cursor']:[])]);
+      if(r.cursor!==undefined&&(typeof r.cursor!=='string'||r.cursor.length>1024||!r.cursor))throw new Error('invalid_cursor');
+      result={type:r.type,threadId:identifier(r.threadId),runId:identifier(r.runId),...(r.cursor===undefined?{}:{cursor:r.cursor as string})};break;
     case 'history-entry': exact(r,['type','threadId','runId']);result={type:r.type,threadId:identifier(r.threadId),runId:identifier(r.runId)};break;
     case 'thread-activity': exact(r,['type','threadId']);result={type:r.type,threadId:identifier(r.threadId)};break;
     case 'history-page': case 'artifact-page':
@@ -43,6 +49,7 @@ export function parseDesktopRequest(raw: unknown): DesktopRequest {
 export interface DesktopApi {
   /** Opaque host connection identity; carries no execution authority or filesystem path. */
   queryScope(): Promise<string>;
+  nativeText(threadId:string,runId:string,cursor?:string,queryScope?:string):Promise<NativeTextPage>;
   historyEntry(threadId:string,runId:string):Promise<HistoryEntry>;
   historyPage(threadId:string,page?:PageOptions):Promise<HistoryPage>;
   operationPage(runId:string,page?:PageOptions,queryScope?:string):Promise<OperationPage>;

@@ -148,6 +148,8 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
   await runFrontendSmoke(window, host);
   const { runPaginationSmoke } = await import('./pagination-smoke.ts');
   await runPaginationSmoke(window, host);
+  const {runNativeTextSmoke}=await import('./native-text-smoke.ts');
+  await runNativeTextSmoke(window,host);
   const {runThreadNamingSmoke} = await import('./thread-naming-smoke.ts');
   await runThreadNamingSmoke(window, host);
 

@@ -6,11 +6,12 @@ import { parseModelSelection, parseModelOutcome, type ModelSelection, type Model
 import { parseShellOutcome, type ShellOutcome } from './shell.ts';
 import { identifier, toolCallIdentity, sha256, type Dispatch } from './index.ts';
 import { parsePresentation, type Presentation } from './presentation.ts';
-export const IPC_VERSION = 11;
+export const IPC_VERSION = 12;
 export const MAX_MESSAGE_BYTES = 65_536;
 export interface ResourceSelection { root: string; id: string; files: readonly { path: string; sha256: string }[]; expectedSkillNames: readonly string[] }
 export interface WorkerInit { fileAccess?: FullFileAccess; binding: Dispatch; workspace: string; agentDir: string; sessions: string; resources: ResourceSelection; deadline: number | null; model?: ModelSelection }
 export type WireBody =
+  | { type:'native-range'; phase:'start'|'end'; entryId:string|null }
   | { type: 'model-key'; key: string }
   | { type: 'model-outcome'; outcome: ModelOutcome }
   | { type: 'model-http'; url: string; method: 'POST'; headers: Record<string,string>; body: string }
@@ -39,7 +40,7 @@ export type WireBody =
   | { type: 'done'; ok: boolean }
   | { type: 'closed'; nativeRef: string | null }
   | { type: 'fault'; code: 'initialization_failed' | 'execution_failed' | 'protocol_failed' };
-export interface Envelope { version: 11; instanceId: string; runtimeBindingId: string; requestId: string; body: WireBody }
+export interface Envelope { version: 12; instanceId: string; runtimeBindingId: string; requestId: string; body: WireBody }
 export function record(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value) || ![Object.prototype, null].includes(Object.getPrototypeOf(value))) throw new Error('invalid_record');
   const fields = Object.getOwnPropertyDescriptors(value);
@@ -64,6 +65,7 @@ export function parseEnvelope(value: unknown): Envelope {
   const b = record(obj.body);
   const check = (...keys: string[]) => exact(b, ['type', ...keys]);
   switch (b.type) {
+    case 'native-range': check('phase','entryId'); if(b.phase!=='start'&&b.phase!=='end')throw new Error('invalid_native_phase'); if(b.entryId!==null)identifier(b.entryId); break;
     case 'model-key': check('key'); string(b.key, 8192); break;
     case 'model-outcome': check('outcome'); b.outcome = parseModelOutcome(b.outcome); obj.body = b; break;
     case 'model-http': check('url','method','headers','body'); string(b.url, 2048); if (b.method !== 'POST') throw new Error('model_http_method'); string(b.body, 24000); parseHeaders(b.headers); break;

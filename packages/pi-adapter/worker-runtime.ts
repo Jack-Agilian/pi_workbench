@@ -46,7 +46,7 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
   const references = new Map<string, { resolve(): void; reject(error: Error): void }>();
   let reservedReference: string | null = null;
   let priorEntries = new Set<string>();
-  const send = (body: WireBody, requestId = `${body.type === 'observation' || body.type === 'presentation' ? body.type : 'worker'}-${++sequence}`) => sender.send({ version: 11, instanceId, runtimeBindingId, requestId, body } satisfies Envelope);
+  const send = (body: WireBody, requestId = `${body.type === 'observation' || body.type === 'presentation' ? body.type : 'worker'}-${++sequence}`) => sender.send({ version: 12, instanceId, runtimeBindingId, requestId, body } satisfies Envelope);
   const publish = () => runtime && started && !closed ? send({ type: 'presentation', projection: projectMessages(runtime.session.sessionManager.getBranch().filter(entry => !priorEntries.has(entry.id))) }) : Promise.resolve();
   function close(): Promise<void> {
     if (closing) return closing;
@@ -183,6 +183,7 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
       if (!runtime || !config || !driver) throw new Error('worker_driver_not_configured'); started = true;
       executing = (async () => {
         priorEntries = new Set(runtime!.session.sessionManager.getBranch().map(entry => entry.id));
+        await send({type:'native-range',phase:'start',entryId:runtime!.session.sessionManager.getLeafId()});
         let ok = false;const firstMessage=runtime!.session.messages.length;
         try {
           abort.signal.throwIfAborted(); verifyContent(config!.resources);
@@ -197,6 +198,7 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
         }
         catch { ok = false; }
         await publish();
+        await send({type:'native-range',phase:'end',entryId:runtime!.session.sessionManager.getLeafId()});
         for (const operationId of claimed) await send({ type: 'result', operationId, ok });
         await send({ type: 'done', ok });
       })(); void executing.catch(fail); return;

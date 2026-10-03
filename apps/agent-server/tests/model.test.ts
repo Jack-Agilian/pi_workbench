@@ -63,7 +63,7 @@ import { parseEnvelope } from '../../../packages/app-contracts/worker-ipc.ts';
 test('M1 strict model DTOs reject coercion, unknown fields and oversized transport',()=>{
  assert.throws(()=>parseModelSelection({...plan().model,mode:['offline']}));
  assert.throws(()=>parseModelOutcome({reason:['stop'],inputTokens:0,outputTokens:0,estimatedCostUsd:0,synthetic:true}));
- for(const body of [{type:'model-http',url:'https://example.invalid',method:'POST',headers:{},body:'x'.repeat(24001)},{type:'model-http-read',hostClean:true},{type:'model-key',key:'x'.repeat(8193)}])assert.throws(()=>parseEnvelope({version:11,instanceId:'worker',runtimeBindingId:'binding',requestId:'http-1',body}));
+ for(const body of [{type:'model-http',url:'https://example.invalid',method:'POST',headers:{},body:'x'.repeat(24001)},{type:'model-http-read',hostClean:true},{type:'model-key',key:'x'.repeat(8193)}])assert.throws(()=>parseEnvelope({version:12,instanceId:'worker',runtimeBindingId:'binding',requestId:'http-1',body}));
 });
 test('M1 bounded pull HTTP, exact URL, one request, error redaction and shared close',async()=>{
  let calls=0;const key='SYNTHETIC_SECRET_CANARY';
