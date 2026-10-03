@@ -116,7 +116,7 @@
         "AgentSessionRuntime.newSession"
       ],
       "reuse": "JSONL、分支、恢复保持 Pi",
-      "productDelta": "Thread原生路径由Pi公开getSessionFile分配，宿主SQLite持久确认及落盘标记；不保存消息或第二份树；M1续验通过稳定产品请求定位原Thread/Session，原生文件未重写，失败请求不自动重发；M2在两个OpenAI协议合成场景中重开原生Session，工具结果延续到下一Run；仍仅存原生引用，无第二份树",
+      "productDelta": "Thread原生路径由Pi公开getSessionFile分配，宿主SQLite持久确认及落盘标记；不保存消息或第二份树；M1续验通过稳定产品请求定位原Thread/Session，原生文件未重写，失败请求不自动重发；M2在两个OpenAI协议合成场景中重开原生Session，工具结果延续到下一Run；仍仅存原生引用，无第二份树 2026-10-03真实Electron四场景限定补证：工具/审批/成果/取消/原Session恢复通过，代理操作与未覆盖范围分列，不晋级全部P0。",
       "acceptanceGate": "保存/恢复/Fork不双写；替换前三类失败点和重绑定；失效旧对象不可继续使用",
       "implementationState": "in_progress",
       "adoption": {
@@ -177,7 +177,11 @@
           "EV-M1-RESUME-MAC-20260929",
           "EV-M1-CLOSEOUT-20260929",
           "EV-M2-SDK-20260929",
-          "EV-M2-MAC-20260929"
+          "EV-M2-MAC-20260929",
+          "EV-DESKTOP-CLOSEOUT-MODEL-20261003",
+          "EV-DESKTOP-CLOSEOUT-MAC-20261003",
+          "EV-DESKTOP-CLOSEOUT-COPY-20261003",
+          "EV-DESKTOP-CLOSEOUT-UI-20261003"
         ]
       }
     },
@@ -200,7 +204,7 @@
         "createAssistantMessageEventStream"
       ],
       "reuse": "Provider、目录、登录/刷新复用",
-      "productDelta": "M1 OpenAI Responses/Chat Completions 与原有 Anthropic；Pi 原生 Provider/公开 registerProvider 元数据接入；应用专用 auth.json 字面量 key 读取和临时原生文件选择；系统 Keychain/OAuth 未完成；0.87.1目录模型只覆盖批准baseUrl，真实首条、原会话恢复及活跃取消已限定验证；追加规范化策略/旧账本兼容和显式timeout修订，真实授权累计4/4，取消实际计费未知；httpIdleTimeoutMs空闲期限与timeoutMs单请求总期限独立，长流使用缩时合成回归；30分钟单LLM总上限已获用户确认，原4/4耗尽授权不变；M2每次HTTP预留独立宿主身份/序号和预算、关闭ACK后允许后续调用；Pi继续负责SSE与Provider；同Run用量汇总，fileTools显式授权且旧timeout修订不能扩权；无新增真实调用；fauxToolCall只在明确合成测试驱动中使用；2026-09-30产品默认无请求次数字段，旧数字限制仅历史/测试兼容；用户取消次数上限，旧请求/费用保留，独立修订禁止顺带扩权；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开；2026-10-03已知模型错误码/HTTP状态经闭合产品DTO安全展示，未知正文不透传，原生错误落盘前收敛；IPC v8，旧结果JSON兼容，具体限定验证见model-errors-2026-10-03报告 2026-10-03默认及本机用量额度清理，API总超时/空闲独立保留；Pi模型默认输出，目录内绝对路径规范化与安全工具失败投影；限定实测见product-defaults-desktop报告，不扩大Gate。",
+      "productDelta": "M1 OpenAI Responses/Chat Completions 与原有 Anthropic；Pi 原生 Provider/公开 registerProvider 元数据接入；应用专用 auth.json 字面量 key 读取和临时原生文件选择；系统 Keychain/OAuth 未完成；0.87.1目录模型只覆盖批准baseUrl，真实首条、原会话恢复及活跃取消已限定验证；追加规范化策略/旧账本兼容和显式timeout修订，真实授权累计4/4，取消实际计费未知；httpIdleTimeoutMs空闲期限与timeoutMs单请求总期限独立，长流使用缩时合成回归；30分钟单LLM总上限已获用户确认，原4/4耗尽授权不变；M2每次HTTP预留独立宿主身份/序号和预算、关闭ACK后允许后续调用；Pi继续负责SSE与Provider；同Run用量汇总，fileTools显式授权且旧timeout修订不能扩权；无新增真实调用；fauxToolCall只在明确合成测试驱动中使用；2026-09-30产品默认无请求次数字段，旧数字限制仅历史/测试兼容；用户取消次数上限，旧请求/费用保留，独立修订禁止顺带扩权；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开；2026-10-03已知模型错误码/HTTP状态经闭合产品DTO安全展示，未知正文不透传，原生错误落盘前收敛；IPC v8，旧结果JSON兼容，具体限定验证见model-errors-2026-10-03报告 2026-10-03默认及本机用量额度清理，API总超时/空闲独立保留；Pi模型默认输出，目录内绝对路径规范化与安全工具失败投影；限定实测见product-defaults-desktop报告，不扩大Gate。 2026-10-03真实Electron四场景限定补证：工具/审批/成果/取消/原Session恢复通过，代理操作与未覆盖范围分列，不晋级全部P0。",
       "acceptanceGate": "secret 不进Renderer/日志/子进程env",
       "implementationState": "in_progress",
       "adoption": {
@@ -357,7 +361,11 @@
           "EV-PRODUCT-DEFAULTS-SDK-20261003",
           "EV-PRODUCT-DEFAULTS-MAC-20261003",
           "EV-PRODUCT-PATH-SDK-20261003",
-          "EV-PRODUCT-PATH-MAC-20261003"
+          "EV-PRODUCT-PATH-MAC-20261003",
+          "EV-DESKTOP-CLOSEOUT-MODEL-20261003",
+          "EV-DESKTOP-CLOSEOUT-MAC-20261003",
+          "EV-DESKTOP-CLOSEOUT-COPY-20261003",
+          "EV-DESKTOP-CLOSEOUT-UI-20261003"
         ]
       }
     },
@@ -1049,7 +1057,7 @@
       ],
       "upstreamSymbolsOrPaths": [],
       "reuse": "复用Pi原生任务执行，不重写",
-      "productDelta": "ProductCore持久Run/Operation/Approval、v2启动日志及v3原生落盘标记；Supervisor冷恢复先失效旧epoch授权，再按清理证据结算；C沿用同一核心，v4仅增有限展示缓存；D1复用产品取消与既有恢复，在宿主关闭时结算活动/排队工作并保留审计；D2-S SQL v5增加Shell意图/结果投影，取消与命令副作用分开，崩溃只对账原Operation；M1 SQL v6请求预留/模型结果及v7显式策略修订；语义摘要/旧账本证明、预算跨重开修订保留、独立HTTP清理及无工具结算；累计4/4真实请求；M2 SQL v8多请求预算/宿主文件意图，IPC v6逐HTTP关闭ACK和逐工具settlement；前成功后失败独立保留，真实文件和清理证据对账；guardian/supervisor关闭即拒绝排队消息；SQL v9逐Shell启动/恢复记录与可信Workspace选择，旧Thread绑定不变；2026-09-30产品默认无请求次数字段，旧数字限制仅历史/测试兼容；用户取消次数上限，旧请求/费用保留，独立修订禁止顺带扩权；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开；2026-09-30后端工作区重新准入、展示消息与控制去重分离、固定SQLite分页/独立活动快照及工作树离线profile，Renderer已通过UI-P2正式分页接入，不重写原生Session；F01新增Thread内单Run安全historyEntry只读查询，Renderer按事件定向刷新，头部桥接与旧尾游标分离，整批成功发布/切换停止后续读取；2026-10-03已知模型错误码/HTTP状态经闭合产品DTO安全展示，未知正文不透传，原生错误落盘前收敛；IPC v8，旧结果JSON兼容，具体限定验证见model-errors-2026-10-03报告 2026-10-03默认及本机用量额度清理，API总超时/空闲独立保留；Pi模型默认输出，目录内绝对路径规范化与安全工具失败投影；限定实测见product-defaults-desktop报告，不扩大Gate。",
+      "productDelta": "ProductCore持久Run/Operation/Approval、v2启动日志及v3原生落盘标记；Supervisor冷恢复先失效旧epoch授权，再按清理证据结算；C沿用同一核心，v4仅增有限展示缓存；D1复用产品取消与既有恢复，在宿主关闭时结算活动/排队工作并保留审计；D2-S SQL v5增加Shell意图/结果投影，取消与命令副作用分开，崩溃只对账原Operation；M1 SQL v6请求预留/模型结果及v7显式策略修订；语义摘要/旧账本证明、预算跨重开修订保留、独立HTTP清理及无工具结算；累计4/4真实请求；M2 SQL v8多请求预算/宿主文件意图，IPC v6逐HTTP关闭ACK和逐工具settlement；前成功后失败独立保留，真实文件和清理证据对账；guardian/supervisor关闭即拒绝排队消息；SQL v9逐Shell启动/恢复记录与可信Workspace选择，旧Thread绑定不变；2026-09-30产品默认无请求次数字段，旧数字限制仅历史/测试兼容；用户取消次数上限，旧请求/费用保留，独立修订禁止顺带扩权；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开；2026-09-30后端工作区重新准入、展示消息与控制去重分离、固定SQLite分页/独立活动快照及工作树离线profile，Renderer已通过UI-P2正式分页接入，不重写原生Session；F01新增Thread内单Run安全historyEntry只读查询，Renderer按事件定向刷新，头部桥接与旧尾游标分离，整批成功发布/切换停止后续读取；2026-10-03已知模型错误码/HTTP状态经闭合产品DTO安全展示，未知正文不透传，原生错误落盘前收敛；IPC v8，旧结果JSON兼容，具体限定验证见model-errors-2026-10-03报告 2026-10-03默认及本机用量额度清理，API总超时/空闲独立保留；Pi模型默认输出，目录内绝对路径规范化与安全工具失败投影；限定实测见product-defaults-desktop报告，不扩大Gate。 2026-10-03真实Electron四场景限定补证：工具/审批/成果/取消/原Session恢复通过，代理操作与未覆盖范围分列，不晋级全部P0。",
       "acceptanceGate": "幂等/绑定/取消/unknown；P0同Workspace写Run串行并覆盖等待审批与清理阶段；扩展通用持久任务/调度/观察流前对照durable，保持Session/审批/清理/预算权威边界",
       "implementationState": "in_progress",
       "adoption": {
@@ -1116,7 +1124,11 @@
           "EV-PRODUCT-DEFAULTS-SDK-20261003",
           "EV-PRODUCT-DEFAULTS-MAC-20261003",
           "EV-PRODUCT-PATH-SDK-20261003",
-          "EV-PRODUCT-PATH-MAC-20261003"
+          "EV-PRODUCT-PATH-MAC-20261003",
+          "EV-DESKTOP-CLOSEOUT-MODEL-20261003",
+          "EV-DESKTOP-CLOSEOUT-MAC-20261003",
+          "EV-DESKTOP-CLOSEOUT-COPY-20261003",
+          "EV-DESKTOP-CLOSEOUT-UI-20261003"
         ]
       }
     },
@@ -1128,7 +1140,7 @@
       ],
       "upstreamSymbolsOrPaths": [],
       "reuse": "复用文件库/预览器而非模型文字猜测",
-      "productDelta": "真实文件/版本/来源验证；已登记成果的历史恢复与当前missing/changed安全预览分离；UI-P2成果分页与按需核验已限定接入，保留来源/版本与上次核验语义",
+      "productDelta": "真实文件/版本/来源验证；已登记成果的历史恢复与当前missing/changed安全预览分离；UI-P2成果分页与按需核验已限定接入，保留来源/版本与上次核验语义 2026-10-03真实Electron四场景限定补证：工具/审批/成果/取消/原Session恢复通过，代理操作与未覆盖范围分列，不晋级全部P0。",
       "acceptanceGate": "missing file拒绝与安全预览",
       "implementationState": "in_progress",
       "adoption": {
@@ -1153,7 +1165,11 @@
           "EV-UI-P2-PAGES-MAC-20260930",
           "EV-UI-P2-PAGES-REGRESSION-20260930",
           "EV-BACKEND-HISTORY-MAC-20260930",
-          "EV-BACKEND-HISTORY-PAGES-20260930"
+          "EV-BACKEND-HISTORY-PAGES-20260930",
+          "EV-DESKTOP-CLOSEOUT-MODEL-20261003",
+          "EV-DESKTOP-CLOSEOUT-MAC-20261003",
+          "EV-DESKTOP-CLOSEOUT-COPY-20261003",
+          "EV-DESKTOP-CLOSEOUT-UI-20261003"
         ]
       }
     },
@@ -1193,7 +1209,7 @@
         "esbuild build"
       ],
       "reuse": "Electron公开窗口/沙盒/IPC，React渲染和esbuild构建；复用既有产品与Pi Worker链路",
-      "productDelta": "闭合产品桥、Thread/Run视图、审批/取消/成果与有界纯文本投影；显式无模型驱动；关闭结果/重连接管分离，未确认命令按意图保留身份并显式重试；D1正常退出/信号统一结算，关闭失败后原窗口显式恢复，候选新宿主不迟到发布；D2-S展示固定命令审批/profile/期限及stdout/stderr有界完成快照，交互终端尚未接入；M1正文流/最终快照、应用专用持久凭据加载及原生临时选择、策略待确认/预算耗尽准入和双时间限制显示；仅产品DTO；M2已有视图增加逐read/write/edit审批、有限版本/参数摘要、后续模型轮流式正文与重连展示；显式SYNTHETIC离线入口，不由Renderer选择工具或worker代码；原生目录选择无自由路径Renderer入口，实际cwd/阶段/逐命令有界结果、三尺寸核心动作核查；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开；UI-P2前端右栏折叠/三档宽度、常驻审批/停止、Thread滚动锚点、按需成果核验展示；现采用正式historyPage/operationPage/artifactPage和独立ThreadActivity；Renderer的thread-pages.ts维护只读已加载范围、事件衔接与重连，首屏错误也保留正确活动身份；F01新增Thread内单Run安全historyEntry只读查询，Renderer按事件定向刷新，头部桥接与旧尾游标分离，整批成功发布/切换停止后续读取；按reference-implementations.md对照pi-gui时间线/viewport/layout，Q1 operationPage已由Query 5.104.0承接缓存/异步状态/去重，原工具LoadedRange移除，产品仅存发布引用；queryScope绑定宿主连接，重连按位置重读，工具错误手动重试；后续Q2历史/成果未迁移，有实测布局瓶颈后采用Virtual，不并存两套缓存/滚动控制；2026-10-03已知模型错误码/HTTP状态经闭合产品DTO安全展示，未知正文不透传，原生错误落盘前收敛；IPC v8，旧结果JSON兼容，具体限定验证见model-errors-2026-10-03报告 2026-10-03默认及本机用量额度清理，API总超时/空闲独立保留；Pi模型默认输出，目录内绝对路径规范化与安全工具失败投影；限定实测见product-defaults-desktop报告，不扩大Gate。",
+      "productDelta": "闭合产品桥、Thread/Run视图、审批/取消/成果与有界纯文本投影；显式无模型驱动；关闭结果/重连接管分离，未确认命令按意图保留身份并显式重试；D1正常退出/信号统一结算，关闭失败后原窗口显式恢复，候选新宿主不迟到发布；D2-S展示固定命令审批/profile/期限及stdout/stderr有界完成快照，交互终端尚未接入；M1正文流/最终快照、应用专用持久凭据加载及原生临时选择、策略待确认/预算耗尽准入和双时间限制显示；仅产品DTO；M2已有视图增加逐read/write/edit审批、有限版本/参数摘要、后续模型轮流式正文与重连展示；显式SYNTHETIC离线入口，不由Renderer选择工具或worker代码；原生目录选择无自由路径Renderer入口，实际cwd/阶段/逐命令有界结果、三尺寸核心动作核查；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开；UI-P2前端右栏折叠/三档宽度、常驻审批/停止、Thread滚动锚点、按需成果核验展示；现采用正式historyPage/operationPage/artifactPage和独立ThreadActivity；Renderer的thread-pages.ts维护只读已加载范围、事件衔接与重连，首屏错误也保留正确活动身份；F01新增Thread内单Run安全historyEntry只读查询，Renderer按事件定向刷新，头部桥接与旧尾游标分离，整批成功发布/切换停止后续读取；按reference-implementations.md对照pi-gui时间线/viewport/layout，Q1 operationPage已由Query 5.104.0承接缓存/异步状态/去重，原工具LoadedRange移除，产品仅存发布引用；queryScope绑定宿主连接，重连按位置重读，工具错误手动重试；后续Q2历史/成果未迁移，有实测布局瓶颈后采用Virtual，不并存两套缓存/滚动控制；2026-10-03已知模型错误码/HTTP状态经闭合产品DTO安全展示，未知正文不透传，原生错误落盘前收敛；IPC v8，旧结果JSON兼容，具体限定验证见model-errors-2026-10-03报告 2026-10-03默认及本机用量额度清理，API总超时/空闲独立保留；Pi模型默认输出，目录内绝对路径规范化与安全工具失败投影；限定实测见product-defaults-desktop报告，不扩大Gate。 2026-10-03真实Electron四场景限定补证：工具/审批/成果/取消/原Session恢复通过，代理操作与未覆盖范围分列，不晋级全部P0。",
       "acceptanceGate": "真实桌面进程/来源/CSP、Thread隔离、审批/取消/恢复；平台/模型/Gate分别验收；确认丢失/交错重试、异常关闭与受证据约束的恢复；Q1还须验证环境/连接缓存隔离、无网络本地读取、显式重试/焦点策略、IPC背压与整批一致性，删除被替代旧机制",
       "implementationState": "in_progress",
       "adoption": {
@@ -1370,7 +1386,11 @@
           "EV-PRODUCT-DEFAULTS-SDK-20261003",
           "EV-PRODUCT-DEFAULTS-MAC-20261003",
           "EV-PRODUCT-PATH-SDK-20261003",
-          "EV-PRODUCT-PATH-MAC-20261003"
+          "EV-PRODUCT-PATH-MAC-20261003",
+          "EV-DESKTOP-CLOSEOUT-MODEL-20261003",
+          "EV-DESKTOP-CLOSEOUT-MAC-20261003",
+          "EV-DESKTOP-CLOSEOUT-COPY-20261003",
+          "EV-DESKTOP-CLOSEOUT-UI-20261003"
         ]
       }
     }
@@ -3211,6 +3231,66 @@
         "darwin"
       ],
       "locator": "docs/validation/product-defaults-desktop-2026-10-03.md"
+    },
+    {
+      "id": "EV-DESKTOP-CLOSEOUT-MODEL-20261003",
+      "kind": "model",
+      "result": "passed",
+      "commit": "ebaf3162b0749c387def40887959f07e891ee706",
+      "scope": "真实Electron驱动gpt-6-luna Responses共8次HTTP；read/write/edit/Bash独立允许、拒绝零写入、活跃Bash取消、成果核验和正常重开原Session无工具继续均通过。仅批准合成项目、代理操作，不是用户人工验收。",
+      "recordedAt": "2026-10-03T06:16:25.102766+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/desktop-functional-closeout-2026-10-03.md"
+    },
+    {
+      "id": "EV-DESKTOP-CLOSEOUT-MAC-20261003",
+      "kind": "platform",
+      "result": "passed",
+      "commit": "ebaf3162b0749c387def40887959f07e891ee706",
+      "scope": "macOS真实桌面四场景、SQLite/Session/文件及清理收据/PID/进程组核验；原22请求不变、恢复无工具重放或文件改写；不推广任意恶意后代/其他平台。",
+      "recordedAt": "2026-10-03T06:16:25.102766+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/desktop-functional-closeout-2026-10-03.md"
+    },
+    {
+      "id": "EV-DESKTOP-CLOSEOUT-COPY-20261003",
+      "kind": "static",
+      "result": "passed",
+      "commit": "1a7514138c678bcde75dc1bc154d734f412c54eb",
+      "scope": "展示措辞保留事实：未知原因不推断服务失败，成果内容不同不推断外部修改；typecheck与39项desktop通过，真实链路证据保留原ebaf316。",
+      "recordedAt": "2026-10-03T06:16:25.102766+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/desktop-functional-closeout-2026-10-03.md"
+    },
+    {
+      "id": "EV-DESKTOP-CLOSEOUT-UI-FIRST-20261003",
+      "kind": "platform",
+      "result": "failed",
+      "commit": "1a7514138c678bcde75dc1bc154d734f412c54eb",
+      "scope": "首次完整Electron UI在frontend older_page超时；直接点击可能仍禁用的按钮，后续复用现有就绪等待；不声称关闭另一工作树历史超时根因。",
+      "recordedAt": "2026-10-03T06:16:25.102766+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/desktop-functional-closeout-2026-10-03.md"
+    },
+    {
+      "id": "EV-DESKTOP-CLOSEOUT-UI-20261003",
+      "kind": "platform",
+      "result": "passed",
+      "commit": "68c63deafb70dd5b4b6b2a9c3531c9f70975799d",
+      "scope": "完整离线Electron UI及Agent Shell/model回归通过；分页按钮就绪后仅点击一次，原页数/重连/关闭断言保留，零新增真实请求。",
+      "recordedAt": "2026-10-03T06:16:25.102766+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/desktop-functional-closeout-2026-10-03.md"
     }
   ]
 }

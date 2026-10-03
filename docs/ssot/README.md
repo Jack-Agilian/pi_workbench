@@ -174,3 +174,5 @@ Q1已集成develop@ee409b1；[2026-10-01真实桌面检查](../validation/q1-des
 2026-10-03费用策略：[产品限制契约](model-limits-contract.md)取消默认费用门槛，保留原账本与独立审批/时间/隔离边界；实现及实测状态见NEXT_STEPS，不以策略授权冒充真实模型验收。
 
 2026-10-03：[产品默认配置与首次真实桌面工具检查](../validation/product-defaults-desktop-2026-10-03.md)。已取消默认及本机请求/费用/输出/工具验证额度，保留API超时检测。实际发现的工具路径和失败展示已修正并离线回归；真实桌面完整工具流程仍待续验。当前主线包含前后端，不再局限前端工作树职责；Gate不扩大，唯一事项见NEXT_STEPS。
+
+2026-10-03收口补证：[真实Electron四场景](../validation/desktop-functional-closeout-2026-10-03.md)通过限定read/write/edit/Bash、拒绝、活跃取消、成果与原Session重开继续。前述待续验和窗口识别问题不再阻挡该范围；展示措辞及测试等待也已修正。不扩大全部P0/Gate，唯一当前事项为集成交付与证据复审。
