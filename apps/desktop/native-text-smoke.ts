@@ -37,6 +37,7 @@ export async function runNativeTextSmoke(window:BrowserWindow,host:HostClient){
  try{
   await click(button);const end=Date.now()+12000;while(!release){if(Date.now()>end)throw Error('native-held-read');await new Promise(r=>setTimeout(r,30));}
   await host.reconnect();await wait(`document.querySelector(${JSON.stringify(button)})?.getAttribute('aria-expanded')==='false'`);release();await new Promise(r=>setTimeout(r,100));
+  await wait(`!document.querySelector('.connection-problem') && !document.querySelector('.sidebar-foot .offline')`);
   assert.equal(await js<boolean>(`!!document.querySelector(${JSON.stringify(row+' .native-reading section')})`),false);
  }finally{release?.();host.request=original;}
  await click(button);await wait(`!!document.querySelector(${JSON.stringify(row+' .native-reading section table')})`);

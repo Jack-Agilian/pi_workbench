@@ -1,4 +1,4 @@
-import { StrictMode, useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { StrictMode, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { createRoot } from 'react-dom/client';
 import type { Command, RunState } from '../../packages/app-contracts/index.ts';
 import type { DesktopApi, DesktopHome } from '../../packages/app-contracts/desktop.ts';
@@ -37,7 +37,12 @@ function App() {
   const pageAction = useRef(false);
   const pageEpoch = useRef(0);
   const [drafts, setDrafts] = useState<Record<string, string>>({}); const [title, setTitle] = useState('');
-  const [problem, setProblem] = useState<{ kind: 'connection' | 'request'; text: string } | null>(null); const [disconnected, setDisconnected] = useState(false);
+  const [problem, setProblem] = useState<{ kind: 'request'; text: string } | null>(null);
+  const [disconnected, setDisconnected] = useState(false), [readProblem, setReadProblem] = useState(false);
+  // A successful read started before a newer failure cannot prove recovery.
+  const healthRevision = useRef(0), connectionLost = useRef(false), reconnecting = useRef(false);
+  const approvalFocus = useRef<{element: HTMLElement; threadId: string} | null>(null);
+  const [approvalNotice, setApprovalNotice] = useState<{threadId: string; text: string} | null>(null);
   const [permissionPending, setPermissionPending] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [busy, setBusy] = useState(false); const [tick, setTick] = useState(0);
@@ -48,20 +53,31 @@ function App() {
   const draft = drafts[selected] ?? '';
   const scroll = useTimelineScroll(selected, thread);
   const inspectorRef = useRef<HTMLElement>(null);
-  function failed(error: unknown) {
-    const lost = error instanceof Error && error.message.includes('disconnected');
-    setDisconnected(lost); setProblem({ kind: lost ? 'connection' : 'request', text: lost ? '与执行宿主的连接已断开。原宿主仍在运行时，重新连接会结束其未完成任务并保留记录；不会重发未确认操作。' : '请求未获确认，请刷新状态后检查。审批可能已过期，任务也可能正在停止。刷新只读取状态，不会重发操作或结束任务。' });
+  function failed(error: unknown, source: 'request' | 'read' = 'request') {
+    ++healthRevision.current;
+    if (error instanceof Error && error.message === 'disconnected') {
+      connectionLost.current = true; setDisconnected(true);
+    }
+    if (source === 'read') setReadProblem(true);
+    else setProblem({kind: 'request', text: '请求未获确认，请刷新状态后检查。审批可能已过期，任务也可能正在停止。刷新只读取状态，不会重发操作或结束任务。'});
+  }
+  function readSucceeded(revision: number) {
+    if (healthRevision.current !== revision || reconnecting.current) return;
+    connectionLost.current = false; setDisconnected(false); setReadProblem(false);
+    // Request confirmation is separate: a live connection does not acknowledge a command.
   }
   useEffect(() => {
     let disposed = false;
-    void api.home().then(value => { if (!disposed) { setHome(value); setSelected(current => current || value.threads[0]?.id || ''); } }, failed);
+    void api.home().then(value => { if (!disposed) { setHome(value); setSelected(current => current || value.threads[0]?.id || ''); } }, error => { if (!disposed) failed(error, 'read'); });
     return () => { disposed = true; };
   }, []);
   useEffect(() => {
     const current = ++generation.current; let stopped = false; let timer: ReturnType<typeof setTimeout>;
 
     const poll = async () => {
+      const revision = healthRevision.current;
       try {
+        if (reconnecting.current) return;
         const latestHome = await api.home();
         if (stopped || generation.current !== current) return;
         if (latestHome.queryScope && queryScope.current && latestHome.queryScope !== queryScope.current) {
@@ -75,8 +91,8 @@ function App() {
           if (stopped || generation.current !== current) return;
           setActivity(value);
         }
-        if (!stopped) setDisconnected(false);
-      } catch (error) { if (!stopped) failed(error); }
+        if (!stopped) readSucceeded(revision);
+      } catch (error) { if (!stopped && generation.current === current) failed(error, 'read'); }
       finally { if (!stopped) timer = setTimeout(() => void poll(), 350); }
     };
     void poll();
@@ -146,6 +162,10 @@ function App() {
   }
   async function command(value: Command) {
     if (commandPending.current) return;
+    // Capture before disabling the clicked control; Chromium can move focus to body
+    // without another focus event, especially while the native window is occluded.
+    const focused = document.activeElement;
+    if (focused instanceof HTMLElement && focused.closest('[data-approval]')) approvalFocus.current = {element: focused, threadId: selected};
     commandPending.current = true; setBusy(true); setProblem(null);
     try { return await api.command(value); } catch (error) {
       if (value.type === 'runs.start' && error instanceof Error && error.message === 'permission_changed') {
@@ -178,6 +198,7 @@ function App() {
     if (refreshing || busy || commandPending.current) return;
     const current = generation.current;
     const observedProblem = problem;
+    const revision = healthRevision.current;
     setRefreshing(true);
     try {
       const latestHome = await api.home();
@@ -187,16 +208,19 @@ function App() {
       if (generation.current !== current) return;
       setHome(latestHome);
       if (latestActivity) setActivity(value => value?.thread.id === selected && value.snapshotSeq > latestActivity.snapshotSeq ? value : latestActivity);
-      setProblem(value => value === observedProblem ? null : value);
-    } catch (error) { if (generation.current === current) failed(error); }
+      readSucceeded(revision);
+      setProblem(value => healthRevision.current === revision && value === observedProblem ? null : value);
+    } catch (error) { if (generation.current === current) failed(error, 'read'); }
     finally { setRefreshing(false); }
   }
   async function reconnect() {
+    if (!connectionLost.current || reconnecting.current || commandPending.current) return;
+    reconnecting.current = true; ++generation.current;
     setBusy(true); ++pageEpoch.current;
     for (const reader of readers.current.values()) reader.cancelPending();
     setPageReader(null); setPages(null);
-    try { await api.reconnect(); setProblem(null); setDisconnected(false); setTick(n => n + 1); }
-    catch (error) { failed(error); } finally { setBusy(false); }
+    try { await api.reconnect(); connectionLost.current = false; setDisconnected(false); setReadProblem(false); }
+    catch (error) { failed(error, 'read'); } finally { reconnecting.current = false; setBusy(false); setTick(n => n + 1); }
   }
   const modelMode=home?.mode==='model'||home?.mode==='model-offline';
   const canSend=activity?.workspaceStatus === 'ready' && (!modelMode||home?.model?.status==='ready');
@@ -210,6 +234,18 @@ function App() {
     setInspectorChoices(all => ({...all, [selected]: false}));
     scroll.revealApproval(pending[0].id);
   };
+  useLayoutEffect(() => {
+    const focused = approvalFocus.current;
+    if (!focused || focused.element.isConnected) return;
+    approvalFocus.current = null;
+    if (focused.threadId !== selected || (document.activeElement !== document.body && document.activeElement !== null)) return;
+    setApprovalNotice({threadId: selected, text: pending.length ? '审批列表已更新，已定位下一项待确认操作。' : '此操作已不再等待审批，请查看操作记录确认结果。'});
+    if (pending[0]) scroll.revealApproval(pending[0].id);
+    else {
+      const composer = document.querySelector<HTMLTextAreaElement>('#composer');
+      (composer && !composer.disabled ? composer : scroll.viewport.current)?.focus({preventScroll: true});
+    }
+  });
   const layout = usePaneLayout(inspectorOpen);
   useEffect(() => {
     if (layout.overlay && inspectorOpen) inspectorRef.current?.querySelector<HTMLButtonElement>('.inspector-close')?.focus();
@@ -220,7 +256,10 @@ function App() {
   const shellTools=home?.model?.limits?.shellTools;
   const isWorking = !!activity?.activeRun && active.has(activity.activeRun.state);
   const stoppableRun = activity?.activeRun && ['running','starting','queued'].includes(activity.activeRun.state) ? activity.activeRun : null;
-  return <div className="shell">
+  return <div className="shell" onFocusCapture={event => {
+    const element = event.target;
+    approvalFocus.current = element instanceof HTMLElement && element.closest('[data-approval]') ? {element, threadId: selected} : null;
+  }}>
     <aside id="workspace-navigation" className="sidebar" hidden={!layout.sidebarOpen} style={{width: layout.sidebarWidth}}>
       {layout.sidebarOpen && <PaneResizeHandle label="导航栏宽度" controls="workspace-navigation" edge="right" width={layout.sidebarWidth} min={layout.sidebarMin} max={layout.sidebarMax} onResize={layout.resizeSidebar} onReset={layout.resetSidebar} />}
       <div className="brand"><span className="brand-mark">π</span><div>Pi Workbench</div></div>
@@ -243,7 +282,9 @@ function App() {
         </div>
       </header>
       {home?.mode==='model' && <details className="model-settings" aria-label="模型配置" open={home.model?.status!=='ready'}><summary>模型配置 · {home.model?.provider} / {home.model?.model}</summary>{home.model?.limits && <p>{home.model.limits.endpoint} · {home.model.limits.requests===null?'LLM 请求次数不限':`本次授权最多 ${home.model.limits.requests} 次请求`} · {home.model.limits.estimatedUsd===null?'费用不限':`估算预算 $${home.model.limits.estimatedUsd}`}  · {home.model.limits.outputTokens===null?'输出长度使用模型默认':`输出上限 ${home.model.limits.outputTokens} token`}{home.model.limits.httpIdleTimeoutMs!==undefined && <> · 空闲等待 {home.model.limits.httpIdleTimeoutMs/1000} 秒</>}{home.model.limits.timeoutMs!==undefined && <> · 单次 LLM 请求总上限 {home.model.limits.timeoutMs/1000} 秒</>}</p>}{home.model?.status==='not_configured'?<p>尚未配置或配置无效。请先运行 model:config 创建非秘密配置，填写并检查后重新启动。本页不会使用全局 Pi 凭据。</p>:home.model?.status==='key_required'?<div><p>仅发送你批准的合成无敏感资料。请求与费用估算限额来自配置；估算不等于服务商硬预算。可在配置目录的 auth.json 保存 API key，重启后自动读取；也可临时选择私有 .key 文件。凭据内容不会传入页面。</p><button disabled={busy} onClick={()=>{setBusy(true);void api.selectModelCredential().then(()=>setTick(n=>n+1),failed).finally(()=>setBusy(false));}}>选择凭据并启用本次应用</button></div>:home.model?.status==='policy_required'?<p>授权策略待确认。请核对原配置并完成显式修订，已有请求记录继续保留。</p>:home.model?.status==='budget_exhausted'?<p>本授权的请求次数或预留预算不足。</p>:<p>{shellTools?'已就绪 · 文件与 Bash 由宿主按任务权限授权':home.model?.limits?.fileTools?'已就绪 · Markdown 工具由宿主按任务权限授权':'已就绪 · 无工具'}</p>}</details>}
-      {problem && <div className="notice error" role="alert">{problem.text}<button onClick={() => void (problem.kind === 'connection' ? reconnect() : refreshStatus())} disabled={busy || refreshing}>{problem.kind === 'connection' ? '重新连接' : '刷新状态'}</button></div>}
+      {disconnected ? <div className="notice error connection-problem" role="alert">与执行宿主的连接已断开。原宿主仍在运行时，重新连接会结束其未完成任务并保留记录；不会重发未确认操作。<button onClick={() => void reconnect()} disabled={busy || refreshing}>重新连接</button></div>
+        : (problem || readProblem) && <div className="notice error request-problem" role="alert">{problem?.text ?? '状态暂时无法读取，已显示内容保留。刷新只读取状态，不会重发操作或结束任务。'}<button onClick={() => void refreshStatus()} disabled={busy || refreshing}>刷新状态</button></div>}
+      <p className="sr-only approval-announcement" role="status" aria-live="polite" aria-atomic="true">{approvalNotice?.threadId === selected ? approvalNotice.text : ''}</p>
       {activity?.workspaceStatus === 'invalid' && <div className="notice error" role="alert">此会话的工作目录已不可用，发送已停用。历史仍可浏览，请恢复原目录后再继续。</div>}
       {home?.recovery === 'blocked' && <div className="notice" role="status">执行结果或清理尚未核实，新任务暂不执行。<button disabled={busy} onClick={() => { void api.recover().then(value => { setHome(value); setTick(n => n + 1); }, failed); }}>核验并恢复</button></div>}
       <div className="content-grid" data-inspector={inspectorOpen ? 'open' : 'closed'} data-overlay={layout.overlay}>

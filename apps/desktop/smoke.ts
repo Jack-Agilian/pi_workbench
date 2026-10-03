@@ -15,7 +15,7 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
   const wait = async (predicate: () => Promise<boolean>, name: string) => {
     console.log(`desktopSmoke wait: ${name}`);
     const until = Date.now() + 20000;
-    while (!await predicate()) { if (Date.now() > until) throw new Error(`ui_timeout:${name}`); await new Promise<void>(r => setTimeout(r, 60)); }
+    while (!await predicate()) { if (Date.now() > until) { console.log('ui timeout focus',await js("({tag:document.activeElement?.tagName,id:document.activeElement?.id,cls:document.activeElement?.className,notice:document.querySelector('.approval-announcement')?.textContent})")); throw new Error(`ui_timeout:${name}`); } await new Promise<void>(r => setTimeout(r, 60)); }
   };
   const click = async (text: string) => {
     console.log(`desktopSmoke click: ${text}`);
@@ -56,6 +56,8 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
     assert.equal(await js<boolean>("Boolean(globalThis.injection) || !!document.querySelector('.timeline img')"), false);
     assert.equal(await js<boolean>("document.querySelector('.timeline').textContent.includes('sk-syntheticSecret123456789')"), false);
     if (scenario === 'allow') {
+      const {runRecoverySmoke} = await import('./recovery-smoke.ts');
+      await runRecoverySmoke(window, host, threadId, op.id);
       // SYNTHETIC ordinary approval failure: the real pending Worker must survive a read retry.
       const originalRequest = host.request.bind(host); const pid: number | undefined = host.processId;
       let rejectApproval = true; let commandCount = 0;
@@ -84,6 +86,10 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
         assert.equal(existsSync(join(profile, 'workspace', op.artifactPath!)), false);
       } finally { releaseReads!(); host.request = originalRequest; }
     }
+    await wait(() => js<boolean>("Boolean(document.querySelector('.approval .primary') && !document.querySelector('.approval .primary').disabled)"), 'approval_focus_ready');
+    await js("document.querySelector('.approval .primary').focus()");
+    assert.equal(await js<boolean>("document.activeElement === document.querySelector('.approval .primary')"), true);
+    if (scenario === 'cancel') await js("document.querySelector('#composer').focus()");
     if (scenario === 'crash') {
       process.kill(host.processId!, 'SIGKILL');
       await wait(() => js<boolean>("document.querySelector('.notice')?.textContent.includes('连接已断开') === true"), 'host_disconnect');
@@ -100,6 +106,10 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
     const expected = scenario === 'allow' ? 'completed' : scenario === 'cancel' ? 'cancelled' : 'failed';
     await wait(async () => { snapshot = await host.request({ type: 'thread', threadId }) as DesktopThread; return snapshot.runs[0]?.state === expected; }, expected);
     await wait(() => js<boolean>(`Boolean(document.querySelector('[data-state="${expected}"]'))`), 'state');
+    if (scenario === 'cancel') assert.equal(await js<boolean>("document.activeElement?.id === 'composer' && !document.querySelector('.approval-announcement').textContent"), true);
+    if (scenario === 'allow' || scenario === 'deny') {
+      await wait(() => js<boolean>("document.activeElement?.id === 'composer' && document.querySelector('.approval-announcement').textContent.includes('不再等待审批')"), 'approval_focus_restored');
+    }
     if (scenario === 'allow') {
       await wait(() => js<boolean>("Boolean(document.querySelector('.run-conversation .message.assistant')) && Boolean(document.querySelector('.run-operations .tool-card'))"), 'separate_body_operations');
       assert.equal(await js<boolean>("document.querySelector('.run-conversation').getAttribute('aria-label') === '会话正文' && document.querySelector('.run-operations').getAttribute('aria-label') === '操作记录' && !document.querySelector('.run-conversation .tool-card') && !document.querySelector('.run-operations .message') && !document.querySelector('[aria-label=会话时间线]')"), true);
@@ -156,11 +166,12 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
   // Trusted test-only transport fault after the real command is durably accepted.
   // This lives in the smoke module, never the Renderer/preload or product protocol.
   const request = host.request.bind(host); const attempts: Command[] = [];
-  let loseAck: Command['type'] | undefined; let ackError = 'disconnected';
+  let loseAck: Command['type'] | undefined; let ackError = 'disconnected'; let offlinePid: number | undefined;
   host.request = async raw => {
+    if (offlinePid === host.processId && (raw.type === 'home' || raw.type === 'thread-activity')) throw Error('disconnected');
     if (raw.type === 'command') attempts.push(structuredClone(raw.command));
     const result = await request(raw);
-    if (raw.type === 'command' && raw.command.type === loseAck) { loseAck = undefined; throw new Error(ackError); }
+    if (raw.type === 'command' && raw.command.type === loseAck) { loseAck = undefined; if (ackError === 'disconnected') offlinePid = host.processId; throw new Error(ackError); }
     return result;
   };
   const create = async (title: string) => {
@@ -170,7 +181,9 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
   };
   const reconnectUi = async () => {
     await click('重新连接');
-    await wait(() => js<boolean>("!document.querySelector('.notice.error') && !document.querySelector('.new-thread').disabled"), 'retry_reconnect');
+    await wait(() => js<boolean>("!document.querySelector('.connection-problem') && !document.querySelector('.new-thread').disabled"), 'retry_reconnect');
+    await click('刷新状态');
+    await wait(() => js<boolean>("!document.querySelector('.notice.error')"), 'unconfirmed_refresh_after_reconnect');
   };
   const submit = async (text: string, lost: boolean) => {
     await fill('#composer', text); if (lost) loseAck = 'runs.start';
@@ -182,7 +195,7 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
   loseAck = 'threads.create'; await fill('#title', 'SYNTHETIC retry A'); await click('＋ 新建会话');
   await wait(() => js<boolean>("document.querySelector('.new-thread').textContent.includes('重试新建会话') && !!document.querySelector('.notice.error')"), 'create_ack_lost');
   assert.equal(await js<boolean>("document.querySelector('#title').disabled"), true);
-  const beforeRetry = await host.request({ type: 'home' }) as DesktopHome; assert.equal(beforeRetry.threads.length, retryThreadCount + 2);
+  const beforeRetry = await request({ type: 'home' }) as DesktopHome; assert.equal(beforeRetry.threads.length, retryThreadCount + 2);
   const a = beforeRetry.threads.find(t => t.title === 'SYNTHETIC retry A')!;
   await reconnectUi(); await click('＋ 重试新建会话');
   await wait(() => js<boolean>("document.querySelector('h1')?.textContent === 'SYNTHETIC retry A' && !document.querySelector('#title').disabled"), 'create_retry_ack');
