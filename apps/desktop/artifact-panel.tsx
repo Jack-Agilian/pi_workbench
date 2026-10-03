@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { DesktopApi, DesktopThread, Preview } from '../../packages/app-contracts/desktop.ts';
 
 const statusLabels: Record<Preview['status'], string> = {
-  ready: '内容与登记版本一致', changed: '文件已被外部修改', missing: '文件已不存在', unavailable: '无法安全读取',
+  ready: '内容与登记版本一致', changed: '当前内容与此登记版本不同', missing: '文件已不存在', unavailable: '无法安全读取',
 };
 /** Status is a host preview result at a point in time, never inferred from a successful command. */
 export function ArtifactPanel({thread, api, disconnected, hasMore, loading, loadMore}: {hasMore: boolean; loading: boolean; loadMore: () => void; thread: DesktopThread | null; api: DesktopApi; disconnected: boolean}) {
@@ -40,7 +40,7 @@ export function ArtifactPanel({thread, api, disconnected, hasMore, loading, load
     })}
     {hasMore && <button className="load-artifacts" disabled={loading || disconnected} onClick={loadMore}>{loading ? '正在加载…' : '加载更多成果'}</button>}
     {preview && <section className="preview" aria-label="成果预览"><div><h3>纯文本预览</h3><button aria-label="关闭预览" onClick={() => { generation.current++; setPreview(null); }}>×</button></div>
-      {preview.error ? <p role="status">核验请求未获确认，无法确定当前文件状态。</p> : !preview.value ? <p role="status">正在核验文件…</p> : preview.value.status === 'ready' ? <pre>{preview.value.text}</pre> : <p role="status">{preview.value.status === 'changed' ? '文件已被外部修改；历史版本保留，不展示未经核验的新内容。' : preview.value.status === 'missing' ? '文件已不存在，历史成果记录仍保留。' : '当前无法安全读取此文件。'}</p>}
+      {preview.error ? <p role="status">核验请求未获确认，无法确定当前文件状态。</p> : !preview.value ? <p role="status">正在核验文件…</p> : preview.value.status === 'ready' ? <pre>{preview.value.text}</pre> : <p role="status">{preview.value.status === 'changed' ? '当前内容与此登记版本不同；历史记录保留，不展示不匹配的内容。' : preview.value.status === 'missing' ? '文件已不存在，历史成果记录仍保留。' : '当前无法安全读取此文件。'}</p>}
       <button disabled={disconnected || (!preview.value && !preview.error)} onClick={() => void inspect(preview.id)}>重新核验文件</button>
     </section>}
   </>;

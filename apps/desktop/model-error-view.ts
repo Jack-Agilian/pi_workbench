@@ -21,6 +21,6 @@ export function modelErrorText(value: ModelError | undefined): string {
     : status === 403 ? '服务拒绝了请求，具体原因未确认。'
     : status === 429 ? '服务限制了请求，可能涉及速率或额度；具体原因未确认。'
     : status && status >= 500 ? '服务端请求失败。'
-    : '请求或流式响应失败，没有可安全展示的具体原因。';
+    : '模型流程未完成，未取得可确认的上游错误信息；请结合工具审批和执行记录核对。';
   return `${status ? `HTTP ${status} · ` : ''}${error.code ? `上游错误码 ${error.code} · ` : ''}${summary} 上游原始错误正文未保存；不会自动重试。`;
 }

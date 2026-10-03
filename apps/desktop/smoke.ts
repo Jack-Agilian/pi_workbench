@@ -84,7 +84,7 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
       writeFileSync(join(evidence, 'desktop.png'), screenshot.toPNG());
       writeFileSync(join(profile, 'workspace', artifact.path), 'EXTERNAL SYNTHETIC edit');
       await click('重新核验文件');
-      await wait(() => js<boolean>("document.querySelector('.preview').textContent.includes('文件已被外部修改')"), 'changed');
+      await wait(() => js<boolean>("document.querySelector('.preview').textContent.includes('当前内容与此登记版本不同')"), 'changed');
     } else assert.equal(existsSync(join(profile, 'workspace', op.artifactPath!)), false);
     const cursor = snapshot.cursor;
     await host.reconnect(); // Actual App Server exit + SQLite reopen, same native references. No tool replay.

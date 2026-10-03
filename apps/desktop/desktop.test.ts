@@ -325,6 +325,7 @@ test('model error display uses only closed status/code, distinguishes legacy and
  assert.match(modelErrorText({httpStatus:403}),/HTTP 403.*具体原因未确认/);assert.doesNotMatch(modelErrorText({httpStatus:401}),/invalid_api_key/);
  assert.match(modelErrorText({httpStatus:429,code:'insufficient_quota'}),/HTTP 429.*上游错误码 insufficient_quota.*额度/);
  assert.match(modelErrorText({code:'server_error'}),/上游错误码 server_error/);assert.doesNotMatch(modelErrorText({code:'server_error'}),/HTTP/);
+ assert.match(modelErrorText({}),/未取得可确认的上游错误信息/);assert.doesNotMatch(modelErrorText({}),/服务请求失败|HTTP \d/);
  for(const error of [{httpStatus:200},{httpStatus:'403'},{code:'secret-canary'},{message:'<script>bad</script>'},{code:['invalid_api_key']},{httpStatus:403,raw:'secret'}])assert.throws(()=>parseModelOutcome({...legacy,error}));
  assert.throws(()=>parseModelOutcome({...legacy,reason:'stop',error:{}}));
 });
