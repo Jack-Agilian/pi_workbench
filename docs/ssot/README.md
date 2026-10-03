@@ -18,6 +18,10 @@
 
 维护规则见 [状态、证据与验收](maintenance.md)；本次处理清单见 [R01–R08 修订](review-fixes.md)。该修订只核验维护脚本和接缝契约；后续实际接入证据分别登记如下。
 
+## 2026-10-03 UI 交付复审
+
+[社区布局研究](../validation/desktop-ui-research-2026-10-03.md) 与 [当前 UI 审核](../validation/ui-layout-review-2026-10-03.md) 已完成，包含一个普通 subagent 的独立意见及两轮交叉质疑。审核基线 d045ce45b64020a8fe0edf5a9e6ee4c52917d094；12项发现尚未修复，优先是展示顺序和非断线错误的恢复动作语义。两套限定 Mac 离线 Electron 回归通过不代表布局验收通过。pi-gui 继续作为现有主参考，其他产品只作布局/交互对照；本轮没有移植组件或改变 adoption，任务与 Gate 状态不晋级。
+
 ## 本次明确减少的自研
 
 不另写 Agent Loop、Session JSONL/分支/压缩、Provider/OAuth、SKILL.md 解析器、包来源解析器、基础 read/edit/write/bash 工具，也不把终端渲染或 Git diff 算法重新实现一遍。产品仍拥有授权、操作审计、跨任务调度、成果索引和桌面体验。

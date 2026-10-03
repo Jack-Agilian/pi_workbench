@@ -3304,6 +3304,30 @@
       ],
       "scope": "普通入口重开实际Electron，读取既有真实拒绝/成果历史核验修正措辞；正常退出、无新增请求、原账本不变。远端develop及功能分支同SHA独立读回；不扩大完整P0。",
       "locator": "docs/validation/desktop-functional-closeout-2026-10-03.md"
+    },
+    {
+      "id": "EV-UI-LAYOUT-REVIEW-20261003",
+      "kind": "review",
+      "result": "passed",
+      "commit": "d045ce45b64020a8fe0edf5a9e6ee4c52917d094",
+      "recordedAt": "2026-10-03T06:58:44.156559+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "scope": "完成七个前端布局资料研究、当前代码/截图审核及一个普通subagent两轮交叉质疑；12项发现未修复，passed仅指审核交付完成，不表示UI体验验收通过、组件已采用或Gate完成。",
+      "locator": "docs/validation/ui-layout-review-2026-10-03.md"
+    },
+    {
+      "id": "EV-UI-LAYOUT-MAC-20261003",
+      "kind": "platform",
+      "result": "passed",
+      "commit": "d045ce45b64020a8fe0edf5a9e6ee4c52917d094",
+      "recordedAt": "2026-10-03T06:58:44.156559+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "scope": "d045ce4产品代码未改：test:desktop-ui和test:desktop-agent-shell通过，三宽度审批/停止可达；隔离profile原生UI检查同名会话、审批过期恢复、收起及Tab。全部合成Provider，真实模型0；不含完整VoiceOver、缩放或用户人工验收。",
+      "locator": "docs/validation/ui-layout-review-2026-10-03.md"
     }
   ]
 }
