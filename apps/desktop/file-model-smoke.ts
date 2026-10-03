@@ -9,7 +9,8 @@ export async function runFileModelSmoke(window:BrowserWindow,host:HostClient){
  const wait=async(check:()=>Promise<boolean>,label:string)=>{const end=Date.now()+15000;while(!await check()){if(Date.now()>=end)throw new Error('file_ui_timeout:'+label);await new Promise(r=>setTimeout(r,40));}};
  const click=(selector:string)=>js(`document.querySelector(${JSON.stringify(selector)}).click()`);
  await click('.new-thread');await wait(()=>js<boolean>("!document.querySelector('#composer').disabled"),'thread');
- assert.equal(await js<boolean>("document.querySelector('.thread-heading').textContent.includes('仅开放逐项批准的 Markdown 文件工具')"),true);
+ assert.equal(await js<boolean>("document.querySelector('.thread-heading').textContent.includes('人工与自动模式限定工作目录内 Markdown')"),true);
+ assert.equal(await js<boolean>("document.querySelector('.thread-heading').textContent.includes('完全访问允许目录外文本文件')"),true);
  assert.equal(await js<boolean>("document.querySelector('.thread-heading').textContent.includes('本模式不提供工具')"),false);
  await js("(()=>{const t=document.querySelector('#composer');Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set.call(t,'SYNTHETIC approved file workflow');t.dispatchEvent(new Event('input',{bubbles:true}));})()");
  await wait(()=>js<boolean>("!document.querySelector('button[type=submit]').disabled"),'send');await js("document.querySelector('form.composer').requestSubmit()");
