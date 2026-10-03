@@ -165,3 +165,8 @@ M2 实机复审：[两处正确性修正与 Mac 回归](../validation/review-m2-
 Q1已集成develop@ee409b1；[2026-10-01真实桌面检查](../validation/q1-desktop-live-2026-10-01.md)记录模型401/403失败与旧历史/成果/重开限定通过，完整桌面工具闭环未完成。Q2按收益选择，不阻塞真实使用；当前事项仍以NEXT_STEPS顶部为准。
 
 [2026-10-03单请求复验](../validation/q1-desktop-retry-2026-10-03.md)通过真实桌面Responses文本访问，未调用工具；历史401/403根因与完整桌面工具验收仍未关闭。
+
+
+## Pi参考错误展示（2026-10-03）
+
+[复用边界与ADR](model-error-contract.md) · [被测代码与离线证据](../validation/model-errors-2026-10-03.md)。复用Pi公开Provider、事件容器与错误格式化；宿主只放行已知错误码，适配层在原生历史落盘前收敛，桌面展示HTTP状态/代码/说明。AGENTS已要求每项功能先查Pi与社区实现，记录模块/API/范围/保留边界。真实调用0，旧401/403不补推原因；UI任务和Gate不晋级，唯一下一步见NEXT_STEPS。

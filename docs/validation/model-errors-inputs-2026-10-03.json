@@ -1,0 +1,156 @@
+{
+  "baseline": "ad92df2f295266bede18c3c33ed2a29ff4d39545",
+  "branch": "codex/model-error-diagnostics",
+  "platform": {
+    "os": "macOS 27.0.1",
+    "build": "26A434",
+    "arch": "arm64",
+    "node": "24.21.0",
+    "nodeArch": "arm64",
+    "pi": "0.87.1",
+    "electron": "44.4.5"
+  },
+  "realModelCalls": 0,
+  "scope": "Actual public Pi SDK, macOS processes/SQLite/native Session and Electron; all provider responses SYNTHETIC. No user credentials/configuration/ledger read or changed.",
+  "results": [
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "commit": "0393f5712c654e2c33501c8a8efada68eb5a4b36"
+    },
+    {
+      "command": "npm run test:product-worker",
+      "exitCode": 0,
+      "commit": "0393f5712c654e2c33501c8a8efada68eb5a4b36",
+      "tests": 51
+    },
+    {
+      "command": "npm run test:product-file-agent",
+      "exitCode": 0,
+      "commit": "0393f5712c654e2c33501c8a8efada68eb5a4b36",
+      "tests": 34
+    },
+    {
+      "command": "npm run test:product-model-shell",
+      "exitCode": 0,
+      "commit": "0393f5712c654e2c33501c8a8efada68eb5a4b36",
+      "tests": 20
+    },
+    {
+      "command": "npm run test:model-network",
+      "exitCode": 0,
+      "commit": "0393f5712c654e2c33501c8a8efada68eb5a4b36"
+    },
+    {
+      "command": "npm run test:pi-probe",
+      "exitCode": 0,
+      "commit": "0393f5712c654e2c33501c8a8efada68eb5a4b36",
+      "tests": 15
+    },
+    {
+      "command": "npm run test:pi-tools",
+      "exitCode": 0,
+      "commit": "0393f5712c654e2c33501c8a8efada68eb5a4b36",
+      "tests": 19
+    },
+    {
+      "command": "npm run test:pi-shell",
+      "exitCode": 0,
+      "commit": "0393f5712c654e2c33501c8a8efada68eb5a4b36",
+      "tests": 4
+    },
+    {
+      "command": "npm run test:pi-resources",
+      "exitCode": 0,
+      "commit": "0393f5712c654e2c33501c8a8efada68eb5a4b36",
+      "tests": 12
+    },
+    {
+      "command": "npm run test:pi-auth",
+      "exitCode": 0,
+      "commit": "0393f5712c654e2c33501c8a8efada68eb5a4b36",
+      "tests": 18
+    },
+    {
+      "command": "npm run test:product-core",
+      "exitCode": 0,
+      "commit": "0393f5712c654e2c33501c8a8efada68eb5a4b36",
+      "tests": 20
+    },
+    {
+      "command": "npm run test:product-sdk",
+      "exitCode": 0,
+      "commit": "0393f5712c654e2c33501c8a8efada68eb5a4b36",
+      "tests": 5
+    },
+    {
+      "command": "npm run test:backend-history",
+      "exitCode": 0,
+      "commit": "0393f5712c654e2c33501c8a8efada68eb5a4b36",
+      "tests": 15
+    },
+    {
+      "command": "npm run test:model-integration-offline",
+      "exitCode": 0,
+      "commit": "0393f5712c654e2c33501c8a8efada68eb5a4b36",
+      "tests": 64
+    },
+    {
+      "command": "npm run test:desktop",
+      "exitCode": 0,
+      "commit": "0393f5712c654e2c33501c8a8efada68eb5a4b36",
+      "tests": 39
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "commit": "18507248a8f5fcb7a58531ff580b060c625fc5d8"
+    },
+    {
+      "command": "npm run test:desktop-model",
+      "exitCode": 0,
+      "commit": "18507248a8f5fcb7a58531ff580b060c625fc5d8"
+    },
+    {
+      "command": "npm run test:desktop-agent-shell",
+      "exitCode": 0,
+      "commit": "18507248a8f5fcb7a58531ff580b060c625fc5d8"
+    },
+    {
+      "command": "npm run test:desktop-ui",
+      "exitCode": 0,
+      "commit": "18507248a8f5fcb7a58531ff580b060c625fc5d8"
+    }
+  ],
+  "failures": [
+    {
+      "command": "npm run test:desktop-model",
+      "commit": "0393f5712c654e2c33501c8a8efada68eb5a4b36",
+      "exitCode": 1,
+      "error": "model_ui_timeout:error-send",
+      "resolution": "18507248a8f5fcb7a58531ff580b060c625fc5d8 waits for new Thread and empty history before fill; no product code or error assertion changed."
+    }
+  ],
+  "documentationChecks": [
+    {
+      "command": ".venv/bin/python scripts/check-ssot.py",
+      "exitCode": 0,
+      "scope": "18507248a8f5fcb7a58531ff580b060c625fc5d8 plus report/SSOT documentation changes"
+    },
+    {
+      "command": ".venv/bin/python scripts/test-tools.py",
+      "exitCode": 0,
+      "scope": "18507248a8f5fcb7a58531ff580b060c625fc5d8 plus report/SSOT documentation changes"
+    },
+    {
+      "command": ".venv/bin/python scripts/check-docs.py --structural-only",
+      "exitCode": 0,
+      "scope": "18507248a8f5fcb7a58531ff580b060c625fc5d8 plus report/SSOT documentation changes"
+    },
+    {
+      "command": ".venv/bin/python scripts/check-docs.py --typecheck",
+      "exitCode": 0,
+      "scope": "18507248a8f5fcb7a58531ff580b060c625fc5d8 plus report/SSOT documentation changes"
+    }
+  ]
+}

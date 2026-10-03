@@ -147,3 +147,8 @@ Context7 用于定位官方文档，最终核对安装包 docs/providers.md 的 
 ## L04发行采用补充（2026-09-30）
 
 Q1实际锁定react-query/query-core 5.104.0，官方tag对应d4033eb1e5bdef3c8aa72a6cc614bcdd98b1ddca；registry、SRI、tarball和安装字节、MIT、根exports/类型及实际ESM import均核对，见[报告和输入](../validation/ui-query-tools-2026-09-30.md)。发行公开QueryClient.query替代已deprecated的fetchQuery；没有照抄Context7中其他版本/框架的语法。两个v5/reference网页路径返回404，未据此声称网页核验成功；最终依据Context7定位和实际精确发行声明/实现。只采用工具范围，不推广为Virtual或durable验证。
+
+
+## Pi 0.87.1 错误展示入口（2026-10-03）
+
+固定官方v0.87.1源码提交 `f07218c4d4bbc12bef056a7058c3dd49dfe41abe`，发行版本/锁不变。`@earendil-works/pi-ai/utils/error-body` 的 normalizeProviderError/formatProviderError 与 `utils/event-stream` 的 createAssistantMessageEventStream/AssistantMessageEventStream 均为公开子路径运行时导出；Provider.streamSimple 是实例方法，TUI assistant-message 为内部行为参考，非React公开组件。Context7部分main结果只作定位，已安装包声明/实际ESM和合成接缝才支持采用。格式化不等于脱敏，HTTP错误可能早于onResponse；细节见[契约](model-error-contract.md)与[真实被测SHA/证据](../validation/model-errors-2026-10-03.md)。没有升级、deep-import或模型调用。
