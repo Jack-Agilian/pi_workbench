@@ -33,12 +33,12 @@ export function PermissionPicker({thread, api, disabled, changed, pending}: {
   }
   const mode = thread.permissionMode ?? 'manual';
   return <details className="permission-picker">
-    <summary>权限：{mode === 'auto' ? '自动审批' : '人工审批'}{saving ? ' · 保存中' : ''}</summary>
+    <summary>权限：{mode === 'full' ? '完全访问' : mode === 'auto' ? '自动审批' : '人工审批'}{saving ? ' · 保存中' : ''}</summary>
     <div className="permission-options">
       <p>仅影响之后发送的任务，已接收或排队的任务保留原模式。</p>
       <button type="button" data-permission="manual" aria-pressed={mode === 'manual'} disabled={disabled || saving || !!intent} onClick={() => void save('manual')}>人工审批 <small>每次工具操作执行前询问。</small></button>
       <button type="button" data-permission="auto" aria-pressed={mode === 'auto'} disabled={disabled || saving || !!intent} onClick={() => void save('auto')}>自动审批 <small>自动允许工作目录内已启用的文件与 Bash 工具，可能修改或删除文件。Bash 网络仍受限。</small></button>
-      <p>完全访问尚未提供。自动审批不会扩大文件、网络或凭据访问范围。</p>
+      <button type="button" data-permission="full" aria-pressed={mode === 'full'} disabled={disabled || saving || !!intent} onClick={() => void save('full')}>完全访问 <small>自动允许已启用的工具访问工作目录外文件及 Bash 联网，可能修改或删除文件。应用私有数据和运行时代码仍受保护，工具结果可能发送给模型。</small></button>
       {problem && <p role="alert">{problem}</p>}
       {intent && !saving && <button type="button" className="retry-permission" disabled={disabled} onClick={() => void save(intent.mode)}>重试权限设置</button>}
     </div>

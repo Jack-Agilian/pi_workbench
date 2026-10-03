@@ -16,6 +16,10 @@ export function inspectMarkdown(workspace: string, path: string) {
     current = join(current, part);
     if (lstatSync(current).isSymbolicLink()) throw new Error('symlink_denied');
   }
+  return { ...inspectTextFile(target), path: rel };
+}
+/** Already-admitted canonical path; caller owns scope and ancestor checks. */
+export function inspectTextFile(target: string) {
   const fd = openSync(target, constants.O_RDONLY | constants.O_NOFOLLOW);
   try {
     const before = fstatSync(fd); const limit = 1024 * 1024;
@@ -30,6 +34,6 @@ export function inspectMarkdown(workspace: string, path: string) {
     if (size > limit || size !== before.size || before.mtimeMs !== after.mtimeMs || before.ctimeMs !== after.ctimeMs) throw new Error('artifact_changed_during_read');
     const data = buffer.subarray(0, size); const text = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true }).decode(data);
     if (text.includes('\0')) throw new Error('unsupported_artifact');
-    return { path: rel, bytes: size, digest: createHash('sha256').update(data).digest('hex'), text };
+    return { bytes: size, digest: createHash('sha256').update(data).digest('hex'), text };
   } finally { closeSync(fd); }
 }

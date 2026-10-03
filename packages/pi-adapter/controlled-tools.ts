@@ -1,8 +1,10 @@
+import { controlledFileTarget, fileWirePath, assertNoFileSymlinks } from './file-target.ts';
+import type { FullFileAccess } from '../app-contracts/file-access.ts';
 // Pi public tool factories and per-call Operations. Authority comes from the host callback.
 import { createHash, randomUUID } from 'node:crypto';
 import { constants } from 'node:fs';
-import { access, lstat, mkdir, readFile, writeFile } from 'node:fs/promises';
-import { dirname, isAbsolute, relative, resolve, sep } from 'node:path';
+import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
+import { dirname, resolve } from 'node:path';
 import {
   createBashToolDefinition, createEditToolDefinition, createReadToolDefinition, createWriteToolDefinition,
   detectSupportedImageMimeTypeFromFile,
@@ -48,8 +50,9 @@ export interface ControlledToolOptions {
   observe: (event: ToolObservation) => void;
   settle?: (operation:ToolOperation,ok:boolean)=>Promise<void>;
   fileLimitBytes?:number;
-  /** Product wire paths are workspace-relative; normalize before approval identity is computed. */
+  /** Normalize before approval: workspace-relative inside, canonical absolute outside in full mode. */
   relativeFilePaths?:boolean;
+  fileAccess?:FullFileAccess;
 }
 
 function freeze(value: unknown): void {
@@ -59,33 +62,10 @@ function freeze(value: unknown): void {
   }
 }
 
-function fileTarget(workspace: string, parameters: unknown): string | undefined {
+function fileTarget(workspace: string, parameters: unknown, access?: FullFileAccess, write = false): string | undefined {
   if (!parameters || typeof parameters !== 'object' || !('path' in parameters)) return undefined;
-  const path = parameters.path;
-  // Narrow probe policy: Pi-specific aliases need an upstream pre-resolution seam.
-  // Do not recreate Pi's ~/@/Unicode fallback path resolver here.
-  if (typeof path !== 'string' || /^[@~]/.test(path) || /[\u00a0\u202f\0]/.test(path)) {
-    throw new Error('unsupported_probe_path');
-  }
-  const target = resolve(workspace, path);
-  const rel = relative(workspace, target);
-  if (!rel || rel === '..' || rel.startsWith('..' + sep) || isAbsolute(rel)) throw new Error('outside_workspace');
-  return target;
-}
-
-async function noSymlinks(workspace: string, target: string): Promise<void> {
-  const rel = relative(workspace, target);
-  if (rel === '..' || rel.startsWith('..' + sep) || isAbsolute(rel)) throw new Error('outside_workspace');
-  let path = workspace;
-  // Check the workspace too. This is a precondition check, not OS-atomic containment.
-  for (const part of ['', ...rel.split(sep).filter(Boolean)]) {
-    path = resolve(path, part);
-    try {
-      if ((await lstat(path)).isSymbolicLink()) throw new Error('symlink_denied');
-    } catch (error) {
-      if (!(error instanceof Error && 'code' in error && error.code === 'ENOENT')) throw error;
-    }
-  }
+  if (typeof parameters.path !== 'string') throw new Error('unsupported_probe_path');
+  return controlledFileTarget(workspace, parameters.path, access, write);
 }
 
 async function version(path: string): Promise<string | null> {
@@ -124,14 +104,14 @@ export function createControlledTools(options: ControlledToolOptions) {
         // Pi owns prepareArguments and schema validation before this entrypoint.
         const parameters = structuredClone(params);
         if(options.relativeFilePaths && parameters && typeof parameters==='object' && 'path' in parameters){
-          const target=fileTarget(binding.workspaceRef,parameters);
-          if(target)parameters.path=relative(binding.workspaceRef,target);
+          const target=fileTarget(binding.workspaceRef,parameters,options.fileAccess,template.name!=='read');
+          if(target)parameters.path=fileWirePath(binding.workspaceRef,target);
         }
         freeze(parameters);
         const operation: ToolOperation = Object.freeze({
           ...binding, toolCallId, tool: template.name, operationId: randomUUID(), parameters,
           parametersDigest: parametersDigest(parameters), deadline: options.deadline(),
-          target: fileTarget(binding.workspaceRef, parameters),
+          target: fileTarget(binding.workspaceRef, parameters,options.fileAccess,template.name!=='read'),
         });
         const controller = new AbortController();
         const signal = AbortSignal.any([controller.signal, lifetime.signal, ...(inputSignal ? [inputSignal] : [])]);
@@ -161,7 +141,8 @@ export function createControlledTools(options: ControlledToolOptions) {
           if (!operation.target || path !== (directory ? dirname(operation.target) : operation.target)) {
             throw new Error('unapproved_target');
           }
-          await noSymlinks(binding.workspaceRef, path);
+          if (fileTarget(binding.workspaceRef, parameters, options.fileAccess, template.name !== 'read') !== operation.target) throw new Error('file_target_changed');
+          assertNoFileSymlinks(options.fileAccess ? '/' : binding.workspaceRef, path);
           check();
         };
         let readVersion: string | undefined;
@@ -216,7 +197,7 @@ export function createControlledTools(options: ControlledToolOptions) {
           check();
           if (!Number.isFinite(operation.deadline) || operation.deadline - Date.now() > 2_147_483_647) throw new Error('invalid_deadline');
           if (ctx.cwd !== binding.workspaceRef) throw new Error('workspace_binding_changed');
-          if (operation.target) await noSymlinks(binding.workspaceRef, operation.target);
+          if (operation.target) assertNoFileSymlinks(options.fileAccess ? '/' : binding.workspaceRef, operation.target);
           check();
           timer = setTimeout(() => controller.abort(new Error('operation_expired')), operation.deadline - Date.now());
           emit(operation, 'approval_requested');
@@ -226,7 +207,7 @@ export function createControlledTools(options: ControlledToolOptions) {
           check();
           if (operation.tool === 'edit' || operation.tool === 'write') {
             if (approval.fileVersion === undefined || !operation.target) throw new Error('missing_file_precondition');
-            await noSymlinks(binding.workspaceRef, operation.target); check();
+            assertNoFileSymlinks(options.fileAccess ? '/' : binding.workspaceRef, operation.target); check();
             if (await version(operation.target) !== approval.fileVersion) throw new Error('write_conflict');
             check();
           }

@@ -69,7 +69,7 @@ test('OpenAI closed policy rejects ambiguous caps, tools, unknown metadata and u
 
 import { parseEnvelope } from '../../../packages/app-contracts/worker-ipc.ts';
 test('HTTP header tokens accept native session_id but reject separators and newlines',()=>{
- const envelope=(headers:unknown)=>({version:10,instanceId:'worker',runtimeBindingId:'binding',requestId:'http-1',body:{type:'model-http',url:'https://example.invalid',method:'POST',headers,body:'{}'}});
+ const envelope=(headers:unknown)=>({version:11,instanceId:'worker',runtimeBindingId:'binding',requestId:'http-1',body:{type:'model-http',url:'https://example.invalid',method:'POST',headers,body:'{}'}});
  assert.doesNotThrow(()=>parseEnvelope(envelope({session_id:'synthetic-session'})));
  for(const headers of [{'bad header':'x'},{'bad:header':'x'},{session_id:'x\r\nInjected: true'}])assert.throws(()=>parseEnvelope(envelope(headers)));
 });

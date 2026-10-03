@@ -21,6 +21,7 @@ export interface PrivateTree {
   root: string;
   // Only host-owned per-process home/session directories; never a tool-supplied exception.
   writableSubtrees?: readonly string[];
+  readableSubtrees?: readonly string[];
 }
 export interface FullMacAccess {
   privateTrees: readonly PrivateTree[];
@@ -37,8 +38,8 @@ function canonicalDirectory(value: string): string {
 
 /**
  * Full filesystem access except host-private trees and immutable application/runtime code.
- * Not yet a selectable product permission: Run admission and native file-tool binding must
- * select the same policy before that UI is enabled. No policy is inferred from model output.
+ * Selected by host-owned Run admission and native file-tool binding together.
+ * No policy or private-directory exception is inferred from model output.
  */
 export function fullMacProfile(access: FullMacAccess): string {
   if (process.platform !== 'darwin' || process.arch !== 'arm64' || process.version !== 'v24.21.0') throw new Error('full_access_platform_unsupported');
@@ -46,8 +47,9 @@ export function fullMacProfile(access: FullMacAccess): string {
   const privateTrees = access.privateTrees.map(tree => {
     const root = canonicalDirectory(tree.root);
     const exceptions = (tree.writableSubtrees ?? []).map(canonicalDirectory);
-    if (exceptions.some(p => p === root || !inside(root, p))) throw new Error('invalid_private_tree_exception');
-    return { root, exceptions };
+    const readable = (tree.readableSubtrees ?? []).map(canonicalDirectory);
+    if ([...exceptions, ...readable].some(p => p === root || !inside(root, p))) throw new Error('invalid_private_tree_exception');
+    return { root, exceptions, readable };
   });
   const readOnly = access.readOnlyRoots.map(canonicalDirectory);
   // Multiple trees may nest. Each deny is independent, so a nested credential directory
@@ -62,14 +64,14 @@ export function fullMacProfile(access: FullMacAccess): string {
     '(allow process-info* signal mach-priv-task-port (target same-sandbox))'];
   for (const tree of privateTrees) {
     const root = `(subpath ${JSON.stringify(tree.root)})`;
-    const filter = tree.exceptions.length ? `(require-all ${root} ${tree.exceptions.map(p => `(require-not (subpath ${JSON.stringify(p)}))`).join(' ')})` : root;
-    rules.push(`(deny file-read-data file-write* ${filter})`);
+    const excluding = (exceptions: string[]) => exceptions.length ? `(require-all ${root} ${exceptions.map(p => `(require-not (subpath ${JSON.stringify(p)}))`).join(' ')})` : root;
+    rules.push(`(deny file-read-data ${excluding([...tree.exceptions, ...tree.readable])})`, `(deny file-write* ${excluding(tree.exceptions)})`);
   }
   rules.push(`(deny file-write* ${paths(readOnly)})`);
   // A path deny alone can be bypassed by renaming its containing directory. Pin every
   // ancestor vnode (not the ancestor's whole subtree), including exception roots.
   const pins = new Set<string>();
-  for (const root of [...privateTrees.flatMap(t => [t.root, ...t.exceptions]), ...readOnly]) {
+  for (const root of [...privateTrees.flatMap(t => [t.root, ...t.exceptions, ...t.readable]), ...readOnly]) {
     let cursor = root;
     for (;;) { pins.add(cursor); const parent = dirname(cursor); if (parent === cursor) break; cursor = parent; }
   }

@@ -84,7 +84,7 @@ test('switching to automatic never resolves an existing manual approval', t => {
 test('permission commands cannot claim full access, supply authority, or use invalid revisions', () => {
   const policy={type:'threads.permissions',requestId:'permission',threadId:'thread',mode:'auto',expectedRevision:0};
   assert.deepEqual(parseCommand(policy),policy);
-  for(const invalid of [{...policy,mode:'full'},{...policy,source:'workspace-tools-v1'},{...policy,expectedRevision:-1},{...policy,expectedRevision:0.5},{...policy,workspace:'/tmp'},{...policy,expectedRevision:Number.MAX_SAFE_INTEGER}])assert.throws(()=>parseCommand(invalid));
+  for(const invalid of [{...policy,mode:'unrestricted'},{...policy,source:'workspace-tools-v1'},{...policy,expectedRevision:-1},{...policy,expectedRevision:0.5},{...policy,workspace:'/tmp'},{...policy,expectedRevision:Number.MAX_SAFE_INTEGER}])assert.throws(()=>parseCommand(invalid));
 });
 
 test('automatic grants still expire and schema v9 migration never changes historical authority', t => {

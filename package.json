@@ -53,7 +53,8 @@
     "test:desktop-agent-shell": "node scripts/launch-desktop.mjs --model-shell-offline --model-smoke-test",
     "validate:agent-shell": "node scripts/validate-agent-shell.mjs",
     "test:backend-history": "node scripts/test-backend-history.mjs",
-    "test:execution-access": "node scripts/test-execution-access.mjs"
+    "test:execution-access": "node scripts/test-execution-access.mjs",
+    "test:product-full-access": "node scripts/run-product-worker.mjs --full-access"
   },
   "dependencies": {
     "@earendil-works/pi-ai": "0.87.1",

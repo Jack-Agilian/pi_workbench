@@ -3,7 +3,7 @@ import type { ShellView } from './shell.ts';
 // Product-only JSON contracts. No Pi, Node or Electron types cross this boundary.
 export type RunState = 'queued' | 'starting' | 'running' | 'cancelling' | 'unknown' | 'completed' | 'failed' | 'cancelled';
 export type OperationState = 'pending' | 'approved' | 'executing' | 'unknown' | 'succeeded' | 'failed' | 'denied';
-export type PermissionMode = 'manual' | 'auto';
+export type PermissionMode = 'manual' | 'auto' | 'full';
 /** Persisted host policy; old databases migrate to manual revision zero. */
 export interface PermissionView { permissionMode: PermissionMode; permissionRevision: number }
 export type Command =
@@ -15,7 +15,7 @@ export type Command =
 export interface Ack { accepted: true; id: string }
 export interface ThreadView extends PermissionView { id: string; workspaceId: string; title: string }
 export interface RunView extends PermissionView { id: string; threadId: string; state: RunState }
-export interface OperationView { approvalSource: 'manual' | 'workspace-tools-v1'; file?:FileOperationView; shell?: ShellView; id: string; runId: string; toolCallId: string; tool: string; parametersDigest: string; artifactPath: string | null; deadline: number; state: OperationState }
+export interface OperationView { approvalSource: 'manual' | 'workspace-tools-v1' | 'full-tools-v1'; file?:FileOperationView; shell?: ShellView; id: string; runId: string; toolCallId: string; tool: string; parametersDigest: string; artifactPath: string | null; deadline: number; state: OperationState }
 export interface ArtifactView { id: string; runId: string; operationId: string; path: string; version: number; digest: string; bytes: number }
 export interface RuntimeObservation { kind: 'activity' | 'idle' | 'diagnostic'; eventType: string; sourceType: string | null }
 export interface ProductEvent { seq: number; runSeq: number; threadId: string; runId: string; kind: string; entityId: string; eventType: string | null; sourceType: string | null }
@@ -54,7 +54,7 @@ export function parseCommand(value: unknown): Command {
   switch (command.type) {
     case 'threads.create': result = { type: command.type, requestId, workspaceId: identifier(command.workspaceId), title: text(command.title, 160) }; break;
     case 'threads.permissions':
-      if (command.mode !== 'manual' && command.mode !== 'auto') throw new Error('unsupported_permission_mode');
+      if (command.mode !== 'manual' && command.mode !== 'auto' && command.mode !== 'full') throw new Error('unsupported_permission_mode');
       result = { type: command.type, requestId, threadId: identifier(command.threadId), mode: command.mode, expectedRevision: revision(command.expectedRevision) }; break;
     case 'runs.start': result = { type: command.type, requestId, threadId: identifier(command.threadId), input: text(command.input, 16_384), ...(Object.hasOwn(command, 'permissionRevision') ? {permissionRevision: revision(command.permissionRevision)} : {}) }; break;
     case 'runs.cancel': result = { type: command.type, requestId, runId: identifier(command.runId) }; break;

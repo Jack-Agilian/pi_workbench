@@ -195,7 +195,7 @@ test('M2 SQL v7 migration preserves old policy rows; host request identities, se
    INSERT INTO model_requests SELECT run_id,authorization_id,policy_digest,reserved_cost FROM rows_v8; DROP TABLE rows_v8; PRAGMA user_version=7;`);
   const before=old.prepare('SELECT * FROM model_requests').all();old.close();
   // ProductCore.close is repeatable; reopen migrates the actual temporary SQLite file.
-  f.reopen();const db=new DatabaseSync(database,{readOnly:true});assert.equal(db.prepare('PRAGMA user_version').get()?.user_version,10);
+  f.reopen();const db=new DatabaseSync(database,{readOnly:true});assert.equal(db.prepare('PRAGMA user_version').get()?.user_version,11);
   assert.deepEqual(db.prepare('SELECT run_id,authorization_id,policy_digest,reserved_cost FROM model_requests').all(),before);db.close();
   const run=f.core.handle({type:'runs.start',requestId:'multi-request',threadId:f.thread,input:'SYNTHETIC multi-budget'}).id;
   const b=f.core.dispatchNext()!;f.core.markRunning(b);assert.equal(b.runId,run);

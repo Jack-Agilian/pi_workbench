@@ -1,7 +1,7 @@
 import { readDesktopPage, row, runRow, artifactRow, displayOperation } from './desktop-pages.ts';
 import { DESKTOP_PAGE_BYTES, type HistoryEntry, type HistoryItem, type PageOptions, type HistoryPage, type OperationPage, type ArtifactPage } from '../../packages/app-contracts/desktop-pages.ts';
 import type { ModelShellOperation } from '../../packages/app-contracts/model-shell.ts';
-import type { FileOperationPlan } from '../../packages/app-contracts/file-tools.ts';
+import { parseFileToolRequest, type FileOperationPlan } from '../../packages/app-contracts/file-tools.ts';
 import { policyDigest, policyText, legacyPolicyDigest, assertTimeoutRevision, assertRequestCountRevision, assertToolScopeRevision, assertCostRevision, assertUsageDefaultsRevision } from './model-policy.ts';
 import { type ModelConfiguration, parseModelOutcome, type ModelOutcome } from '../../packages/app-contracts/model.ts';
 import { parseShellIntent, parseShellOutcome, type ShellIntent, type ShellOutcome, type ShellView } from '../../packages/app-contracts/shell.ts';
@@ -37,7 +37,7 @@ export class ProductCore {
       if (path !== ':memory:') chmodSync(path, 0o600);
       this.db.exec('PRAGMA busy_timeout=1000; PRAGMA synchronous=FULL;');
       const version = this.one<{ user_version: number }>('PRAGMA user_version').user_version;
-      if (![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].includes(version)) throw new Error('unsupported_database_version');
+      if (![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].includes(version)) throw new Error('unsupported_database_version');
       if (version === 0) {
         this.db.exec(`BEGIN IMMEDIATE;
           CREATE TABLE workspaces(id TEXT PRIMARY KEY, path TEXT NOT NULL UNIQUE) STRICT;
@@ -99,6 +99,20 @@ export class ProductCore {
         ALTER TABLE runs ADD COLUMN permission_revision INTEGER NOT NULL DEFAULT 0;
         ALTER TABLE approvals ADD COLUMN source TEXT NOT NULL DEFAULT 'manual' CHECK(source IN ('manual','workspace-tools-v1'));
         PRAGMA user_version=10; COMMIT;`);
+      if (version < 11) this.db.exec(`BEGIN IMMEDIATE;
+        ALTER TABLE threads ADD COLUMN permission_mode_v11 TEXT NOT NULL DEFAULT 'manual' CHECK(permission_mode_v11 IN ('manual','auto','full'));
+        UPDATE threads SET permission_mode_v11=permission_mode;
+        ALTER TABLE threads DROP COLUMN permission_mode;
+        ALTER TABLE threads RENAME COLUMN permission_mode_v11 TO permission_mode;
+        ALTER TABLE runs ADD COLUMN permission_mode_v11 TEXT NOT NULL DEFAULT 'manual' CHECK(permission_mode_v11 IN ('manual','auto','full'));
+        UPDATE runs SET permission_mode_v11=permission_mode;
+        ALTER TABLE runs DROP COLUMN permission_mode;
+        ALTER TABLE runs RENAME COLUMN permission_mode_v11 TO permission_mode;
+        ALTER TABLE approvals ADD COLUMN source_v11 TEXT NOT NULL DEFAULT 'manual' CHECK(source_v11 IN ('manual','workspace-tools-v1','full-tools-v1'));
+        UPDATE approvals SET source_v11=source;
+        ALTER TABLE approvals DROP COLUMN source;
+        ALTER TABLE approvals RENAME COLUMN source_v11 TO source;
+        PRAGMA user_version=11; COMMIT;`);
       this.transaction(() => {
         for (const workspace of workspaces) {
           identifier(workspace.id); const canonical = realpathSync(workspace.path);
@@ -238,6 +252,7 @@ export class ProductCore {
     return {selectedId:this.one<{id:string}>('SELECT workspace_id AS id FROM desktop_workspace WHERE singleton=1').id,items:this.all('SELECT id,path FROM workspaces ORDER BY rowid')};
   }
   workspacePath(id: string): string { return this.one<{path:string}>('SELECT path FROM workspaces WHERE id=?', id).path; }
+  runPermission(runId:string): RunView['permissionMode'] { return this.run(runId).permissionMode; }
   activeRuns():RunView[] { return this.all(`SELECT id,thread_id AS threadId,state,permission_mode AS permissionMode,permission_revision AS permissionRevision FROM runs WHERE state IN ${active} ORDER BY rowid`); }
   listThreads(): ThreadView[] { return this.all('SELECT id,workspace_id AS workspaceId,title,permission_mode AS permissionMode,permission_revision AS permissionRevision FROM threads ORDER BY rowid DESC'); }
   /** Trusted host scheduling only. Renderer cannot select an executable or plan. */
@@ -372,7 +387,9 @@ export class ProductCore {
     return this.mutate(() => {
       const run = this.bound(binding); if (run.state !== 'running') throw new Error('not_running');
       const workspace = this.one<{ path: string }>('SELECT w.path FROM workspaces w JOIN threads t ON t.workspace_id=w.id WHERE t.id=?', run.threadId);
-      const target = intent.artifactPath === undefined ? null : artifactPath(workspace.path, intent.artifactPath);
+      const target = intent.artifactPath === undefined ? null : run.permissionMode === 'full' && intent.file ? parseFileToolRequest(intent.file.request, 'full').parameters.path : artifactPath(workspace.path, intent.artifactPath);
+      if (run.permissionMode === 'full' && intent.file && target !== intent.artifactPath) throw new Error('noncanonical_operation_target');
+      if (intent.shell?.profile === 'full-bash-v1' && run.permissionMode !== 'full') throw new Error('shell_permission_mismatch');
       const prior = this.get<Operation>(`SELECT ${operationColumns} FROM operations WHERE run_id=? AND tool_call_id=?`, run.id, intent.toolCallId);
       if (prior) {
         if (prior.runtimeBindingId !== binding.runtimeBindingId || prior.parametersDigest !== intent.parametersDigest || prior.tool !== intent.tool || prior.deadline !== intent.deadline || prior.artifactPath !== target) throw new Error('operation_conflict');
@@ -385,9 +402,9 @@ export class ProductCore {
       if (intent.shell) this.db.prepare('INSERT INTO shell_display VALUES (?,?,NULL)').run(id, JSON.stringify(intent.shell));
       // A fixed host rule covers only existing admitted tools. No command parsing or model classifier.
       // Native file/version/resource checks and the guardian still gate actual execution.
-      const automatic = run.permissionMode === 'auto' &&
+      const automatic = (run.permissionMode === 'auto' || run.permissionMode === 'full') &&
         (['read','write','edit'].includes(intent.tool) && target !== null || intent.tool === 'bash' && intent.shell !== undefined);
-      this.db.prepare('INSERT INTO approvals(operation_id,decision,source) VALUES (?,?,?)').run(id, automatic ? 'allow' : 'pending', automatic ? 'workspace-tools-v1' : 'manual');
+      this.db.prepare('INSERT INTO approvals(operation_id,decision,source) VALUES (?,?,?)').run(id, automatic ? 'allow' : 'pending', automatic ? run.permissionMode === 'full' ? 'full-tools-v1' : 'workspace-tools-v1' : 'manual');
       if (automatic) this.db.prepare("UPDATE operations SET state='approved' WHERE id=?").run(id);
       this.event(run.threadId, run.id, automatic ? 'approval.automatic' : 'approval.requested', id);
       return this.operationView(this.operation(id));

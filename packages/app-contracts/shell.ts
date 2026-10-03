@@ -2,12 +2,12 @@
 import { exact } from './worker-ipc.ts';
 // Per stream, measured after UTF-8 decoding and re-encoding for the product DTO.
 export const SHELL_OUTPUT_MAX_BYTES = 8192;
-export interface ShellIntent { command: string; cwd: '.'; profile: 'restricted-bash-v1'; environmentPolicy: 'sterile-v1'; timeoutMs: number | null }
+export interface ShellIntent { command: string; cwd: '.'; profile: 'restricted-bash-v1' | 'full-bash-v1'; environmentPolicy: 'sterile-v1'; timeoutMs: number | null }
 export interface ShellOutcome { exitCode: number | null; signal: string | null; timedOut: boolean; stdout: string; stderr: string; truncated: boolean; sideEffects: 'possible' | 'not-started' }
 export interface ShellView { intent: ShellIntent; outcome: ShellOutcome | null }
 export function parseShellIntent(value: unknown): ShellIntent {
   const r = exact(value, ['command','cwd','profile','environmentPolicy','timeoutMs']);
-  if (typeof r.command !== 'string' || !r.command || r.command.length > 4096 || r.command.includes('\0') || r.cwd !== '.' || r.profile !== 'restricted-bash-v1' || r.environmentPolicy !== 'sterile-v1' || (r.timeoutMs!==null && (typeof r.timeoutMs !== 'number' || !Number.isSafeInteger(r.timeoutMs) || r.timeoutMs < 100 || r.timeoutMs > 86400000))) throw new Error('invalid_shell_intent');
+  if (typeof r.command !== 'string' || !r.command || r.command.length > 4096 || r.command.includes('\0') || r.cwd !== '.' || (r.profile !== 'restricted-bash-v1' && r.profile !== 'full-bash-v1') || r.environmentPolicy !== 'sterile-v1' || (r.timeoutMs!==null && (typeof r.timeoutMs !== 'number' || !Number.isSafeInteger(r.timeoutMs) || r.timeoutMs < 100 || r.timeoutMs > 86400000))) throw new Error('invalid_shell_intent');
   return r as unknown as ShellIntent;
 }
 export function parseShellOutcome(value: unknown): ShellOutcome {

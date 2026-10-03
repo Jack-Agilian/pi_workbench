@@ -15,9 +15,9 @@ export function parseBashParameters(value: unknown): BashParameters {
   if (Object.hasOwn(r,'timeout') && (typeof r.timeout !== 'number' || !Number.isFinite(r.timeout) || !Number.isSafeInteger(r.timeout * 1000) || r.timeout < 0.1 || r.timeout > 86400)) throw new Error('model_shell_timeout');
   return r as unknown as BashParameters;
 }
-export function modelShellIntent(parameters: BashParameters, policy: ModelShellPolicy): ShellIntent {
+export function modelShellIntent(parameters: BashParameters, policy: ModelShellPolicy, full = false): ShellIntent {
   const p = parseBashParameters(parameters); parseModelShellPolicy(policy);
   const timeoutMs = p.timeout === undefined ? policy.timeoutMs??null : p.timeout * 1000;
   if (timeoutMs!==null && policy.timeoutMs!=null && timeoutMs > policy.timeoutMs) throw new Error('model_shell_timeout');
-  return parseShellIntent({ command: p.command, cwd: '.', profile: policy.profile, environmentPolicy: 'sterile-v1', timeoutMs });
+  return parseShellIntent({ command: p.command, cwd: '.', profile: full ? 'full-bash-v1' : policy.profile, environmentPolicy: 'sterile-v1', timeoutMs });
 }

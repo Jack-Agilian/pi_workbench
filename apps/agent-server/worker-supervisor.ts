@@ -1,3 +1,6 @@
+import { fullFileAccess } from './full-file-access.ts';
+import { controlledFileTarget, fileWirePath, assertNoFileSymlinks } from '../../packages/pi-adapter/file-target.ts';
+import type { FullFileAccess } from '../../packages/app-contracts/file-access.ts';
 import { modelShellIntent, parseBashParameters, type BashParameters } from '../../packages/app-contracts/model-shell.ts';
 import { fileRunDuration, parseFileToolRequest, type FileToolRequest, type FileOperationPlan } from '../../packages/app-contracts/file-tools.ts';
 import { plannedFileDigest } from '../../packages/pi-adapter/file-planning.ts';
@@ -8,14 +11,14 @@ import { parseShellIntent, parseShellOutcome, type ShellIntent, type ShellOutcom
 import { parametersDigest } from '../../packages/pi-adapter/controlled-tools.ts';
 import { randomUUID } from 'node:crypto';
 import { existsSync, lstatSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import type { ChildProcess } from 'node:child_process';
 import { parseCommand, sha256, type Dispatch } from '../../packages/app-contracts/index.ts';
 import { exact, parseEnvelope, type Envelope, type ResourceSelection, type WireBody, type WorkerInit } from '../../packages/app-contracts/worker-ipc.ts';
 import { IpcSender } from '../../packages/pi-adapter/ipc-channel.ts';
 import { inside, verifyContent } from '../../packages/pi-adapter/approved-resources.ts';
 import { ProductCore } from './core.ts';
-import { artifactPath, inspectMarkdown } from './artifact.ts';
+import { artifactPath, inspectMarkdown, inspectTextFile } from './artifact.ts';
 import { ObservationOrder } from '../../packages/pi-adapter/observation-order.ts';
 import { launchSpec, shellLaunch, spawnGuardian, type LaunchSpec, type TrustedWorkerEntry } from './worker-launcher.ts';
 
@@ -34,7 +37,7 @@ interface Active {
   requests: Map<string, string>; replies: Map<string, WireBody>; pending: Map<string, string>; startedAt: number;
   observations: ObservationOrder;
 }
-export interface SupervisorOptions { stateDirectory: string; databaseDirectory: string; resources: ResourceSelection; readyTimeoutMs?: number; validateWorkspace?: (workspaceId:string, path:string)=>void }
+export interface SupervisorOptions { fullAccessRoots?: () => readonly string[]; stateDirectory: string; databaseDirectory: string; resources: ResourceSelection; readyTimeoutMs?: number; validateWorkspace?: (workspaceId:string, path:string)=>void }
 export class WorkerSupervisor {
   private readonly core: ProductCore;
   private readonly options: SupervisorOptions;
@@ -47,6 +50,7 @@ export class WorkerSupervisor {
   get completion() { return this.active?.done; }
   command(raw: unknown) {
     const command = parseCommand(raw);
+    if(command.type==='threads.permissions' && command.mode==='full') { const w=this.core.threadWorkspace(command.threadId);this.options.validateWorkspace?.(w.id,w.path);this.fullScope(w.path); }
     if(command.type==='approvals.resolve'&&command.decision==='allow'&&this.active&&!this.core.hasRequest(command.requestId)){
       const {binding,config}=this.active.journal;this.options.validateWorkspace?.(binding.workspaceId,config.workspace);
     }
@@ -67,11 +71,12 @@ export class WorkerSupervisor {
     if (this.active) return this.active.done;
     plan = structuredClone(plan); if (plan.tool === 'bash') Object.freeze(plan.shell); if (plan.tool === 'none') Object.freeze(plan.model); Object.freeze(plan);
     if (plan.tool === 'none') {
+      const selectedModel=plan.model;
       parseModelSelection(plan.model);
       if (plan.model.mode === 'live') {
         if (!modelAccess || !modelAccess.key || /[\r\n\0]/.test(modelAccess.key) || modelAccess.key.length > 8192) throw new Error('model_not_configured');
         const configuration = parseModelConfiguration(structuredClone(modelAccess.configuration));
-        if (!configuration.approved || (['provider','model','endpoint','maxOutputTokens','timeoutMs'] as const).some(k => configuration[k] !== plan.model[k]) || JSON.stringify(configuration.openai)!==JSON.stringify(plan.model.openai) || JSON.stringify(configuration.fileTools)!==JSON.stringify(plan.model.fileTools) || JSON.stringify(configuration.shellTools)!==JSON.stringify(plan.model.shellTools)) throw new Error('model_policy_mismatch');
+        if (!configuration.approved || (['provider','model','endpoint','maxOutputTokens','timeoutMs'] as const).some(k => configuration[k] !== selectedModel[k]) || JSON.stringify(configuration.openai)!==JSON.stringify(plan.model.openai) || JSON.stringify(configuration.fileTools)!==JSON.stringify(plan.model.fileTools) || JSON.stringify(configuration.shellTools)!==JSON.stringify(plan.model.shellTools)) throw new Error('model_policy_mismatch');
         const url = new URL(modelAccess.requestUrl); const endpoint = new URL(configuration.endpoint);
         if (url.origin !== endpoint.origin || url.username || url.password || url.hash || !Number.isFinite(modelAccess.reserveCostUsd) || modelAccess.reserveCostUsd < 0) throw new Error('model_access_not_admitted');
         modelAccess = Object.freeze({ ...modelAccess, configuration: Object.freeze(configuration) });
@@ -92,9 +97,10 @@ export class WorkerSupervisor {
       const sessions = join(this.options.stateDirectory, 'sessions', dispatch.threadId);
       for (const dir of [lease, agentDir, sessions]) mkdirSync(dir, { recursive: true, mode: 0o700 });
       const config: WorkerInit = { binding: dispatch, workspace, agentDir, sessions, resources: structuredClone(this.options.resources), deadline: plan.deadline, ...(plan.tool === 'none' ? { model: plan.model } : {}) };
+      if (this.core.runPermission(dispatch.runId) === 'full') { config.fileAccess=this.fullScope(workspace);if(plan.tool==='bash')plan=Object.freeze({...plan,shell:{...plan.shell,profile:'full-bash-v1' as const}}); }
       const spec = launchSpec(config, { instanceId: randomUUID(), nonce: randomUUID() }, { lease, databaseDirectory: this.options.databaseDirectory }, entry);
-      if (plan.tool === 'bash') spec.shell = shellLaunch(plan.shell, workspace, lease);
-      if(plan.tool==='none'&&plan.model.shellTools)spec.modelShell={template:shellLaunch(modelShellIntent({command:':'},plan.model.shellTools),workspace,lease),maxCommands:plan.model.shellTools.maxCommands,index:join(lease,'shell-index.json')};
+      if (plan.tool === 'bash') spec.shell = shellLaunch({...plan.shell,profile:config.fileAccess?'full-bash-v1':'restricted-bash-v1'}, workspace, lease,config.fileAccess);
+      if(plan.tool==='none'&&plan.model.shellTools)spec.modelShell={template:shellLaunch(modelShellIntent({command:':'},plan.model.shellTools,!!config.fileAccess),workspace,lease,config.fileAccess),maxCommands:plan.model.shellTools.maxCommands,index:join(lease,'shell-index.json')};
       journal = { binding: dispatch, config, plan: Object.freeze({ ...plan }), spec, lease };
       // Guardian exists before commit, but may not launch any Worker until the committed host arms it.
       child = spawnGuardian(spec, lease); return JSON.stringify(journal);
@@ -123,7 +129,7 @@ export class WorkerSupervisor {
   private send(active: Active, body: WireBody, requestId = `host-${++this.sequence}`): Promise<void> {
     if(active.stopping)return Promise.reject(new Error('worker_stopping'));
     const { spec } = active.journal;
-    return active.sender.send({ version: 10, instanceId: spec.instanceId, runtimeBindingId: spec.runtimeBindingId, requestId, body } satisfies Envelope);
+    return active.sender.send({ version: 11, instanceId: spec.instanceId, runtimeBindingId: spec.runtimeBindingId, requestId, body } satisfies Envelope);
   }
   private receive(active: Active, raw: unknown) {
     if (this.active !== active || active.stopping) return; // owned channel, fenced synchronously before disconnect
@@ -201,10 +207,10 @@ export class WorkerSupervisor {
         if(plan.tool!=='none'||!plan.model.fileTools||!active.pending.has(body.operationId))throw new Error('file_result_not_admitted');
         const op=this.core.snapshot(binding.threadId).operations.find(o=>o.id===body.operationId);const file=this.core.fileOperation(body.operationId);
         if(!op||op.state!=='executing'||!file)throw new Error('file_result_before_claim');
-        const version=this.markdownVersion(config.workspace,file.request.parameters.path);
+        const version=this.toolFileVersion(config,file.request);
         if(body.ok&&file.expectedDigest!==null&&version===file.expectedDigest){
           this.core.finishOperation(binding,op.id,'succeeded',version);
-          if(file.request.tool!=='read')this.core.recordArtifact(binding,op.id,file.request.parameters.path);
+          const artifact=this.workspaceArtifact(config,file.request);if(artifact!==undefined)this.core.recordArtifact(binding,op.id,artifact);
         }else if(version===file.fileVersion)this.core.finishOperation(binding,op.id,'failed');
         else this.core.finishOperation(binding,op.id,'unknown');
         const current=this.core.snapshot(binding.threadId).operations.find(o=>o.id===op.id)!;
@@ -256,9 +262,9 @@ export class WorkerSupervisor {
     if(plan.tool!=='none'||!plan.model.shellTools||!plan.model.fileTools||!active.ready||active.closed||active.fileFailed||active.preparingFile||active.pending.size||resourceLock!==config.resources.id)throw new Error('model_shell_not_admitted');
     const operations=this.core.snapshot(binding.threadId).operations.filter(o=>o.runId===binding.runId);
     if((plan.model.fileTools.maxOperations!=null && operations.length>=plan.model.fileTools.maxOperations)||(plan.model.shellTools.maxCommands!=null && operations.filter(o=>o.tool==='bash').length>=plan.model.shellTools.maxCommands))throw new Error('model_shell_limit');
-    verifyContent(config.resources);const parameters=parseBashParameters(raw);const intent=modelShellIntent(parameters,plan.model.shellTools);
+    verifyContent(config.resources);const parameters=parseBashParameters(raw);const intent=modelShellIntent(parameters,plan.model.shellTools,!!config.fileAccess);
     const deadline=Math.min(plan.deadline??Infinity,Date.now()+plan.model.fileTools.operationTimeoutMs);
-    const approvalDigest=parametersDigest({parameters,intent,workspace:config.workspace,resourceLock,binding,deadline});
+    const approvalDigest=parametersDigest({parameters,intent,workspace:config.workspace,resourceLock,binding,deadline,...(config.fileAccess?{fileAccess:config.fileAccess}:{})});
     const modelShell={parameters,intent,resourceLock,deadline,approvalDigest};
     const op=this.core.requestOperation(binding,{toolCallId,tool:'bash',parametersDigest:approvalDigest,deadline,shell:intent,modelShell});
     active.pending.set(op.id,requestId);this.deliverApproval(active,op.id);
@@ -277,23 +283,48 @@ export class WorkerSupervisor {
     }else if(op.state==='denied'){active.pending.delete(operationId);active.fileFailed=true;}else return;
     active.replies.set(requestId,reply);void this.send(active,reply,requestId).catch(()=>this.stop(active));
   }
-  private markdownVersion(workspace:string,path:string):string|null {
-    try{const f=inspectMarkdown(workspace,path);if(f.bytes>16000)throw new Error('file_size_limit');return f.digest;}
+  private fullScope(workspace:string):FullFileAccess {
+    if(!this.options.fullAccessRoots)throw new Error('full_access_not_available');
+    return fullFileAccess(workspace,this.options.fullAccessRoots());
+  }
+  private toolScope(config:WorkerInit):FullFileAccess|undefined {
+    if((this.core.runPermission(config.binding.runId)==='full')!==!!config.fileAccess)throw new Error('file_permission_mismatch');
+    if(!config.fileAccess)return undefined;
+    const current=this.fullScope(config.workspace);
+    // Recovery never loses a deny saved with the original Run; a newly protected directory
+    // is also enforced before the host reads any external operation target.
+    return {privateTrees:[...config.fileAccess.privateTrees,...current.privateTrees],readOnlyRoots:[...config.fileAccess.readOnlyRoots,...current.readOnlyRoots]};
+  }
+  private inspectToolFile(config:WorkerInit,request:FileToolRequest) {
+    const access=this.toolScope(config);parseFileToolRequest(request,access?'full':'workspace');
+    const target=controlledFileTarget(config.workspace,request.parameters.path,access,request.tool!=='read');
+    if(fileWirePath(config.workspace,target)!==request.parameters.path)throw new Error('noncanonical_file_target');
+    assertNoFileSymlinks(access?'/':config.workspace,target);
+    const file=inspectTextFile(target);if(file.bytes>16000)throw new Error('file_size_limit');return file;
+  }
+  private toolFileVersion(config:WorkerInit,request:FileToolRequest):string|null {
+    try{return this.inspectToolFile(config,request).digest;}
     catch(error){if(error instanceof Error&&'code' in error&&error.code==='ENOENT')return null;throw error;}
+  }
+  private workspaceArtifact(config:WorkerInit,request:FileToolRequest):string|undefined {
+    if(request.tool==='read')return undefined;
+    const target=resolve(config.workspace,request.parameters.path);
+    if(!inside(config.workspace,target)||!target.endsWith('.md'))return undefined;
+    return artifactPath(config.workspace,fileWirePath(config.workspace,target));
   }
   private async prepareFileOperation(active:Active,toolCallId:string,raw:FileToolRequest,requestId:string){
     const {plan,config,binding}=active.journal;if(plan.tool!=='none'||!plan.model.fileTools)throw new Error('file_tools_missing');
     const count=this.core.snapshot(binding.threadId).operations.filter(o=>o.runId===binding.runId).length;
     if(plan.model.fileTools.maxOperations!=null && count>=plan.model.fileTools.maxOperations)throw new Error('file_operation_limit');
-    verifyContent(config.resources);const request=parseFileToolRequest(raw);
-    const target=artifactPath(config.workspace,request.parameters.path);if(target!==request.parameters.path)throw new Error('noncanonical_file_target');
-    const fileVersion=this.markdownVersion(config.workspace,target);
-    const before=fileVersion===null?null:inspectMarkdown(config.workspace,target).text;
+    verifyContent(config.resources);const request=parseFileToolRequest(raw,config.fileAccess?'full':'workspace');
+    const absolute=controlledFileTarget(config.workspace,request.parameters.path,this.toolScope(config),request.tool!=='read');const target=fileWirePath(config.workspace,absolute);if(target!==request.parameters.path)throw new Error('noncanonical_file_target');
+    const fileVersion=this.toolFileVersion(config,request);
+    const before=fileVersion===null?null:this.inspectToolFile(config,request).text;
     const expectedDigest=await plannedFileDigest(config.workspace,request,before);
     if(this.active!==active||active.closed||active.stopping||(plan.deadline!==null && Date.now()>=plan.deadline))throw new Error('stale_file_preparation');
-    verifyContent(config.resources);if(this.markdownVersion(config.workspace,target)!==fileVersion)throw new Error('file_changed_during_plan');
+    verifyContent(config.resources);if(this.toolFileVersion(config,request)!==fileVersion)throw new Error('file_changed_during_plan');
     const deadline=Math.min(plan.deadline??Infinity,Date.now()+plan.model.fileTools.operationTimeoutMs);
-    const approvalDigest=parametersDigest({request,fileVersion,expectedDigest,resourceLock:config.resources.id,binding,deadline});
+    const approvalDigest=parametersDigest({request,fileVersion,expectedDigest,resourceLock:config.resources.id,binding,deadline,...(config.fileAccess?{fileAccess:config.fileAccess}:{})});
     const file:FileOperationPlan={request,fileVersion,expectedDigest,resourceLock:config.resources.id,deadline,approvalDigest};
     const op=this.core.requestOperation(binding,{toolCallId,tool:request.tool,parametersDigest:approvalDigest,deadline,artifactPath:target,file});
     active.pending.set(op.id,requestId);this.deliverApproval(active,op.id);
@@ -304,7 +335,7 @@ export class WorkerSupervisor {
     let reply:WireBody={type:'deny'};
     if(op.state==='approved'){
       try{
-        verifyContent(config.resources);if(this.markdownVersion(config.workspace,file.request.parameters.path)!==file.fileVersion)throw new Error('file_version_changed');
+        verifyContent(config.resources);if(this.toolFileVersion(config,file.request)!==file.fileVersion)throw new Error('file_version_changed');
         this.core.claimOperation(binding,operationId,file.approvalDigest);
         reply={type:'grant',operationId,parametersDigest:parametersDigest(file.request.parameters),expiresAt:file.deadline,fileVersion:file.fileVersion};
       }catch{this.stop(active);return;}
@@ -314,7 +345,7 @@ export class WorkerSupervisor {
   private approvalDigest(journal: Journal): string {
     const { plan, binding, config } = journal;
     if(plan.tool==='none')throw new Error('model_has_no_operation');
-    return plan.tool === 'bash' ? parametersDigest({ intent: plan.shell, toolParametersDigest: plan.parametersDigest, workspace: config.workspace, binding, deadline: plan.deadline }) : plan.parametersDigest;
+    return plan.tool === 'bash' ? parametersDigest({ intent: plan.shell, toolParametersDigest: plan.parametersDigest, workspace: config.workspace, binding, deadline: plan.deadline, ...(config.fileAccess?{fileAccess:config.fileAccess}:{}) }) : plan.parametersDigest;
   }
   private shellReceipt(journal: Journal, operationId: string): ShellOutcome | undefined {
     const dynamic = this.core.modelShellOperation(operationId);
@@ -473,7 +504,7 @@ export class WorkerSupervisor {
             // reconcile; today's file bytes cannot prove yesterday's read result.
             this.core.reconcileOperation(op.id,'failed');
           } else {
-            const version=this.markdownVersion(journal.config.workspace,file.request.parameters.path);
+            const version=this.toolFileVersion(journal.config,file.request);
             if(file.expectedDigest!==null&&version===file.expectedDigest)this.core.reconcileOperation(op.id,'succeeded',version);
             else if(version===file.fileVersion)this.core.reconcileOperation(op.id,'failed');
             else throw new Error('file_side_effect_unresolved');
@@ -491,7 +522,7 @@ export class WorkerSupervisor {
           else throw new Error('side_effect_unresolved');
         }
         const current = this.core.snapshot(binding.threadId).operations.find(o => o.id === op.id)!;
-        if(plan.tool==='none'&&plan.model.fileTools&&current.tool!=='bash'&&current.state==='succeeded'){const file=this.core.fileOperation(op.id)!;if(file.request.tool!=='read')this.core.reconcileArtifact(binding,op.id,file.request.parameters.path);}
+        if(plan.tool==='none'&&plan.model.fileTools&&current.tool!=='bash'&&current.state==='succeeded'){const file=this.core.fileOperation(op.id)!;const artifact=this.workspaceArtifact(journal.config,file.request);if(artifact!==undefined)this.core.reconcileArtifact(binding,op.id,artifact);}
         if (plan.tool !== 'bash' && plan.tool !== 'none' && current.state === 'succeeded') this.core.reconcileArtifact(binding, op.id, plan.target);
       }
       this.core.reconcileRun(binding.runId, cancelRequested ? 'cancelled' : 'failed', { piIdle: true, hostClean: true });

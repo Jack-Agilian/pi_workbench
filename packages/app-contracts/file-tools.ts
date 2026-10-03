@@ -1,4 +1,4 @@
-// Bounded product policy/intent, not Pi SDK objects. Markdown-only for this increment.
+// Bounded product policy/intent, not Pi SDK objects. Restricted mode admits Markdown; full mode admits bounded UTF-8 text.
 import { exact, record } from './worker-ipc.ts';
 // maxModelRequests is optional legacy/validation compatibility; omission means no count cap.
 export interface FileToolPolicy { maxOperations?: number | null; maxModelRequests?: number | null; operationTimeoutMs: number }
@@ -15,9 +15,9 @@ export function parseFileToolPolicy(value:unknown):FileToolPolicy {
   if(!(key==='maxOperations' && r[key]==null) && (typeof r[key]!=='number'||!Number.isSafeInteger(r[key])||r[key]<min||r[key]>max))throw new Error('file_tool_policy');
  return r as unknown as FileToolPolicy;
 }
-export function parseFileToolRequest(value:unknown):FileToolRequest {
+export function parseFileToolRequest(value:unknown, scope:'workspace'|'full'='workspace'):FileToolRequest {
  const r=exact(value,['tool','parameters']),p=record(r.parameters);
- if(typeof p.path!=='string'||!p.path||p.path.length>1024||p.path.startsWith('/')||/^[@~]/.test(p.path)||/[\u0000-\u001f\u00a0\u202f]/.test(p.path)||!p.path.endsWith('.md'))throw new Error('file_tool_path');
+ if(typeof p.path!=='string'||!p.path||p.path.length>1024||scope==='workspace'&&(p.path.startsWith('/')||!p.path.endsWith('.md'))||/^[@~]/.test(String(p.path))||/[\u0000-\u001f\u007f\u00a0\u202f]/.test(String(p.path)))throw new Error('file_tool_path');
  const text=(s:unknown)=>{if(typeof s!=='string'||s.includes('\0')||byteLength(s)>16000)throw new Error('file_tool_text');};
  if(r.tool==='read'){
   exact(p,['path',...(Object.hasOwn(p,'offset')?['offset']:[]),...(Object.hasOwn(p,'limit')?['limit']:[])]);

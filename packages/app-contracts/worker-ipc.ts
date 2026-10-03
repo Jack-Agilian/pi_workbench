@@ -1,3 +1,4 @@
+import { parseFullFileAccess, type FullFileAccess } from './file-access.ts';
 import { parseBashParameters, type BashParameters } from './model-shell.ts';
 import { parseFileToolRequest, type FileToolRequest } from './file-tools.ts';
 import { parseModelSelection, parseModelOutcome, type ModelSelection, type ModelOutcome } from './model.ts';
@@ -5,10 +6,10 @@ import { parseModelSelection, parseModelOutcome, type ModelSelection, type Model
 import { parseShellOutcome, type ShellOutcome } from './shell.ts';
 import { identifier, toolCallIdentity, sha256, type Dispatch } from './index.ts';
 import { parsePresentation, type Presentation } from './presentation.ts';
-export const IPC_VERSION = 10;
+export const IPC_VERSION = 11;
 export const MAX_MESSAGE_BYTES = 65_536;
 export interface ResourceSelection { root: string; id: string; files: readonly { path: string; sha256: string }[]; expectedSkillNames: readonly string[] }
-export interface WorkerInit { binding: Dispatch; workspace: string; agentDir: string; sessions: string; resources: ResourceSelection; deadline: number | null; model?: ModelSelection }
+export interface WorkerInit { fileAccess?: FullFileAccess; binding: Dispatch; workspace: string; agentDir: string; sessions: string; resources: ResourceSelection; deadline: number | null; model?: ModelSelection }
 export type WireBody =
   | { type: 'model-key'; key: string }
   | { type: 'model-outcome'; outcome: ModelOutcome }
@@ -38,7 +39,7 @@ export type WireBody =
   | { type: 'done'; ok: boolean }
   | { type: 'closed'; nativeRef: string | null }
   | { type: 'fault'; code: 'initialization_failed' | 'execution_failed' | 'protocol_failed' };
-export interface Envelope { version: 10; instanceId: string; runtimeBindingId: string; requestId: string; body: WireBody }
+export interface Envelope { version: 11; instanceId: string; runtimeBindingId: string; requestId: string; body: WireBody }
 export function record(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value) || ![Object.prototype, null].includes(Object.getPrototypeOf(value))) throw new Error('invalid_record');
   const fields = Object.getOwnPropertyDescriptors(value);
@@ -70,13 +71,14 @@ export function parseEnvelope(value: unknown): Envelope {
     case 'model-http-chunk': check('data','end'); if (typeof b.data !== 'string' || b.data.length > 24000 || !/^[A-Za-z0-9+/]*={0,2}$/.test(b.data)) throw new Error('http_chunk'); boolean(b.end); break;
     case 'model-http-read': case 'model-http-error': case 'model-http-finish': case 'model-http-finished': check(); break;
     case 'shell-operation': check('toolCallId','parameters','resourceLock'); toolCallIdentity(b.toolCallId); parseBashParameters(b.parameters); sha256(b.resourceLock); break;
-    case 'file-operation': check('toolCallId','request','resourceLock'); toolCallIdentity(b.toolCallId); parseFileToolRequest(b.request); sha256(b.resourceLock); break;
+    case 'file-operation': check('toolCallId','request','resourceLock'); toolCallIdentity(b.toolCallId); parseFileToolRequest(b.request,'full'); sha256(b.resourceLock); break;
     case 'file-result': check('operationId','ok'); identifier(b.operationId); boolean(b.ok); break;
     case 'file-settled': check('operationId'); identifier(b.operationId); break;
     case 'hello': check('pid'); number(b.pid); break;
     case 'init': {
-      check('config'); const c = exact(b.config, ['binding','workspace','agentDir','sessions','resources','deadline', ...(Object.hasOwn(Object(b.config), 'model') ? ['model'] : [])]);
+      check('config'); const c = exact(b.config, ['binding','workspace','agentDir','sessions','resources','deadline', ...(Object.hasOwn(Object(b.config), 'fileAccess') ? ['fileAccess'] : []), ...(Object.hasOwn(Object(b.config), 'model') ? ['model'] : [])]);
       if (c.model !== undefined) parseModelSelection(c.model);
+      if (c.fileAccess !== undefined) parseFullFileAccess(c.fileAccess);
       for (const key of ['workspace','agentDir','sessions']) string(c[key]);
       if(c.deadline===null){if(!c.model || !parseModelSelection(c.model).fileTools || parseModelSelection(c.model).fileTools!.maxModelRequests!=null)throw new Error('invalid_deadline');}else number(c.deadline);
       const d = exact(c.binding, ['runId','threadId','runtimeBindingId','workerEpoch','sessionGeneration','workspaceId','nativeSessionRef','nativeSessionPersisted','input']);

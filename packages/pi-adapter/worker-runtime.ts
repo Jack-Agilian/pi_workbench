@@ -25,7 +25,7 @@ interface WorkerDriver {
   testOnly?: { afterSessionCreated?: (close: () => Promise<void>) => Promise<void>; beforeBind?: (close: () => Promise<void>) => Promise<void>; beforeFileResult?:()=>Promise<void> };
   beforeReady?(runtime: AgentSessionRuntime, close: () => Promise<void>): Promise<void>;
   afterGrant?(signal: AbortSignal): Promise<void>;
-  model?: (options: {cwd:string;agentDir:string}, selection: ModelSelection, key: string, fetch: typeof globalThis.fetch) => ReturnType<typeof modelServices>;
+  model?: (options: {cwd:string;agentDir:string;fullAccess?:boolean}, selection: ModelSelection, key: string, fetch: typeof globalThis.fetch) => ReturnType<typeof modelServices>;
   execute?(runtime: AgentSessionRuntime, signal: AbortSignal): Promise<void>;
 }
 export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
@@ -46,7 +46,7 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
   const references = new Map<string, { resolve(): void; reject(error: Error): void }>();
   let reservedReference: string | null = null;
   let priorEntries = new Set<string>();
-  const send = (body: WireBody, requestId = `${body.type === 'observation' || body.type === 'presentation' ? body.type : 'worker'}-${++sequence}`) => sender.send({ version: 10, instanceId, runtimeBindingId, requestId, body } satisfies Envelope);
+  const send = (body: WireBody, requestId = `${body.type === 'observation' || body.type === 'presentation' ? body.type : 'worker'}-${++sequence}`) => sender.send({ version: 11, instanceId, runtimeBindingId, requestId, body } satisfies Envelope);
   const publish = () => runtime && started && !closed ? send({ type: 'presentation', projection: projectMessages(runtime.session.sessionManager.getBranch().filter(entry => !priorEntries.has(entry.id))) }) : Promise.resolve();
   function close(): Promise<void> {
     if (closing) return closing;
@@ -86,7 +86,7 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
     config = c;
     const resources = contentLoader({ cwd: c.workspace, agentDir: c.agentDir }); resources.select(c.resources); await resources.loader.reload();
     if (closed || resources.loaded?.id !== c.resources.id) throw new Error('resource_admission_blocked'); verifyContent(c.resources);
-    tools = createControlledTools({ binding: { runId: c.binding.runId, runtimeBindingId, runtimeEpoch: 1, workspaceRef: c.workspace },
+    tools = createControlledTools({ fileAccess:c.fileAccess, binding: { runId: c.binding.runId, runtimeBindingId, runtimeEpoch: 1, workspaceRef: c.workspace },
       deadline: () => c.model?.fileTools?Math.min(c.deadline??Infinity,Date.now()+c.model.fileTools.operationTimeoutMs):(c.deadline??Date.now()), bash: shellBackend, observe: () => {},
       ...(c.model?.fileTools?{relativeFilePaths:true,fileLimitBytes:16000,settle:async(operation:import('./controlled-tools.ts').ToolOperation,ok:boolean)=>{
         const operationId=fileClaims.get(operation.operationId);if(!operationId)return;
@@ -103,7 +103,7 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
         const requestId = `operation-${++sequence}`;
         const promise = new Promise<ToolApproval | undefined>(resolve => { grants.set(requestId, { resolve, localId: operation.operationId, tool: operation.tool }); });
         if(c.model?.shellTools&&operation.tool==='bash')await send({type:'shell-operation',toolCallId:operation.toolCallId,parameters:parseBashParameters(operation.parameters),resourceLock:c.resources.id},requestId);
-        else if(c.model?.fileTools)await send({type:'file-operation',toolCallId:operation.toolCallId,request:parseFileToolRequest({tool:operation.tool,parameters:operation.parameters}),resourceLock:c.resources.id},requestId);
+        else if(c.model?.fileTools)await send({type:'file-operation',toolCallId:operation.toolCallId,request:parseFileToolRequest({tool:operation.tool,parameters:operation.parameters},c.fileAccess?'full':'workspace'),resourceLock:c.resources.id},requestId);
         else await send({ type: 'operation', toolCallId: operation.toolCallId, tool: operation.tool as 'write' | 'edit' | 'bash', parametersDigest: operation.parametersDigest,
           target: operation.target ? relative(c.workspace, operation.target) : '.', resourceLock: c.resources.id }, requestId);
         try { const approval = await promise; if (approval) await driver?.afterGrant?.(abort.signal); return approval; } finally { grants.delete(requestId); }
@@ -120,7 +120,7 @@ export function serveWorker(driver?: WorkerDriver): { close(): Promise<void> } {
       try { await accepted; } finally { references.delete(requestId); }
       if (closed) throw new Error('worker_closed'); reservedReference = reference;
       if (Boolean(c.model) !== Boolean(driver?.model)) throw new Error('model_composition_mismatch');
-      const configured = c.model && driver?.model ? await driver.model(options, c.model, key ?? '', transport.fetch) : undefined; key = undefined;
+      const configured = c.model && driver?.model ? await driver.model({...options,fullAccess:!!c.fileAccess}, c.model, key ?? '', transport.fetch) : undefined; key = undefined;
       const services = configured?.services ?? await createIsolatedServices(options); if (!c.model) services.resourceLoader = resources.loader;
       const result = await createAgentSession({ ...services, sessionManager: options.sessionManager, sessionStartEvent: options.sessionStartEvent,
         ...(configured ? { model: configured.model } : {}), tools: c.model?.fileTools?['read','write','edit',...(c.model.shellTools?['bash']:[])]:c.model ? [] : ['write','edit','bash'], customTools: definitions, noTools: c.model&&!c.model.fileTools ? 'all' : 'builtin', thinkingLevel: 'off' });

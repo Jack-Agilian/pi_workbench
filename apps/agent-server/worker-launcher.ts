@@ -7,7 +7,8 @@ import { inside } from '../../packages/pi-adapter/path-scope.ts';
 import type { ShellLaunch } from './shell-execution.ts';
 import type { ShellIntent } from '../../packages/app-contracts/shell.ts';
 import type { WorkerInit } from '../../packages/app-contracts/worker-ipc.ts';
-import { restrictedMacProfile } from './macos-access.ts';
+import { restrictedMacProfile, fullMacProfile } from './macos-access.ts';
+import type { FullFileAccess } from '../../packages/app-contracts/file-access.ts';
 export const repository = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 export interface LaunchSpec {
   shell?: ShellLaunch;
@@ -32,8 +33,13 @@ export function launchSpec(config: WorkerInit, identity: { instanceId: string; n
   for (const root of readRoots) if (denied.some(d => inside(root, d) || inside(d, root))) throw new Error('host_worker_roots_overlap');
   for (const root of writeRoots) if (inside(root, config.resources.root)) throw new Error('writable_resource_snapshot');
   const home = config.agentDir; const env = sterileEnvironment(home); env.PI_CODING_AGENT_DIR = config.agentDir;
-  const profile = restrictedMacProfile([...readRoots, resolve(dirname(node), '..')], writeRoots, denied);
-  const flags = ['--permission', '--allow-fs-read=*', ...writeRoots.map(p => `--allow-fs-write=${p}`),
+  const profile = config.fileAccess ? fullMacProfile({
+    network: 'brokered', readOnlyRoots: [...config.fileAccess.readOnlyRoots, config.resources.root],
+    privateTrees: [...config.fileAccess.privateTrees.map(t => ({root:t.root,
+      writableSubtrees:[...t.allowedSubtrees,...[config.agentDir,config.sessions].filter(p=>inside(t.root,p))],
+      readableSubtrees:inside(t.root,config.resources.root)?[config.resources.root]:[]})), ...denied.map(root=>({root}))],
+  }) : restrictedMacProfile([...readRoots, resolve(dirname(node), '..')], writeRoots, denied);
+  const flags = ['--permission', '--allow-fs-read=*', ...(config.fileAccess ? ['--allow-fs-write=*'] : writeRoots.map(p => `--allow-fs-write=${p}`)),
     '--import', join(repository, 'scripts/probe-no-network.mjs'), ...(entry?.allowFixedChildren ? ['--allow-child-process'] : [])];
   return { ...identity, runtimeBindingId: config.binding.runtimeBindingId, receipt: join(host.lease, 'cleanup.json'),
     executable: '/usr/bin/sandbox-exec', args: ['-p', profile, node, ...flags, entry?.path ?? join(repository, 'packages/pi-adapter/worker-entry.ts'), identity.instanceId, config.binding.runtimeBindingId, ...(entry?.args ?? [])],
@@ -50,11 +56,14 @@ export function spawnGuardian(spec: LaunchSpec, lease: string): ChildProcess {
 }
 
 /** Restricted Mac backend selected by the host, never by a Worker or Renderer. */
-export function shellLaunch(intent: ShellIntent, workspace: string, lease: string): ShellLaunch {
+export function shellLaunch(intent: ShellIntent, workspace: string, lease: string, access?: FullFileAccess): ShellLaunch {
   if (process.platform !== 'darwin' || process.arch !== 'arm64') throw new Error('restricted_shell_platform_unsupported');
   const cwd = realpathSync(workspace); const runtime = resolve(dirname(realpathSync(process.execPath)), '..');
   const home = join(lease, 'shell-home'); mkdirSync(home, { recursive: true, mode: 0o700 });
   const env = sterileEnvironment(home); env.PATH = '/usr/bin:/bin'; env.LANG = 'en_US.UTF-8';
-  const profile = restrictedMacProfile([cwd, runtime, home], [cwd, home]);
+  if ((intent.profile === 'full-bash-v1') !== !!access) throw new Error('shell_access_mismatch');
+  const profile = access ? fullMacProfile({network:'direct',readOnlyRoots:access.readOnlyRoots,
+    privateTrees:access.privateTrees.map(t=>({root:t.root,writableSubtrees:[...t.allowedSubtrees,...(inside(t.root,home)?[home]:[])]})),
+  }) : restrictedMacProfile([cwd, runtime, home], [cwd, home]);
   return { intent, profile, cwd, env, receipt: join(lease, 'shell.json') };
 }

@@ -29,20 +29,20 @@ function fixture() {
   const snapshot = () => host.request({ type: 'thread', threadId: thread }) as DesktopThread;
   return { root, host, thread, start, snapshot, dispose: async () => { await host.close(); rmSync(root, { recursive: true, force: true }); } };
 }
-test('desktop permission policy persists; automatic write uses the real Worker once and manual denial still prevents writes', async () => {
+for(const permissionMode of ['auto','full'] as const)test(`desktop ${permissionMode} policy persists; automatic write uses the real Worker once and manual denial still prevents writes`, async () => {
   const f=fixture();let reopened:DesktopHost|undefined;
   try {
-    const policy={type:'threads.permissions',requestId:'auto',threadId:f.thread,mode:'auto',expectedRevision:0};
+    const policy={type:'threads.permissions',requestId:'auto',threadId:f.thread,mode:permissionMode,expectedRevision:0};
     f.host.request({type:'command',command:policy});
     const start={...f.start,permissionRevision:1};
     const ack=f.host.request({type:'command',command:start}) as Ack;
     assert.deepEqual(f.host.request({type:'command',command:start}),ack);
     await until(()=>f.snapshot().runs[0]?.state==='completed','automatic-write');
-    const snap=f.snapshot();assert.equal(snap.operations.length,1);assert.equal(snap.operations[0]!.approvalSource,'workspace-tools-v1');
+    const snap=f.snapshot();assert.equal(snap.operations.length,1);assert.equal(snap.operations[0]!.approvalSource,permissionMode==='full'?'full-tools-v1':'workspace-tools-v1');
     assert.equal(snap.operations[0]!.state,'succeeded');assert.equal(snap.artifacts.length,1);
     const path=join(f.root,'workspace',snap.artifacts[0]!.path);const modified=statSync(path).mtimeMs;
     await f.host.close();reopened=new DesktopHost(f.root);
-    assert.equal((reopened.request({type:'home'}) as DesktopHome).threads[0]!.permissionMode,'auto');
+    assert.equal((reopened.request({type:'home'}) as DesktopHome).threads[0]!.permissionMode,permissionMode);
     assert.deepEqual(reopened.request({type:'command',command:start}),ack);assert.equal(statSync(path).mtimeMs,modified);
     reopened.request({type:'command',command:{...policy,requestId:'manual',mode:'manual',expectedRevision:1}});
     reopened.request({type:'command',command:{...f.start,requestId:'denied',permissionRevision:2}});

@@ -7,7 +7,7 @@ import type { ModelSelection, ModelOutcome } from '../app-contracts/model.ts';
 import type { AgentSession } from '@earendil-works/pi-coding-agent';
 
 /** Public native Provider delegation only. No provider protocol or Agent loop here. */
-export async function modelServices(options: { cwd: string; agentDir: string }, selection: ModelSelection,
+export async function modelServices(options: { cwd: string; agentDir: string; fullAccess?:boolean }, selection: ModelSelection,
   key: string, fetch: FetchFunction, syntheticProvider?: Provider) {
   const runtime = await ModelRuntime.create({ credentials: new InMemoryCredentialStore(), modelsStore: new InMemoryModelsStore(), modelsPath: null, allowModelNetwork: false, refreshOnCreate: false });
   configureOpenAI(runtime, selection);
@@ -28,10 +28,10 @@ export async function modelServices(options: { cwd: string; agentDir: string }, 
     },
   });
   await runtime.setRuntimeApiKey(selection.provider, key);
-  return { model, services: { ...options, modelRuntime: runtime, settingsManager: SettingsManager.inMemory({
+  return { model, services: { cwd: options.cwd, agentDir: options.agentDir, modelRuntime: runtime, settingsManager: SettingsManager.inMemory({
     retry: { enabled: false, maxRetries: 0, provider: { maxRetries: 0, timeoutMs: selection.timeoutMs } },
     compaction: { enabled: false }, cacheWarming: 'off', transport: 'sse',
-  }), resourceLoader: explicitEmptyResources(selection.shellTools?'You may use read, write and edit on approved Markdown files and bash within the approved workspace. Every operation requires host authorization under the task\'s fixed permission mode: manual confirmation or approved automatic rules. Bash is offline, uses a sterile environment, and may change any workspace file. A known nonzero exit may be corrected with a separately host-authorized command. Never retry denied, cancelled or unconfirmed operations.':selection.fileTools?'You may use only read, write and edit on approved Markdown files in the workspace. Every operation requires host authorization under the task\'s fixed permission mode: manual confirmation or approved automatic rules. Treat a denial as a refusal; do not retry it or claim an unconfirmed change.':'You are a concise assistant. You have no tools. Never claim to have read or changed files.'), diagnostics: [] } };
+  }), resourceLoader: explicitEmptyResources(options.fullAccess && selection.fileTools ? 'You may use read, write and edit on UTF-8 text files outside the workspace under host full-access policy. Use ordinary relative or absolute paths, not ~ or @ aliases. Application private directories and runtime code remain protected. Bash, when enabled, may access external files and IP networks with a sterile environment. Every operation is still host-authorized for this fixed task; never retry denied, cancelled or unconfirmed operations. External file changes are audited but are not workspace artifacts.' : selection.shellTools?'You may use read, write and edit on approved Markdown files and bash within the approved workspace. Every operation requires host authorization under the task\'s fixed permission mode: manual confirmation or approved automatic rules. Bash is offline, uses a sterile environment, and may change any workspace file. A known nonzero exit may be corrected with a separately host-authorized command. Never retry denied, cancelled or unconfirmed operations.':selection.fileTools?'You may use only read, write and edit on approved Markdown files in the workspace. Every operation requires host authorization under the task\'s fixed permission mode: manual confirmation or approved automatic rules. Treat a denial as a refusal; do not retry it or claim an unconfirmed change.':'You are a concise assistant. You have no tools. Never claim to have read or changed files.'), diagnostics: [] } };
 }
 export function modelOutcome(session: AgentSession, synthetic: boolean, cancelled: boolean, firstMessage=0): ModelOutcome {
   const messages=session.messages.slice(firstMessage).filter(m=>m.role==='assistant');

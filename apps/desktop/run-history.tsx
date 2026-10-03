@@ -25,7 +25,7 @@ export function RunHistory({thread, pending, workspacePath, mode, busy, disconne
     const hasMore = operationPages?.get(run.id)?.hasMore;
     return <article className={modelMode ? 'run model-run' : 'run'} key={run.id} data-run={run.id} data-state={run.state}>
       <div className="run-label"><span className={`state state-${run.state}`}>{runLabel(run)}</span>
-        {['queued','starting','running','cancelling','unknown'].includes(run.state) && <span className="run-permission">本次：{run.permissionMode === 'auto' ? '自动审批' : '人工审批'}</span>}
+        {['queued','starting','running','cancelling','unknown'].includes(run.state) && <span className="run-permission">本次：{run.permissionMode === 'full' ? '完全访问' : run.permissionMode === 'auto' ? '自动审批' : '人工审批'}</span>}
         {run.state === 'queued' && <button className="stop" disabled={busy || disconnected} onClick={() => void command({type:'runs.cancel', requestId:id(), runId:run.id})}>取消排队</button>}
       </div>
       <section className="run-conversation" aria-label="会话正文"><h3 className="run-section-title">会话正文</h3>
@@ -36,13 +36,13 @@ export function RunHistory({thread, pending, workspacePath, mode, busy, disconne
       {(operations.length > 0 || hasMore) && <section className="run-operations" aria-label="操作记录"><h3 className="run-section-title" title="独立的操作列表，不表示与正文的先后关系">操作记录 · {operations.length}{hasMore ? '+' : ''}</h3>
         {operations.map(op => <div className="operation-record" key={op.id} data-operation={op.id}>
           {pending.some(current => current.id === op.id) ? <ApprovalList pending={pending.filter(current => current.id === op.id)} workspacePath={workspacePath} modelMode={modelMode} busy={busy} disconnected={disconnected} command={command} /> : <div className="tool-card">
-          <div><strong>{op.shell ? 'Bash' : op.tool === 'read' ? '读取 Markdown' : op.tool === 'edit' ? '修改 Markdown' : '写入 Markdown'}</strong><span>{op.shell ? op.shell.intent.command : op.artifactPath}</span>
+          <div><strong>{op.shell ? 'Bash' : op.tool === 'read' ? '读取文件' : op.tool === 'edit' ? '修改文件' : '写入文件'}</strong><span>{op.shell ? op.shell.intent.command : op.artifactPath}</span>
             {op.shell?.outcome && <details className="shell-output"><summary>命令结果 · 退出码 {op.shell.outcome.exitCode ?? op.shell.outcome.signal ?? '未启动'}</summary><p>{op.shell.outcome.timedOut ? '已超时 · ' : ''}{op.shell.outcome.sideEffects === 'possible' ? '可能已有文件改动，不代表回滚。' : '命令未启动。'}{op.shell.outcome.truncated && '输出超过上限，已截断。'}</p><strong>stdout</strong><pre>{op.shell.outcome.stdout}</pre><strong>stderr</strong><pre>{op.shell.outcome.stderr}</pre></details>}
-          </div><span className="tool-status">{op.approvalSource === 'workspace-tools-v1' && <small className="approval-source">自动批准 · </small>}{op.state === 'pending' ? '正在同步操作状态' : (op.shell ? shellLabels : operationLabels)[op.state] ?? '未知操作'}</span>
+          </div><span className="tool-status">{op.approvalSource !== 'manual' && <small className="approval-source">{op.approvalSource === 'full-tools-v1' ? '完全访问 · 自动批准' : '自动批准'} · </small>}{op.state === 'pending' ? '正在同步操作状态' : (op.shell ? shellLabels : operationLabels)[op.state] ?? '未知操作'}</span>
         </div>}</div>)}
         {hasMore && <button className="load-operations" disabled={loading || disconnected} onClick={() => loadMore(run.id)}>加载更早工具记录</button>}
       </section>}
-      {outcome && <details className="run-meta"><summary>运行信息</summary><p>本次权限：{run.permissionMode === 'auto' ? '自动审批（工作目录）' : '人工审批'}</p><p>模型状态：{{stop:'回答结束',length:'达到输出上限',cancelled:'已停止',provider_error:'模型流程未完成',budget:'预算不足',protocol:'协议异常'}[outcome.reason]} · 输入 {outcome.inputTokens} / 输出 {outcome.outputTokens} token</p></details>}
+      {outcome && <details className="run-meta"><summary>运行信息</summary><p>本次权限：{run.permissionMode === 'full' ? '完全访问（应用私有数据仍受保护）' : run.permissionMode === 'auto' ? '自动审批（工作目录）' : '人工审批'}</p><p>模型状态：{{stop:'回答结束',length:'达到输出上限',cancelled:'已停止',provider_error:'模型流程未完成',budget:'预算不足',protocol:'协议异常'}[outcome.reason]} · 输入 {outcome.inputTokens} / 输出 {outcome.outputTokens} token</p></details>}
       {outcome?.reason === 'provider_error' && <p className="run-note model-error" role="alert">{modelErrorText(outcome.error)}</p>}
       {run.state === 'unknown' && <p className="run-note">不能确认此次执行的最终结果。完成对账后再继续，不会自动重新执行。</p>}
       {run.state === 'cancelled' && <p className="run-note">{modelMode ? '本次执行与清理已结束；服务端已发生的费用不会因此撤销。' : '执行与清理已结束；已经发生的文件改动不会自动回滚。'}</p>}

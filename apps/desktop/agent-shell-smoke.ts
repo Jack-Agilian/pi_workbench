@@ -108,6 +108,25 @@ export async function runAgentShellSmoke(window:BrowserWindow,host:HostClient){
   await host.reconnect();
   await new Promise<void>(resolve=>{window.webContents.once('did-finish-load',resolve);window.webContents.reload();});
   await wait(()=>js<boolean>("document.querySelector('.permission-picker summary')?.textContent==='权限：自动审批' && document.querySelectorAll('.approval-source').length===2"),'automatic-policy-restored');
+  await js("document.querySelector('.permission-picker').open=true");
+  const fullCaptures=join(app.getAppPath(),'../../.artifacts/full-product-20261004');mkdirSync(fullCaptures,{recursive:true});
+  for(const [width,height] of [[1320,860],[820,640]]){
+    window.setContentSize(width!,height!);await new Promise(r=>setTimeout(r,180));
+    assert.equal(await js<boolean>("(()=>{const e=document.querySelector('[data-permission=full]'),b=e.getBoundingClientRect();return b.x>=0&&b.y>=0&&b.right<=innerWidth&&b.bottom<=innerHeight&&e.contains(document.elementFromPoint(b.x+b.width/2,b.y+b.height/2));})()"),true);
+    writeFileSync(join(fullCaptures,`full-permission-${width}.png`),(await window.webContents.capturePage(undefined,{stayAwake:true})).toPNG());
+  }
+  window.setContentSize(originalSize[0]!,originalSize[1]!);await click('[data-permission=full]');
+  await wait(()=>js<boolean>("document.querySelector('.permission-picker summary').textContent==='权限：完全访问'"),'full-mode-confirmed');
+  await js("document.querySelector('.permission-picker').open=false;const t=document.querySelector('#composer');Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set.call(t,'SYNTHETIC full access task');t.dispatchEvent(new Event('input',{bubbles:true}));");
+  await wait(()=>js<boolean>("!document.querySelector('button[type=submit]').disabled"),'full-send');await js("document.querySelector('form.composer').requestSubmit()");
+  await wait(async()=>{const t=await host.request({type:'thread',threadId:automatic.thread.id}) as DesktopThread;return t.runs.some(r=>r.permissionMode==='full'&&r.state==='completed');},'full-task-complete');
+  const full=await host.request({type:'thread',threadId:automatic.thread.id}) as DesktopThread;
+  const fullRun=full.runs.find(r=>r.permissionMode==='full')!;
+  assert.ok(full.operations.filter(o=>o.runId===fullRun.id).length>0);
+  assert.ok(full.operations.filter(o=>o.runId===fullRun.id).every(o=>o.approvalSource==='full-tools-v1'&&o.shell?.intent.profile==='full-bash-v1'));
+  assert.equal(await js<number>("document.querySelectorAll('.approval .primary').length"),0);
+  await host.reconnect();await new Promise<void>(resolve=>{window.webContents.once('did-finish-load',resolve);window.webContents.reload();});
+  await wait(()=>js<boolean>("document.querySelector('.permission-picker summary')?.textContent==='权限：完全访问' && [...document.querySelectorAll('.approval-source')].some(e=>e.textContent.includes('完全访问'))"),'full-mode-restored');
   console.log('agent-shell desktop: native directory dialog contract, selected cwd, separate approvals, nonzero continuation, real Bash, bounded result cards, 3 viewport captures and reconnect without replay passed; SYNTHETIC Provider only');
  }finally{dialog.showOpenDialog=original;rmSync(directory,{recursive:true,force:true});}
 }

@@ -47,6 +47,7 @@ export class DesktopHost {
     if (files.length !== 1) throw new Error('unapproved_demo_resources');
     this.core = new ProductCore(join(database, 'product.sqlite'), [{ id: 'demo-workspace', path: workspace }]);
     this.supervisor = new WorkerSupervisor(this.core, { stateDirectory: state, databaseDirectory: database,
+      fullAccessRoots:()=>[root,...protectedDirectories,...this.credentialRoots],
       validateWorkspace:(id,path)=>{this.admission.check(path,id==='demo-workspace');},
       resources: { root: resourcesRoot, id: contentId(files), files, expectedSkillNames: [] } });
     this.recover();

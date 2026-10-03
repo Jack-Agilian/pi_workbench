@@ -1,7 +1,7 @@
 // SYNTHETIC protocol producer; tests real IPC and cancellation, not a Pi fixture.
 import { parseEnvelope, type WireBody, type WorkerInit } from '../../../packages/app-contracts/worker-ipc.ts';
 const instanceId=process.argv[2]!,runtimeBindingId=process.argv[3]!;
-const send=(body:WireBody,requestId:string)=>new Promise<void>((resolve,reject)=>process.send!({version:10,instanceId,runtimeBindingId,requestId,body},error=>error?reject(error):resolve()));
+const send=(body:WireBody,requestId:string)=>new Promise<void>((resolve,reject)=>process.send!({version:11,instanceId,runtimeBindingId,requestId,body},error=>error?reject(error):resolve()));
 let config:WorkerInit;
 const presentation=(text:string):WireBody=>({type:'presentation',projection:{messages:[{id:'synthetic-display',role:'assistant',text,truncated:false}],omitted:false}});
 process.on('message',raw=>{void (async()=>{
