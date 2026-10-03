@@ -137,3 +137,7 @@ React事件及清理经Context7查询 [DOM事件](https://react.dev/reference/re
 ## 恢复与审批连续操作（2026-10-04）
 
 [本批映射及复审](../validation/workflow-review-2026-10-04.md)继续核对固定pi-gui `163054227d370a49d09099c61eb65798481294ac`的use-session-composer.tsx：保留失败输入、操作后的焦点处理。只借鉴行为，本项目仍保留产品requestId、宿主清理/替换和单一滚动所有者；不复制新组件或新增依赖。本机早期checkout为另一个提交，已明确不混作本次固定参考。恢复状态拆分属于业务逻辑修复，不另建通用错误/状态框架。
+
+## 会话目录采用（2026-10-04）
+
+完整“本项目模块→固定参考/API→采用→边界”见[目录契约](thread-directory-contract.md)。复读C03固定163054227d370a49d09099c61eb65798481294ac的sidebar.tsx，仅借鉴选中会话独立、编辑目标保留行为，没有新增社区片段。Query 5.104.0根级运行时useInfiniteQuery已核对声明和实际ESM，与QueryClient共同管理新目录页；Context7 main文档仅辅助理解，不当作发行依据。宿主沿用已有SQLite keyset/字节约束，Renderer不建全库镜像、Session索引或第二套分页缓存；证据见[报告](../validation/thread-directory-2026-10-04.md)。

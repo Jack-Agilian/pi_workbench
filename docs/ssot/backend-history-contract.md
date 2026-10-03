@@ -68,7 +68,7 @@ Renderer按当前已知事件失效：display.replaced和model结果只读对应
 
 新run.queued从首屏补到已知头部，保留旧尾游标；大于一页的新插入不漏项。未加载旧Run的正文变化不会自动装载全部历史。只在整批查询成功后发布新视图并推进到已收到的最后事件；后读snapshotSeq不得跳过128条批次。失败保留完整旧视图和水位；会话切换停止未发出的查询，迟到结果不发布。重连/无效页位置从新首屏重新建立已浏览范围；这些读取不会执行产品命令。
 
-历史R03“前端切换之前”的描述只记录当时阶段；当前Renderer已分页并采用上述定向入口。仍没有home目录分页或虚拟列表；后续限定原生正文补读见下节，不替代产品历史分页。
+历史R03“前端切换之前”的描述只记录当时阶段；当前Renderer已分页并采用上述定向入口。当时尚未分页home目录；2026-10-04新增目录入口见下节末尾，仍无虚拟列表。后续限定原生正文补读不替代产品历史分页。
 
 ## Q1连接身份与缓存边界
 
@@ -77,3 +77,7 @@ HostClient每次启动实际宿主产生新的不透明queryScope，query-scope�
 ## 安全正文读取补充（2026-10-04）
 
 [安全阅读契约](safe-reading-contract.md)增加native-text只读请求，宿主按Thread/Run及持久原生范围提供安全文本分页，不允许自由路径。SQL v13只存起止entry引用；Worker IPC v12的native-range通知不作为结算依据。Pi公开parseSessionEntries及SessionManager.inMemory/getBranch负责原生解析/分支，产品库不保存第二份正文。session.range只推进既有事件水位，不重载历史或执行工具；旧Run不补猜范围。16KiB正文页、8MiB原生文件上限及实际SDK/进程/Electron边界见[证据](../validation/safe-reading-2026-10-04.md)。
+
+## 2026-10-04 会话目录查询
+
+[目录契约](thread-directory-contract.md)新增固定参数化只读thread-directory：名称/已登记路径查询、工作目录筛选、创建倒序、默认16/最多32条、revision绑定游标。home的Thread集合限制32条；workspaces/activeRuns保持原未分页范围，不声称整个home无限扩展。Renderer已采用该正式入口，当前会话/审批独立于过滤结果。SQL v13/Worker IPC v12不变，查找不执行工具、不修改原生Session；实测见[报告](../validation/thread-directory-2026-10-04.md)。
