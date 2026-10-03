@@ -54,6 +54,35 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
     assert.equal(existsSync(join(profile, 'workspace', op.artifactPath!)), false);
     assert.equal(await js<boolean>("Boolean(globalThis.injection) || !!document.querySelector('.timeline img')"), false);
     assert.equal(await js<boolean>("document.querySelector('.timeline').textContent.includes('sk-syntheticSecret123456789')"), false);
+    if (scenario === 'allow') {
+      // SYNTHETIC ordinary approval failure: the real pending Worker must survive a read retry.
+      const originalRequest = host.request.bind(host); const pid: number | undefined = host.processId;
+      let rejectApproval = true; let commandCount = 0;
+      let holdReads = false; let releaseReads: (() => void) | undefined;
+      const readGate = new Promise<void>(resolve => { releaseReads = resolve; });
+      host.request = async raw => {
+        if (holdReads && (raw.type === 'home' || raw.type === 'thread-activity')) await readGate;
+        if (raw.type === 'command') {
+          ++commandCount;
+          if (rejectApproval) { rejectApproval = false; throw new Error('SYNTHETIC_approval_unconfirmed'); }
+        }
+        return originalRequest(raw);
+      };
+      try {
+        await click('仅本次允许');
+        await wait(() => js<boolean>("document.querySelector('.notice.error button')?.textContent === '刷新状态'"), 'ordinary_error_read_action');
+        assert.equal(await js<boolean>("document.querySelector('.notice.error').textContent.includes('重新连接')"), false);
+        holdReads = true; await click('刷新状态');
+        await wait(() => js<boolean>("document.querySelector('.notice.error button').disabled && !document.querySelector('.view-toolbar .stop').disabled"), 'slow_read_preserves_stop');
+        holdReads = false; releaseReads!();
+        await wait(() => js<boolean>("!document.querySelector('.notice.error') && !document.querySelector('.stop')?.disabled"), 'read_refresh_complete');
+        assert.equal(host.processId, pid); assert.equal(commandCount, 1);
+        const refreshed = await originalRequest({ type: 'thread', threadId }) as DesktopThread;
+        assert.equal(refreshed.runs[0]!.state, 'running');
+        assert.equal(refreshed.operations[0]!.id, op.id); assert.equal(refreshed.operations[0]!.state, 'pending');
+        assert.equal(existsSync(join(profile, 'workspace', op.artifactPath!)), false);
+      } finally { releaseReads!(); host.request = originalRequest; }
+    }
     if (scenario === 'crash') {
       process.kill(host.processId!, 'SIGKILL');
       await wait(() => js<boolean>("document.querySelector('.notice')?.textContent.includes('连接已断开') === true"), 'host_disconnect');
@@ -71,6 +100,8 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
     await wait(async () => { snapshot = await host.request({ type: 'thread', threadId }) as DesktopThread; return snapshot.runs[0]?.state === expected; }, expected);
     await wait(() => js<boolean>(`Boolean(document.querySelector('[data-state="${expected}"]'))`), 'state');
     if (scenario === 'allow') {
+      await wait(() => js<boolean>("Boolean(document.querySelector('.run-conversation .message.assistant')) && Boolean(document.querySelector('.run-operations .tool-card'))"), 'separate_body_operations');
+      assert.equal(await js<boolean>("document.querySelector('.run-conversation').getAttribute('aria-label') === '会话正文' && document.querySelector('.run-operations').getAttribute('aria-label') === '操作记录' && !document.querySelector('.run-conversation .tool-card') && !document.querySelector('.run-operations .message') && !document.querySelector('[aria-label=会话时间线]')"), true);
       const artifact = snapshot.artifacts[0]!; assert.ok(artifact); assert.ok(readFileSync(join(profile, 'workspace', artifact.path), 'utf8').includes(text));
       await wait(() => js<boolean>("Boolean(document.querySelector('.artifact'))"), 'artifact');
       await js("document.querySelector('.artifact').click()");
@@ -119,11 +150,11 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
   // Trusted test-only transport fault after the real command is durably accepted.
   // This lives in the smoke module, never the Renderer/preload or product protocol.
   const request = host.request.bind(host); const attempts: Command[] = [];
-  let loseAck: Command['type'] | undefined;
+  let loseAck: Command['type'] | undefined; let ackError = 'disconnected';
   host.request = async raw => {
     if (raw.type === 'command') attempts.push(structuredClone(raw.command));
     const result = await request(raw);
-    if (raw.type === 'command' && raw.command.type === loseAck) { loseAck = undefined; throw new Error('disconnected'); }
+    if (raw.type === 'command' && raw.command.type === loseAck) { loseAck = undefined; throw new Error(ackError); }
     return result;
   };
   const create = async (title: string) => {
@@ -167,7 +198,13 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
   assert.equal((await host.request({ type: 'thread', threadId: a.id }) as DesktopThread).runs.length, 1);
 
   await click(b.title); await wait(() => js<boolean>("document.querySelector('h1')?.textContent === 'SYNTHETIC retry B'"), 'same_thread_retry');
-  const repeatedText = 'SYNTHETIC deliberate same content'; await submit(repeatedText, true); await reconnectUi();
+  const repeatedText = 'SYNTHETIC deliberate same content'; ackError = 'SYNTHETIC_request_unconfirmed';
+  await submit(repeatedText, true);
+  const refreshPid = host.processId; const beforeRefreshAttempts = attempts.length;
+  await click('刷新状态');
+  await wait(() => js<boolean>("!document.querySelector('.notice.error') && !document.querySelector('.composer button').disabled"), 'unconfirmed_read_refresh');
+  assert.equal(host.processId, refreshPid); assert.equal(attempts.length, beforeRefreshAttempts);
+  assert.equal(await js<string>("document.querySelector('#composer').value"), repeatedText);
   await click('重试未确认请求 ↑'); await wait(() => js<boolean>("document.querySelector('#composer').value === ''"), 'B_retry_ack');
   await submit(repeatedText, false); // A new, explicitly submitted intent, despite identical content.
   const bRuns = attempts.filter(c => c.type === 'runs.start' && c.threadId === b.id && c.input === repeatedText);
@@ -208,5 +245,5 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
     assert.equal(proof.exited, true); assert.equal(proof.groupGone, true); assert.throws(() => process.kill(-proof.workerPid, 0));
   } finally { dialog.showMessageBox = originalDialog; }
   console.log(JSON.stringify({ desktopSmoke: 'passed', versions: { electron: process.versions.electron, chromium: process.versions.chrome, node: process.versions.node, abi: process.versions.modules }, platform: process.platform, arch: process.arch, scenarios: counts,
-    reviewRegressions: ['create-ack-loss', 'interleaved-thread-ack-loss', 'same-thread-retry', 'explicit-identical-new-intent', 'actual-before-quit-cleanup-failure'], realModelCalls: 0 }));
+    reviewRegressions: ['ordinary-error-read-refresh-preserves-worker', 'unconfirmed-read-refresh-no-replay', 'separate-body-operations', 'create-ack-loss', 'interleaved-thread-ack-loss', 'same-thread-retry', 'explicit-identical-new-intent', 'actual-before-quit-cleanup-failure'], realModelCalls: 0 }));
 }

@@ -873,3 +873,8 @@ select:focus-visible,.timeline:focus-visible { outline:2px solid #257354; outlin
   .composer-footer { flex-wrap:wrap; }
   .composer-footer button { margin-left:auto; }
 }
+
+/* Separate native message order from the independently paged product operations. */
+.run-section-title { margin: 14px 0 8px; font-size: 12px; font-weight: 650; color: #435349; }
+.run-operations { border-top: 1px solid #d5ded6; margin-top: 16px; }
+.run-section-hint { margin: 0 0 12px; font-size: 12px; line-height: 1.5; color: #52645b; }

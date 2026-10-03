@@ -38,8 +38,15 @@ export async function runAgentShellSmoke(window:BrowserWindow,host:HostClient){
   await wait(()=>js<boolean>("!!document.querySelector('[data-state=completed]')"),'complete');
   const result=join(directory,'synthetic-shell.md');assert.match(readFileSync(result,'utf8'),/SYNTHETIC shell result/);const time=statSync(result).mtimeMs;
   const before=await host.request({type:'thread',threadId}) as DesktopThread;assert.deepEqual(before.operations.map(o=>o.state),['failed','succeeded']);assert.equal(before.artifacts.length,0);
+  const expectedText=before.presentations[0]!.value.messages.filter(m=>m.role==='assistant'||m.role==='tool').map(m=>m.text);
+  const grouped=()=>js<boolean>("document.querySelectorAll('.run-operations .tool-card').length===2 && document.querySelectorAll('.run-operations .shell-output').length===2 && !document.querySelector('.run-conversation .tool-card')");
+  await wait(grouped,'grouped-tools-after-nonzero-continuation');
+  assert.deepEqual(await js<string[]>("[...document.querySelectorAll('.run-conversation .message.assistant p')].map(e=>e.textContent)"),expectedText);
   await host.reconnect();const after=await host.request({type:'thread',threadId}) as DesktopThread;
   assert.equal(after.cursor,before.cursor);assert.equal(statSync(result).mtimeMs,time);assert.equal((await host.request({type:'home'}) as DesktopHome).workspaces.selectedId,home.workspaces.selectedId);assert.equal(dialogs,1);
+  await new Promise<void>(resolve=>{window.webContents.once('did-finish-load',resolve);window.webContents.reload();});
+  await wait(grouped,'grouped-tools-after-reconnect');
+  assert.deepEqual(await js<string[]>("[...document.querySelectorAll('.run-conversation .message.assistant p')].map(e=>e.textContent)"),expectedText);
   console.log('agent-shell desktop: native directory dialog contract, selected cwd, separate approvals, nonzero continuation, real Bash, bounded result cards, 3 viewport captures and reconnect without replay passed; SYNTHETIC Provider only');
  }finally{dialog.showOpenDialog=original;rmSync(directory,{recursive:true,force:true});}
 }
