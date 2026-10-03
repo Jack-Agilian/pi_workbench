@@ -7,6 +7,7 @@ import { inside } from '../../packages/pi-adapter/path-scope.ts';
 import type { ShellLaunch } from './shell-execution.ts';
 import type { ShellIntent } from '../../packages/app-contracts/shell.ts';
 import type { WorkerInit } from '../../packages/app-contracts/worker-ipc.ts';
+import { restrictedMacProfile } from './macos-access.ts';
 export const repository = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 export interface LaunchSpec {
   shell?: ShellLaunch;
@@ -31,12 +32,7 @@ export function launchSpec(config: WorkerInit, identity: { instanceId: string; n
   for (const root of readRoots) if (denied.some(d => inside(root, d) || inside(d, root))) throw new Error('host_worker_roots_overlap');
   for (const root of writeRoots) if (inside(root, config.resources.root)) throw new Error('writable_resource_snapshot');
   const home = config.agentDir; const env = sterileEnvironment(home); env.PI_CODING_AGENT_DIR = config.agentDir;
-  const literals = (paths: string[]) => paths.map(p => `(subpath ${JSON.stringify(p)})`).join(' ');
-  const profile = ['(version 1)', '(allow default)', '(deny network*)', '(deny file-read*)', '(allow file-read-metadata)', '(deny file-write*)',
-    `(allow file-read* ${literals([...readRoots, resolve(dirname(node), '..')])})`,
-    '(allow file-read* (subpath "/System") (subpath "/usr/lib") (subpath "/usr/bin") (subpath "/bin") (literal "/") (literal "/dev/null") (literal "/dev/urandom") (literal "/dev/random") (subpath "/dev/fd"))',
-    `(allow file-write* ${literals(writeRoots)})`, '(allow file-write* (literal "/dev/null"))',
-    `(deny file-read-data file-write* ${literals(denied)})`].join(' ');
+  const profile = restrictedMacProfile([...readRoots, resolve(dirname(node), '..')], writeRoots, denied);
   const flags = ['--permission', '--allow-fs-read=*', ...writeRoots.map(p => `--allow-fs-write=${p}`),
     '--import', join(repository, 'scripts/probe-no-network.mjs'), ...(entry?.allowFixedChildren ? ['--allow-child-process'] : [])];
   return { ...identity, runtimeBindingId: config.binding.runtimeBindingId, receipt: join(host.lease, 'cleanup.json'),
@@ -59,9 +55,6 @@ export function shellLaunch(intent: ShellIntent, workspace: string, lease: strin
   const cwd = realpathSync(workspace); const runtime = resolve(dirname(realpathSync(process.execPath)), '..');
   const home = join(lease, 'shell-home'); mkdirSync(home, { recursive: true, mode: 0o700 });
   const env = sterileEnvironment(home); env.PATH = '/usr/bin:/bin'; env.LANG = 'en_US.UTF-8';
-  const profile = ['(version 1)', '(allow default)', '(deny network*)', '(deny file-read*)', '(allow file-read-metadata)', '(deny file-write*)',
-    `(allow file-read* (subpath ${JSON.stringify(cwd)}) (subpath ${JSON.stringify(runtime)}) (subpath ${JSON.stringify(home)}))`,
-    '(allow file-read* (subpath "/System") (subpath "/usr/lib") (subpath "/usr/bin") (subpath "/bin") (literal "/") (literal "/dev/null") (literal "/dev/urandom") (literal "/dev/random") (subpath "/dev/fd"))',
-    `(allow file-write* (subpath ${JSON.stringify(cwd)}) (subpath ${JSON.stringify(home)}) (literal "/dev/null"))`].join(' ');
+  const profile = restrictedMacProfile([cwd, runtime, home], [cwd, home]);
   return { intent, profile, cwd, env, receipt: join(lease, 'shell.json') };
 }
