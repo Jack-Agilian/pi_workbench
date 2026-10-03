@@ -54,4 +54,4 @@
 
 原始输出在`.artifacts/uncapped-cost-2026-10-03/`，本报告和证据清单是新克隆可定位摘要。当前真实链路通过不能把所有P0或完整产品标为完成。Skill评估：动态故障定位仍依赖现场判断；复用已有配置/审计/回归脚本，不新增泛化Skill。
 
-收口检查：68c63de及本报告文档差异上，typecheck、check-ssot、test-tools、check-docs --structural-only均通过；diff空白检查和常见密钥模式扫描无命中。没有提交用户配置、凭据、即时输出或startup快照改动。
+收口检查：68c63de及本报告文档差异上，typecheck、check-ssot、test-tools、check-docs --structural-only均通过；diff空白检查通过，新增行常见密钥模式扫描无命中；完整文件扫描命中既有syntheticCredential脱敏测试值，已与5e1709d基线核对相同，不是新增秘密。没有提交用户配置、凭据、即时输出或startup快照改动。
