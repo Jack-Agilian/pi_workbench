@@ -1390,7 +1390,8 @@
           "EV-DESKTOP-CLOSEOUT-MODEL-20261003",
           "EV-DESKTOP-CLOSEOUT-MAC-20261003",
           "EV-DESKTOP-CLOSEOUT-COPY-20261003",
-          "EV-DESKTOP-CLOSEOUT-UI-20261003"
+          "EV-DESKTOP-CLOSEOUT-UI-20261003",
+          "EV-DESKTOP-CLOSEOUT-READONLY-20261003"
         ]
       }
     }
@@ -3290,6 +3291,18 @@
       "platforms": [
         "darwin"
       ],
+      "locator": "docs/validation/desktop-functional-closeout-2026-10-03.md"
+    },
+    {
+      "id": "EV-DESKTOP-CLOSEOUT-READONLY-20261003",
+      "kind": "platform",
+      "result": "passed",
+      "commit": "d7f9f519e6eb668c24fa7d590869561688674e30",
+      "recordedAt": "2026-10-03T06:22:58.670982+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "scope": "普通入口重开实际Electron，读取既有真实拒绝/成果历史核验修正措辞；正常退出、无新增请求、原账本不变。远端develop及功能分支同SHA独立读回；不扩大完整P0。",
       "locator": "docs/validation/desktop-functional-closeout-2026-10-03.md"
     }
   ]
