@@ -1521,7 +1521,8 @@
           "EV-EXPERIENCE-MOCK-20261004",
           "EV-CROSS-THREAD-STATIC-20261004",
           "EV-CROSS-THREAD-MAC-20261004",
-          "EV-CROSS-THREAD-MOCK-20261004"
+          "EV-CROSS-THREAD-MOCK-20261004",
+          "EV-DAILY-READINESS-REVIEW-20261004"
         ]
       }
     }
@@ -3950,6 +3951,18 @@
       ],
       "locator": "docs/validation/cross-thread-2026-10-04.md",
       "scope": "显式合成目录/输入；排队用原会话取消不执行，其他活动Run绑定停止只发一条命令，不误报当前会话完成。保留开发快照语义/测试顺序失败，不扩大Gate。"
+    },
+    {
+      "id": "EV-DAILY-READINESS-REVIEW-20261004",
+      "kind": "review",
+      "result": "passed",
+      "commit": "dd119043fcc639e4f6f3fb4e69029adf93c217f0",
+      "recordedAt": "2026-10-03T19:56:10.970608+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/daily-readiness-2026-10-04.md",
+      "scope": "逐七项目标核对当前代码/原实测SHA和测试断言，区分30项合成定位/3个真实版本和历史模型；完成审查不等于产品验收。Mac锁屏仍在，原生连续操作/VoiceOver未验证，无新增运行套件或模型。"
     }
   ]
 }
