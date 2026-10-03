@@ -26,7 +26,7 @@
 
 固定 pi-gui 文件：[timeline](https://github.com/minghinmatthewlam/pi-gui/blob/163054227d370a49d09099c61eb65798481294ac/apps/desktop/src/features/conversation/conversation-timeline.tsx)、[timeline-item](https://github.com/minghinmatthewlam/pi-gui/blob/163054227d370a49d09099c61eb65798481294ac/apps/desktop/src/features/conversation/timeline-item.tsx)。根 MIT 已在前次研究核对；本轮是行为借鉴，不新增片段移植。原 Composer 的来源与许可不变。React 文档经 Context7 核对 [异步响应清理](https://react.dev/learn/synchronizing-with-effects) 和 [DOM refs](https://react.dev/learn/manipulating-the-dom-with-refs)。
 
-## 权限模式：社区事实与下一设计，不是本轮已实现能力
+## 权限模式：社区事实与当前接入
 
 用户指出产品不应永久围绕逐操作人工审批布局。2026-10-03核对官方资料：
 
@@ -34,6 +34,6 @@
 - [Claude Code](https://code.claude.com/docs/en/permission-modes)：Manual、acceptEdits、Auto、Plan、bypassPermissions 等模式；Auto 有独立分类器，不等同“所有操作都允许”。不同界面/配置的可用模式不同。
 - [OpenCode](https://opencode.ai/docs/permissions/)：allow/ask/deny 规则；询问可选择 once/always/reject，其中 always 按工具给出的模式在当前会话内持续生效。不是所有产品都恰好三个相同档位。
 
-本项目拟采用易理解的三档入口：人工审批、自动审批、完全访问。**当前只有逐项人工审批实现；另外两档是候选能力，未启用，也没有伪造可切换按钮。** 下一增量先确定每档的实际目录、网络、工具和审批范围，再将宿主持久策略、Run 绑定和界面入口一起交付。自动审批优先评估明确规则与既有 Operation 一次领取，不默认引入额外模型分类调用；如采用模型审核，须另核对适配与故障行为。
+本项目拟采用易理解的三档入口：人工审批、自动审批、完全访问。**当前已接通人工审批和工作目录内自动审批，完全访问尚未实现。** 详见[权限模式契约](permission-modes-contract.md)。自动审批采用宿主固定规则与既有 Operation 一次领取，不引入模型分类调用，不扩大执行范围；不能将其宣传为智能风险审核。
 
-权限模式入口放在输入区域，正常阅读不常驻大审批面板；仅待决操作出现紧凑卡片。完全访问的 OS 范围、产品保留目录及变更生效时机须明确，不能把隐藏提示或跳过前端按钮当作实现。模式变化仍由宿主核验并记录；Worker/Renderer 不能自报权限。下一设计不自动修改真实用户会话或当前运行。
+权限模式入口放在输入区域，正常阅读不常驻大审批面板；仅待决操作出现紧凑卡片。完全访问的 OS 范围、产品保留目录及变更生效时机须明确，不能把隐藏提示或跳过前端按钮当作实现。模式变化仍由宿主核验并记录；Worker/Renderer 不能自报权限。模式切换只影响之后接收的任务，不追溯修改当前运行或已经排队的任务。

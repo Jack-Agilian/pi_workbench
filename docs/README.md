@@ -119,3 +119,5 @@ UI-P2前端分页组合：[接入证据与范围](validation/ui-p2-pages-2026-09
 2026-09-30 Q1：[工具查询迁移、发行与离线证据](validation/ui-query-tools-2026-09-30.md)。F01已集成develop@4644902；Q1代码5b10b19在功能分支，工具数据由Query 5.104.0拥有，重连保留浏览位置。历史/成果待Q2，真实模型调用0，不晋级完整任务/Gate。
 
 [Q1集成后真实桌面检查](validation/q1-desktop-live-2026-10-01.md)：区分模型访问失败、旧成果浏览与正常重开，不将失败请求计为工具验收。
+
+2026-10-03权限模式：[契约](ssot/permission-modes-contract.md) · [限定验证](validation/permission-modes-2026-10-03.md)。输入区可选择人工或工作目录内自动审批，设置与每次任务的有效模式持久保存；完全访问尚未提供。
