@@ -1092,9 +1092,23 @@
             "EV-EXPERIENCE-STATIC-20261004",
             "EV-EXPERIENCE-MAC-20261004"
           ]
+        },
+        {
+          "id": "UI-01-A07",
+          "requirement": "会话切换/目录分页/筛选不使实际执行任务失去返回与停止入口；完整宿主Run身份绑定，草稿保持，排队与实际执行不混同，不重放或误报当前会话完成",
+          "plannedChecks": [
+            "other-task-off-page-filter-return-drafts",
+            "other-task-cancel-exact-run-and-no-file",
+            "other-task-zoom-controls"
+          ],
+          "evidenceRefs": [
+            "EV-CROSS-THREAD-STATIC-20261004",
+            "EV-CROSS-THREAD-MAC-20261004",
+            "EV-CROSS-THREAD-MOCK-20261004"
+          ]
         }
       ],
-      "statusReason": "会话查找、目录分页与阅读/成果动作已限定验证；整体布局密度、键盘/缩放/辅助技术和日常体验仍待集中复审，保持in_progress。 最新d4d50e0已限定通过侧栏收拢、窄窗/200%导航与审批停止可达、真实键盘和宿主终态通知；会话查找/阅读成果已由前批完成限定验证。唯一当前事项以NEXT_STEPS顶部为准，继续完整日常工作流体验复审；VoiceOver和完整用户人工验收未完成，不扩大Gate。"
+      "statusReason": "会话查找、目录分页与阅读/成果动作已限定验证；整体布局密度、键盘/缩放/辅助技术和日常体验仍待集中复审，保持in_progress。 最新d4d50e0已限定通过侧栏收拢、窄窗/200%导航与审批停止可达、真实键盘和宿主终态通知；会话查找/阅读成果已由前批完成限定验证。唯一当前事项以NEXT_STEPS顶部为准，继续完整日常工作流体验复审；VoiceOver和完整用户人工验收未完成，不扩大Gate。 后续24e59d8补齐跨会话实际执行入口，原生连续体验因锁屏未验证，整体目标与唯一NEXT事项保持。"
     },
     {
       "id": "UI-02",

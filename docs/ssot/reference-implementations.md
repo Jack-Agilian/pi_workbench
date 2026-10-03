@@ -151,3 +151,7 @@ React事件及清理经Context7查询 [DOM事件](https://react.dev/reference/re
 `pane-layout/renderer/thread-directory` → C03固定pi-gui `sidebar.tsx`、`conversation-timeline.tsx` → 选择身份独立、条件焦点、栏宽限制和唯一阅读所有者 → 保留宿主目录/权限/确认，不复制DnD/driver。覆盖导航另按WAI APG dialog模式处理inert/Tab/Escape/返回焦点。`run-status-notice`只读取产品宿主Run终态变化，不从Pi或界面空闲推测完成。
 
 Electron44.4.5的webContents缩放/键盘/debugger实例方法仅用于真实窗口测试，未新增Renderer权限。所查来源、实测SHA、失败和VoiceOver限制见[报告](../validation/experience-review-2026-10-04.md)；没有新增社区组件或依赖。
+
+## 跨会话执行可达（2026-10-04）
+
+`other-runs/renderer` → C03固定pi-gui sidebar的selectedSession与显式onSelectSession → 借鉴选择不依赖当前列表，用既有宿主activeRuns和runs.cancel展示/停止实际执行任务 → 不移植driver、调度或修改activeRuns的无queued语义。没有新依赖/API；实际证据及锁屏限制见[报告](../validation/cross-thread-2026-10-04.md)。
