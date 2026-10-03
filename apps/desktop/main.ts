@@ -56,7 +56,13 @@ protocol.handle('workbench', request => {
   return new Response(readFileSync(join(outputDirectory, asset[0]!)), { headers: { 'Content-Type': asset[1]!,
     'Content-Security-Policy': "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'none'; connect-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'" } });
 });
-const trusted = (event: Electron.IpcMainInvokeEvent) => window && event.sender === window.webContents && event.senderFrame === window.webContents.mainFrame && event.senderFrame.url === origin;
+const trusted = (event: Electron.IpcMainInvokeEvent): boolean => {
+  // A queued invocation may arrive after its native window/frame was destroyed.
+  // Teardown never converts an unreadable identity into a trusted sender.
+  if (!window || window.isDestroyed() || event.sender.isDestroyed()) return false;
+  try { return event.sender === window.webContents && event.senderFrame === window.webContents.mainFrame && event.senderFrame.url === origin; }
+  catch { return false; }
+};
 let inFlight = 0;
 let credentialDialog = false;
 let workspaceDialog = false;

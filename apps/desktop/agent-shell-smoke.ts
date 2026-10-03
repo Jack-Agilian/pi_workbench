@@ -21,7 +21,7 @@ export async function runAgentShellSmoke(window:BrowserWindow,host:HostClient){
   await wait(()=>js<boolean>(`document.querySelector('.execution-summary').textContent.includes(${JSON.stringify(directory)})`),'directory-shown');
   await click('.new-thread');await wait(()=>js<boolean>("!document.querySelector('#composer').disabled"),'thread');
   await js("(()=>{const t=document.querySelector('#composer');Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set.call(t,'SYNTHETIC Bash task');t.dispatchEvent(new Event('input',{bubbles:true}));})()");
-  await wait(()=>js<boolean>("!document.querySelector('button[type=submit]').disabled"),'send');await js("document.querySelector('form.composer').requestSubmit()");
+  await wait(()=>js<boolean>("!document.querySelector('.composer button[type=submit]').disabled"),'send');await js("document.querySelector('form.composer').requestSubmit()");
   const home=await host.request({type:'home'}) as DesktopHome;const threadId=home.threads[0]!.id;
   for(let i=0;i<2;i++){
    await wait(()=>js<boolean>("!!document.querySelector('.approval .primary')"),'approval-'+i);
@@ -66,7 +66,7 @@ export async function runAgentShellSmoke(window:BrowserWindow,host:HostClient){
   try{
    await js("document.querySelector('.permission-picker').open=true");await click('[data-permission=auto]');
    await wait(()=>js<boolean>("!!document.querySelector('.retry-permission')"),'policy-ack-lost');
-   assert.equal(await js<boolean>("document.querySelector('button[type=submit]').disabled"),true);
+   assert.equal(await js<boolean>("document.querySelector('.composer button[type=submit]').disabled"),true);
    await click('.retry-permission');await wait(()=>js<boolean>("!document.querySelector('.retry-permission') && !document.querySelector('.permission-picker summary').textContent.includes('保存中')"),'policy-ack-retry');
    assert.equal(policyAttempts.length,2);assert.equal(policyAttempts[0],policyAttempts[1]);
   }finally{host.request=request;}
@@ -81,7 +81,7 @@ export async function runAgentShellSmoke(window:BrowserWindow,host:HostClient){
    return request(raw);
   };
   try{
-   await wait(()=>js<boolean>("!document.querySelector('button[type=submit]').disabled"),'stale-send');await js("document.querySelector('form.composer').requestSubmit()");
+   await wait(()=>js<boolean>("!document.querySelector('.composer button[type=submit]').disabled"),'stale-send');await js("document.querySelector('form.composer').requestSubmit()");
    await wait(()=>js<boolean>("document.querySelector('.notice.error')?.textContent.includes('权限模式已变化') && document.querySelector('.permission-picker summary')?.textContent==='权限：人工审批'"),'stale-policy-rejected');
    assert.equal(await js<string>("document.querySelector('#composer').value"),'SYNTHETIC automatic Bash task');
    const current=(await request({type:'home'}) as DesktopHome).threads[0]!;
@@ -97,7 +97,7 @@ export async function runAgentShellSmoke(window:BrowserWindow,host:HostClient){
    writeFileSync(join(captures,`permission-picker-${width}.png`),(await window.webContents.capturePage(undefined,{stayAwake:true})).toPNG());
   }
   window.setContentSize(originalSize[0]!,originalSize[1]!);await js("document.querySelector('.permission-picker').open=false");
-  await wait(()=>js<boolean>("!document.querySelector('button[type=submit]').disabled"),'auto-send');await js("document.querySelector('form.composer').requestSubmit()");
+  await wait(()=>js<boolean>("!document.querySelector('.composer button[type=submit]').disabled"),'auto-send');await js("document.querySelector('form.composer').requestSubmit()");
   await wait(()=>js<boolean>("!!document.querySelector('[data-state=completed]') && document.querySelectorAll('.approval-source').length===2"),'automatic-tool-completion');
   const automaticHome=await host.request({type:'home'}) as DesktopHome;
   const automatic=await host.request({type:'thread',threadId:automaticHome.threads[0]!.id}) as DesktopThread;
@@ -119,7 +119,7 @@ export async function runAgentShellSmoke(window:BrowserWindow,host:HostClient){
   await wait(()=>js<boolean>("document.querySelector('.permission-picker summary').textContent==='权限：完全访问'"),'full-mode-confirmed');
   assert.match(await js<string>("document.querySelector('.context-popover').textContent"),/完全访问可操作目录外文件并让 Bash 联网/);
   await js("document.querySelector('.permission-picker').open=false;const t=document.querySelector('#composer');Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set.call(t,'SYNTHETIC full access task');t.dispatchEvent(new Event('input',{bubbles:true}));");
-  await wait(()=>js<boolean>("!document.querySelector('button[type=submit]').disabled"),'full-send');await js("document.querySelector('form.composer').requestSubmit()");
+  await wait(()=>js<boolean>("!document.querySelector('.composer button[type=submit]').disabled"),'full-send');await js("document.querySelector('form.composer').requestSubmit()");
   await wait(async()=>{const t=await host.request({type:'thread',threadId:automatic.thread.id}) as DesktopThread;return t.runs.some(r=>r.permissionMode==='full'&&r.state==='completed');},'full-task-complete');
   const full=await host.request({type:'thread',threadId:automatic.thread.id}) as DesktopThread;
   const fullRun=full.runs.find(r=>r.permissionMode==='full')!;

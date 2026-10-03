@@ -13,7 +13,7 @@ export async function runFileModelSmoke(window:BrowserWindow,host:HostClient){
  assert.equal(await js<boolean>("document.querySelector('.thread-heading').textContent.includes('完全访问允许目录外文本文件')"),true);
  assert.equal(await js<boolean>("document.querySelector('.thread-heading').textContent.includes('本模式不提供工具')"),false);
  await js("(()=>{const t=document.querySelector('#composer');Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set.call(t,'SYNTHETIC approved file workflow');t.dispatchEvent(new Event('input',{bubbles:true}));})()");
- await wait(()=>js<boolean>("!document.querySelector('button[type=submit]').disabled"),'send');await js("document.querySelector('form.composer').requestSubmit()");
+ await wait(()=>js<boolean>("!document.querySelector('.composer button[type=submit]').disabled"),'send');await js("document.querySelector('form.composer').requestSubmit()");
  const home=await host.request({type:'home'}) as DesktopHome;const threadId=home.threads[0]!.id;
  for(const tool of ['write','read','edit']){
   await wait(()=>js<boolean>(`Array.from(document.querySelectorAll('.approval dd')).some(e=>e.textContent==='Pi ${tool}')`),tool);

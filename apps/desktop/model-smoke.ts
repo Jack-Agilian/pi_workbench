@@ -40,22 +40,22 @@ export async function runModelSmoke(window:BrowserWindow,host:HostClient){
  if(home.mode==='model'){
   assert.equal(await js<boolean>("document.querySelector('[aria-label=模型配置]').textContent.includes('尚未配置')"),true);
   await click('.new-thread');await wait(()=>js<boolean>("!document.querySelector('#composer').disabled"),'thread');await fill('must not send');
-  assert.equal(await js<boolean>("document.querySelector('button[type=submit]').disabled"),true);console.log('desktop model not-configured: passed');return;
+  assert.equal(await js<boolean>("document.querySelector('.composer button[type=submit]').disabled"),true);console.log('desktop model not-configured: passed');return;
  }
  assert.equal(home.mode,'model-offline');await click('.new-thread');await wait(()=>js<boolean>("!document.querySelector('#composer').disabled"),'thread');
- await fill('remember SYNTHETIC green-29');await wait(()=>js<boolean>("!document.querySelector('button[type=submit]').disabled"),'send');await js("document.querySelector('form.composer').requestSubmit()");
+ await fill('remember SYNTHETIC green-29');await wait(()=>js<boolean>("!document.querySelector('.composer button[type=submit]').disabled"),'send');await js("document.querySelector('form.composer').requestSubmit()");
  await wait(()=>js<boolean>("!!document.querySelector('[data-state=completed] .message.assistant')"),'complete');
  let current=await host.request({type:'home'}) as DesktopHome;const threadId=current.threads[0]!.id;
- await host.reconnect();await js("window.workbench.home()");await fill('repeat remembered token');await wait(()=>js<boolean>("!document.querySelector('button[type=submit]').disabled"),'continue');await js("document.querySelector('form.composer').requestSubmit()");
+ await host.reconnect();await js("window.workbench.home()");await fill('repeat remembered token');await wait(()=>js<boolean>("!document.querySelector('.composer button[type=submit]').disabled"),'continue');await js("document.querySelector('form.composer').requestSubmit()");
  await wait(()=>js<boolean>("document.querySelectorAll('[data-state=completed]').length===2"),'resumed');
  let state=await host.request({type:'thread',threadId}) as DesktopThread;assert.match(state.presentations[1]!.value.messages.find(m=>m.role==='assistant')!.text,/green-29.*repeat remembered/);assert.equal(state.operations.length,0);
- await fill('[long]');await wait(()=>js<boolean>("!document.querySelector('button[type=submit]').disabled"),'long');await js("document.querySelector('form.composer').requestSubmit()");
+ await fill('[long]');await wait(()=>js<boolean>("!document.querySelector('.composer button[type=submit]').disabled"),'long');await js("document.querySelector('form.composer').requestSubmit()");
  await wait(()=>js<boolean>("!!document.querySelector('[data-state=running] .message.assistant')"),'live-stream');await click('.stop');
  await wait(()=>js<boolean>("!!document.querySelector('[data-state=cancelled]')"),'cancelled');
  state=await host.request({type:'thread',threadId}) as DesktopThread;assert.equal(state.runs.length,3);assert.equal(state.operations.length,0);
  assert.equal(await js<boolean>("!document.body.textContent.includes('新建任务') && document.body.textContent.includes('新建会话')"),true);
  await click('.new-thread');await wait(()=>js<boolean>("document.querySelectorAll('.thread-link').length===2 && !!document.querySelector('.empty') && !document.querySelector('#composer').disabled"),'error-thread');
- await fill('[error]');await wait(()=>js<boolean>("!document.querySelector('button[type=submit]').disabled"),'error-send');await js("document.querySelector('form.composer').requestSubmit()");
+ await fill('[error]');await wait(()=>js<boolean>("!document.querySelector('.composer button[type=submit]').disabled"),'error-send');await js("document.querySelector('form.composer').requestSubmit()");
  await wait(()=>js<boolean>("!!document.querySelector('[data-state=failed] .model-error[role=alert]')"),'safe-error');
  assert.equal(await js<boolean>("document.querySelector('.model-error').textContent.includes('原始错误正文未保存') && !document.body.textContent.includes('SYNTHETIC_PROVIDER_FAILURE')"),true);
  console.log('desktop model offline: stream, native resume, cancel, safe error and terminology passed');

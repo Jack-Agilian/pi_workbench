@@ -12,7 +12,7 @@ export async function runShellSmoke(window: BrowserWindow, host: HostClient) {
     await click('＋ 新建会话');
     await wait(()=>js<boolean>("!document.querySelector('button.new-thread').disabled && !!document.querySelector('.thread-link.selected')"),'thread');
     await click(mode==='cancel'?'填入可停止命令演示':'填入只读命令演示');
-    await wait(()=>js<boolean>("!document.querySelector('button[type=submit]').disabled"),'composer');
+    await wait(()=>js<boolean>("!document.querySelector('.composer button[type=submit]').disabled"),'composer');
     await js("document.querySelector('form.composer').requestSubmit()");
     await wait(()=>js<boolean>("!!document.querySelector('[aria-label=命令执行审批]')"),'approval');
     assert.equal(await js<boolean>("document.querySelector('.approval').textContent.includes('restricted-bash-v1')"),true);
