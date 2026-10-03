@@ -174,3 +174,9 @@ test('query migration: replacement restores browsed positions with fresh data an
   assert.equal(view.operations.get('24')!.items.length,12);
   assert.equal(f.reader.tools.client.getQueryCache().getAll().length,0);replacement.dispose();
 });
+
+test('thread rename advances event cursor without reloading message/tool/artifact pages',async()=>{
+  const f=targetedFixture(64);await f.load();const before=f.reader.view();f.emit('thread.renamed','');
+  await f.reader.poll();assert.deepEqual(f.calls,[{method:'events'}]);assert.deepEqual(f.reader.view(),before);
+  f.calls.length=0;await f.reader.poll();assert.deepEqual(f.calls,[{method:'events'}]);
+});

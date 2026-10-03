@@ -251,7 +251,7 @@ test('schema v3 forward migration preserves the pre-Assistant product intent and
     // DesktopHost.close now intentionally cancels queued work, which is not this fixture.
     f.host.core.close();
     const db = new DatabaseSync(join(f.root, 'host/product.sqlite'));
-    db.exec('ALTER TABLE threads DROP COLUMN permission_mode; ALTER TABLE threads DROP COLUMN permission_revision; ALTER TABLE runs DROP COLUMN permission_mode; ALTER TABLE runs DROP COLUMN permission_revision; ALTER TABLE approvals DROP COLUMN source; DROP TABLE desktop_workspace; DROP TABLE model_shell_operations; DROP TABLE file_operations; DROP TABLE model_policy_revisions; DROP TABLE model_requests; DROP TABLE model_outcomes; DROP TABLE shell_display; DROP TABLE run_display; PRAGMA user_version=3;'); db.close();
+    db.exec('ALTER TABLE threads DROP COLUMN title_revision; ALTER TABLE threads DROP COLUMN permission_mode; ALTER TABLE threads DROP COLUMN permission_revision; ALTER TABLE runs DROP COLUMN permission_mode; ALTER TABLE runs DROP COLUMN permission_revision; ALTER TABLE approvals DROP COLUMN source; DROP TABLE desktop_workspace; DROP TABLE model_shell_operations; DROP TABLE file_operations; DROP TABLE model_policy_revisions; DROP TABLE model_requests; DROP TABLE model_outcomes; DROP TABLE shell_display; DROP TABLE run_display; PRAGMA user_version=3;'); db.close();
     const reopened = new DesktopHost(f.root);
     try {
       const restored = reopened.request({ type: 'thread', threadId: f.thread }) as DesktopThread;
@@ -353,4 +353,24 @@ test('model error display uses only closed status/code, distinguishes legacy and
  assert.match(modelErrorText({}),/未取得可确认的上游错误信息/);assert.doesNotMatch(modelErrorText({}),/服务请求失败|HTTP \d/);
  for(const error of [{httpStatus:200},{httpStatus:'403'},{code:'secret-canary'},{message:'<script>bad</script>'},{code:['invalid_api_key']},{httpStatus:403,raw:'secret'}])assert.throws(()=>parseModelOutcome({...legacy,error}));
  assert.throws(()=>parseModelOutcome({...legacy,reason:'stop',error:{}}));
+});
+
+test('renaming queued or active desktop threads never dispatches/rebinds work or affects approvals; title survives reopen',async()=>{
+  const f=fixture();let reopened:DesktopHost|undefined;
+  try {
+    f.host.core.handle(f.start); // Persisted intent without calling the product pump.
+    f.host.request({type:'command',command:{type:'threads.rename',requestId:'queued-title',threadId:f.thread,title:'SYNTHETIC queued rename',expectedRevision:0}});
+    assert.equal(f.snapshot().runs[0]!.state,'queued');assert.equal(f.host.core.workerLaunches().length,0);
+    f.host.pump();await until(()=>f.snapshot().operations.some(o=>o.state==='pending'),'rename-pending');
+    const before=f.snapshot(),native=f.host.core.nativeSessionReference(f.thread),launches=f.host.core.workerLaunches();
+    const cmd={type:'threads.rename',requestId:'active-title',threadId:f.thread,title:'SYNTHETIC active rename',expectedRevision:1};
+    f.host.request({type:'command',command:cmd});f.host.request({type:'command',command:cmd});
+    assert.deepEqual(f.snapshot().operations,before.operations);assert.deepEqual(f.snapshot().runs,before.runs);assert.deepEqual(f.host.core.workerLaunches(),launches);assert.deepEqual(f.host.core.nativeSessionReference(f.thread),native);
+    const op=before.operations[0]!;f.host.request({type:'command',command:{type:'approvals.resolve',requestId:'rename-deny',operationId:op.id,parametersDigest:op.parametersDigest,decision:'deny'}});
+    await until(()=>f.snapshot().runs[0]!.state==='failed','rename-denied');
+    await f.host.close();reopened=new DesktopHost(f.root);
+    assert.equal((reopened.request({type:'thread',threadId:f.thread}) as DesktopThread).thread.titleRevision,2);
+    assert.equal((reopened.request({type:'home'}) as DesktopHome).threads[0]!.title,'SYNTHETIC active rename');
+    assert.equal((reopened.request({type:'thread',threadId:f.thread}) as DesktopThread).artifacts.length,0);
+  }finally{await reopened?.close();await f.dispose();}
 });

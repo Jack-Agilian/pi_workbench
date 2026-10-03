@@ -155,9 +155,9 @@ test('SQL v10 migration retains manual/auto requests and revisions, foreign keys
       UPDATE runs SET old_mode=permission_mode; ALTER TABLE runs DROP COLUMN permission_mode; ALTER TABLE runs RENAME COLUMN old_mode TO permission_mode;
       ALTER TABLE approvals ADD COLUMN old_source TEXT NOT NULL DEFAULT 'manual' CHECK(old_source IN ('manual','workspace-tools-v1'));
       UPDATE approvals SET old_source=source;ALTER TABLE approvals DROP COLUMN source;ALTER TABLE approvals RENAME COLUMN old_source TO source;
-      PRAGMA user_version=10; COMMIT;`);db.close();
+      ALTER TABLE threads DROP COLUMN title_revision; PRAGMA user_version=10; COMMIT;`);db.close();
     f.reopen();assert.deepEqual(f.core.snapshot(f.thread),before);f.core.handle(policy);assert.deepEqual(f.core.snapshot(f.thread),before);
-    const verify=new DatabaseSync(f.database);assert.equal(verify.prepare('PRAGMA user_version').get()!.user_version,11);assert.deepEqual(verify.prepare('PRAGMA foreign_key_check').all(),[]);
+    const verify=new DatabaseSync(f.database);assert.equal(verify.prepare('PRAGMA user_version').get()!.user_version,12);assert.deepEqual(verify.prepare('PRAGMA foreign_key_check').all(),[]);
     assert.throws(()=>verify.prepare("UPDATE threads SET permission_mode='anything'").run());verify.close();
     f.core.handle({type:'threads.permissions',requestId:'new-full',threadId:f.thread,mode:'full',expectedRevision:1});
     assert.deepEqual(f.core.snapshot(f.thread).runs.map(r=>r.permissionMode),['manual','auto']);

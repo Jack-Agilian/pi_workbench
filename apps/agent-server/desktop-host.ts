@@ -123,7 +123,7 @@ export class DesktopHost {
         if(request.command.type==='runs.start'&&!this.core.hasRequest(request.command.requestId))this.checkThreadWorkspace(request.command.threadId);
         if(request.command.type==='runs.start' && this.modelMode?.mode==='live' && (!this.modelMode.configuration?.approved||!this.modelKey))throw new Error('model_not_configured');
         if(request.command.type==='runs.start' && this.modelMode?.mode==='live' && this.modelMode.configuration && !this.core.hasRequest(request.command.requestId) && this.core.modelAdmission(this.modelMode.configuration,this.modelMode.reserveCostUsd ?? 0).status!=='ready')throw new Error('model_policy_or_budget');
-        const ack = this.supervisor.command(request.command); this.pump(); return ack;
+        const ack = this.supervisor.command(request.command); if (request.command.type !== 'threads.rename') this.pump(); return ack;
       }
     }
   }

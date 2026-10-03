@@ -192,10 +192,10 @@ test('M2 SQL v7 migration preserves old policy rows; host request identities, se
   f.core.close();
   const old=new DatabaseSync(database);old.exec(`ALTER TABLE threads DROP COLUMN permission_mode; ALTER TABLE threads DROP COLUMN permission_revision; ALTER TABLE runs DROP COLUMN permission_mode; ALTER TABLE runs DROP COLUMN permission_revision; ALTER TABLE approvals DROP COLUMN source; DROP TABLE desktop_workspace; DROP TABLE model_shell_operations; DROP TABLE file_operations; ALTER TABLE model_requests RENAME TO rows_v8;
    CREATE TABLE model_requests(run_id TEXT PRIMARY KEY REFERENCES runs(id),authorization_id TEXT NOT NULL,policy_digest TEXT NOT NULL,reserved_cost REAL NOT NULL) STRICT;
-   INSERT INTO model_requests SELECT run_id,authorization_id,policy_digest,reserved_cost FROM rows_v8; DROP TABLE rows_v8; PRAGMA user_version=7;`);
+   INSERT INTO model_requests SELECT run_id,authorization_id,policy_digest,reserved_cost FROM rows_v8; DROP TABLE rows_v8; ALTER TABLE threads DROP COLUMN title_revision; PRAGMA user_version=7;`);
   const before=old.prepare('SELECT * FROM model_requests').all();old.close();
   // ProductCore.close is repeatable; reopen migrates the actual temporary SQLite file.
-  f.reopen();const db=new DatabaseSync(database,{readOnly:true});assert.equal(db.prepare('PRAGMA user_version').get()?.user_version,11);
+  f.reopen();const db=new DatabaseSync(database,{readOnly:true});assert.equal(db.prepare('PRAGMA user_version').get()?.user_version,12);
   assert.deepEqual(db.prepare('SELECT run_id,authorization_id,policy_digest,reserved_cost FROM model_requests').all(),before);db.close();
   const run=f.core.handle({type:'runs.start',requestId:'multi-request',threadId:f.thread,input:'SYNTHETIC multi-budget'}).id;
   const b=f.core.dispatchNext()!;f.core.markRunning(b);assert.equal(b.runId,run);

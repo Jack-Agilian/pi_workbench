@@ -66,7 +66,7 @@ const runKinds = new Set(['run.queued','run.starting','run.running','run.cancell
 const operationKinds = new Set(['approval.requested','approval.allow','approval.deny','shell.launch','shell.outcome',
   'operation.executing','operation.succeeded','operation.failed','operation.unknown',
   'operation.late_succeeded','operation.late_failed','operation.late_unknown','operation.reconciled_succeeded','operation.reconciled_failed']);
-const noDisplayKinds = new Set(['thread.created','session.bound','session.persisted','session.rebound','model.request_reserved',
+const noDisplayKinds = new Set(['thread.created','thread.renamed','session.bound','session.persisted','session.rebound','model.request_reserved',
   'observation.activity','observation.idle','observation.diagnostic']);
 interface BrowsePositions { history?: string; artifacts?: string; operations: Map<string, string | undefined> }
 export class ThreadPages {

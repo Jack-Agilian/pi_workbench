@@ -8,12 +8,13 @@ export type PermissionMode = 'manual' | 'auto' | 'full';
 export interface PermissionView { permissionMode: PermissionMode; permissionRevision: number }
 export type Command =
   | { type: 'threads.create'; requestId: string; workspaceId: string; title: string }
+  | { type: 'threads.rename'; requestId: string; threadId: string; title: string; expectedRevision: number }
   | { type: 'threads.permissions'; requestId: string; threadId: string; mode: PermissionMode; expectedRevision: number }
   | { type: 'runs.start'; requestId: string; threadId: string; input: string; permissionRevision?: number }
   | { type: 'runs.cancel'; requestId: string; runId: string }
   | { type: 'approvals.resolve'; requestId: string; operationId: string; parametersDigest: string; decision: 'allow' | 'deny' };
 export interface Ack { accepted: true; id: string }
-export interface ThreadView extends PermissionView { id: string; workspaceId: string; title: string }
+export interface ThreadView extends PermissionView { id: string; workspaceId: string; title: string; titleRevision: number }
 export interface RunView extends PermissionView { id: string; threadId: string; state: RunState }
 export interface OperationView { approvalSource: 'manual' | 'workspace-tools-v1' | 'full-tools-v1'; file?:FileOperationView; shell?: ShellView; id: string; runId: string; toolCallId: string; tool: string; parametersDigest: string; artifactPath: string | null; deadline: number; state: OperationState }
 export interface ArtifactView { id: string; runId: string; operationId: string; path: string; version: number; digest: string; bytes: number }
@@ -38,8 +39,8 @@ function text(value: unknown, limit: number): string {
   if (typeof value !== 'string' || !value.trim() || value.length > limit || value.includes('\0')) throw new Error('invalid_text');
   return value;
 }
-function revision(value: unknown): number {
-  if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < 0 || value >= Number.MAX_SAFE_INTEGER) throw new Error('invalid_permission_revision');
+function revision(value: unknown, code = 'invalid_permission_revision'): number {
+  if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < 0 || value >= Number.MAX_SAFE_INTEGER) throw new Error(code);
   return value;
 }
 /** Normalize into a new object: fixed field order for durable idempotency, reject unknown authority fields. */
@@ -53,6 +54,10 @@ export function parseCommand(value: unknown): Command {
   let result: Command;
   switch (command.type) {
     case 'threads.create': result = { type: command.type, requestId, workspaceId: identifier(command.workspaceId), title: text(command.title, 160) }; break;
+    case 'threads.rename': {
+      if (typeof command.title !== 'string' || !command.title.trim() || command.title.length > 160 || /[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/.test(command.title)) throw new Error('invalid_title');
+      result = {type: command.type, requestId, threadId: identifier(command.threadId), title: command.title.trim(), expectedRevision: revision(command.expectedRevision, 'invalid_title_revision')}; break;
+    }
     case 'threads.permissions':
       if (command.mode !== 'manual' && command.mode !== 'auto' && command.mode !== 'full') throw new Error('unsupported_permission_mode');
       result = { type: command.type, requestId, threadId: identifier(command.threadId), mode: command.mode, expectedRevision: revision(command.expectedRevision) }; break;

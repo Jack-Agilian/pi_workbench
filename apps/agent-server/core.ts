@@ -37,7 +37,7 @@ export class ProductCore {
       if (path !== ':memory:') chmodSync(path, 0o600);
       this.db.exec('PRAGMA busy_timeout=1000; PRAGMA synchronous=FULL;');
       const version = this.one<{ user_version: number }>('PRAGMA user_version').user_version;
-      if (![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].includes(version)) throw new Error('unsupported_database_version');
+      if (![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].includes(version)) throw new Error('unsupported_database_version');
       if (version === 0) {
         this.db.exec(`BEGIN IMMEDIATE;
           CREATE TABLE workspaces(id TEXT PRIMARY KEY, path TEXT NOT NULL UNIQUE) STRICT;
@@ -113,6 +113,9 @@ export class ProductCore {
         ALTER TABLE approvals DROP COLUMN source;
         ALTER TABLE approvals RENAME COLUMN source_v11 TO source;
         PRAGMA user_version=11; COMMIT;`);
+      if (version < 12) this.db.exec(`BEGIN IMMEDIATE;
+        ALTER TABLE threads ADD COLUMN title_revision INTEGER NOT NULL DEFAULT 0 CHECK(title_revision >= 0);
+        PRAGMA user_version=12; COMMIT;`);
       this.transaction(() => {
         for (const workspace of workspaces) {
           identifier(workspace.id); const canonical = realpathSync(workspace.path);
@@ -179,6 +182,16 @@ export class ProductCore {
           this.one('SELECT id FROM workspaces WHERE id=?', command.workspaceId); id = randomUUID();
           this.db.prepare('INSERT INTO threads(id,workspace_id,title) VALUES (?,?,?)').run(id, command.workspaceId, command.title);
           this.event(id, '', 'thread.created', id); break;
+        case 'threads.rename': {
+          const thread = this.one<{title: string; titleRevision: number}>('SELECT title,title_revision AS titleRevision FROM threads WHERE id=?', command.threadId);
+          if (thread.titleRevision !== command.expectedRevision) throw new Error('title_changed');
+          id = command.threadId;
+          if (thread.title !== command.title) {
+            this.db.prepare('UPDATE threads SET title=?,title_revision=title_revision+1 WHERE id=?').run(command.title, id);
+            this.event(id, '', 'thread.renamed', id);
+          }
+          break;
+        }
         case 'threads.permissions': {
           const thread = this.one<Pick<ThreadView, 'id' | 'permissionMode' | 'permissionRevision'>>(`SELECT id,${permissionColumns} FROM threads WHERE id=?`, command.threadId);
           if (thread.permissionRevision !== command.expectedRevision) throw new Error('permission_changed');
@@ -254,7 +267,7 @@ export class ProductCore {
   workspacePath(id: string): string { return this.one<{path:string}>('SELECT path FROM workspaces WHERE id=?', id).path; }
   runPermission(runId:string): RunView['permissionMode'] { return this.run(runId).permissionMode; }
   activeRuns():RunView[] { return this.all(`SELECT id,thread_id AS threadId,state,permission_mode AS permissionMode,permission_revision AS permissionRevision FROM runs WHERE state IN ${active} ORDER BY rowid`); }
-  listThreads(): ThreadView[] { return this.all('SELECT id,workspace_id AS workspaceId,title,permission_mode AS permissionMode,permission_revision AS permissionRevision FROM threads ORDER BY rowid DESC'); }
+  listThreads(): ThreadView[] { return this.all('SELECT id,workspace_id AS workspaceId,title,title_revision AS titleRevision,permission_mode AS permissionMode,permission_revision AS permissionRevision FROM threads ORDER BY rowid DESC'); }
   /** Trusted host scheduling only. Renderer cannot select an executable or plan. */
   nextQueuedIntent(): { id: string; input: string; threadId:string } | undefined { return this.get("SELECT id,input,thread_id AS threadId FROM runs WHERE state='queued' ORDER BY rowid LIMIT 1"); }
   threadWorkspace(threadId:string): {id:string;path:string} { return this.one('SELECT w.id,w.path FROM workspaces w JOIN threads t ON t.workspace_id=w.id WHERE t.id=?',threadId); }
@@ -566,7 +579,7 @@ export class ProductCore {
   snapshot(threadId: string): Snapshot {
     return this.transaction(() => ({
       cursor: this.one<{ cursor: number }>('SELECT coalesce(max(seq),0) AS cursor FROM events').cursor,
-      thread: this.one<ThreadView>('SELECT id,workspace_id AS workspaceId,title,permission_mode AS permissionMode,permission_revision AS permissionRevision FROM threads WHERE id=?', threadId),
+      thread: this.one<ThreadView>('SELECT id,workspace_id AS workspaceId,title,title_revision AS titleRevision,permission_mode AS permissionMode,permission_revision AS permissionRevision FROM threads WHERE id=?', threadId),
       runs: this.all<RunView>('SELECT id,thread_id AS threadId,state,permission_mode AS permissionMode,permission_revision AS permissionRevision FROM runs WHERE thread_id=? ORDER BY rowid', threadId),
       operations: this.all<Operation>(`SELECT ${operationColumns} FROM operations WHERE run_id IN (SELECT id FROM runs WHERE thread_id=?) ORDER BY rowid`, threadId).map(op => this.operationView(op)),
       artifacts: this.all<ArtifactView>(`SELECT ${artifactColumns} FROM artifacts WHERE run_id IN (SELECT id FROM runs WHERE thread_id=?) ORDER BY rowid`, threadId),
@@ -600,7 +613,7 @@ export class ProductCore {
   }
   threadActivity(threadId:string) {
     return this.transaction(()=>{
-      const thread=this.one<ThreadView>('SELECT id,workspace_id AS workspaceId,title,permission_mode AS permissionMode,permission_revision AS permissionRevision FROM threads WHERE id=?',threadId);
+      const thread=this.one<ThreadView>('SELECT id,workspace_id AS workspaceId,title,title_revision AS titleRevision,permission_mode AS permissionMode,permission_revision AS permissionRevision FROM threads WHERE id=?',threadId);
       const run=this.get<RunView>(`SELECT id,thread_id AS threadId,state,permission_mode AS permissionMode,permission_revision AS permissionRevision FROM runs WHERE thread_id=? AND state IN ${active} LIMIT 1`,threadId);
       // At most 16 operations are admitted; expose current actions independently of history pages.
       const operations=run?this.all<Operation>(`SELECT ${operationColumns} FROM operations WHERE run_id=? AND state IN ('pending','approved','executing') ORDER BY rowid LIMIT 16`,run.id).map(op=>this.operationView(op)):[];

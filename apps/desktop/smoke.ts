@@ -148,6 +148,8 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
   await runFrontendSmoke(window, host);
   const { runPaginationSmoke } = await import('./pagination-smoke.ts');
   await runPaginationSmoke(window, host);
+  const {runThreadNamingSmoke} = await import('./thread-naming-smoke.ts');
+  await runThreadNamingSmoke(window, host);
 
   // Trusted test-only transport fault after the real command is durably accepted.
   // This lives in the smoke module, never the Renderer/preload or product protocol.
@@ -173,17 +175,18 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
     await js("document.querySelector('.composer').requestSubmit()");
     await wait(() => js<boolean>(lost ? "document.querySelector('.composer button[type=submit]').textContent.includes('重试未确认请求') && !!document.querySelector('.notice.error')" : "document.querySelector('#composer').value === ''"), 'submit_ack_result');
   };
+  const retryThreadCount = (await host.request({type:'home'}) as DesktopHome).threads.length;
   const b = await create('SYNTHETIC retry B');
   loseAck = 'threads.create'; await fill('#title', 'SYNTHETIC retry A'); await click('＋ 新建会话');
   await wait(() => js<boolean>("document.querySelector('.new-thread').textContent.includes('重试新建会话') && !!document.querySelector('.notice.error')"), 'create_ack_lost');
   assert.equal(await js<boolean>("document.querySelector('#title').disabled"), true);
-  const beforeRetry = await host.request({ type: 'home' }) as DesktopHome; assert.equal(beforeRetry.threads.length, home.threads.length + 2);
+  const beforeRetry = await host.request({ type: 'home' }) as DesktopHome; assert.equal(beforeRetry.threads.length, retryThreadCount + 2);
   const a = beforeRetry.threads.find(t => t.title === 'SYNTHETIC retry A')!;
   await reconnectUi(); await click('＋ 重试新建会话');
   await wait(() => js<boolean>("document.querySelector('h1')?.textContent === 'SYNTHETIC retry A' && !document.querySelector('#title').disabled"), 'create_retry_ack');
   const creations = attempts.filter(c => c.type === 'threads.create' && c.title === a.title);
   assert.equal(creations.length, 2); assert.deepEqual(creations[0], creations[1]);
-  assert.equal((await host.request({ type: 'home' }) as DesktopHome).threads.length, home.threads.length + 2);
+  assert.equal((await host.request({ type: 'home' }) as DesktopHome).threads.length, retryThreadCount + 2);
 
   await submit('SYNTHETIC unconfirmed A', true);
   assert.equal(await js<boolean>("document.querySelector('#composer').disabled"), true);
