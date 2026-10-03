@@ -3025,6 +3025,18 @@
         "darwin"
       ],
       "locator": "docs/validation/q1-desktop-live-2026-10-01.md"
+    },
+    {
+      "id": "EV-Q1-DESKTOP-TEXT-20261003",
+      "kind": "model",
+      "result": "passed",
+      "scope": "真实Electron代理操作1次Responses请求回复CONNECTIVITY_OK；0工具，原21条账本未改、清理确认；不代表桌面工具闭环或历史错误根因已解决。",
+      "commit": "61141c78ffcc00ccecde02828c710d7d27c4df00",
+      "recordedAt": "2026-10-03T02:58:06.108205+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/q1-desktop-retry-2026-10-03.md"
     }
   ]
 }

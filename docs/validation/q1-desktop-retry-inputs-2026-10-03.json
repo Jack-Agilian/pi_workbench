@@ -1,0 +1,33 @@
+{
+  "commit": "61141c78ffcc00ccecde02828c710d7d27c4df00",
+  "recordedAt": "2026-10-03T02:56:45.242Z",
+  "platform": "darwin-arm64",
+  "operator": "codex_ui",
+  "provider": "openai",
+  "model": "gpt-6-luna",
+  "api": "openai-responses",
+  "runId": "c453f314-ac55-44c8-b8f3-4a052b213b93",
+  "state": "completed",
+  "reply": "CONNECTIVITY_OK",
+  "requestsAdded": 1,
+  "operations": 0,
+  "nativePersisted": true,
+  "cleanup": {
+    "exited": true,
+    "groupGone": true
+  },
+  "receiptDigest": "23a61c024b81c39efb50b39a389f28f3e846dd36eed6503dad36640b5122f009",
+  "outcome": {
+    "reason": "stop",
+    "inputTokens": 5010,
+    "outputTokens": 7,
+    "estimatedCostUsd": 0.0005045000000000001,
+    "synthetic": false
+  },
+  "priorRequestRowsUnchanged": 21,
+  "totalRequests": 22,
+  "totalReservedUsd": 0.7536319999999997,
+  "remainingReservedUsd": 0.24636800000000025,
+  "activeRuns": 0,
+  "workspaceStillEmpty": true
+}

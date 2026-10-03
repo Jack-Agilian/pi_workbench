@@ -2,13 +2,15 @@
 
 当前依据：[SSOT](../ssot/README.md)、[任务账本](backlog.json)。以下当前事项优先于后文历史阶段的“下一步”。
 
-## 唯一当前事项：真实桌面使用检查（模型访问401/403待恢复）
+## 唯一当前事项：真实桌面使用检查（文本访问已恢复，工具闭环待验）
 
 2026-09-30按用户授权，将前端 `codex/ui-history-artifacts@c0e99c2` 和后端 `codex/backend-history-safety@feaa3f4` 合入develop，组合代码提交 `169df60a51fc1d394d6cc45c335e54eddbc9cef7`。双方证据ID保留，分页与后端边界现在位于同一分支；集成检查与当前可测范围见 [收口报告](../validation/ui-p2-merged-2026-09-30.md)。
 
 F01/F02及规划已快进合入develop `46449024d31b0ce4601c971b90b8c036f88a27a7`，推送后独立读回同SHA。Q1在`codex/ui-query-tools`完成限定实现，代码`5b10b19fb608159a37459592b265c6392d0d5331`，见[发行与离线验证报告](../validation/ui-query-tools-2026-09-30.md)。Q1计划审核已对照实现完成[复核](../validation/q1-plan-rereview-2026-09-30.md)，已快进集成并推送develop `ee409b1606c794fb853290e7e238bc30eebe638d`，独立读回一致；不并行启动Q2、Virtual或durable。
 
 2026-10-01真实Electron检查：代理发送2次、用户手动2次请求，均失败（403/401），无工具执行；原会话/成果核验预览、正常关闭重开、原账本保留与进程清理通过限定检查，见[实际报告](../validation/q1-desktop-live-2026-10-01.md)。累计18次、保守预留$0.616608/$1仅为报告时快照。当前配置及原生记录均确认Responses，不是messages接口；先恢复当前端点的访问，再续验下述工具闭环。
+
+2026-10-03按用户授权复验1次：真实Responses文本回复`CONNECTIVITY_OK`，0工具、原21条账本未改，累计22次；见[复验报告](../validation/q1-desktop-retry-2026-10-03.md)。当前已解除文本访问阻塞，但不据此宣布工具闭环或历史401/403根因解决。先补安全错误诊断的具体设计与离线回归，再集中续验工具/审批/取消；不原样透传上游错误，不为调试连续付费调用。
 
 ### Q1已交付范围
 
