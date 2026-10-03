@@ -96,3 +96,8 @@ F01/F02的限定修正与本参考方向可以一并复审集成，不将全面Q
 Query 5.104.0实际公开入口为根导出QueryClient；采用非deprecated的实例方法query，而不是把方法冒充根导出。工具加载/错误由QueryCache经React useSyncExternalStore订阅；工具分页不再写独立busy/error状态。不可变批次键是产品一致性屏障，成功后回收旧键，不是第二份数据缓存。历史/成果LoadedRange、产品串行批次、水位、游标和阅读锚点保留；明确删除与保留清单、失败、许可和测试见[报告](../validation/ui-query-tools-2026-09-30.md)。前面“首次/本次复审”段落记录原文档采纳范围，不覆盖本节的新实现事实。
 
 Q1_PLAN_REVIEW复核补充：真实使用优先，不把全应用统一Query当作验收目标；Q2只有在具体范围能减少维护职责时才实施，否则保留当前正确查询。见[复核记录](../validation/q1-plan-rereview-2026-09-30.md)。
+
+
+## 2026-10-03 UI 重构采用
+
+[会话工作台契约](ui-experience-contract.md)追加固定 pi-gui timeline-item 工具摘要参考、React 焦点/失效处理及各模块保留边界。旧Q1迁移“不顺带改UI”仍约束查询迁移范围；本轮是用户另行授权的整套UI重构，未迁移Q2或替换缓存。权限模式官方对照属于下一设计，不是已实现自动审批。

@@ -1209,7 +1209,7 @@
         "esbuild build"
       ],
       "reuse": "Electron公开窗口/沙盒/IPC，React渲染和esbuild构建；复用既有产品与Pi Worker链路",
-      "productDelta": "闭合产品桥、Thread/Run视图、审批/取消/成果与有界纯文本投影；显式无模型驱动；关闭结果/重连接管分离，未确认命令按意图保留身份并显式重试；D1正常退出/信号统一结算，关闭失败后原窗口显式恢复，候选新宿主不迟到发布；D2-S展示固定命令审批/profile/期限及stdout/stderr有界完成快照，交互终端尚未接入；M1正文流/最终快照、应用专用持久凭据加载及原生临时选择、策略待确认/预算耗尽准入和双时间限制显示；仅产品DTO；M2已有视图增加逐read/write/edit审批、有限版本/参数摘要、后续模型轮流式正文与重连展示；显式SYNTHETIC离线入口，不由Renderer选择工具或worker代码；原生目录选择无自由路径Renderer入口，实际cwd/阶段/逐命令有界结果、三尺寸核心动作核查；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开；UI-P2前端右栏折叠/三档宽度、常驻审批/停止、Thread滚动锚点、按需成果核验展示；现采用正式historyPage/operationPage/artifactPage和独立ThreadActivity；Renderer的thread-pages.ts维护只读已加载范围、事件衔接与重连，首屏错误也保留正确活动身份；F01新增Thread内单Run安全historyEntry只读查询，Renderer按事件定向刷新，头部桥接与旧尾游标分离，整批成功发布/切换停止后续读取；按reference-implementations.md对照pi-gui时间线/viewport/layout，Q1 operationPage已由Query 5.104.0承接缓存/异步状态/去重，原工具LoadedRange移除，产品仅存发布引用；queryScope绑定宿主连接，重连按位置重读，工具错误手动重试；后续Q2历史/成果未迁移，有实测布局瓶颈后采用Virtual，不并存两套缓存/滚动控制；2026-10-03已知模型错误码/HTTP状态经闭合产品DTO安全展示，未知正文不透传，原生错误落盘前收敛；IPC v8，旧结果JSON兼容，具体限定验证见model-errors-2026-10-03报告 2026-10-03默认及本机用量额度清理，API总超时/空闲独立保留；Pi模型默认输出，目录内绝对路径规范化与安全工具失败投影；限定实测见product-defaults-desktop报告，不扩大Gate。 2026-10-03真实Electron四场景限定补证：工具/审批/成果/取消/原Session恢复通过，代理操作与未覆盖范围分列，不晋级全部P0。",
+      "productDelta": "闭合产品桥、Thread/Run视图、审批/取消/成果与有界纯文本投影；显式无模型驱动；关闭结果/重连接管分离，未确认命令按意图保留身份并显式重试；D1正常退出/信号统一结算，关闭失败后原窗口显式恢复，候选新宿主不迟到发布；D2-S展示固定命令审批/profile/期限及stdout/stderr有界完成快照，交互终端尚未接入；M1正文流/最终快照、应用专用持久凭据加载及原生临时选择、策略待确认/预算耗尽准入和双时间限制显示；仅产品DTO；M2已有视图增加逐read/write/edit审批、有限版本/参数摘要、后续模型轮流式正文与重连展示；显式SYNTHETIC离线入口，不由Renderer选择工具或worker代码；原生目录选择无自由路径Renderer入口，实际cwd/阶段/逐命令有界结果、三尺寸核心动作核查；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开；UI-P2前端右栏折叠/三档宽度、常驻审批/停止、Thread滚动锚点、按需成果核验展示；现采用正式historyPage/operationPage/artifactPage和独立ThreadActivity；Renderer的thread-pages.ts维护只读已加载范围、事件衔接与重连，首屏错误也保留正确活动身份；F01新增Thread内单Run安全historyEntry只读查询，Renderer按事件定向刷新，头部桥接与旧尾游标分离，整批成功发布/切换停止后续读取；按reference-implementations.md对照pi-gui时间线/viewport/layout，Q1 operationPage已由Query 5.104.0承接缓存/异步状态/去重，原工具LoadedRange移除，产品仅存发布引用；queryScope绑定宿主连接，重连按位置重读，工具错误手动重试；后续Q2历史/成果未迁移，有实测布局瓶颈后采用Virtual，不并存两套缓存/滚动控制；2026-10-03已知模型错误码/HTTP状态经闭合产品DTO安全展示，未知正文不透传，原生错误落盘前收敛；IPC v8，旧结果JSON兼容，具体限定验证见model-errors-2026-10-03报告 2026-10-03默认及本机用量额度清理，API总超时/空闲独立保留；Pi模型默认输出，目录内绝对路径规范化与安全工具失败投影；限定实测见product-defaults-desktop报告，不扩大Gate。 2026-10-03真实Electron四场景限定补证：工具/审批/成果/取消/原Session恢复通过，代理操作与未覆盖范围分列，不晋级全部P0。 2026-10-03整体重构导航/会话/输入/审批与成果页及CSS；错误区分只读刷新/重连，成果版本就近预览和连接失效。权限三档只完成官方对照与下一设计，未实现自动审批/完全访问。",
       "acceptanceGate": "真实桌面进程/来源/CSP、Thread隔离、审批/取消/恢复；平台/模型/Gate分别验收；确认丢失/交错重试、异常关闭与受证据约束的恢复；Q1还须验证环境/连接缓存隔离、无网络本地读取、显式重试/焦点策略、IPC背压与整批一致性，删除被替代旧机制",
       "implementationState": "in_progress",
       "adoption": {
@@ -1280,6 +1280,10 @@
               },
               {
                 "name": "useSyncExternalStore",
+                "kind": "runtime"
+              },
+              {
+                "name": "Fragment",
                 "kind": "runtime"
               }
             ],
@@ -1391,7 +1395,10 @@
           "EV-DESKTOP-CLOSEOUT-MAC-20261003",
           "EV-DESKTOP-CLOSEOUT-COPY-20261003",
           "EV-DESKTOP-CLOSEOUT-UI-20261003",
-          "EV-DESKTOP-CLOSEOUT-READONLY-20261003"
+          "EV-DESKTOP-CLOSEOUT-READONLY-20261003",
+          "EV-UI-REFACTOR-MAC-20261003",
+          "EV-UI-REFACTOR-MOCK-20261003",
+          "EV-UI-REFACTOR-REGRESSION-20261003"
         ]
       }
     }
@@ -3328,6 +3335,42 @@
       ],
       "scope": "d045ce4产品代码未改：test:desktop-ui和test:desktop-agent-shell通过，三宽度审批/停止可达；隔离profile原生UI检查同名会话、审批过期恢复、收起及Tab。全部合成Provider，真实模型0；不含完整VoiceOver、缩放或用户人工验收。",
       "locator": "docs/validation/ui-layout-review-2026-10-03.md"
+    },
+    {
+      "id": "EV-UI-REFACTOR-MAC-20261003",
+      "kind": "platform",
+      "result": "passed",
+      "commit": "5468a3df96f1c6ae343b77e69c219630ba6320b2",
+      "recordedAt": "2026-10-03T14:25:24.365868+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "scope": "真实Electron与宿主/Worker允许拒绝取消崩溃重开、三尺寸布局、真实Bash及原生Session离线接入；全部合成Provider，真实模型0，不扩大平台或Gate。",
+      "locator": "docs/validation/ui-refactor-2026-10-03.md"
+    },
+    {
+      "id": "EV-UI-REFACTOR-MOCK-20261003",
+      "kind": "mock",
+      "result": "passed",
+      "commit": "5468a3df96f1c6ae343b77e69c219630ba6320b2",
+      "recordedAt": "2026-10-03T14:25:24.365868+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "scope": "普通错误/确认丢失/慢查询的合成故障，30版本首中尾预览和历史显示fixture；验证只读刷新不重启/重发、焦点与分区，不冒充真实模型输出。",
+      "locator": "docs/validation/ui-refactor-2026-10-03.md"
+    },
+    {
+      "id": "EV-UI-REFACTOR-REGRESSION-20261003",
+      "kind": "static",
+      "result": "passed",
+      "commit": "5468a3df96f1c6ae343b77e69c219630ba6320b2",
+      "recordedAt": "2026-10-03T14:25:24.365868+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "scope": "最终代码严格类型/声明检查、39桌面回归与后续文档60SSOT/15脚本/结构5通过2跳过；未运行完整文档类型或A0-A4全套。",
+      "locator": "docs/validation/ui-refactor-2026-10-03.md"
     }
   ]
 }

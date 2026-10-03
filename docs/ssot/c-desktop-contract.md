@@ -44,3 +44,6 @@ Electron 44.4.5、React/React DOM 19.3.0、esbuild 0.28.2 和 React 类型 19.3.
 ## M1 后续采用（2026-09-29）
 
 上述 C 的 v3/v4 与“模型流未实现”属于当时范围。当前 [M1契约](m1-model-contract.md) 在 IPC v5 / SQL v7 上追加无工具真实会话、有界流式/最终快照、安全模型准入状态及双时间显示；原生API key选择为无参数主进程动作，持久auth.json由宿主加载。Pi 0.87.1与真实恢复/取消的限定证据见 [收口核对](../validation/m1-closeout-2026-09-29.md)。这仍不是完整聊天历史重建或M2多操作界面。
+
+
+2026-10-03后续 UI：[会话工作台契约](ui-experience-contract.md)替代旧布局安排。导航/输入/正文/详情整体重排；审批语义、宿主与Pi边界继续保留。具体代码、结果与未覆盖项见[重构报告](../validation/ui-refactor-2026-10-03.md)。

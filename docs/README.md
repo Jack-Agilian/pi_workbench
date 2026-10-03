@@ -8,7 +8,9 @@
 
 当前设计不再把 Pi 已提供的 Session、工具、模型、技能解析和包管理列为自研引擎；自有实现聚焦产品治理和桌面体验。`ssot/` 指定的替代范围优先于原始快照。
 
-2026-10-03 UI 交付复审：[社区前端布局研究与开源复用建议](validation/desktop-ui-research-2026-10-03.md) · [当前布局审核、交叉质疑与建议顺序](validation/ui-layout-review-2026-10-03.md)。仅研究/审核，未实施新布局。
+当前 UI：[整体重构与验证](validation/ui-refactor-2026-10-03.md) · [界面与权限模式边界](ssot/ui-experience-contract.md)。
+
+2026-10-03 UI 首轮交付复审（历史）：[社区前端布局研究与开源复用建议](validation/desktop-ui-research-2026-10-03.md) · [当前布局审核、交叉质疑与建议顺序](validation/ui-layout-review-2026-10-03.md)。仅研究/审核，未实施新布局。
 
 ## 原始产品与技术规格（历史快照）
 
