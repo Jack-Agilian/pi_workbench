@@ -8,6 +8,12 @@
 
 右侧是按需详情，分为审批和成果两页。空会话默认隐藏；有待审批或成果时可显示。用户手动收起/选择页面按会话保留，不因新审批强抢焦点。顶部待审批入口与停止始终独立于历史/侧栏。运行中的停止只有一个常驻入口；排队记录保留各自取消排队。
 
+左右分隔线现支持真实指针拖动、方向键20px微调、Home/End到边界、双击或Enter复位。导航栏可收起，宽度和导航开合只保存在Renderer本机布局偏好，不写产品权限或Run状态；无效/不可写存储回退默认或内存。拖动结束、失去捕获、取消和窗口失焦都停止调宽。窗口缩小时只限制当前显示宽度，不覆盖用户偏好。
+
+宽窗口为导航/会话/详情三块，会话至少保留360px；低于1000px时详情成为覆盖层，不继续压缩正文。覆盖范围内正文不可点击或键盘操作，关闭按钮、Escape或背景点击可关闭，焦点返回顶部详情入口；顶部审批/停止和导航仍可操作。当前最小窗口820×640。详情原有按会话开合/页签不变。限定实现与实测见[三栏报告](../validation/pane-layout-2026-10-03.md)。
+
+审批仍暂置详情页，并非最终行内审批已实现。下一批应将待决卡片就近绑定到原Operation，让右栏主要承担成果/预览；不能按时间或位置猜测操作和正文对应关系。顶部待审批与停止继续保留，旧模式/自动批准来源需要准确展示。
+
 正文保持原生安全投影的顺序；产品操作单独分区，不按 ID 或位置猜测两者的交错关系。工具输出和用量元信息默认折叠；原 Operation 身份对应的 DOM 保持展开状态。未实现真正穿插时间线、Markdown 渲染或原生全文补载。
 
 审批默认展示具体目标、简短影响、期限和一次允许/拒绝。完整目录与校验信息可展开。参数摘要、当前绑定、版本、期限和一次领取仍由宿主校验；收起字段不改变其效力。Bash 风险和工具结果发送给模型的事实可见。
@@ -21,10 +27,11 @@
 | 本项目模块 | 固定参考/API | 本轮采用 | 保留边界 |
 |---|---|---|---|
 | renderer/run-history/style | pi-gui `163054227d370a49d09099c61eb65798481294ac` 的 conversation-timeline.tsx、timeline-item.tsx；前次研究中的工作台布局 | 借鉴会话优先、错误独立处理、工具默认紧凑/按身份展开；重写本项目展示与 CSS | 未复制社区组件或 SessionDriver；产品 DTO 与已有查询/滚动所有者保留 |
+| pane-resize-handle / pane-layout / renderer | pi-gui同提交 `ui/pane-resize-handle.tsx`、`features/workbench/workbench-resize-handle.tsx`；React Pointer Events | MIT分隔条局部适配：捕获指针、键盘和复位；本项目单一布局所有者提供宽度/边界，增加失焦清理与本地偏好 | 不复制其布局/Session驱动；不新增依赖、跨进程入口、权限或滚动位置控制者 |
 | artifact-panel | React 19.3.0 的 useRef/useLayoutEffect；既有 DesktopApi.preview | 条件渲染后定位/聚焦，连接身份隔离 | 不添加任意文件读取；正文/工具/成果均不透传 SDK 对象 |
 | renderer 错误动作 | 既有 home/threadActivity 与 HostClient.reconnect；React 异步结果失效说明 | 区分只读刷新、显式意图重试和重启宿主 | 无新的通用请求框架、自动重试或第二套缓存 |
 
-固定 pi-gui 文件：[timeline](https://github.com/minghinmatthewlam/pi-gui/blob/163054227d370a49d09099c61eb65798481294ac/apps/desktop/src/features/conversation/conversation-timeline.tsx)、[timeline-item](https://github.com/minghinmatthewlam/pi-gui/blob/163054227d370a49d09099c61eb65798481294ac/apps/desktop/src/features/conversation/timeline-item.tsx)。根 MIT 已在前次研究核对；本轮是行为借鉴，不新增片段移植。原 Composer 的来源与许可不变。React 文档经 Context7 核对 [异步响应清理](https://react.dev/learn/synchronizing-with-effects) 和 [DOM refs](https://react.dev/learn/manipulating-the-dom-with-refs)。
+固定 pi-gui 文件：[timeline](https://github.com/minghinmatthewlam/pi-gui/blob/163054227d370a49d09099c61eb65798481294ac/apps/desktop/src/features/conversation/conversation-timeline.tsx)、[timeline-item](https://github.com/minghinmatthewlam/pi-gui/blob/163054227d370a49d09099c61eb65798481294ac/apps/desktop/src/features/conversation/timeline-item.tsx)。根 MIT 已在前次研究核对；前一重构批次是行为借鉴；后续三栏批次另移植固定提交的分隔条，来源/许可见THIRD_PARTY_NOTICES.md。原 Composer 的来源与许可不变。React 文档经 Context7 核对 [异步响应清理](https://react.dev/learn/synchronizing-with-effects) 和 [DOM refs](https://react.dev/learn/manipulating-the-dom-with-refs)。
 
 ## 权限模式：社区事实与当前接入
 

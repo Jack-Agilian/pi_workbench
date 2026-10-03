@@ -105,3 +105,11 @@ Q1_PLAN_REVIEW复核补充：真实使用优先，不把全应用统一Query当�
 ## 2026-10-03 权限策略接入
 
 [权限契约](permission-modes-contract.md)补齐模块→参考→采用→边界。复用上一批 Codex/Claude/OpenCode 官方模式对照；pi-gui继续只作会话/输入区域主参考，不搬其会话驱动取代本产品的宿主审批。实际 Pi 0.87.1工具/Operations继续走原适配，新增固定宿主规则和产品模式投影；React受控状态与按身份重挂载经Context7核对。自动模式的命令确认、Run快照与批准来源已接通，不含完全访问或模型分类器。
+
+## 2026-10-03 三栏拖动与按需详情
+
+固定C03提交 `163054227d370a49d09099c61eb65798481294ac` 的 [pane-resize-handle.tsx](https://github.com/minghinmatthewlam/pi-gui/blob/163054227d370a49d09099c61eb65798481294ac/apps/desktop/src/ui/pane-resize-handle.tsx) 和 [workbench-resize-handle.tsx](https://github.com/minghinmatthewlam/pi-gui/blob/163054227d370a49d09099c61eb65798481294ac/apps/desktop/src/features/workbench/workbench-resize-handle.tsx) 已在实施前读取，并核验同提交根MIT。前者仅依赖React，适合局部复用；后者的比例边界不直接适用本项目，改由pane-layout统一保障正文最小宽度与窄窗覆盖。
+
+本项目 `pane-resize-handle.tsx` 局部适配其指针捕获、键盘、双击逻辑，宽度由布局所有者传入，移除第二套DOM测量，补取消/窗口失焦清理。`pane-layout.ts`只拥有宽度和本机显示偏好；会话数据、Pi Session、审批宿主与timeline-scroll单一滚动所有者均保留。Composer仍固定于旧C01提交，未偷偷更新来源。许可已补THIRD_PARTY_NOTICES.md，无新增依赖。
+
+React事件及清理经Context7查询 [DOM事件](https://react.dev/reference/react-dom/components/common) 与 [Effect清理](https://react.dev/reference/react/useEffect)。本次不复用上游完整应用或会话驱动，实际证据见[三栏报告](../validation/pane-layout-2026-10-03.md)。

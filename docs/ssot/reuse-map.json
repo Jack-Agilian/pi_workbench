@@ -933,21 +933,24 @@
       "upstreamSymbolsOrPaths": [
         "packages/pi-sdk-driver",
         "timeline",
-        "customizations"
+        "customizations",
+        "apps/desktop/src/ui/pane-resize-handle.tsx (163054227d370a49d09099c61eb65798481294ac; Composer remains at 0b4cd334942ac01bfc6b3cba736a79984925d8cf)"
       ],
       "reuse": "定向选社区模块，不整仓拼装",
-      "productDelta": "固定pi-gui许可/来源后仅局部移植Composer键盘保护；React产品视图，不引入上游SessionDriver",
+      "productDelta": "固定pi-gui许可/来源后仅局部移植Composer键盘保护；React产品视图，不引入上游SessionDriver 2026-10-03局部适配C03固定提交的PaneResizeHandle；左右拖动/键盘/收起，本机宽度偏好和窄窗覆盖。单一布局与滚动所有者、原产品DTO/权限保留；审批仍在详情页，行内收口待做。",
       "acceptanceGate": "固定commit/许可证/最小组件验证",
       "implementationState": "in_progress",
       "adoption": {
         "status": "selected",
         "imports": [],
-        "selectedSourceCommit": "0b4cd334942ac01bfc6b3cba736a79984925d8cf",
+        "selectedSourceCommit": "163054227d370a49d09099c61eb65798481294ac",
         "verificationStatus": "verified",
         "testEvidence": [
           "EV-C-REVIEW-20260923",
           "EV-C-SYNTHETIC-20260923",
-          "EV-C-MAC-20260923"
+          "EV-C-MAC-20260923",
+          "EV-PANE-LAYOUT-MAC-20261003",
+          "EV-PANE-LAYOUT-STATIC-20261003"
         ]
       }
     },
@@ -1212,7 +1215,7 @@
         "esbuild build"
       ],
       "reuse": "Electron公开窗口/沙盒/IPC，React渲染和esbuild构建；复用既有产品与Pi Worker链路",
-      "productDelta": "闭合产品桥、Thread/Run视图、审批/取消/成果与有界纯文本投影；显式无模型驱动；关闭结果/重连接管分离，未确认命令按意图保留身份并显式重试；D1正常退出/信号统一结算，关闭失败后原窗口显式恢复，候选新宿主不迟到发布；D2-S展示固定命令审批/profile/期限及stdout/stderr有界完成快照，交互终端尚未接入；M1正文流/最终快照、应用专用持久凭据加载及原生临时选择、策略待确认/预算耗尽准入和双时间限制显示；仅产品DTO；M2已有视图增加逐read/write/edit审批、有限版本/参数摘要、后续模型轮流式正文与重连展示；显式SYNTHETIC离线入口，不由Renderer选择工具或worker代码；原生目录选择无自由路径Renderer入口，实际cwd/阶段/逐命令有界结果、三尺寸核心动作核查；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开；UI-P2前端右栏折叠/三档宽度、常驻审批/停止、Thread滚动锚点、按需成果核验展示；现采用正式historyPage/operationPage/artifactPage和独立ThreadActivity；Renderer的thread-pages.ts维护只读已加载范围、事件衔接与重连，首屏错误也保留正确活动身份；F01新增Thread内单Run安全historyEntry只读查询，Renderer按事件定向刷新，头部桥接与旧尾游标分离，整批成功发布/切换停止后续读取；按reference-implementations.md对照pi-gui时间线/viewport/layout，Q1 operationPage已由Query 5.104.0承接缓存/异步状态/去重，原工具LoadedRange移除，产品仅存发布引用；queryScope绑定宿主连接，重连按位置重读，工具错误手动重试；后续Q2历史/成果未迁移，有实测布局瓶颈后采用Virtual，不并存两套缓存/滚动控制；2026-10-03已知模型错误码/HTTP状态经闭合产品DTO安全展示，未知正文不透传，原生错误落盘前收敛；IPC v8，旧结果JSON兼容，具体限定验证见model-errors-2026-10-03报告 2026-10-03默认及本机用量额度清理，API总超时/空闲独立保留；Pi模型默认输出，目录内绝对路径规范化与安全工具失败投影；限定实测见product-defaults-desktop报告，不扩大Gate。 2026-10-03真实Electron四场景限定补证：工具/审批/成果/取消/原Session恢复通过，代理操作与未覆盖范围分列，不晋级全部P0。 2026-10-03整体重构导航/会话/输入/审批与成果页及CSS；错误区分只读刷新/重连，成果版本就近预览和连接失效。该UI重构批次权限三档仅完成官方对照；后续接入见下句。 2026-10-03后续SQL v10和桌面权限入口：持久人工/工作目录自动审批、Run接收时固定模式、来源审计与确认丢失重试；原工具/清理复用。完全访问仍未实现。",
+      "productDelta": "闭合产品桥、Thread/Run视图、审批/取消/成果与有界纯文本投影；显式无模型驱动；关闭结果/重连接管分离，未确认命令按意图保留身份并显式重试；D1正常退出/信号统一结算，关闭失败后原窗口显式恢复，候选新宿主不迟到发布；D2-S展示固定命令审批/profile/期限及stdout/stderr有界完成快照，交互终端尚未接入；M1正文流/最终快照、应用专用持久凭据加载及原生临时选择、策略待确认/预算耗尽准入和双时间限制显示；仅产品DTO；M2已有视图增加逐read/write/edit审批、有限版本/参数摘要、后续模型轮流式正文与重连展示；显式SYNTHETIC离线入口，不由Renderer选择工具或worker代码；原生目录选择无自由路径Renderer入口，实际cwd/阶段/逐命令有界结果、三尺寸核心动作核查；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开；UI-P2前端右栏折叠/三档宽度、常驻审批/停止、Thread滚动锚点、按需成果核验展示；现采用正式historyPage/operationPage/artifactPage和独立ThreadActivity；Renderer的thread-pages.ts维护只读已加载范围、事件衔接与重连，首屏错误也保留正确活动身份；F01新增Thread内单Run安全historyEntry只读查询，Renderer按事件定向刷新，头部桥接与旧尾游标分离，整批成功发布/切换停止后续读取；按reference-implementations.md对照pi-gui时间线/viewport/layout，Q1 operationPage已由Query 5.104.0承接缓存/异步状态/去重，原工具LoadedRange移除，产品仅存发布引用；queryScope绑定宿主连接，重连按位置重读，工具错误手动重试；后续Q2历史/成果未迁移，有实测布局瓶颈后采用Virtual，不并存两套缓存/滚动控制；2026-10-03已知模型错误码/HTTP状态经闭合产品DTO安全展示，未知正文不透传，原生错误落盘前收敛；IPC v8，旧结果JSON兼容，具体限定验证见model-errors-2026-10-03报告 2026-10-03默认及本机用量额度清理，API总超时/空闲独立保留；Pi模型默认输出，目录内绝对路径规范化与安全工具失败投影；限定实测见product-defaults-desktop报告，不扩大Gate。 2026-10-03真实Electron四场景限定补证：工具/审批/成果/取消/原Session恢复通过，代理操作与未覆盖范围分列，不晋级全部P0。 2026-10-03整体重构导航/会话/输入/审批与成果页及CSS；错误区分只读刷新/重连，成果版本就近预览和连接失效。该UI重构批次权限三档仅完成官方对照；后续接入见下句。 2026-10-03后续SQL v10和桌面权限入口：持久人工/工作目录自动审批、Run接收时固定模式、来源审计与确认丢失重试；原工具/清理复用。完全访问仍未实现。 2026-10-03局部适配C03固定提交的PaneResizeHandle；左右拖动/键盘/收起，本机宽度偏好和窄窗覆盖。单一布局与滚动所有者、原产品DTO/权限保留；审批仍在详情页，行内收口待做。",
       "acceptanceGate": "真实桌面进程/来源/CSP、Thread隔离、审批/取消/恢复；平台/模型/Gate分别验收；确认丢失/交错重试、异常关闭与受证据约束的恢复；Q1还须验证环境/连接缓存隔离、无网络本地读取、显式重试/焦点策略、IPC背压与整批一致性，删除被替代旧机制",
       "implementationState": "in_progress",
       "adoption": {
@@ -1404,7 +1407,9 @@
           "EV-UI-REFACTOR-REGRESSION-20261003",
           "EV-PERMISSION-POLICY-SDK-20261003",
           "EV-PERMISSION-POLICY-MAC-20261003",
-          "EV-PERMISSION-POLICY-STATIC-20261003"
+          "EV-PERMISSION-POLICY-STATIC-20261003",
+          "EV-PANE-LAYOUT-MAC-20261003",
+          "EV-PANE-LAYOUT-STATIC-20261003"
         ]
       }
     }
@@ -3413,6 +3418,30 @@
         "darwin"
       ],
       "locator": "docs/validation/permission-modes-2026-10-03.md"
+    },
+    {
+      "id": "EV-PANE-LAYOUT-MAC-20261003",
+      "kind": "platform",
+      "result": "passed",
+      "scope": "实际macOS Electron指针拖动/键盘/收起、三尺寸覆盖、偏好重载与坏值回退、原审批/停止/恢复/Session与自动模式回归；Provider合成、真实模型0，不含完整VoiceOver或其他平台。",
+      "commit": "f742f982bde7f942826e1fe9a5f632a33364cd70",
+      "recordedAt": "2026-10-03T15:21:46.713409+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/pane-layout-2026-10-03.md"
+    },
+    {
+      "id": "EV-PANE-LAYOUT-STATIC-20261003",
+      "kind": "static",
+      "result": "passed",
+      "scope": "严格类型/40桌面测试与文档SSOT/脚本/结构检查；没有新增依赖或改变宿主/Worker/数据库边界，不代表完整产品验收。",
+      "commit": "f742f982bde7f942826e1fe9a5f632a33364cd70",
+      "recordedAt": "2026-10-03T15:21:46.713409+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/pane-layout-2026-10-03.md"
     }
   ]
 }

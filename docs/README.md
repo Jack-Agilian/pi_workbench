@@ -121,3 +121,5 @@ UI-P2前端分页组合：[接入证据与范围](validation/ui-p2-pages-2026-09
 [Q1集成后真实桌面检查](validation/q1-desktop-live-2026-10-01.md)：区分模型访问失败、旧成果浏览与正常重开，不将失败请求计为工具验收。
 
 2026-10-03权限模式：[契约](ssot/permission-modes-contract.md) · [限定验证](validation/permission-modes-2026-10-03.md)。输入区可选择人工或工作目录内自动审批，设置与每次任务的有效模式持久保存；完全访问尚未提供。
+
+2026-10-03：[可拖动三栏与窄窗详情](validation/pane-layout-2026-10-03.md)，固定社区分隔条适配、左右收起/键盘调宽和布局偏好；审批行内收口尚未实施。
