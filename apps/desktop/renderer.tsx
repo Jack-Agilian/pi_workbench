@@ -5,6 +5,8 @@ import type { DesktopApi, DesktopHome } from '../../packages/app-contracts/deskt
 import type { ThreadActivity } from '../../packages/app-contracts/desktop-pages.ts';
 import { ThreadPages, projectPages, type ThreadPagesView } from './thread-pages.ts';
 import { RunHistory } from './run-history.tsx';
+import { PaneResizeHandle } from './pane-resize-handle.tsx';
+import { usePaneLayout } from './pane-layout.ts';
 import { PermissionPicker } from './permission-picker.tsx';
 import { ApprovalList } from './approval-list.tsx';
 import { ArtifactPanel } from './artifact-panel.tsx';
@@ -17,7 +19,6 @@ const id = () => crypto.randomUUID();
 function App() {
   const [inspectorChoices, setInspectorChoices] = useState<Record<string, boolean>>({});
   const [inspectorTabs, setInspectorTabs] = useState<Record<string, 'approvals' | 'artifacts'>>({});
-  const [inspectorWidth, setInspectorWidth] = useState('normal');
   const [home, setHome] = useState<DesktopHome | null>(null);
   const [selected, setSelected] = useState('');
   const [activityState, setActivity] = useState<ThreadActivity | null>(null);
@@ -205,13 +206,19 @@ function App() {
   const pending = activity?.operations.filter(op => op.state === 'pending') ?? [];
   const inspectorTab = inspectorTabs[selected] ?? (pending.length ? 'approvals' : 'artifacts');
   const inspectorOpen = inspectorChoices[selected] ?? (pending.length > 0 || Boolean(thread?.artifacts.length));
+  const layout = usePaneLayout(inspectorOpen);
+  useEffect(() => {
+    if (layout.overlay && inspectorOpen) inspectorRef.current?.querySelector<HTMLButtonElement>('.inspector-close')?.focus();
+  }, [layout.overlay, inspectorOpen]);
+  const closeInspector = () => { setInspectorChoices(all => ({...all, [selected]: false})); document.querySelector<HTMLButtonElement>('.inspector-toggle')?.focus(); };
   const workspacePath=home?.workspaces.items.find(w=>w.id===(activity?.thread.workspaceId??home.workspaces.selectedId))?.path??'正在读取目录';
   const selectedWorkspace=home?.workspaces.items.find(w=>w.id===home.workspaces.selectedId)?.path??'正在读取目录';
   const shellTools=home?.model?.limits?.shellTools;
   const isWorking = !!activity?.activeRun && active.has(activity.activeRun.state);
   const stoppableRun = activity?.activeRun && ['running','starting','queued'].includes(activity.activeRun.state) ? activity.activeRun : null;
   return <div className="shell">
-    <aside className="sidebar">
+    <aside id="workspace-navigation" className="sidebar" hidden={!layout.sidebarOpen} style={{width: layout.sidebarWidth}}>
+      {layout.sidebarOpen && <PaneResizeHandle label="导航栏宽度" controls="workspace-navigation" edge="right" width={layout.sidebarWidth} min={layout.sidebarMin} max={layout.sidebarMax} onResize={layout.resizeSidebar} onReset={layout.resetSidebar} />}
       <div className="brand"><span className="brand-mark">π</span><div>Pi Workbench</div></div>
       <button className="choose-workspace" title={selectedWorkspace} disabled={busy||disconnected||!!pendingCreation.current||Boolean(home?.activeRuns.length)} onClick={()=>{setBusy(true);void api.selectWorkspace().then(()=>setTick(n=>n+1),failed).finally(()=>setBusy(false));}}><span>工作目录</span><strong>{selectedWorkspace.split('/').at(-1)}</strong><small>切换目录 ↗</small></button>
       <button className="new-thread primary" onClick={() => void createThread()} disabled={busy || disconnected}><span>＋</span> {pendingCreation.current ? '重试新建会话' : '新建会话'}</button>
@@ -222,6 +229,7 @@ function App() {
     </aside>
     <main>
       <header className="thread-heading">
+        <button className="sidebar-toggle" aria-label={layout.sidebarOpen ? '收起导航' : '展开导航'} title={layout.sidebarOpen ? '收起导航' : '展开导航'} aria-controls="workspace-navigation" aria-expanded={layout.sidebarOpen} onClick={layout.toggleSidebar}>☰</button>
         <div className="heading-copy"><h1>{activity?.thread.title ?? '开始一项工作'}</h1><div className="execution-summary"><span title={workspacePath}>{workspacePath}</span></div></div>
         <div className="view-toolbar">
           {pending.length > 0 ? <button className="show-approvals" onClick={openApprovals}><span className="approval-indicator" role="status">{pending.length} 项待审批</span></button> : <span className="approval-indicator sr-only" role="status">暂无待审批</span>}
@@ -234,8 +242,8 @@ function App() {
       {problem && <div className="notice error" role="alert">{problem.text}<button onClick={() => void (problem.kind === 'connection' ? reconnect() : refreshStatus())} disabled={busy || refreshing}>{problem.kind === 'connection' ? '重新连接' : '刷新状态'}</button></div>}
       {activity?.workspaceStatus === 'invalid' && <div className="notice error" role="alert">此会话的工作目录已不可用，发送已停用。历史仍可浏览，请恢复原目录后再继续。</div>}
       {home?.recovery === 'blocked' && <div className="notice" role="status">执行结果或清理尚未核实，新任务暂不执行。<button disabled={busy} onClick={() => { void api.recover().then(value => { setHome(value); setTick(n => n + 1); }, failed); }}>核验并恢复</button></div>}
-      <div className="content-grid" data-inspector={inspectorOpen ? 'open' : 'closed'} data-width={inspectorWidth}>
-        <section className="conversation" aria-label="会话记录">
+      <div className="content-grid" data-inspector={inspectorOpen ? 'open' : 'closed'} data-overlay={layout.overlay}>
+        <section className="conversation" aria-label="会话记录" inert={layout.overlay && inspectorOpen}>
           <div className="timeline" ref={scroll.viewport} onScroll={scroll.onScroll} tabIndex={0} aria-label="执行记录"><div className="timeline-content" ref={scroll.content}>
             {(pageProblem || toolsProblem) && <div className="notice" role="status">{toolsProblem ? pageError(new Error(toolsProblem)) : pageProblem}<button className="retry-pages" disabled={pageBusy || toolsBusy || disconnected} onClick={() => void loadPages()}>重新读取记录</button></div>}
             {selected && !pages && !pageProblem && !toolsProblem && <p role="status">正在读取最近记录…</p>}
@@ -250,8 +258,11 @@ function App() {
             {unconfirmedRun && <p role="status">尚未收到确认；重试会核对同一次提交，原内容已保留。</p>}
           </form><p className="composer-hint">Enter 发送 · Shift + Enter 换行</p>
         </section>
+        {inspectorOpen && layout.overlay && <button className="inspector-backdrop" tabIndex={-1} aria-label="关闭详情" onClick={closeInspector} />}
+        <div className="inspector-pane" hidden={!inspectorOpen} style={{width: layout.inspectorWidth}} onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); closeInspector(); } }}>
+        {inspectorOpen && <PaneResizeHandle label="详情栏宽度" controls="task-inspector" edge="left" width={layout.inspectorWidth} min={layout.inspectorMin} max={layout.inspectorMax} onResize={layout.resizeInspector} onReset={layout.resetInspector} />}
         <aside id="task-inspector" ref={inspectorRef} className="inspector" aria-label="审批与成果" hidden={!inspectorOpen}>
-          <div className="inspector-nav" aria-label="详情分类"><button data-panel="approvals" aria-pressed={inspectorTab==='approvals'} onClick={()=>setInspectorTabs(all=>({...all,[selected]:'approvals'}))}>审批 <span>{pending.length}</span></button><button data-panel="artifacts" aria-pressed={inspectorTab==='artifacts'} onClick={()=>setInspectorTabs(all=>({...all,[selected]:'artifacts'}))}>成果 <span>{thread?.artifacts.length ?? 0}{pages?.artifacts.hasMore ? '+' : ''}</span></button><details className="rail-options"><summary aria-label="详情显示选项">···</summary><label className="rail-width">栏宽 <select aria-label="审批与成果栏宽" value={inspectorWidth} onChange={event => setInspectorWidth(event.target.value)}><option value="compact">紧凑</option><option value="normal">标准</option><option value="wide">宽</option></select></label></details></div>
+          <div className="inspector-nav" aria-label="详情分类"><button data-panel="approvals" aria-pressed={inspectorTab==='approvals'} onClick={()=>setInspectorTabs(all=>({...all,[selected]:'approvals'}))}>审批 <span>{pending.length}</span></button><button data-panel="artifacts" aria-pressed={inspectorTab==='artifacts'} onClick={()=>setInspectorTabs(all=>({...all,[selected]:'artifacts'}))}>成果 <span>{thread?.artifacts.length ?? 0}{pages?.artifacts.hasMore ? '+' : ''}</span></button><button className="inspector-close" aria-label="关闭详情" onClick={closeInspector}>×</button></div>
           <section className="inspector-panel" aria-label="待审批操作" hidden={inspectorTab!=='approvals'}>
             <ApprovalList pending={pending} workspacePath={workspacePath} modelMode={modelMode} busy={busy} disconnected={disconnected} command={command} />
             {!pending.length && <div className="panel-empty"><h2>暂无待审批操作</h2><p>需要你确认时，会在这里列出具体目标和权限。</p></div>}
@@ -261,6 +272,7 @@ function App() {
             <p className="inspector-foot">{shellTools?'Bash 成功不代表成果已登记；只有核验过的文件版本才列入这里。':'成果由宿主核验后登记，打开时重新检查文件。'}</p>
           </section>
         </aside>
+        </div>
       </div>
     </main>
   </div>;

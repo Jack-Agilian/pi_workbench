@@ -118,25 +118,70 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
     assert.deepEqual(await js("[document.activeElement.id,document.querySelector('#composer').selectionStart,document.querySelector('#composer').selectionEnd]"), ['composer', 3, 7]);
     await captureLayout(window, 'ui-p2-approval');
     const originalSize = window.getContentSize();
+    const frame = () => js('new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))');
+    const rail = (name: string) => `[role=separator][aria-label="${name}"]`;
+    const leftRail = rail('导航栏宽度'), rightRail = rail('详情栏宽度');
+    const paneWidth = (selector: string) => js<number>(`document.querySelector(${JSON.stringify(selector)}).getBoundingClientRect().width`);
+    const key = async (selector: string, key: string) => {
+      await js(`document.querySelector(${JSON.stringify(selector)}).focus()`);
+      window.webContents.sendInputEvent({type: 'keyDown', keyCode: key});
+      window.webContents.sendInputEvent({type: 'keyUp', keyCode: key});
+      await frame();
+    };
+    const drag = async (selector: string, delta: number) => {
+      const point = await js<{x: number; y: number}>(`(()=>{const r=document.querySelector(${JSON.stringify(selector)}).getBoundingClientRect();return {x:Math.round(r.x+r.width/2),y:Math.round(r.y+r.height/2)}})()`);
+      window.webContents.sendInputEvent({type: 'mouseMove', ...point});
+      window.webContents.sendInputEvent({type: 'mouseDown', button: 'left', clickCount: 1, ...point});
+      window.webContents.sendInputEvent({type: 'mouseMove', x: point.x+delta, y: point.y});
+      await frame();
+      window.webContents.sendInputEvent({type: 'mouseUp', button: 'left', clickCount: 1, x: point.x+delta, y: point.y});
+      await frame();
+      assert.equal(await js<boolean>("!!document.querySelector('[data-resizing=true]')"), false);
+    };
     for (const [width, height] of [[1320, 860], [1024, 720], [820, 640]]) {
-      window.setContentSize(width!, height!);
-      for (const size of ['compact', 'normal', 'wide']) {
-        await js(`(()=>{const s=document.querySelector('.rail-width select');s.value=${JSON.stringify(size)};s.dispatchEvent(new Event('change',{bubbles:true}))})()`);
-        await new Promise(r => setTimeout(r, 100));
-        const boxes = await js<{overflow: boolean; rail: number; composerVisible: boolean}>("(()=>{const c=document.querySelector('.composer').getBoundingClientRect();return {overflow:document.body.scrollWidth>innerWidth,rail:document.querySelector('.inspector').getBoundingClientRect().width,composerVisible:c.bottom<=innerHeight&&c.width>200}})()");
-        assert.equal(boxes.overflow, false); assert.equal(boxes.composerVisible, true);
-        metrics.push({width, height, size, ...boxes});
+      window.setContentSize(width!, height!); await frame();
+      for (const selector of [leftRail, rightRail]) {
+        const pane = selector === leftRail ? '.sidebar' : '.inspector-pane';
+        await key(selector, 'Home');
+        const before = await paneWidth(pane);
+        await drag(selector, selector === leftRail ? 48 : -48);
+        assert.ok(Math.abs(await paneWidth(pane)-before-48)<2, 'real pointer drag changes pane width');
+        const after = await paneWidth(pane);
+        window.webContents.sendInputEvent({type:'mouseMove',x:500,y:250}); await frame();
+        assert.equal(await paneWidth(pane), after, 'released pointer must not keep resizing');
+        await key(selector, 'End');
+        assert.equal(await paneWidth(pane), await js<number>(`Number(document.querySelector(${JSON.stringify(selector)}).getAttribute('aria-valuemax'))`));
+        await key(selector, 'Enter');
       }
-      await click('.inspector-toggle');
+      const boxes = await js<{overflow: boolean; rail: number; composerVisible: boolean; overlay: boolean}>("(()=>{const c=document.querySelector('.composer').getBoundingClientRect();return {overflow:document.body.scrollWidth>innerWidth,rail:document.querySelector('.inspector').getBoundingClientRect().width,composerVisible:c.bottom<=innerHeight&&c.width>200,overlay:document.querySelector('.content-grid').dataset.overlay==='true'}})()");
+      assert.equal(boxes.overflow, false); assert.equal(boxes.composerVisible, true); assert.equal(boxes.overlay, width!<1000);
+      metrics.push({width, height, ...boxes});
+      if (boxes.overlay) {
+        assert.equal(await js<boolean>("document.querySelector('.conversation').inert && document.activeElement.className==='pane-resize'"), true);
+        await key(rightRail, 'Escape');
+        assert.equal(await js<boolean>("document.activeElement.className==='inspector-toggle' && !document.querySelector('.conversation').inert"), true);
+      } else await click('.inspector-toggle');
       assert.equal(await js<boolean>("document.querySelector('.inspector').hidden"), true);
       assert.equal(await js<string>("document.querySelector('.approval-indicator').textContent"), '1 项待审批');
       assert.equal(await js<boolean>("(()=>{const e=document.querySelector('.view-toolbar .stop');const b=e.getBoundingClientRect();return e.contains(document.elementFromPoint(b.x+b.width/2,b.y+b.height/2))})()"), true);
       await click('.show-approvals');
       assert.equal(await js<boolean>("document.querySelector('.inspector').hidden"), false);
+      await click('.sidebar-toggle');
+      assert.equal(await js<boolean>("document.querySelector('.sidebar').hidden && !document.querySelector('[aria-label=导航栏宽度]')"), true);
+      await click('.sidebar-toggle');
+      assert.equal(await js<boolean>("!document.querySelector('.sidebar').hidden"), true);
     }
-    window.setContentSize(originalSize[0]!, originalSize[1]!);
-    await js("(()=>{const s=document.querySelector('.rail-width select');s.value='normal';s.dispatchEvent(new Event('change',{bubbles:true}))})()");
-    await new Promise(r => setTimeout(r, 200));
+    window.setContentSize(originalSize[0]!, originalSize[1]!); await frame();
+    await key(leftRail, 'Enter'); await key(rightRail, 'Enter');
+    // Width preferences survive window resize; shrinking only clamps rendered width.
+    await key(rightRail, 'End');
+    const preferred = await paneWidth('.inspector-pane');
+    window.setContentSize(820,640); await frame();
+    assert.ok(await paneWidth('.inspector-pane') < preferred);
+    window.setContentSize(originalSize[0]!,originalSize[1]!); await frame();
+    assert.equal(await paneWidth('.inspector-pane'),preferred);
+    await key(rightRail,'Enter');
+    assert.equal(await js<string>("document.querySelector('#composer').value"), 'SYNTHETIC 保留草稿');
     await js("document.querySelector('.timeline').scrollTop=1500");
     await wait(() => js<boolean>("!!document.querySelector('.return-latest')"), 'browsing');
     const anchor = await js<{id: string; offset: number}>("(()=>{const t=document.querySelector('.timeline');const y=t.getBoundingClientRect().top;const e=[...t.querySelectorAll('[data-run]')].find(e=>e.getBoundingClientRect().bottom>y);return {id:e.dataset.run,offset:e.getBoundingClientRect().top-y}})()");
@@ -215,9 +260,35 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
     releasePreview!(); delayPreview = false;
     await new Promise(r => setTimeout(r, 200));
     assert.equal(await js<boolean>("!!document.querySelector('.preview')"), false);
+    // Native pointer cancellation on window blur, plus actual reload of local preferences.
+    await key(leftRail, 'Home');
+    const point = await js<{x:number;y:number}>(`(()=>{const r=document.querySelector(${JSON.stringify(leftRail)}).getBoundingClientRect();return {x:Math.round(r.x+r.width/2),y:120}})()`);
+    window.webContents.sendInputEvent({type:'mouseDown',button:'left',clickCount:1,...point}); await frame();
+    assert.equal(await js<boolean>("!!document.querySelector('[data-resizing=true]')"),true);
+    // Explicitly synthetic browser lifecycle event; real native pointer owns capture.
+    await js("window.dispatchEvent(new Event('blur'))"); await frame();
+    window.webContents.sendInputEvent({type:'mouseMove',x:point.x+80,y:point.y});
+    window.webContents.sendInputEvent({type:'mouseUp',button:'left',clickCount:1,x:point.x+80,y:point.y}); await frame();
+    assert.equal(await paneWidth('.sidebar'),180);
+    assert.equal(await js<boolean>("!!document.querySelector('[data-resizing=true]')"),false);
+    await drag(leftRail,60);
+    await click('.sidebar-toggle');
+    const reload = async () => {
+      await new Promise<void>(resolve => { window.webContents.once('did-finish-load',resolve); window.webContents.reload(); });
+      await wait(() => js<boolean>("!!document.querySelector('.sidebar-toggle')"),'pane_preferences_reload');
+    };
+    await reload();
+    assert.equal(await js<boolean>("document.querySelector('.sidebar').hidden"),true);
+    await click('.sidebar-toggle'); await frame();
+    assert.equal(await paneWidth('.sidebar'),240);
+    // Corrupted local UI preferences cannot break startup or create arbitrary widths.
+    await js(`localStorage.setItem('pi-workbench.panes.v1','{"sidebar":"bad","inspector":999999,"collapsed":"true"}')`);
+    await reload(); await frame();
+    assert.equal(await paneWidth('.sidebar'),224);
+    assert.equal(await js<boolean>("document.querySelector('.sidebar').hidden"),false);
     assert.equal(commands, 0, 'view interactions must not submit execution commands');
     const directory = join(app.getAppPath(), '../../.artifacts/ui-p2-frontend'); mkdirSync(directory, {recursive: true});
-    writeFileSync(join(directory, 'interaction-results.json'), JSON.stringify({scope: 'SYNTHETIC display fixtures in real Electron; no model calls or execution claims',metrics,anchorPreserved: true,threadScrollRestored: true,draftAndSelectionPreserved: true,latePreviewRejected: true,previewStatuses: ['ready','changed','missing','unavailable'],commands}, null, 2));
-    console.log('UI-P2 frontend: 3 sizes / 3 widths, collapsed approvals/stop, scroll anchor + thread restore, draft/focus, preview statuses and late response fencing passed (SYNTHETIC UI fixtures)');
+    writeFileSync(join(directory, 'interaction-results.json'), JSON.stringify({scope: 'SYNTHETIC display fixtures in real Electron; no model calls or execution claims',metrics,anchorPreserved: true,threadScrollRestored: true,draftAndSelectionPreserved: true,latePreviewRejected: true,nativePaneDragging: true,keyboardResize: true,overlayFocus: true,preferenceReload: true,invalidPreferencesFallback: true,blurStopsDrag: true,previewStatuses: ['ready','changed','missing','unavailable'],commands}, null, 2));
+    console.log('UI-P2 frontend: 3 sizes / native pointer + keyboard resize, overlay/collapse and approvals/stop, scroll anchor + thread restore, draft/focus, preview statuses and late response fencing passed (SYNTHETIC UI fixtures)');
   } finally { releaseHistory?.(); releasePreview?.(); host.request = request; }
 }

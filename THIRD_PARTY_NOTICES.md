@@ -4,7 +4,7 @@
 
 Source: https://github.com/minghinmatthewlam/pi-gui/tree/0b4cd334942ac01bfc6b3cba736a79984925d8cf
 
-`apps/desktop/composer-key.ts` adapts the Enter / Shift+Enter / IME submit guard from `apps/desktop/src/features/conversation/hooks/use-session-composer.tsx`. Added keyCode 229 and repeat guards; removed steer/followUp and upstream application dependencies. Other desktop UI code is original. The full upstream Composer/timeline/driver were reviewed but not copied.
+`apps/desktop/composer-key.ts` adapts the Enter / Shift+Enter / IME submit guard from `apps/desktop/src/features/conversation/hooks/use-session-composer.tsx`. Added keyCode 229 and repeat guards; removed steer/followUp and upstream application dependencies. `apps/desktop/pane-resize-handle.tsx` additionally adapts `apps/desktop/src/ui/pane-resize-handle.tsx` at commit `163054227d370a49d09099c61eb65798481294ac`: host-owned width/bounds replace DOM measurement, and cancellation/window-blur cleanup is added. The source and root MIT license were read at that fixed commit. Other desktop UI code is original. The full upstream Composer/timeline/driver were reviewed but not copied.
 
 MIT License
 
