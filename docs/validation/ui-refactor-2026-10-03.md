@@ -69,7 +69,7 @@ UI 新增及保留的关键断言：
 
 ![820宽紧凑审批](ui-refactor-20261003/agent-shell-approval-820x640.png)
 
-[成果旁预览截图](ui-refactor-20261003/conversation-artifact.png)。截图及程序化断言不是用户人工验收、VoiceOver认证或全部状态视觉覆盖。
+[会话与成果列表截图](ui-refactor-20261003/conversation-artifact.png)。成果就近预览由上述程序化断言验证，此截图未展开预览。截图及程序化断言不是用户人工验收、VoiceOver认证或全部状态视觉覆盖。
 
 ## 审核项与剩余工作
 
