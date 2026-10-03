@@ -658,11 +658,12 @@
             "EV-D2S-S01-MAC-20260928",
             "EV-D2S-S01-REGRESSION-20260928",
             "EV-AGENT-SHELL-SDK-20260930",
-            "EV-AGENT-SHELL-MAC-20260930"
+            "EV-AGENT-SHELL-MAC-20260930",
+            "EV-FULL-ACCESS-PLATFORM-20261004"
           ]
         }
       ],
-      "statusReason": "B-IPC实际Worker内复用Pi write/edit与既有Operations，拒绝/版本/期限/取消通过；原子写入约束、完整Shell产品路径与其他平台仍未完成。 D2-S限定Mac非交互Bash产品链路通过；独立组/命令结果与副作用分开，D2-T、Windows及完整Gate仍未完成。 S01输出/收据字节预算修正后Mac产品与退出回归通过；仍不完成终端、其他平台或M0 Gate。 Agent Shell显式动态Bash复用公开定义/Operations及原guardian，逐命令独立收据、普通非零结果/未知恢复已离线验证；真实任务待新授权。"
+      "statusReason": "B-IPC实际Worker内复用Pi write/edit与既有Operations，拒绝/版本/期限/取消通过；原子写入约束、完整Shell产品路径与其他平台仍未完成。 D2-S限定Mac非交互Bash产品链路通过；独立组/命令结果与副作用分开，D2-T、Windows及完整Gate仍未完成。 S01输出/收据字节预算修正后Mac产品与退出回归通过；仍不完成终端、其他平台或M0 Gate。 Agent Shell显式动态Bash复用公开定义/Operations及原guardian，逐命令独立收据、普通非零结果/未知恢复已离线验证；真实任务待新授权。 2026-10-04在376c06e完成完全访问Mac平台前置及原链路回归；真实外部文件/loopback/私有SQLite/祖先保护/固定宿主死亡清理限定通过，产品Run模式、外部Pi工具与持久恢复仍待集成，UI第三档未启用。"
     },
     {
       "id": "SEC-01",
@@ -809,9 +810,22 @@
           "evidenceRefs": [
             "EV-BACKEND-HISTORY-MAC-20260930"
           ]
+        },
+        {
+          "id": "SEC-02-A05",
+          "requirement": "完全访问必须将宿主保护集、固定Run模式、外部工具目标/版本与实际OS策略贯通；保留私有SQLite/凭据及清理/恢复边界，限定平台验证后才启用UI",
+          "plannedChecks": [
+            "test:execution-access",
+            "full-permission-run-snapshot",
+            "full-native-file-target-and-reconciliation",
+            "full-product-reopen-and-desktop-mode"
+          ],
+          "evidenceRefs": [
+            "EV-FULL-ACCESS-PLATFORM-20261004"
+          ]
         }
       ],
-      "statusReason": "既有摘要/目标/版本/期限与逐工具审批保持；本轮统一旧Thread启动、派发、批准、工具及冷恢复的工作区准入，保护当前配置和临时凭据目录。限定Mac证据，不声称原子CAS、任意TOCTOU防护或跨平台生产沙箱。 2026-10-03人工/工作目录自动审批贯通宿主SQL v10与桌面；权限按Run固定，确认丢失/旧版本拒绝/取消和重开限定通过。完全访问未实现，整体任务不晋级。"
+      "statusReason": "既有摘要/目标/版本/期限与逐工具审批保持；本轮统一旧Thread启动、派发、批准、工具及冷恢复的工作区准入，保护当前配置和临时凭据目录。限定Mac证据，不声称原子CAS、任意TOCTOU防护或跨平台生产沙箱。 2026-10-03人工/工作目录自动审批贯通宿主SQL v10与桌面；权限按Run固定，确认丢失/旧版本拒绝/取消和重开限定通过。完全访问未实现，整体任务不晋级。 2026-10-04在376c06e完成完全访问Mac平台前置及原链路回归；真实外部文件/loopback/私有SQLite/祖先保护/固定宿主死亡清理限定通过，产品Run模式、外部Pi工具与持久恢复仍待集成，UI第三档未启用。"
     },
     {
       "id": "SEC-03",

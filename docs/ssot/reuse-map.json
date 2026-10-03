@@ -724,7 +724,7 @@
         "PowerShellOperations"
       ],
       "reuse": "保留Shell语义和工具结果",
-      "productDelta": "限定Mac非交互Bash接产品审批/Operation/IPC；公开Operations委托原guardian监督独立Shell组、空凭据/禁网OS限制、有界完成输出和持久收据，不复用文件摘要推导命令副作用；S01统一解码后输出预算，非法字节替换/安全截断不阻断有效清理收据；Agent Shell显式权限复用该工具接模型循环，逐命令审批/启动账本/独立收据与关闭清单，普通非零返回Pi、未知副作用阻断；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开",
+      "productDelta": "限定Mac非交互Bash接产品审批/Operation/IPC；公开Operations委托原guardian监督独立Shell组、空凭据/禁网OS限制、有界完成输出和持久收据，不复用文件摘要推导命令副作用；S01统一解码后输出预算，非法字节替换/安全截断不阻断有效清理收据；Agent Shell显式权限复用该工具接模型循环，逐命令审批/启动账本/独立收据与关闭清单，普通非零返回Pi、未知副作用阻断；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开 2026-10-04共用原Mac受限profile生成器，新增宿主内部完全访问profile及真实平台测试；复用原ShellExecution/guardian，保护私有树、只读代码与祖先，IP网络和Worker禁网分开。产品full模式尚未接入，限定证据见full-access-platform报告。",
       "acceptanceGate": "保留定义/增量/取消；绑定操作、中文路径和受管理进程停止核验；残留可见",
       "implementationState": "in_progress",
       "adoption": {
@@ -769,7 +769,8 @@
           "EV-AGENT-SHELL-SDK-20260930",
           "EV-AGENT-SHELL-MAC-20260930",
           "EV-AGENT-TASK-MODEL-20260930",
-          "EV-AGENT-TASK-MAC-20260930"
+          "EV-AGENT-TASK-MAC-20260930",
+          "EV-FULL-ACCESS-PLATFORM-20261004"
         ]
       }
     },
@@ -3482,6 +3483,18 @@
         "darwin"
       ],
       "locator": "docs/validation/inline-approval-2026-10-03.md"
+    },
+    {
+      "id": "EV-FULL-ACCESS-PLATFORM-20261004",
+      "kind": "platform",
+      "result": "passed",
+      "commit": "376c06e028cfd1f0bc337daf274aa8e395b8917e",
+      "recordedAt": "2026-10-03T16:14:13.024972+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/full-access-platform-2026-10-04.md",
+      "scope": "macOS arm64完全访问profile前置：真实外部文件/SQLite、loopback、私有目录与祖先移动限制、Unix服务拒绝、固定宿主SIGKILL后的原guardian端口/后代/心跳清理；原Worker/工具/Electron回归。未接产品full模式、真实Worker外部工具和产品库恢复；无真实模型/其他平台/任意恶意进程证明。"
     }
   ]
 }

@@ -152,3 +152,7 @@ Q1实际锁定react-query/query-core 5.104.0，官方tag对应d4033eb1e5bdef3c8a
 ## Pi 0.87.1 错误展示入口（2026-10-03）
 
 固定官方v0.87.1源码提交 `f07218c4d4bbc12bef056a7058c3dd49dfe41abe`，发行版本/锁不变。`@earendil-works/pi-ai/utils/error-body` 的 normalizeProviderError/formatProviderError 与 `utils/event-stream` 的 createAssistantMessageEventStream/AssistantMessageEventStream 均为公开子路径运行时导出；Provider.streamSimple 是实例方法，TUI assistant-message 为内部行为参考，非React公开组件。Context7部分main结果只作定位，已安装包声明/实际ESM和合成接缝才支持采用。格式化不等于脱敏，HTTP错误可能早于onResponse；细节见[契约](model-error-contract.md)与[真实被测SHA/证据](../validation/model-errors-2026-10-03.md)。没有升级、deep-import或模型调用。
+
+## 完全访问平台规则对照（2026-10-04）
+
+读取Anthropic sandbox-runtime `9e93406ab2e0b6e9794624896f729560dc9445db`的macos-sandbox-utils.ts；源码blob与Apache-2.0许可证blob通过GitHub API/本机git hash-object独立比对一致，见[平台报告](../validation/full-access-platform-2026-10-04.md)。Context7滚动文档只补文件权限语义；固定源码中的祖先目录移动保护等规则作为既有Mac后端的设计参考，没有安装/移植整个库，不构成其发行或跨平台兼容证据。

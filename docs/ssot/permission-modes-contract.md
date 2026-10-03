@@ -40,6 +40,12 @@ SQL v10仅增加 threads/runs 的 `permission_mode`、`permission_revision` 以�
 | ProductCore / 产品命令 | [OpenCode allow/ask/deny](https://opencode.ai/docs/permissions/)、[Codex审批与访问范围](https://learn.chatgpt.com/docs/sandboxing)、[Claude模式差异](https://code.claude.com/docs/en/permission-modes)；本仓库requestOperation/claimOperation | 固定宿主规则、会话设置与Run快照、批准来源 | 不声称复刻分类器、第三方API或全部模式；不靠前端隐藏确认放行 |
 | Supervisor / Pi适配 | 已安装Pi0.87.1公开工具工厂与Operations、原delivery/claim/recovery | 原链路直接复用，新增批准状态不绕过执行前校验 | 发行包docs/extensions.md明确扩展与Pi同OS权限；不可搬进扩展充当宿主隔离 |
 
+## 完全访问的平台前置（2026-10-04）
+
+`macos-access.ts`已实现宿主内部profile生成；原生产Worker/Bash统一调用受限生成器，新full生成器仅由固定平台测试调用。目录外文件和IP网络可开放，同时保留私有目录/只读代码/祖先移动保护，宿主为Worker保留禁直接网络的策略；保护集和进程临时目录例外只能由宿主给定。限定macOS实测、参考来源及失败见[报告](../validation/full-access-platform-2026-10-04.md)。
+
+这不是产品第三档。SQL仍v10，命令仍只接受manual/auto；全访问尚未绑定Run或原生文件工具，尚未完成产品库恢复。下面矩阵的OS策略部分已有证据，其余必须一起贯通，不能只替换profile就提供入口。
+
 ## 完全访问的下一实施矩阵
 
 这是未完成工作，不由本批通过自动晋级：

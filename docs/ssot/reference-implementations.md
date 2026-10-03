@@ -121,3 +121,7 @@ React事件及清理经Context7查询 [DOM事件](https://react.dev/reference/re
 滚动故障后重新读取同提交 `hooks/use-timeline-viewport.ts`：其“render不是scroll请求”和expectedScrollTop区分自身滚动的规则适用于本项目。只收敛已有timeline-scroll的恢复触发与自身事件识别，不移植虚拟化、估高或第二套滚动状态机。React key/refs/Effect经Context7核对。
 
 `model-services.ts`仍经已安装Pi0.87.1公开ResourceLoader/getSystemPrompt接入（发行包docs/sdk.md与实际类型已核对），文案改为宿主人工/自动授权；不新增模式推断、工具或授权旁路。模块边界及实际被测SHA见[本批报告](../validation/inline-approval-2026-10-03.md)。
+
+## 完全访问平台策略（2026-10-04）
+
+`macos-access.ts` → [Anthropic sandbox-runtime固定Mac源码](https://github.com/anthropics/sandbox-runtime/blob/9e93406ab2e0b6e9794624896f729560dc9445db/src/sandbox/macos-sandbox-utils.ts) → 参考拒绝优先级、目录例外/祖先移动保护与同沙箱进程边界 → 保留本产品guardian/审批/收据/固定Node，不安装或移植其通用runtime。源码与Apache-2.0许可证blob已独立核对，具体映射、限定验证与不采用整包的原因见[平台报告](../validation/full-access-platform-2026-10-04.md)。Pi公开Operations、pi-gui主UI参考不变，产品full模式尚未开放。
