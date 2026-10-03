@@ -50,6 +50,8 @@ export function parseDesktopRequest(raw: unknown): DesktopRequest {
   return result;
 }
 export interface DesktopApi {
+  /** Desktop-only bounded plain-text clipboard write; never reads clipboard or executes. */
+  copyText(text:string):Promise<void>;
   threadDirectory(search?:ThreadSearch,queryScope?:string):Promise<ThreadDirectoryPage>;
   /** Opaque host connection identity; carries no execution authority or filesystem path. */
   queryScope(): Promise<string>;

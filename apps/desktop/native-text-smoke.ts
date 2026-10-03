@@ -1,6 +1,6 @@
 // Actual Electron/preload/HostClient/Pi-native-file reads; all content and faults SYNTHETIC.
 import assert from 'node:assert/strict';
-import { app,type BrowserWindow } from 'electron';
+import { app,clipboard,type BrowserWindow } from 'electron';
 import { mkdirSync,writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { HostClient } from './host-client.ts';
@@ -20,6 +20,7 @@ export async function runNativeTextSmoke(window:BrowserWindow,host:HostClient){
   await click(row+' .retry-native');await wait(`!!document.querySelector(${JSON.stringify(row+' .native-reading section table')})`);
   assert.equal(await js<string>(`document.querySelector(${JSON.stringify(row+' .native-reading section strong')}).textContent`),'加粗内容');
   assert.ok(await js<boolean>(`document.querySelector(${JSON.stringify(row+' .native-reading section code')}).textContent.includes('<script>SYNTHETIC_CODE</script>')`));
+  const {checkReadingCopy}=await import('./reading-actions-smoke.ts');await checkReadingCopy(window,row);
   for(let i=0;i<8;i++){
    const more=await js<boolean>(`!!document.querySelector(${JSON.stringify(row+' .more-native')})`);if(!more)break;
    const before=reads;await click(row+' .more-native');await wait(`!document.querySelector(${JSON.stringify(row+' .more-native')})?.disabled`);assert.equal(reads,before+1);
@@ -29,6 +30,11 @@ export async function runNativeTextSmoke(window:BrowserWindow,host:HostClient){
   assert.ok(body.includes('SYNTHETIC_COMPLETE_BODY')&&body.includes('SYNTHETIC_EXTRA_MESSAGE_20'));assert.ok(!body.includes('SYNTHETIC_READING_SECRET'));
   assert.equal(await js<boolean>(`!!document.querySelector(${JSON.stringify(row+' .markdown-body img, '+row+' .markdown-body script, '+row+' .markdown-body a[href]')})`),false);
   assert.equal(await js<boolean>(`performance.getEntriesByType('resource').some(e=>e.name.includes('example.invalid'))`),false);
+  await js(`(()=>{const m=[...document.querySelectorAll(${JSON.stringify(row+' .native-reading section .message')})].find(e=>e.textContent.includes('SYNTHETIC_COMPLETE_BODY'));m.querySelector('.markdown-body > .copy-action .copy-text').click();})()`);
+  await wait(`document.querySelector(${JSON.stringify(row+' .native-reading section')}).textContent.includes('已复制')`);
+  // Wait for the actual async platform write; only our synthetic content is read.
+  const copyEnd=Date.now()+12000;while(!(await clipboard.readText()).includes('SYNTHETIC_COMPLETE_BODY')){if(Date.now()>copyEnd)throw Error('full_display_copy_timeout');await new Promise(r=>setTimeout(r,30));}
+  const copied=await clipboard.readText();assert.ok(copied.includes('中😀'.repeat(7000)));assert.ok(!copied.includes('SYNTHETIC_READING_SECRET'));assert.ok(!copied.includes('复制可展示正文'));
   assert.equal(commands,0);await click(button);await wait(`!document.querySelector(${JSON.stringify(row+' .native-reading section')})`);
   assert.equal(await js<boolean>(`document.activeElement===document.querySelector(${JSON.stringify(button)})`),true);
  }finally{host.request=original;}

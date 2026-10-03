@@ -15,7 +15,7 @@ export async function seedPaginationFixture(profile: string) {
       const binding = host.core.dispatchNext()!; host.core.markRunning(binding);
       host.core.projectSession(binding,{messages:Array.from({length:4},(_,j)=>({id:`message-${i}-${j}`,role:'assistant',text:'文'.repeat(2000),truncated:false})),omitted:false});
       if (i < 10) {
-        const path = `pagination-${i}.md`, text = `# SYNTHETIC file ${i}`, hash = digest(text);
+        const path = i<3?'pagination-versions.md':`pagination-${i}.md`, text = `# SYNTHETIC file ${i}`, hash = digest(text);
         const op = host.core.requestOperation(binding,{toolCallId:`page-tool-${i}`,tool:'write',parametersDigest:hash,deadline:Date.now()+10000,artifactPath:path});
         host.core.handle({type:'approvals.resolve',requestId:`page-approve-${i}`,operationId:op.id,parametersDigest:hash,decision:'allow'});
         host.core.claimOperation(binding,op.id,hash);

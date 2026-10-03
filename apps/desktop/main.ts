@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain, protocol, session } from 'electron';
+import { app, BrowserWindow, clipboard, dialog, ipcMain, protocol, session } from 'electron';
 import { readFileSync, mkdirSync, realpathSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -6,6 +6,7 @@ import { execFileSync } from 'node:child_process';
 import { useModelCredentialFile } from './model-credential.ts';
 import { HostClient } from './host-client.ts';
 import { desktopErrorCode, parseDesktopRequest, type DesktopReply } from '../../packages/app-contracts/desktop.ts';
+import { clipboardText } from '../../packages/app-contracts/clipboard.ts';
 const outputDirectory = dirname(fileURLToPath(import.meta.url));
 const root = resolve(outputDirectory, '../..');
 // Arguments come only from the local launch script. None is an IPC/Renderer option.
@@ -66,6 +67,13 @@ const trusted = (event: Electron.IpcMainInvokeEvent): boolean => {
 let inFlight = 0;
 let credentialDialog = false;
 let workspaceDialog = false;
+let copying = false;
+ipcMain.handle('workbench:copy-text', async (event,...args:unknown[]) => {
+  if(!trusted(event)||args.length!==1||closing||copying)return false;
+  let text:string;try{text=clipboardText(args[0]);}catch{return false;}
+  copying=true;
+  try{await clipboard.writeText(text);return true;}catch{return false;}finally{copying=false;}
+});
 ipcMain.handle('workbench:workspace',async(event,...args:unknown[])=>{
   if(!trusted(event)||args.length||closing||shutdownFailed||reconnecting||workspaceDialog)return false;
   workspaceDialog=true;const owner=host;

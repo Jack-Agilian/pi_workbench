@@ -276,3 +276,15 @@ h1 { font-size: 17px; font-weight: 600; line-height: 1.4; overflow: hidden; text
 .directory-status button { margin-top:6px; font-size:11px; }
 .directory-context { display:block; padding:6px 8px 2px; }
 .load-threads { margin:4px 6px; font-size:11px; }
+
+/* Reading actions remain keyboard-visible; status doesn't overlay the text. */
+.copy-action{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:6px;font-size:12px}
+.copy-text{padding:3px 8px;font-size:12px;color:var(--muted,#59685f);background:transparent}
+.copy-feedback{font-size:12px;overflow-wrap:anywhere}
+.markdown-code{min-width:0;margin:10px 0}
+.markdown-code>.copy-action{justify-content:flex-end}
+.markdown-code>pre{margin-top:4px}
+.artifact-version-picker{display:grid;gap:5px;font-size:12px;margin:10px 0}
+.artifact-version-picker select{width:100%;min-width:0}
+.artifact-evidence{font-size:12px;margin:10px 0;overflow-wrap:anywhere}
+.artifact-evidence code{white-space:normal;word-break:break-all}

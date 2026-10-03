@@ -33,8 +33,8 @@ export function RunHistory({api,scope,onRead,thread, pending, workspacePath, mod
       </div>
       <section className="run-conversation" aria-label="会话正文"><h3 className="run-section-title">会话正文</h3>
         <NativeText onRead={onRead} key={`${thread.thread.id}:${run.id}:${scope}`} api={api} threadId={thread.thread.id} runId={run.id} scope={scope} disconnected={disconnected}>
-        <div className="message user"><div><small>你</small><MessageMarkdown text={thread.inputs.find(input => input.id === run.id)?.text ?? ''}/></div></div>
-        {presentation?.messages.filter(message => message.role === 'assistant' || message.role === 'tool').map(message => <div className="message assistant" key={message.id}><div><small>{message.role === 'tool' ? '工具执行提示' : mode === 'model' ? 'Pi' : 'Pi · 合成演示记录'}</small><MessageMarkdown text={message.text}/>{message.truncated && <small>正文已截断或脱敏</small>}</div></div>)}
+        <div className="message user"><div><small>你</small><MessageMarkdown text={thread.inputs.find(input => input.id === run.id)?.text ?? ''} copyLabel="复制已显示输入"/></div></div>
+        {presentation?.messages.filter(message => message.role === 'assistant' || message.role === 'tool').map(message => <div className="message assistant" key={message.id}><div><small>{message.role === 'tool' ? '工具执行提示' : mode === 'model' ? 'Pi' : 'Pi · 合成演示记录'}</small><MessageMarkdown text={message.text} copyLabel="复制已显示正文"/>{message.truncated && <small>正文已截断或脱敏</small>}</div></div>)}
         {presentation?.omitted && <p className="run-note">部分消息超出展示上限；此处仅显示有限摘要。</p>}
         </NativeText>
       </section>

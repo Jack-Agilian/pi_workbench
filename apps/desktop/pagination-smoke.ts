@@ -22,6 +22,7 @@ export async function runPaginationSmoke(window: BrowserWindow, host: HostClient
   await click('.load-artifacts'); await wait("document.querySelectorAll('[data-artifact]').length===10");
   await click('.artifact'); await wait("!!document.querySelector('.preview pre')");
   assert.match(await js<string>("document.querySelector('.preview pre').textContent"), /SYNTHETIC file/);
+  const {checkArtifactVersions}=await import('./reading-actions-smoke.ts');await checkArtifactVersions(window,host,thread.id);
   for (const count of [16,24,32,40,48,56,60]) {
     await js("document.querySelector('.timeline').scrollTop=100");
     await wait("!!document.querySelector('.return-latest')");

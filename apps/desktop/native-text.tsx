@@ -30,7 +30,7 @@ export function NativeText({api,threadId,runId,scope,disconnected,children,onRea
   <button className="read-native" ref={opener} disabled={!open&&(disconnected||busy)} aria-expanded={open} onClick={()=>open?close():void read(true)}>{open?'收起原生正文':'读取原生正文'}</button>
   {open&&<section aria-label="原生正文" aria-busy={busy}>
    <p className="run-note">{next===null?'本次可展示正文已读完':'按需读取本次执行的正文'} · 已过滤已知凭据格式{filtered?'、思考/附件及原始工具结果':''}；操作状态以操作记录为准。</p>
-   {messages.map(m=><div className={`message ${m.role==='user'?'user':'assistant'}`} key={m.id}><div><small>{m.role==='user'?'你':m.role==='tool'?'工具执行提示':'Pi'}{!m.end?' · 后续内容待加载':''}{m.redacted?' · 已脱敏':''}</small><MessageMarkdown text={m.text}/></div></div>)}
+   {messages.map(m=><div className={`message ${m.role==='user'?'user':'assistant'}`} key={m.id}><div><small>{m.role==='user'?'你':m.role==='tool'?'工具执行提示':'Pi'}{!m.end?' · 后续内容待加载':''}{m.redacted?' · 已脱敏':''}</small><MessageMarkdown text={m.text} copyLabel={m.end?'复制可展示正文':'复制已加载部分'}/></div></div>)}
    {error&&<p role="status">{error}<button className="retry-native" disabled={disconnected||busy} onClick={()=>void read()}>重试读取</button></p>}
    {!error&&next!==null&&<button className="more-native" disabled={disconnected||busy} onClick={()=>void read()}>{busy?'读取中…':'继续读取正文'}</button>}
   </section>}

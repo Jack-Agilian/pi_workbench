@@ -10,6 +10,7 @@ async function request<T>(payload: DesktopRequest, queryScope?: string): Promise
   return reply.value as T;
 }
 const api: DesktopApi = {
+  copyText:async text=>{if(!await ipcRenderer.invoke('workbench:copy-text',text))throw Error('clipboard_unavailable');},
   threadDirectory:(search,scope)=>request<ThreadDirectoryPage>({type:'thread-directory',...(search?{search}:{})},scope),
   queryScope: async () => {
     const scope: unknown = await ipcRenderer.invoke('workbench:query-scope');

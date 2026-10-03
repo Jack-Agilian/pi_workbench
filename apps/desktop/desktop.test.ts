@@ -374,3 +374,11 @@ test('renaming queued or active desktop threads never dispatches/rebinds work or
     assert.equal((reopened.request({type:'thread',threadId:f.thread}) as DesktopThread).artifacts.length,0);
   }finally{await reopened?.close();await f.dispose();}
 });
+
+// Desktop-only copy transport never opens a product request or a file path.
+import { clipboardText, CLIPBOARD_TEXT_BYTES } from '../../packages/app-contracts/clipboard.ts';
+test('clipboard projection accepts plain text including code and refuses nontext or excessive UTF-8 bytes',()=>{
+ assert.equal(clipboardText('中文😀\n<script>literal</script>'),'中文😀\n<script>literal</script>');
+ for(const value of [null,{},['x'],42,'x'.repeat(CLIPBOARD_TEXT_BYTES+1),'中'.repeat(Math.floor(CLIPBOARD_TEXT_BYTES/3)+1)])assert.throws(()=>clipboardText(value));
+ assert.throws(()=>parseDesktopRequest({type:'copy-text',text:'x'}));
+});
