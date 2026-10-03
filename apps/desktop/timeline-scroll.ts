@@ -7,6 +7,9 @@ export function useTimelineScroll(threadId: string, snapshot: DesktopThread | nu
   const viewport = useRef<HTMLDivElement>(null);
   const content = useRef<HTMLDivElement>(null);
   const expectedScroll = useRef<number | null>(null);
+  const committedGeometry = useRef({height: 0, client: 0, width: 0});
+  const userIntentUntil = useRef(0);
+  const onUserScroll = () => { expectedScroll.current = null; userIntentUntil.current = performance.now() + 1000; };
   const positions = useRef(new Map<string, Position>());
   const [browsing, setBrowsing] = useState(false);
   const [navigation, setNavigation] = useState<{threadId: string; operationId: string} | null>(null);
@@ -25,11 +28,17 @@ export function useTimelineScroll(threadId: string, snapshot: DesktopThread | nu
     // Like pi-gui's expectedScrollTop, do not turn delayed events from our own
     // positioning into new reading intent (or accidentally re-enable following).
     if (element && expectedScroll.current !== null && Math.abs(element.scrollTop - expectedScroll.current) < 1) return;
+    // pi-gui distinguishes layout clamping from navigation using the last committed
+    // geometry. A queued native event may arrive before ResizeObserver realigns it.
+    const geometry = committedGeometry.current;
+    if (element && performance.now() > userIntentUntil.current &&
+      (element.scrollHeight !== geometry.height || element.clientHeight !== geometry.client || element.clientWidth !== geometry.width)) return;
     expectedScroll.current = null; capturePosition();
   };
   const restore = () => {
     const element = viewport.current;
     if (!element || !loaded) return;
+    committedGeometry.current = {height: element.scrollHeight, client: element.clientHeight, width: element.clientWidth};
     const position = positions.current.get(threadId);
     if (!position || position.following) element.scrollTop = element.scrollHeight;
     else {
@@ -52,6 +61,7 @@ export function useTimelineScroll(threadId: string, snapshot: DesktopThread | nu
     return () => observer.disconnect();
   }, [threadId, loaded]);
   const returnLatest = () => {
+    userIntentUntil.current = 0;
     positions.current.set(threadId, {top: 0, following: true, offset: 0});
     restore(); setBrowsing(false);
   };
@@ -68,7 +78,7 @@ export function useTimelineScroll(threadId: string, snapshot: DesktopThread | nu
   }, [navigation, threadId]);
   const revealApproval = (operationId: string) => {
     // Commit the reading affordance before measuring: its height is part of the viewport.
-    setBrowsing(true); setNavigation({threadId, operationId});
+    userIntentUntil.current = 0; setBrowsing(true); setNavigation({threadId, operationId});
   };
-  return {viewport, content, onScroll, browsing, returnLatest, revealApproval};
+  return {viewport, content, onScroll, onUserScroll, browsing, returnLatest, revealApproval};
 }

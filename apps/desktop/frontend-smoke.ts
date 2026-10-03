@@ -186,7 +186,11 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
     assert.equal(await paneWidth('.inspector-pane'),preferred);
     await key(rightRail,'Enter');
     assert.equal(await js<string>("document.querySelector('#composer').value"), 'SYNTHETIC 保留草稿');
-    await js("document.querySelector('.timeline').scrollTop=1500");
+    await key('.timeline', 'Home');
+    for (let page=0;page<3;page++) await key('.timeline', 'PageDown');
+    // Native PageDown may animate beyond the key frame. Record the reading anchor
+    // only after the actual scroll stops, before injecting older-content growth.
+    await js("new Promise((resolve,reject)=>{const t=document.querySelector('.timeline');let last=t.scrollTop,stable=0;const end=performance.now()+2000;const check=()=>{const top=t.scrollTop;stable=Math.abs(top-last)<0.1?stable+1:0;last=top;if(stable>=5)resolve();else if(performance.now()>end)reject(Error('keyboard_scroll_not_settled'));else requestAnimationFrame(check)};requestAnimationFrame(check)})");
     await wait(() => js<boolean>("!!document.querySelector('.return-latest')"), 'browsing');
     const anchor = await js<{id: string; offset: number}>("(()=>{const t=document.querySelector('.timeline');const y=t.getBoundingClientRect().top;const e=[...t.querySelectorAll('[data-run]')].find(e=>e.getBoundingClientRect().bottom>y);return {id:e.dataset.run,offset:e.getBoundingClientRect().top-y}})()");
     const beforeHistoryReads=historyReads,beforeEntryReads=entryReads;
@@ -217,6 +221,10 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
     if (await js<boolean>("!!document.querySelector('.return-latest')")) await click('.return-latest');
     await wait(() => js<boolean>("document.querySelector('.timeline').scrollHeight-document.querySelector('.timeline').clientHeight-document.querySelector('.timeline').scrollTop<3"), 'latest');
     await click('.inspector-toggle');
+    // Opening the pane changes wrapping/height. ResizeObserver aligns the follower
+    // before paint; programmatic clicks can otherwise outrun that browser frame.
+    await frame();
+    await wait(() => js<boolean>("document.querySelector('.timeline').scrollHeight-document.querySelector('.timeline').clientHeight-document.querySelector('.timeline').scrollTop<3"), 'latest_after_inspector_layout');
     assert.equal(await js<string>("document.querySelector('.artifact-status').dataset.status"), 'unchecked');
     for (const status of ['ready', 'changed', 'missing', 'unavailable'] as const) {
       previewStatus = status; await click('.artifact');
@@ -228,12 +236,14 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
     for (const index of [0, 14, 29]) {
       previewStatus = 'ready';
       await js(`document.querySelectorAll('.artifact')[${index}].scrollIntoView({block:'nearest'})`);
-      const timelineTop = await js<number>("document.querySelector('.timeline').scrollTop");
+      const timelineBefore = await js<{top:number;height:number;width:number;client:number}>("(()=>{const t=document.querySelector('.timeline');return {top:t.scrollTop,height:t.scrollHeight,width:t.clientWidth,client:t.clientHeight}})()");
+      const timelineTop = timelineBefore.top;
       await click(`.artifact[data-artifact="${fixture.artifacts[index]!.id}"]`);
       await wait(() => js<boolean>("Boolean(document.querySelector('.preview pre'))"), 'nearby_preview_'+index);
       assert.equal(await js<boolean>(`(()=>{const p=document.querySelector('.preview');const b=p.getBoundingClientRect();const r=document.querySelector('.inspector').getBoundingClientRect();return p.previousElementSibling.dataset.artifact===${JSON.stringify(fixture.artifacts[index]!.id)} && p===document.activeElement && b.top>=r.top && b.top<r.bottom && p.querySelector('h3').textContent.includes('版本 ${index+1}');})()`), true);
       const afterPreviewTop=await js<number>("document.querySelector('.timeline').scrollTop");
-      assert.ok(Math.abs(afterPreviewTop-timelineTop)<3,`preview ${index} changed timeline ${timelineTop} -> ${afterPreviewTop}`);
+      const timelineAfter = await js("(()=>{const t=document.querySelector('.timeline');return {top:t.scrollTop,height:t.scrollHeight,width:t.clientWidth,client:t.clientHeight,following:!document.querySelector('.return-latest')}})()");
+      assert.ok(Math.abs(afterPreviewTop-timelineTop)<3,`preview ${index} changed timeline ${JSON.stringify(timelineBefore)} -> ${JSON.stringify(timelineAfter)}`);
       await click('.preview button[aria-label="关闭预览"]');
       assert.equal(await js<string>("document.activeElement.dataset.artifact"), fixture.artifacts[index]!.id);
     }

@@ -117,6 +117,7 @@ export async function runAgentShellSmoke(window:BrowserWindow,host:HostClient){
   }
   window.setContentSize(originalSize[0]!,originalSize[1]!);await click('[data-permission=full]');
   await wait(()=>js<boolean>("document.querySelector('.permission-picker summary').textContent==='权限：完全访问'"),'full-mode-confirmed');
+  assert.match(await js<string>("document.querySelector('.context-popover').textContent"),/完全访问可操作目录外文件并让 Bash 联网/);
   await js("document.querySelector('.permission-picker').open=false;const t=document.querySelector('#composer');Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set.call(t,'SYNTHETIC full access task');t.dispatchEvent(new Event('input',{bubbles:true}));");
   await wait(()=>js<boolean>("!document.querySelector('button[type=submit]').disabled"),'full-send');await js("document.querySelector('form.composer').requestSubmit()");
   await wait(async()=>{const t=await host.request({type:'thread',threadId:automatic.thread.id}) as DesktopThread;return t.runs.some(r=>r.permissionMode==='full'&&r.state==='completed');},'full-task-complete');
