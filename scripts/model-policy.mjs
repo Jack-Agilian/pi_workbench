@@ -3,16 +3,16 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 import { parseModelConfiguration } from '../packages/app-contracts/model.ts';
-import { assertTimeoutRevision,assertRequestCountRevision,assertToolScopeRevision,policyDigest } from '../apps/agent-server/model-policy.ts';
+import { assertTimeoutRevision,assertRequestCountRevision,assertToolScopeRevision,assertCostRevision,assertUsageDefaultsRevision,policyDigest } from '../apps/agent-server/model-policy.ts';
 import { ProductCore } from '../apps/agent-server/core.ts';
 // The application profile is fixed, not an IPC argument. No credentials or networking.
 const [action,previousFile,candidateFile,revisionId,...extra]=process.argv.slice(2);
-if(!['check','apply-approved','check-requests','apply-approved-requests','check-tools','apply-approved-tools'].includes(action)||!previousFile||!candidateFile||!revisionId||extra.length)throw new Error('Usage: model:policy check|apply-approved|check-requests|apply-approved-requests|check-tools|apply-approved-tools previous.json candidate.json revision-id');
+if(!['check','apply-approved','check-requests','apply-approved-requests','check-tools','apply-approved-tools','check-cost','apply-approved-cost','check-usage-defaults','apply-approved-usage-defaults'].includes(action)||!previousFile||!candidateFile||!revisionId||extra.length)throw new Error('Usage: model:policy check|apply-approved|check-requests|apply-approved-requests|check-tools|apply-approved-tools|check-cost|apply-approved-cost|check-usage-defaults|apply-approved-usage-defaults previous.json candidate.json revision-id');
 const previous=parseModelConfiguration(JSON.parse(readFileSync(previousFile,'utf8')));
 const candidate=parseModelConfiguration(JSON.parse(readFileSync(candidateFile,'utf8')));
-const scope=action.endsWith('-tools')?'tools':action.endsWith('-requests')?'request-count':'timeout';
-if(scope==='tools')assertToolScopeRevision(previous,candidate);else if(scope==='request-count')assertRequestCountRevision(previous,candidate);else assertTimeoutRevision(previous,candidate);
-const result={revisionId,scope,previousDigest:policyDigest(previous),candidateDigest:policyDigest(candidate),previousTimeoutMs:previous.timeoutMs,candidateTimeoutMs:candidate.timeoutMs,previousHttpIdleTimeoutMs:previous.httpIdleTimeoutMs??previous.timeoutMs,candidateHttpIdleTimeoutMs:candidate.httpIdleTimeoutMs??candidate.timeoutMs,requests:candidate.maxRequests,budgetUsd:candidate.maxEstimatedCostUsd,applied:false};
+const scope=action.endsWith('-usage-defaults')?'usage-defaults':action.endsWith('-cost')?'cost':action.endsWith('-tools')?'tools':action.endsWith('-requests')?'request-count':'timeout';
+if(scope==='usage-defaults')assertUsageDefaultsRevision(previous,candidate);else if(scope==='cost')assertCostRevision(previous,candidate);else if(scope==='tools')assertToolScopeRevision(previous,candidate);else if(scope==='request-count')assertRequestCountRevision(previous,candidate);else assertTimeoutRevision(previous,candidate);
+const result={revisionId,scope,previousDigest:policyDigest(previous),candidateDigest:policyDigest(candidate),previousTimeoutMs:previous.timeoutMs,candidateTimeoutMs:candidate.timeoutMs,previousHttpIdleTimeoutMs:previous.httpIdleTimeoutMs??previous.timeoutMs,candidateHttpIdleTimeoutMs:candidate.httpIdleTimeoutMs??candidate.timeoutMs,requests:candidate.maxRequests,budgetUsd:candidate.maxEstimatedCostUsd??null,applied:false};
 if(action.startsWith('apply-approved')){
  const profile=join(homedir(),'Library/Application Support/Pi Workbench/model-profile');
  const core=new ProductCore(join(profile,'host/product.sqlite'),[]);

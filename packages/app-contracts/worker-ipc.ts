@@ -5,10 +5,10 @@ import { parseModelSelection, parseModelOutcome, type ModelSelection, type Model
 import { parseShellOutcome, type ShellOutcome } from './shell.ts';
 import { identifier, toolCallIdentity, sha256, type Dispatch } from './index.ts';
 import { parsePresentation, type Presentation } from './presentation.ts';
-export const IPC_VERSION = 8;
+export const IPC_VERSION = 9;
 export const MAX_MESSAGE_BYTES = 65_536;
 export interface ResourceSelection { root: string; id: string; files: readonly { path: string; sha256: string }[]; expectedSkillNames: readonly string[] }
-export interface WorkerInit { binding: Dispatch; workspace: string; agentDir: string; sessions: string; resources: ResourceSelection; deadline: number; model?: ModelSelection }
+export interface WorkerInit { binding: Dispatch; workspace: string; agentDir: string; sessions: string; resources: ResourceSelection; deadline: number | null; model?: ModelSelection }
 export type WireBody =
   | { type: 'model-key'; key: string }
   | { type: 'model-outcome'; outcome: ModelOutcome }
@@ -38,7 +38,7 @@ export type WireBody =
   | { type: 'done'; ok: boolean }
   | { type: 'closed'; nativeRef: string | null }
   | { type: 'fault'; code: 'initialization_failed' | 'execution_failed' | 'protocol_failed' };
-export interface Envelope { version: 8; instanceId: string; runtimeBindingId: string; requestId: string; body: WireBody }
+export interface Envelope { version: 9; instanceId: string; runtimeBindingId: string; requestId: string; body: WireBody }
 export function record(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value) || ![Object.prototype, null].includes(Object.getPrototypeOf(value))) throw new Error('invalid_record');
   const fields = Object.getOwnPropertyDescriptors(value);
@@ -77,7 +77,8 @@ export function parseEnvelope(value: unknown): Envelope {
     case 'init': {
       check('config'); const c = exact(b.config, ['binding','workspace','agentDir','sessions','resources','deadline', ...(Object.hasOwn(Object(b.config), 'model') ? ['model'] : [])]);
       if (c.model !== undefined) parseModelSelection(c.model);
-      for (const key of ['workspace','agentDir','sessions']) string(c[key]); number(c.deadline);
+      for (const key of ['workspace','agentDir','sessions']) string(c[key]);
+      if(c.deadline===null){if(!c.model || !parseModelSelection(c.model).fileTools || parseModelSelection(c.model).fileTools!.maxModelRequests!=null)throw new Error('invalid_deadline');}else number(c.deadline);
       const d = exact(c.binding, ['runId','threadId','runtimeBindingId','workerEpoch','sessionGeneration','workspaceId','nativeSessionRef','nativeSessionPersisted','input']);
       for (const key of ['runId','threadId','runtimeBindingId','workerEpoch','sessionGeneration','workspaceId']) identifier(d[key]); string(d.input, 16_384); nullablePath(d.nativeSessionRef); boolean(d.nativeSessionPersisted);
       const r = exact(c.resources, ['root','id','files','expectedSkillNames']); string(r.root); sha256(r.id);

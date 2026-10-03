@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { parseEnvelope, MAX_MESSAGE_BYTES } from '../../../packages/app-contracts/worker-ipc.ts';
 import { IpcSender } from '../../../packages/pi-adapter/ipc-channel.ts';
-const envelope = { version: 8, instanceId: 'worker', runtimeBindingId: 'binding', requestId: 'request', body: { type: 'hello', pid: 12 } };
+const envelope = { version: 9, instanceId: 'worker', runtimeBindingId: 'binding', requestId: 'request', body: { type: 'hello', pid: 12 } };
 test('IPC enums require original JSON strings, never coercible arrays or objects', () => {
   for (const [field, body, values] of [
     ['tool', { type: 'operation', toolCallId: 'call', parametersDigest: 'a'.repeat(64), target: 'report.md', resourceLock: 'b'.repeat(64) }, ['write','edit','bash']],
@@ -18,7 +18,7 @@ test('IPC enums require original JSON strings, never coercible arrays or objects
 });
 test('closed IPC schema rejects authority injection, unknown/version/accessor fields', () => {
   assert.deepEqual(parseEnvelope(envelope), envelope);
-  for (const value of [{ ...envelope, version: 1 }, { ...envelope, version: 7 }, { ...envelope, hostClean: true }, { ...envelope, body: { type: 'done', ok: true, hostClean: true } },
+  for (const value of [{ ...envelope, version: 1 }, { ...envelope, version: 8 }, { ...envelope, hostClean: true }, { ...envelope, body: { type: 'done', ok: true, hostClean: true } },
     { ...envelope, body: { type: 'execute-anything' } }, { ...envelope, get requestId() { throw new Error('accessor_executed'); } }]) {
     assert.throws(() => parseEnvelope(value), /protocol_version|unknown_field|unknown_message|invalid_record/);
   }

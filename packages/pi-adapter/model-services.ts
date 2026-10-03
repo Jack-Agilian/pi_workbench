@@ -15,7 +15,7 @@ export async function modelServices(options: { cwd: string; agentDir: string }, 
   const provider = runtime.getProvider(selection.provider); const model = runtime.getModel(selection.provider, selection.model);
   if (!provider || !model || (selection.mode === 'live' && (!supportedModelApis.some(api=>api===model.api) || model.baseUrl !== selection.endpoint))) throw new Error('model_not_supported');
   let calls = 0;
-  const limits = { maxTokens: selection.maxOutputTokens, maxRetries: 0, timeoutMs: selection.timeoutMs, transport: 'sse' as const, fetch, env: {} };
+  const limits = { ...(selection.maxOutputTokens===undefined?{}:{maxTokens:selection.maxOutputTokens}), maxRetries: 0, timeoutMs: selection.timeoutMs, transport: 'sse' as const, fetch, env: {} };
   runtime.registerNativeProvider({ ...provider,
     getModels: () => [model],
     stream: () => { throw new Error('raw_model_stream_not_admitted'); },

@@ -48,7 +48,7 @@ export class ShellExecution {
       child.once('close', finish);
     });
     void this.finished.catch(() => {});
-    this.timer = setTimeout(() => { this.outcome.timedOut = true; void this.stop().catch(() => {}); }, Math.min(this.spec.intent.timeoutMs, deadline - Date.now()));
+    this.timer = setTimeout(() => { this.outcome.timedOut = true; void this.stop().catch(() => {}); }, Math.min(this.spec.intent.timeoutMs??Infinity, deadline - Date.now()));
   }
   private finishOutput(name: 'stdout' | 'stderr'): void {
     const decoded = this[name] + this.decoders[name].end();

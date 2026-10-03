@@ -51,8 +51,8 @@ function close(): Promise<void> {
 }
 process.on('disconnect', () => { void close(); });
 process.on('SIGTERM', () => { void close(); });
-// Poll absolute time so a cost-derived long Run cannot overflow Node's 32-bit timer delay.
-const lifetime = setInterval(() => { if(Date.now() >= spec.deadline + 3000) void close(); }, 1000);
+// Finite legacy envelopes use absolute polling; uncapped Runs retain disconnect/phase supervision.
+const lifetime = setInterval(() => { if(spec.deadline!==null && Date.now() >= spec.deadline + 3000) void close(); }, 1000);
 function startWorker() {
   if (worker || closing || !process.connected) { void close(); return; }
   worker = spawn(spec.executable, spec.args, { cwd: spec.cwd, env: spec.env, detached: true, stdio: ['ignore','ignore','ignore','ipc'], serialization: 'json' });
@@ -77,7 +77,7 @@ process.on('message', raw => {
     if (raw && typeof raw === 'object' && 'kind' in raw && raw.kind === 'model-shell-start') {
       const r = exact(raw,['kind','operationId','deadline','intent']); const id = identifier(r.operationId);
       const intent = parseShellIntent(r.intent); const cap = spec.modelShell;
-      if (!cap || closing || !worker || runningCommand || commands.has(id) || commands.size >= cap.maxCommands || typeof r.deadline !== 'number' || !Number.isSafeInteger(r.deadline) || r.deadline > spec.deadline || Date.now() >= r.deadline || intent.timeoutMs > cap.template.intent.timeoutMs) throw new Error('model_shell_not_admitted');
+      if (!cap || closing || !worker || runningCommand || commands.has(id) || (cap.maxCommands!=null && commands.size >= cap.maxCommands) || typeof r.deadline !== 'number' || !Number.isSafeInteger(r.deadline) || (spec.deadline!==null && r.deadline > spec.deadline) || Date.now() >= r.deadline || (cap.template.intent.timeoutMs!==null && (intent.timeoutMs===null || intent.timeoutMs > cap.template.intent.timeoutMs))) throw new Error('model_shell_not_admitted');
       const execution = new ShellExecution({...cap.template,intent,receipt:join(dirname(cap.template.receipt),id+'.json')},spec,()=>{
         runningCommand=false; if(process.connected)void parent.send({kind:'shell-complete'}).catch(()=>close());
       });

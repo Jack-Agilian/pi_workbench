@@ -36,7 +36,7 @@ const commit=execFileSync('git',['-C',repository,'rev-parse','HEAD'],{encoding:'
 let owners='';try{owners=execFileSync('/usr/sbin/lsof',['-t','--',join(profile,'host/product.sqlite')],{encoding:'utf8',stdio:['ignore','pipe','ignore']}).trim();}catch(e){assert.equal(e.status,1,'profile_owner_check_failed');}assert.equal(owners,'','close_other_profile_hosts');
 const catalog=await describeModel(config.provider,config.model,config.maxOutputTokens,config);
 assert.equal(catalog.endpoint,config.endpoint);const before=auditLedger(profile,config,catalog.reserveCostUsd);assert.equal(before.active,0);
-assert.ok(before.remainingReservedUsd>=catalog.reserveCostUsd,'cost_budget_insufficient');
+assert.ok(before.remainingReservedUsd===null || before.remainingReservedUsd>=catalog.reserveCostUsd,'cost_budget_insufficient');
 const resultPath=join(profile,`agent-task-${attempt}.json`),lockPath=join(profile,'live-validation.lock'),nonce=randomUUID();
 assert.equal(existsSync(resultPath),false,'attempt_already_exists');
 const lock=openSync(lockPath,'wx',0o600);writeFileSync(lock,JSON.stringify({nonce,pid:process.pid,attempt}));closeSync(lock);
@@ -53,7 +53,7 @@ const prompts={
 };
 try{
  save();await client.connect();await client.selectWorkspace(workspace);const home=await client.request({type:'home'});assert.equal(home.model.status,'ready');assert.equal(home.recovery,'ready');selectedWorkspace=home.workspaces.selectedId;
- console.log(JSON.stringify({commit,model:config.model,remainingReservedUsd:before.remainingReservedUsd,requestCount:'uncapped',workspace}));
+ console.log(JSON.stringify({commit,model:config.model,requestCount:'uncapped',workspace}));
  for(const stage of ['normal','deny','cancel','resume']){
   assert.equal(policyDigest(parseModelConfiguration(JSON.parse(readFileSync(configPath,'utf8')))),result.policyDigest,'configuration_changed');
   assert.equal(execFileSync('git',['-C',repository,'rev-parse','HEAD'],{encoding:'utf8'}).trim(),commit,'code_changed');
@@ -64,9 +64,10 @@ try{
   const record={stage,threadId,decisions:[]};result.stages.push(record);save();
   const command={type:'runs.start',requestId:`agent-${attempt}-${stage}`,threadId,input:prompts[stage]};record.runId=(await client.request({type:'command',command})).id;save();
   assert.equal((await client.request({type:'command',command})).id,record.runId,'duplicate_run_start');
-  const deadline=Date.now()+fileRunDuration(config.fileTools,config.timeoutMs,{total:config.maxEstimatedCostUsd,perRequest:catalog.reserveCostUsd})+15000;
+  const duration=fileRunDuration(config.fileTools,config.timeoutMs,{total:config.maxEstimatedCostUsd,perRequest:catalog.reserveCostUsd});
+  const deadline=duration===null?null:Date.now()+duration+15000;
   let snapshot,run,cancelled=false;const decided=new Set();
-  while(Date.now()<deadline){
+  while((deadline===null || Date.now()<deadline)){
    snapshot=await client.request({type:'thread',threadId});run=snapshot.runs.find(r=>r.id===record.runId);
    if(run && ['completed','failed','cancelled','unknown'].includes(run.state))break;
    for(const op of snapshot.operations.filter(o=>o.runId===record.runId&&o.state==='pending')){

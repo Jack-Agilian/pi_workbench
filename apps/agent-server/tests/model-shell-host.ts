@@ -2,7 +2,7 @@
 import { writeFileSync } from 'node:fs';
 import { setupShell, approveShell, entry } from './model-shell-fixture.ts';
 import { syntheticReply } from './file-agent-fixture.ts';
-const {f,access,plan}=setupShell();const phase=process.argv[3]!;
+const {f,access,plan}=setupShell('chat-completions',process.argv[4]==='uncapped');const phase=process.argv[3]!;
 function checkpoint(){writeFileSync(process.argv[2]!,JSON.stringify({root:f.root,cwd:f.cwd,database:f.database,thread:f.thread,resources:f.resources,workerPid:f.supervisor.workerPid}));process.kill(process.pid,'SIGKILL');}
 if(phase==='launch')f.core.subscribe(f.thread,0,event=>{if(event.kind==='shell.launch')checkpoint();});
 if(phase==='result')f.core.recordShellOutcome=()=>checkpoint();

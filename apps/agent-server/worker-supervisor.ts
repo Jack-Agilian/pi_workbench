@@ -22,7 +22,7 @@ import { launchSpec, shellLaunch, spawnGuardian, type LaunchSpec, type TrustedWo
 /** Host-approved one-operation intent. Not a Renderer command and not accepted from the Worker. */
 export interface FileExecutionPlan { tool: 'write' | 'edit'; target: string; parametersDigest: string; fileVersion: string | null; expectedContentDigest: string; deadline: number }
 export interface ShellExecutionPlan { tool: 'bash'; target: '.'; parametersDigest: string; shell: ShellIntent; deadline: number }
-export interface ModelExecutionPlan { tool: 'none'; model: ModelSelection; deadline: number }
+export interface ModelExecutionPlan { tool: 'none'; model: ModelSelection; deadline: number | null }
 export interface ModelAccess { key: string; configuration: ModelConfiguration; requestUrl: string; reserveCostUsd: number; fetch?: typeof globalThis.fetch }
 export type ExecutionPlan = FileExecutionPlan | ShellExecutionPlan | ModelExecutionPlan;
 interface Journal { binding: Dispatch; config: WorkerInit; plan: ExecutionPlan; spec: LaunchSpec; lease: string }
@@ -78,9 +78,10 @@ export class WorkerSupervisor {
       } else if (modelAccess) throw new Error('offline_model_access');
     }
     else sha256(plan.parametersDigest);
-    if (plan.tool === 'bash') { parseShellIntent(plan.shell); if (plan.target !== '.' || parametersDigest({ command: plan.shell.command, timeout: plan.shell.timeoutMs / 1000 }) !== plan.parametersDigest) throw new Error('shell_parameters_mismatch'); }
+    if (plan.tool === 'bash') { parseShellIntent(plan.shell); if (plan.target !== '.' || parametersDigest({ command: plan.shell.command, timeout: (plan.shell.timeoutMs??0) / 1000 }) !== plan.parametersDigest) throw new Error('shell_parameters_mismatch'); }
     else if (plan.tool !== 'none') { sha256(plan.expectedContentDigest); if (plan.fileVersion !== null) sha256(plan.fileVersion); }
-    if (!['write','edit','bash','none'].includes(plan.tool) || plan.deadline <= Date.now() || plan.deadline > Date.now() + (plan.tool === 'none' ? plan.model.fileTools?fileRunDuration(plan.model.fileTools,plan.model.timeoutMs,modelAccess?{total:modelAccess.configuration.maxEstimatedCostUsd,perRequest:modelAccess.reserveCostUsd}:undefined):86_405_000 : 120_000)) throw new Error('invalid_execution_plan');
+    const duration=plan.tool==='none' ? plan.model.fileTools?fileRunDuration(plan.model.fileTools,plan.model.timeoutMs,modelAccess?{total:modelAccess.configuration.maxEstimatedCostUsd,perRequest:modelAccess.reserveCostUsd}:undefined):86_405_000 : 120_000;
+    if (!['write','edit','bash','none'].includes(plan.tool) || (plan.deadline===null ? duration!==null : !Number.isSafeInteger(plan.deadline) || plan.deadline<=Date.now() || duration!==null&&plan.deadline>Date.now()+duration)) throw new Error('invalid_execution_plan');
     let journal: Journal | undefined; let child: ChildProcess | undefined;
     let binding: Dispatch | undefined;
     try { binding = this.core.dispatchNext(dispatch => {
@@ -110,15 +111,19 @@ export class WorkerSupervisor {
     guardian.on('error', () => this.stop(active));
     guardian.once('exit', () => { void this.finish(active); });
     guardian.once('close', () => { if (!guardian.pid) void this.finish(active); });
+    let lastBusyAt=Date.now();
     const timer = setInterval(() => {
-      if ((!active.ready && Date.now() - active.startedAt > (this.options.readyTimeoutMs ?? 5000)) || Date.now() >= plan.deadline || active.httpDeadline!==undefined&&Date.now()>=active.httpDeadline || this.core.snapshot(binding!.threadId).operations.some(o=>o.runId===binding!.runId&&['pending','approved','executing'].includes(o.state)&&Date.now()>=o.deadline)) this.stop(active);
+      const pending=this.core.snapshot(binding!.threadId).operations.filter(o=>o.runId===binding!.runId&&['pending','approved','executing'].includes(o.state));
+      if(active.http || active.httpClosing || pending.length)lastBusyAt=Date.now();
+      if(plan.deadline===null && active.ready && Date.now()-lastBusyAt>=5000)this.stop(active);
+      if ((!active.ready && Date.now() - active.startedAt > (this.options.readyTimeoutMs ?? 5000)) || (plan.deadline!==null && Date.now() >= plan.deadline) || active.httpDeadline!==undefined&&Date.now()>=active.httpDeadline || pending.some(o=>Date.now()>=o.deadline)) this.stop(active);
     }, 50); void done.then(() => clearInterval(timer), () => clearInterval(timer));
     return done;
   }
   private send(active: Active, body: WireBody, requestId = `host-${++this.sequence}`): Promise<void> {
     if(active.stopping)return Promise.reject(new Error('worker_stopping'));
     const { spec } = active.journal;
-    return active.sender.send({ version: 8, instanceId: spec.instanceId, runtimeBindingId: spec.runtimeBindingId, requestId, body } satisfies Envelope);
+    return active.sender.send({ version: 9, instanceId: spec.instanceId, runtimeBindingId: spec.runtimeBindingId, requestId, body } satisfies Envelope);
   }
   private receive(active: Active, raw: unknown) {
     if (this.active !== active || active.stopping) return; // owned channel, fenced synchronously before disconnect
@@ -136,8 +141,8 @@ export class WorkerSupervisor {
     if(['file-operation','shell-operation','operation','shell-exec','file-result','result'].includes(body.type))this.options.validateWorkspace?.(binding.workspaceId,config.workspace);
     if(body.type!=='observation'&&body.type!=='presentation')active.observations.assertControl(requestId);
     if (body.type==='model-http' || body.type==='model-http-read' || body.type==='model-http-finish') {
-      if(plan.tool!=='none'||plan.model.mode!=='live'||!active.ready||active.closed||active.result!==undefined||Date.now()>=plan.deadline)throw new Error('model_http_not_admitted');
-      const number=Number(requestId.replace(/^http-/,''));if(requestId!==`http-${number}`||number!==(active.httpSequence??0)+1||number>4096)throw new Error('model_http_sequence');active.httpSequence=number;
+      if(plan.tool!=='none'||plan.model.mode!=='live'||!active.ready||active.closed||active.result!==undefined||(plan.deadline!==null && Date.now()>=plan.deadline))throw new Error('model_http_not_admitted');
+      const number=Number(requestId.replace(/^http-/,''));if(requestId!==`http-${number}`||number!==(active.httpSequence??0)+1||!Number.isSafeInteger(number))throw new Error('model_http_sequence');active.httpSequence=number;
       if(body.type==='model-http-finish'){
         if(!plan.model.fileTools||!active.http||active.httpClosing)throw new Error('model_http_finish');
         const http=active.http;active.httpClosing=true;
@@ -165,14 +170,13 @@ export class WorkerSupervisor {
       else {if(!active.ready||active.closed)throw new Error('unexpected_presentation');this.core.projectSession(binding,body.projection);}
       return;
     }
-    // Control facts are never evicted. At most 16 admitted operations per Run;
-    // this independent defensive cap cannot be consumed by display/stream updates.
+    // Control facts are kept for this Run; display traffic stays outside this replay map.
     const serialized = JSON.stringify(body); const prior = active.requests.get(requestId);
     if (prior) {
       if (prior !== serialized) throw new Error('request_id_conflict');
       const reply = active.replies.get(requestId); if (reply) void this.send(active, reply, requestId).catch(() => this.stop(active)); return;
     }
-    if (active.requests.size >= 128) throw new Error('request_limit'); active.requests.set(requestId, serialized);
+    active.requests.set(requestId, serialized); // Per-Run audit/replay state is released with this Worker.
     switch (body.type) {
       case 'hello':
         if (active.hello || body.pid !== active.pid) throw new Error('unexpected_worker'); active.hello = true;
@@ -219,7 +223,7 @@ export class WorkerSupervisor {
       case 'shell-exec': {
         const dynamic = this.core.modelShellOperation(body.operationId);
         const digest = plan.tool === 'bash' ? plan.parametersDigest : dynamic ? parametersDigest(dynamic.parameters) : null;
-        if ((plan.tool !== 'bash' && !(plan.tool === 'none' && plan.model.shellTools && dynamic)) || !active.ready || active.closed || active.shellRequest || !active.pending.has(body.operationId) || body.parametersDigest !== digest || Date.now() >= (dynamic?.deadline ?? plan.deadline)) throw new Error('shell_not_authorized');
+        if ((plan.tool !== 'bash' && !(plan.tool === 'none' && plan.model.shellTools && dynamic)) || !active.ready || active.closed || active.shellRequest || !active.pending.has(body.operationId) || body.parametersDigest !== digest || Date.now() >= (dynamic?.deadline ?? plan.deadline ?? 0)) throw new Error('shell_not_authorized');
         const snap = this.core.snapshot(binding.threadId); const op = snap.operations.find(o => o.id === body.operationId);
         if (op?.state !== 'executing' || snap.runs.find(r => r.id === binding.runId)?.state !== 'running') throw new Error('shell_not_authorized');
         verifyContent(config.resources); active.shellRequest = { id: requestId, operationId: op.id };
@@ -251,9 +255,9 @@ export class WorkerSupervisor {
     const {plan,config,binding}=active.journal;
     if(plan.tool!=='none'||!plan.model.shellTools||!plan.model.fileTools||!active.ready||active.closed||active.fileFailed||active.preparingFile||active.pending.size||resourceLock!==config.resources.id)throw new Error('model_shell_not_admitted');
     const operations=this.core.snapshot(binding.threadId).operations.filter(o=>o.runId===binding.runId);
-    if(operations.length>=plan.model.fileTools.maxOperations||operations.filter(o=>o.tool==='bash').length>=plan.model.shellTools.maxCommands)throw new Error('model_shell_limit');
+    if((plan.model.fileTools.maxOperations!=null && operations.length>=plan.model.fileTools.maxOperations)||(plan.model.shellTools.maxCommands!=null && operations.filter(o=>o.tool==='bash').length>=plan.model.shellTools.maxCommands))throw new Error('model_shell_limit');
     verifyContent(config.resources);const parameters=parseBashParameters(raw);const intent=modelShellIntent(parameters,plan.model.shellTools);
-    const deadline=Math.min(plan.deadline,Date.now()+plan.model.fileTools.operationTimeoutMs);
+    const deadline=Math.min(plan.deadline??Infinity,Date.now()+plan.model.fileTools.operationTimeoutMs);
     const approvalDigest=parametersDigest({parameters,intent,workspace:config.workspace,resourceLock,binding,deadline});
     const modelShell={parameters,intent,resourceLock,deadline,approvalDigest};
     const op=this.core.requestOperation(binding,{toolCallId,tool:'bash',parametersDigest:approvalDigest,deadline,shell:intent,modelShell});
@@ -280,15 +284,15 @@ export class WorkerSupervisor {
   private async prepareFileOperation(active:Active,toolCallId:string,raw:FileToolRequest,requestId:string){
     const {plan,config,binding}=active.journal;if(plan.tool!=='none'||!plan.model.fileTools)throw new Error('file_tools_missing');
     const count=this.core.snapshot(binding.threadId).operations.filter(o=>o.runId===binding.runId).length;
-    if(count>=plan.model.fileTools.maxOperations)throw new Error('file_operation_limit');
+    if(plan.model.fileTools.maxOperations!=null && count>=plan.model.fileTools.maxOperations)throw new Error('file_operation_limit');
     verifyContent(config.resources);const request=parseFileToolRequest(raw);
     const target=artifactPath(config.workspace,request.parameters.path);if(target!==request.parameters.path)throw new Error('noncanonical_file_target');
     const fileVersion=this.markdownVersion(config.workspace,target);
     const before=fileVersion===null?null:inspectMarkdown(config.workspace,target).text;
     const expectedDigest=await plannedFileDigest(config.workspace,request,before);
-    if(this.active!==active||active.closed||active.stopping||Date.now()>=plan.deadline)throw new Error('stale_file_preparation');
+    if(this.active!==active||active.closed||active.stopping||(plan.deadline!==null && Date.now()>=plan.deadline))throw new Error('stale_file_preparation');
     verifyContent(config.resources);if(this.markdownVersion(config.workspace,target)!==fileVersion)throw new Error('file_changed_during_plan');
-    const deadline=Math.min(plan.deadline,Date.now()+plan.model.fileTools.operationTimeoutMs);
+    const deadline=Math.min(plan.deadline??Infinity,Date.now()+plan.model.fileTools.operationTimeoutMs);
     const approvalDigest=parametersDigest({request,fileVersion,expectedDigest,resourceLock:config.resources.id,binding,deadline});
     const file:FileOperationPlan={request,fileVersion,expectedDigest,resourceLock:config.resources.id,deadline,approvalDigest};
     const op=this.core.requestOperation(binding,{toolCallId,tool:request.tool,parametersDigest:approvalDigest,deadline,artifactPath:target,file});
@@ -392,7 +396,7 @@ export class WorkerSupervisor {
     if(!journal.spec.modelShell)return;
     try{
       const r=exact(JSON.parse(readFileSync(journal.spec.modelShell.index,'utf8')),['instanceId','runtimeBindingId','nonce','operations','closed']);
-      if(r.instanceId!==journal.spec.instanceId||r.runtimeBindingId!==journal.binding.runtimeBindingId||r.nonce!==journal.spec.nonce||r.closed!==true||!Array.isArray(r.operations)||r.operations.length>journal.spec.modelShell.maxCommands||new Set(r.operations).size!==r.operations.length||r.operations.some(id=>typeof id!=='string'||!this.core.modelShellOperation(id)?.launched))return;
+      if(r.instanceId!==journal.spec.instanceId||r.runtimeBindingId!==journal.binding.runtimeBindingId||r.nonce!==journal.spec.nonce||r.closed!==true||!Array.isArray(r.operations)||(journal.spec.modelShell.maxCommands!=null && r.operations.length>journal.spec.modelShell.maxCommands)||new Set(r.operations).size!==r.operations.length||r.operations.some(id=>typeof id!=='string'||!this.core.modelShellOperation(id)?.launched))return;
       return r.operations as string[];
     }catch{return;}
   }

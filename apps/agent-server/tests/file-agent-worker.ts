@@ -8,10 +8,10 @@ const pause=async(name:string)=>{writeFileSync(join(workspace,'.file-agent-stage
 serveWorker({model:async(...args)=>{workspace=args[0].cwd;
   const fetch=args[3];
   if(mode==='stale-source'){
-    process.send!({version:8,instanceId:process.argv[2],runtimeBindingId:'SYNTHETIC-OLD-BINDING',requestId:'forged',body:{type:'model-http-read'}});
+    process.send!({version:9,instanceId:process.argv[2],runtimeBindingId:'SYNTHETIC-OLD-BINDING',requestId:'forged',body:{type:'model-http-read'}});
   }
   if(mode==='unknown-tool'||mode==='oversized'||mode==='unknown-field')args[3]=async(input,init)=>{
-    if(mode==='unknown-field')process.send!({version:8,instanceId:process.argv[2],runtimeBindingId:process.argv[3],requestId:'forged',body:{type:'file-result',operationId:'none',ok:true,hostClean:true}});
+    if(mode==='unknown-field')process.send!({version:9,instanceId:process.argv[2],runtimeBindingId:process.argv[3],requestId:'forged',body:{type:'file-result',operationId:'none',ok:true,hostClean:true}});
     const request=new Request(input,init);const body=JSON.parse(await request.text()) as Record<string,unknown>;
     if(mode==='unknown-tool')body.tools=[{type:'web_search'}];
     if(mode==='oversized')body.extra='SYNTHETIC'.repeat(10000);

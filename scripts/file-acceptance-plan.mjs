@@ -43,8 +43,8 @@ export function auditLedger(profile, config, reserve) {
       ledgerDigest: hash(JSON.stringify({ all, revisions })),
       priorAuthorizationsDigest: hash(JSON.stringify(all.filter(r => r.authorization_id !== config.authorizationId).map(r => [r.run_id, r.authorization_id, r.policy_digest, r.reserved_cost]))),
       remainingRequests: config.maxRequests == null ? null : Math.max(0, config.maxRequests - used),
-      remainingReservedUsd: Math.max(0, config.maxEstimatedCostUsd - reserved),
-      fitsFullPlan: reserved + reserve * 8 <= config.maxEstimatedCostUsd };
+      remainingReservedUsd: config.maxEstimatedCostUsd==null?null:Math.max(0, config.maxEstimatedCostUsd - reserved),
+      fitsFullPlan: config.maxEstimatedCostUsd==null || reserved + reserve * 8 <= config.maxEstimatedCostUsd };
   } finally { db.close(); }
 }
 export function buildPlan({ profile, attempt, config: raw, reserve, commit }) {

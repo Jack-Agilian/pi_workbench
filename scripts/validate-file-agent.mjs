@@ -85,7 +85,7 @@ if (action === 'inspect') {
           const audit = auditLedger(profile, config, catalog.reserveCostUsd);
           assert.equal(audit.priorAuthorizationsDigest, plan.audit.priorAuthorizationsDigest, 'prior_ledger_changed');
           const planned = { normal: 4, deny: 1, cancel: 1, resume: 2 }[stage];
-          assert.equal(audit.active, 0); assert.ok((audit.remainingRequests === null || audit.remainingRequests >= planned) && audit.remainingReservedUsd >= catalog.reserveCostUsd * planned, 'stage_budget_insufficient');
+          assert.equal(audit.active, 0); assert.ok((audit.remainingRequests === null || audit.remainingRequests >= planned) && (audit.remainingReservedUsd === null || audit.remainingReservedUsd >= catalog.reserveCostUsd * planned), 'stage_budget_insufficient');
           console.log(`Stage ${stage}; used ${audit.used}/${config.maxRequests}.`);
         },
         decide: async ({ stage, op }) => {

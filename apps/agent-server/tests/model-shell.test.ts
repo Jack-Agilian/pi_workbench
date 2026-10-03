@@ -28,8 +28,8 @@ for(const api of ['chat-completions','responses'] as const)test(`model Bash ${ap
   const time=statSync(join(f.cwd,'result.txt')).mtimeMs;f.reopen();f.supervisor.recover();assert.equal(statSync(join(f.cwd,'result.txt')).mtimeMs,time);assert.equal(f.core.snapshot(f.thread).operations.length,2);
  }finally{await f.dispose();}
 });
-for(const scenario of ['deny','cancel','timeout','limit','resource'] as const)test(`model Bash ${scenario}: fail closed, never silently repeat effects`,async()=>{
- const {f,access,plan}=setupShell();let calls=0;
+for(const uncapped of [false,true])for(const scenario of ['deny','cancel','timeout','limit','resource'] as const)test(`model Bash ${scenario}, uncapped=${uncapped}: fail closed, never silently repeat effects`,async()=>{
+ const {f,access,plan}=setupShell('chat-completions',uncapped);let calls=0;
  if(scenario==='limit'){plan.model.shellTools!.maxCommands=1;access.configuration.shellTools!.maxCommands=1;}
  try{
   const done=f.supervisor.startNext(plan,entry,{...access,fetch:async()=>{
@@ -56,7 +56,7 @@ test('model Bash policy: old config stays closed, timeout revision cannot add sh
   const config=access.configuration;const old={...config};delete old.shellTools;
   assert.throws(()=>assertTimeoutRevision(old,config),/scope/);assert.notEqual(policyDigest(old),policyDigest(config));
   assert.equal(parseModelConfiguration(old).shellTools,undefined);
-  for(const value of [{command:'x',cwd:'/tmp'},{command:'x',timeout:31},{command:'x',env:{}},{command:'x'.repeat(4097)}])assert.throws(()=>parseBashParameters(value));
+  for(const value of [{command:'x',cwd:'/tmp'},{command:'x',timeout:86401},{command:'x',env:{}},{command:'x'.repeat(4097)}])assert.throws(()=>parseBashParameters(value));
  }finally{await f.dispose();}
 });
 
@@ -68,9 +68,9 @@ import { repository, sterileEnvironment } from '../worker-launcher.ts';
 import { ProductCore } from '../core.ts';
 import { WorkerSupervisor } from '../worker-supervisor.ts';
 import type { ResourceSelection } from '../../../packages/app-contracts/worker-ipc.ts';
-for(const phase of ['approval','launch','result'] as const)test(`model Bash actual App Server SIGKILL at ${phase}: closed inventory and per-command receipt, no replay`,async()=>{
+for(const uncapped of [false,true])for(const phase of ['approval','launch','result'] as const)test(`model Bash actual App Server SIGKILL at ${phase}, uncapped=${uncapped}: closed inventory and per-command receipt, no replay`,async()=>{
  const dir=realpathSync(mkdtempSync(join(tmpdir(),'shell-host-crash-'))),manifest=join(dir,'checkpoint.json');
- const host=spawn(process.execPath,['--import',join(repository,'scripts/probe-no-network.mjs'),join(import.meta.dirname,'model-shell-host.ts'),manifest,phase],{cwd:dir,env:sterileEnvironment(dir),stdio:['ignore','ignore','inherit']});const exited=once(host,'exit');
+ const host=spawn(process.execPath,['--import',join(repository,'scripts/probe-no-network.mjs'),join(import.meta.dirname,'model-shell-host.ts'),manifest,phase,uncapped?'uncapped':'bounded'],{cwd:dir,env:sterileEnvironment(dir),stdio:['ignore','ignore','inherit']});const exited=once(host,'exit');
  let core:ProductCore|undefined;let m:{root:string;cwd:string;database:string;thread:string;resources:ResourceSelection;workerPid:number}|undefined;
  try{
   assert.equal((await exited)[1],'SIGKILL');m=JSON.parse(readFileSync(manifest,'utf8')) as NonNullable<typeof m>;
@@ -125,13 +125,15 @@ test('dynamic shell IPC has a closed argument set and preserves version/identity
 });
 
 import { fileRunDuration } from '../../../packages/app-contracts/file-tools.ts';
-for(const constrainedCost of [false,true])test(`unlimited request counts: native Pi continues beyond four; cost gate=${constrainedCost}`,async()=>{
+for(const costMode of ['bounded','exhausted','uncapped'])test(`unlimited request counts: native Pi continues beyond four; cost gate=${costMode}`,async()=>{
+ const constrainedCost=costMode==='exhausted';
  const {f,access,plan}=setupShell();let calls=0;
  delete plan.model.fileTools!.maxModelRequests;plan.model.shellTools!.maxCommands=6;
  access.configuration={...access.configuration,maxRequests:undefined,fileTools:{...plan.model.fileTools!},shellTools:{...plan.model.shellTools!},maxEstimatedCostUsd:constrainedCost?0.025:1};
  // Large envelope also exercises the guardian beyond the 32-bit setTimeout range.
  if(!constrainedCost){plan.model.timeoutMs=1800000;access.configuration.timeoutMs=1800000;access.reserveCostUsd=0.0001;}
- plan.deadline=Date.now()+fileRunDuration(plan.model.fileTools!,plan.model.timeoutMs,{total:access.configuration.maxEstimatedCostUsd,perRequest:access.reserveCostUsd});
+ plan.deadline=Date.now()+fileRunDuration(plan.model.fileTools!,plan.model.timeoutMs,{total:access.configuration.maxEstimatedCostUsd,perRequest:access.reserveCostUsd})!;
+ if(costMode==='uncapped'){delete access.configuration.maxEstimatedCostUsd;plan.deadline=null;access.reserveCostUsd=100;}
  try{
   const done=f.supervisor.startNext(plan,entry,{...access,fetch:async()=>{
    calls++;return new Response(syntheticReply('chat-completions',calls,calls<=5?[bash('printf x >> count.txt')]:[]),{headers:{'content-type':'text/event-stream'}});
@@ -186,5 +188,53 @@ for(const mixed of [false,true])test(`R02 sixteen approved operations, mixed=${m
   while(page.hasMore){page=f.core.operationPage(f.run,{limit:5,cursor:page.nextCursor!});ids.push(...page.items.map(op=>op.id));}
   assert.deepEqual(ids,snapshot.operations.map(op=>op.id).reverse());assert.equal(new Set(ids).size,16);
   assert.equal(readFileSync(join(f.cwd,'sixteen.txt'),'utf8'),'x'.repeat(mixed?8:16));
+ }finally{await f.dispose();}
+});
+
+for(const phase of ['http','approval','between-phases'] as const)test(`uncapped Run still stops stalled ${phase} and records real process cleanup`,async()=>{
+ const {f,access,plan}=setupShell('chat-completions',true);let calls=0;
+ if(phase==='http'){plan.model.timeoutMs=250;access.configuration.timeoutMs=250;}
+ if(phase==='approval'){plan.model.fileTools!.operationTimeoutMs=250;}
+ try{
+  const selected=phase==='between-phases'?{path:join(import.meta.dirname,'protocol-fixture.ts'),extraRead:[join(import.meta.dirname,'protocol-fixture.ts')],args:['idle']}:entry;
+  const done=f.supervisor.startNext(plan,selected,{...access,fetch:async(_url,options)=>{
+   calls++;
+   if(phase==='http')return await new Promise<Response>((_resolve,reject)=>options!.signal!.addEventListener('abort',()=>reject(new Error('SYNTHETIC abort')),{once:true}));
+   return new Response(syntheticReply('chat-completions',calls,[bash('printf forbidden > forbidden.txt')]),{headers:{'content-type':'text/event-stream'}});
+  }})!;
+  if(phase==='between-phases')await until(()=>f.core.snapshot(f.thread).runs[0]!.state==='running','ready before phase timeout');
+  const started=Date.now();await done;
+  if(phase==='between-phases')assert.ok(Date.now()-started>=4000,'must exercise host phase watchdog');
+  const journal=JSON.parse(f.core.workerLaunches()[0]!.record) as {spec:{receipt:string}};
+  const receipt=JSON.parse(readFileSync(journal.spec.receipt,'utf8')) as {exited:boolean;groupGone:boolean};
+  assert.equal(receipt.exited,true);assert.equal(receipt.groupGone,true);
+  assert.notEqual(f.core.snapshot(f.thread).runs[0]!.state,'completed');
+  assert.equal(existsSync(join(f.cwd,'forbidden.txt')),false);assert.equal(calls,phase==='between-phases'?0:1);
+ }finally{await f.dispose();}
+});
+
+test('product defaults: actual Pi performs 44 separately approved Bash operations without validation quotas',async()=>{
+ const {f,access,plan}=setupShell('responses',true);let calls=0;
+ delete plan.model.fileTools!.maxOperations;delete plan.model.shellTools!.maxCommands;delete plan.model.shellTools!.timeoutMs;
+ delete plan.model.maxOutputTokens;delete access.configuration.maxOutputTokens;
+ plan.model.openai!.maxTokens=8192;
+ try{
+  const done=f.supervisor.startNext(plan,entry,{...access,fetch:async(_url,options)=>{
+   const payload=JSON.parse(String(options?.body)) as {max_output_tokens:number};assert.ok(payload.max_output_tokens>512);assert.ok(payload.max_output_tokens<=8192);
+   calls++;return new Response(syntheticReply('responses',calls,calls<=44?[bash(':')]:[]),{headers:{'content-type':'text/event-stream'}});
+  }})!;
+  for(let i=0;i<44;i++)await approveShell(f);
+  await done;const snapshot=f.core.snapshot(f.thread);assert.equal(calls,45);assert.equal(snapshot.runs[0]!.state,'completed');assert.equal(snapshot.operations.length,44);assert.ok(snapshot.operations.every(o=>o.state==='succeeded'));
+ }finally{await f.dispose();}
+});
+test('product Bash default has no forced 30-second timeout: real 31-second command completes',async()=>{
+ const {f,access,plan}=setupShell('chat-completions',true);let calls=0;
+ delete plan.model.shellTools!.timeoutMs;plan.model.fileTools!.operationTimeoutMs=60000;
+ try{
+  const done=f.supervisor.startNext(plan,entry,{...access,fetch:async()=>{
+   calls++;return new Response(syntheticReply('chat-completions',calls,calls===1?[bash('sleep 31; printf SYNTHETIC > beyond-30.txt')]:[]),{headers:{'content-type':'text/event-stream'}});
+  }})!;
+  const op=await approveShell(f);assert.equal(op.shell!.intent.timeoutMs,null);
+  await done;assert.equal(f.core.snapshot(f.thread).runs[0]!.state,'completed');assert.equal(readFileSync(join(f.cwd,'beyond-30.txt'),'utf8'),'SYNTHETIC');
  }finally{await f.dispose();}
 });

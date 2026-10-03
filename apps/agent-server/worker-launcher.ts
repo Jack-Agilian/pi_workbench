@@ -10,9 +10,9 @@ import type { WorkerInit } from '../../packages/app-contracts/worker-ipc.ts';
 export const repository = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 export interface LaunchSpec {
   shell?: ShellLaunch;
-  modelShell?: { template: ShellLaunch; maxCommands: number; index: string };
+  modelShell?: { template: ShellLaunch; maxCommands?: number | null; index: string };
   instanceId: string; runtimeBindingId: string; nonce: string; receipt: string;
-  executable: string; args: string[]; cwd: string; env: Record<string, string>; deadline: number;
+  executable: string; args: string[]; cwd: string; env: Record<string, string>; deadline: number | null;
 }
 export interface CleanupReceipt { instanceId: string; runtimeBindingId: string; nonce: string; workerPid: number | null; exited: boolean; groupGone: boolean }
 export interface TrustedWorkerEntry { path: string; extraRead?: string[]; args?: string[]; allowFixedChildren?: boolean }
