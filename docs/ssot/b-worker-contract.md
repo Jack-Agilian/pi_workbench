@@ -49,3 +49,7 @@ schema v3 在 Thread 的既有原生引用旁增加 native_persisted 标记，�
 ## C 的后续采用
 
 上述 v2/v3 和类型标签描述保留 B-IPC 阶段语境。C 当前使用 Worker IPC v3 的有界 presentation 替换消息与产品 schema v4 展示缓存；不改变原生 Session、审批或清理所有权。独立 Electron/Node 宿主入口及安全正文/工具视图见 [C 契约](c-desktop-contract.md)，不能把缓存当原生消息树或恢复模型上下文。
+
+## IPC v11：完全访问的宿主范围（2026-10-04）
+
+最新限定接入见[权限模式契约](permission-modes-contract.md)及[产品验证](../validation/full-access-product-2026-10-04.md)。WorkerInit可携带仅宿主生成的FullFileAccess，接收文件消息的语法可容纳规范外部路径，但是否可访问仍按宿主持久Run模式独立核验。实际子进程句柄、实例/绑定、资源锁、批准摘要、一次领取和清理证据继续负责准入；放宽消息路径语法不构成权限授予。旧版本握手拒绝，旧产品库通过v11迁移，不改写Pi历史。

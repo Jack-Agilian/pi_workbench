@@ -169,3 +169,7 @@ M1收口已集成develop `148022b05250cfda824725778e9a056d00cd6830`；[M2最小�
 ## Agent Shell真实任务与策略边界（2026-09-30）
 
 [真实任务证据](../validation/agent-task-live-2026-09-30.md)补齐10次gpt-6-luna调用，限定MODEL-03/04与M0-Pi按既定条件完成。原“4/4耗尽/blocked”仅为M1阶段历史；产品默认不配置次数限制，独立tools修订保留原授权/消费，不改变费用或时间。宿主复用Pi公开makeStrictJsonSchema核对strict工具声明，不放宽未知工具准入。真实CLI链路的Mac证据不冒充本轮Electron UI或其他平台；下一步以NEXT_STEPS交付复审与集成准备为准。
+
+## 完全访问接入（2026-10-04）
+
+[权限契约](permission-modes-contract.md)明确SQL/IPC v11中的manual/auto/full。模式由宿主按Run固定，范围只在宿主启动配置中产生；Worker不自报权限，Renderer不选择目录例外。Pi公开文件工具仍用Operations委托既有宿主审批与版本/摘要核验；完全访问扩大目录外文本及Bash IP策略，保留产品SQLite/凭据隔离。目录外文件只记Operation，恢复只核验且不重发；未获进程清理证据仍unknown/blocked。[限定实测](../validation/full-access-product-2026-10-04.md)不扩大既有Gate或跨平台声明。

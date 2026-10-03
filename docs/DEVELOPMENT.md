@@ -357,3 +357,9 @@ npm run demo:agent-shell -- --dev-profile=frontend
 ## Q1工具查询
 
 现有`npm run test:desktop`包含Query缓存/默认行为/取消隔离及产品批次回归，`npm run test:desktop-ui`覆盖工具错误手动重试、审批/停止与重连浏览位置。依赖固定Query5.104.0，不需要新的服务或初始化模式；原bootstrap --app --offline可重复安装，Electron仍显式prepare。详见[接入与实测](validation/ui-query-tools-2026-09-30.md)。
+
+## 完全访问产品回归
+
+`npm run test:product-full-access` 在独立临时目录/空凭据环境中验证实际Pi Worker的目录外文本工具、自动授权、私有SQLite拒绝、取消、SIGKILL和原产品库重开。仅支持已验证macOS arm64/项目Node；合成Provider，不调用真实模型。配套`npm run test:execution-access`复核固定进程/网络/祖先保护，`npm run test:desktop-agent-shell`覆盖三档选择及重连。测试有界等待与合成故障不属于产品预算。
+
+入口与当前范围见[权限契约](ssot/permission-modes-contract.md)和[实际代码证据](validation/full-access-product-2026-10-04.md)。完全访问不会开放产品库或替换Pi原生Session；外部文件不自动成为workspace成果。
