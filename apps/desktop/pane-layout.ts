@@ -16,6 +16,8 @@ function readPreferences(): Preferences {
 export function usePaneLayout(inspectorOpen: boolean) {
   const [preferences, setPreferences] = useState(readPreferences);
   const [viewport, setViewport] = useState(window.innerWidth);
+  const [drawerOpen,setDrawerOpen]=useState(false);
+  const narrow=viewport<700;
   useEffect(() => {
     const resize = () => setViewport(window.innerWidth);
     window.addEventListener('resize', resize);
@@ -25,16 +27,19 @@ export function usePaneLayout(inspectorOpen: boolean) {
     try { localStorage.setItem(preferenceKey, JSON.stringify(preferences)); } catch { /* Read-only profiles still work in memory. */ }
   }, [preferences]);
   const overlay = viewport < 1000;
+  const sidebarOpen=narrow?drawerOpen:!preferences.collapsed;
+  useEffect(()=>{setDrawerOpen(false);},[narrow]);
   const sidebarMin = 180;
-  const sidebarMax = Math.max(sidebarMin, Math.min(360, viewport - 360 - (inspectorOpen && !overlay ? 280 : 0)));
-  const sidebarWidth = Math.min(sidebarMax, Math.max(sidebarMin, preferences.sidebar ?? 224));
-  const mainWidth = viewport - (preferences.collapsed ? 0 : sidebarWidth);
+  const sidebarMax = Math.max(sidebarMin, Math.min(360, narrow?viewport-32:viewport - 360 - (inspectorOpen && !overlay ? 280 : 0)));
+  const sidebarWidth = Math.min(sidebarMax, Math.max(sidebarMin, preferences.sidebar ?? (narrow?280:224)));
+  const mainWidth = viewport - (narrow||!sidebarOpen ? 0 : sidebarWidth);
   const inspectorMax = Math.max(0, Math.min(640, mainWidth - (overlay ? 32 : 360)));
   const inspectorMin = Math.min(280, inspectorMax);
   const inspectorWidth = Math.min(inspectorMax, Math.max(inspectorMin, preferences.inspector ?? (overlay ? 380 : 328)));
-  return {overlay, sidebarWidth, sidebarMin, sidebarMax, inspectorWidth, inspectorMin, inspectorMax,
-    sidebarOpen: !preferences.collapsed,
-    toggleSidebar: () => setPreferences(p => ({...p, collapsed: !p.collapsed})),
+  return {overlay, narrow, sidebarWidth, sidebarMin, sidebarMax, inspectorWidth, inspectorMin, inspectorMax,
+    sidebarOpen,
+    closeDrawer:()=>setDrawerOpen(false),
+    toggleSidebar: () => narrow?setDrawerOpen(v=>!v):setPreferences(p => ({...p, collapsed: !p.collapsed})),
     resizeSidebar: (sidebar: number) => setPreferences(p => ({...p, sidebar})),
     resizeInspector: (inspector: number) => setPreferences(p => ({...p, inspector})),
     resetSidebar: () => setPreferences(p => ({...p, sidebar: undefined})),

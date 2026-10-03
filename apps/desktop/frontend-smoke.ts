@@ -124,6 +124,7 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
     const frame = () => js('new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))');
     const rail = (name: string) => `[role=separator][aria-label="${name}"]`;
     const leftRail = rail('导航栏宽度'), rightRail = rail('详情栏宽度');
+    const {runExperienceSmoke}=await import('./experience-smoke.ts');await runExperienceSmoke(window);
     const paneWidth = (selector: string) => js<number>(`document.querySelector(${JSON.stringify(selector)}).getBoundingClientRect().width`);
     const key = async (selector: string, key: string) => {
       await js(`document.querySelector(${JSON.stringify(selector)}).focus()`);

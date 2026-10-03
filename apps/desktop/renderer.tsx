@@ -7,6 +7,7 @@ import { ThreadPages, projectPages, type ThreadPagesView } from './thread-pages.
 import { RunHistory } from './run-history.tsx';
 import { PaneResizeHandle } from './pane-resize-handle.tsx';
 import { usePaneLayout } from './pane-layout.ts';
+import { RunStatusNotice } from './run-status-notice.tsx';
 import { ThreadDirectory } from './thread-directory.tsx';
 import { PermissionPicker } from './permission-picker.tsx';
 import { ApprovalList } from './approval-list.tsx';
@@ -53,6 +54,7 @@ function App() {
   const draft = drafts[selected] ?? '';
   const scroll = useTimelineScroll(selected, thread);
   const inspectorRef = useRef<HTMLElement>(null);
+  const sidebarRef=useRef<HTMLElement>(null);
   function failed(error: unknown, source: 'request' | 'read' = 'request') {
     ++healthRevision.current;
     if (error instanceof Error && error.message === 'disconnected') {
@@ -181,7 +183,7 @@ function App() {
     const intent = pendingCreation.current ?? { type: 'threads.create', requestId: id(), workspaceId: home?.workspaces.selectedId ?? 'demo-workspace', title: title.trim() || '新的工作记录' };
     pendingCreation.current = intent;
     const response = await command(intent);
-    if (response && pendingCreation.current === intent) { pendingCreation.current = null; setTitle(''); setSelected(response.id); setTick(n => n + 1); }
+    if (response && pendingCreation.current === intent) { pendingCreation.current = null; setTitle(''); setSelected(response.id); layout.closeDrawer(); const options=document.querySelector<HTMLDetailsElement>('.new-thread-options');if(options)options.open=false; setTick(n => n + 1); }
   }
   async function submit() {
     if (!selected || !draft.trim() || commandPending.current || busy || disconnected || permissionPending || !activity || !canSend) return;
@@ -250,26 +252,37 @@ function App() {
   useEffect(() => {
     if (layout.overlay && inspectorOpen) inspectorRef.current?.querySelector<HTMLButtonElement>('.inspector-close')?.focus();
   }, [layout.overlay, inspectorOpen]);
+  const closeDrawer=()=>{layout.closeDrawer();requestAnimationFrame(()=>document.querySelector<HTMLButtonElement>('.sidebar-toggle')?.focus());};
+  useEffect(()=>{if(layout.narrow&&layout.sidebarOpen)sidebarRef.current?.querySelector<HTMLButtonElement>('.sidebar-close')?.focus();},[layout.narrow,layout.sidebarOpen]);
   const closeInspector = () => { setInspectorChoices(all => ({...all, [selected]: false})); document.querySelector<HTMLButtonElement>('.inspector-toggle')?.focus(); };
   const workspacePath=home?.workspaces.items.find(w=>w.id===(activity?.thread.workspaceId??home.workspaces.selectedId))?.path??'正在读取目录';
   const selectedWorkspace=home?.workspaces.items.find(w=>w.id===home.workspaces.selectedId)?.path??'正在读取目录';
   const shellTools=home?.model?.limits?.shellTools;
   const isWorking = !!activity?.activeRun && active.has(activity.activeRun.state);
   const stoppableRun = activity?.activeRun && ['running','starting','queued'].includes(activity.activeRun.state) ? activity.activeRun : null;
-  return <div className="shell" onFocusCapture={event => {
+  return <div className="shell" data-narrow={layout.narrow} onFocusCapture={event => {
     const element = event.target;
     approvalFocus.current = element instanceof HTMLElement && element.closest('[data-approval]') ? {element, threadId: selected} : null;
   }}>
-    <aside id="workspace-navigation" className="sidebar" hidden={!layout.sidebarOpen} style={{width: layout.sidebarWidth}}>
-      {layout.sidebarOpen && <PaneResizeHandle label="导航栏宽度" controls="workspace-navigation" edge="right" width={layout.sidebarWidth} min={layout.sidebarMin} max={layout.sidebarMax} onResize={layout.resizeSidebar} onReset={layout.resetSidebar} />}
-      <div className="brand"><span className="brand-mark">π</span><div>Pi Workbench</div></div>
+    {layout.narrow&&layout.sidebarOpen&&<button className="navigation-backdrop" tabIndex={-1} aria-label="关闭导航" onClick={closeDrawer}/>}
+    <aside id="workspace-navigation" ref={sidebarRef} className="sidebar" aria-label="会话导航" role={layout.narrow?'dialog':undefined} aria-modal={layout.narrow&&layout.sidebarOpen?true:undefined} hidden={!layout.sidebarOpen} style={{width: layout.sidebarWidth}} onKeyDown={event=>{
+      if(!layout.narrow||!layout.sidebarOpen||event.defaultPrevented)return;
+      if(event.key==='Escape'){event.preventDefault();closeDrawer();}
+      if(event.key==='Tab'){
+        const controls=[...event.currentTarget.querySelectorAll<HTMLElement>('button:not([disabled]),input:not([disabled]),select:not([disabled]),summary,[tabindex="0"]')].filter(el=>el.getClientRects().length>0);
+        const first=controls[0],last=controls.at(-1);
+        if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
+      }
+    }}>
+      {layout.sidebarOpen && !layout.narrow && <PaneResizeHandle label="导航栏宽度" controls="workspace-navigation" edge="right" width={layout.sidebarWidth} min={layout.sidebarMin} max={layout.sidebarMax} onResize={layout.resizeSidebar} onReset={layout.resetSidebar} />}
+      <div className="brand"><span className="brand-mark">π</span><div>Pi Workbench</div>{layout.narrow&&<button className="sidebar-close" aria-label="关闭导航" onClick={closeDrawer}>×</button>}</div>
       <button className="choose-workspace" title={selectedWorkspace} disabled={busy||disconnected||!!pendingCreation.current||Boolean(home?.activeRuns.length)} onClick={()=>{setBusy(true);void api.selectWorkspace().then(()=>setTick(n=>n+1),failed).finally(()=>setBusy(false));}}><span>工作目录</span><strong>{selectedWorkspace.split('/').at(-1)}</strong><small>切换目录 ↗</small></button>
-      <button className="new-thread primary" onClick={() => void createThread()} disabled={busy || disconnected}><span>＋</span> {pendingCreation.current ? '重试新建会话' : '新建会话'}</button>
-      <details className="new-thread-options"><summary>自定义会话名称</summary><label className="sr-only" htmlFor="title">新会话名称</label><input id="title" placeholder="留空使用默认名称" maxLength={160} value={title} disabled={pendingCreation.current !== null} onChange={event => setTitle(event.target.value)} /></details>
-      <ThreadDirectory api={api} home={home} current={activity?.thread??null} selected={selected} select={setSelected} disconnected={disconnected} changed={()=>setTick(n=>n+1)} />
+      <div className="new-thread-controls"><button className="new-thread primary" onClick={() => void createThread()} disabled={busy || disconnected}><span>＋</span> {pendingCreation.current ? '重试新建会话' : '新建会话'}</button>
+      <details className="new-thread-options"><summary aria-label="自定义会话名称" title="自定义会话名称">···</summary><div className="new-thread-popover"><label className="sr-only" htmlFor="title">新会话名称</label><input id="title" placeholder="留空使用默认名称" maxLength={160} value={title} disabled={pendingCreation.current !== null} onChange={event => setTitle(event.target.value)} /></div></details></div>
+      <ThreadDirectory api={api} home={home} current={activity?.thread??null} selected={selected} select={id=>{setSelected(id);if(layout.narrow)closeDrawer();}} disconnected={disconnected} changed={()=>setTick(n=>n+1)} />
       <div className="sidebar-foot"><span className={`status-dot ${disconnected ? 'offline' : ''}`} />{disconnected ? '连接断开' : '本地连接'}</div>
     </aside>
-    <main>
+    <main inert={layout.narrow&&layout.sidebarOpen}>
       <header className="thread-heading">
         <button className="sidebar-toggle" aria-label={layout.sidebarOpen ? '收起导航' : '展开导航'} title={layout.sidebarOpen ? '收起导航' : '展开导航'} aria-controls="workspace-navigation" aria-expanded={layout.sidebarOpen} onClick={layout.toggleSidebar}>☰</button>
         <div className="heading-copy"><h1>{activity?.thread.title ?? '开始一项工作'}</h1><div className="execution-summary"><span title={workspacePath}>{workspacePath}</span></div></div>
@@ -283,6 +296,7 @@ function App() {
       {home?.mode==='model' && <details className="model-settings" aria-label="模型配置" open={home.model?.status!=='ready'}><summary>模型配置 · {home.model?.provider} / {home.model?.model}</summary>{home.model?.limits && <p>{home.model.limits.endpoint} · {home.model.limits.requests===null?'LLM 请求次数不限':`本次授权最多 ${home.model.limits.requests} 次请求`} · {home.model.limits.estimatedUsd===null?'费用不限':`估算预算 $${home.model.limits.estimatedUsd}`}  · {home.model.limits.outputTokens===null?'输出长度使用模型默认':`输出上限 ${home.model.limits.outputTokens} token`}{home.model.limits.httpIdleTimeoutMs!==undefined && <> · 空闲等待 {home.model.limits.httpIdleTimeoutMs/1000} 秒</>}{home.model.limits.timeoutMs!==undefined && <> · 单次 LLM 请求总上限 {home.model.limits.timeoutMs/1000} 秒</>}</p>}{home.model?.status==='not_configured'?<p>尚未配置或配置无效。请先运行 model:config 创建非秘密配置，填写并检查后重新启动。本页不会使用全局 Pi 凭据。</p>:home.model?.status==='key_required'?<div><p>仅发送你批准的合成无敏感资料。请求与费用估算限额来自配置；估算不等于服务商硬预算。可在配置目录的 auth.json 保存 API key，重启后自动读取；也可临时选择私有 .key 文件。凭据内容不会传入页面。</p><button disabled={busy} onClick={()=>{setBusy(true);void api.selectModelCredential().then(()=>setTick(n=>n+1),failed).finally(()=>setBusy(false));}}>选择凭据并启用本次应用</button></div>:home.model?.status==='policy_required'?<p>授权策略待确认。请核对原配置并完成显式修订，已有请求记录继续保留。</p>:home.model?.status==='budget_exhausted'?<p>本授权的请求次数或预留预算不足。</p>:<p>{shellTools?'已就绪 · 文件与 Bash 由宿主按任务权限授权':home.model?.limits?.fileTools?'已就绪 · Markdown 工具由宿主按任务权限授权':'已就绪 · 无工具'}</p>}</details>}
       {disconnected ? <div className="notice error connection-problem" role="alert">与执行宿主的连接已断开。原宿主仍在运行时，重新连接会结束其未完成任务并保留记录；不会重发未确认操作。<button onClick={() => void reconnect()} disabled={busy || refreshing}>重新连接</button></div>
         : (problem || readProblem) && <div className="notice error request-problem" role="alert">{problem?.text ?? '状态暂时无法读取，已显示内容保留。刷新只读取状态，不会重发操作或结束任务。'}<button onClick={() => void refreshStatus()} disabled={busy || refreshing}>刷新状态</button></div>}
+      <RunStatusNotice key={`${selected}:${queryScope.current}`} runs={currentRuns}/>
       <p className="sr-only approval-announcement" role="status" aria-live="polite" aria-atomic="true">{approvalNotice?.threadId === selected ? approvalNotice.text : ''}</p>
       {activity?.workspaceStatus === 'invalid' && <div className="notice error" role="alert">此会话的工作目录已不可用，发送已停用。历史仍可浏览，请恢复原目录后再继续。</div>}
       {home?.recovery === 'blocked' && <div className="notice" role="status">执行结果或清理尚未核实，新任务暂不执行。<button disabled={busy} onClick={() => { void api.recover().then(value => { setHome(value); setTick(n => n + 1); }, failed); }}>核验并恢复</button></div>}

@@ -106,6 +106,11 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
     const expected = scenario === 'allow' ? 'completed' : scenario === 'cancel' ? 'cancelled' : 'failed';
     await wait(async () => { snapshot = await host.request({ type: 'thread', threadId }) as DesktopThread; return snapshot.runs[0]?.state === expected; }, expected);
     await wait(() => js<boolean>(`Boolean(document.querySelector('[data-state="${expected}"]'))`), 'state');
+    if(scenario!=='crash'){
+      const notice=scenario==='allow'?'任务已结束':scenario==='cancel'?'任务已停止并完成清理':'任务未完成';
+      await wait(()=>js<boolean>(`document.querySelector('.run-completion')?.textContent.includes(${JSON.stringify(notice)})===true`),'host_terminal_announcement');
+      assert.equal(await js<string>("document.querySelector('.run-completion').getAttribute('aria-live')"),'polite');
+    }
     if (scenario === 'cancel') assert.equal(await js<boolean>("document.activeElement?.id === 'composer' && !document.querySelector('.approval-announcement').textContent"), true);
     if (scenario === 'allow' || scenario === 'deny') {
       await wait(() => js<boolean>("document.activeElement?.id === 'composer' && document.querySelector('.approval-announcement').textContent.includes('不再等待审批')"), 'approval_focus_restored');
@@ -134,6 +139,7 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
     snapshot = await host.request({ type: 'thread', threadId }) as DesktopThread;
     assert.equal(snapshot.runs[0]!.state, expected); assert.equal(snapshot.runs.length, 1);
     assert.deepEqual(await host.request({ type: 'events', threadId, cursor }), []);
+    await wait(()=>js<boolean>("!document.querySelector('.run-completion')?.textContent"),'reconnect_does_not_reannounce_history');
     counts.push({ scenario, runId: run.id, state: expected, nativeProjection: snapshot.presentations[0]!.value.messages.length });
     await new Promise<void>(resolve => { wc.once('did-finish-load', resolve); wc.reload(); });
     await wait(() => js<boolean>("Boolean(document.querySelector('.new-thread'))"), 'reload');
