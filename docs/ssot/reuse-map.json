@@ -1070,7 +1070,7 @@
       ],
       "upstreamSymbolsOrPaths": [],
       "reuse": "复用Pi原生任务执行，不重写",
-      "productDelta": "ProductCore持久Run/Operation/Approval、v2启动日志及v3原生落盘标记；Supervisor冷恢复先失效旧epoch授权，再按清理证据结算；C沿用同一核心，v4仅增有限展示缓存；D1复用产品取消与既有恢复，在宿主关闭时结算活动/排队工作并保留审计；D2-S SQL v5增加Shell意图/结果投影，取消与命令副作用分开，崩溃只对账原Operation；M1 SQL v6请求预留/模型结果及v7显式策略修订；语义摘要/旧账本证明、预算跨重开修订保留、独立HTTP清理及无工具结算；累计4/4真实请求；M2 SQL v8多请求预算/宿主文件意图，IPC v6逐HTTP关闭ACK和逐工具settlement；前成功后失败独立保留，真实文件和清理证据对账；guardian/supervisor关闭即拒绝排队消息；SQL v9逐Shell启动/恢复记录与可信Workspace选择，旧Thread绑定不变；2026-09-30产品默认无请求次数字段，旧数字限制仅历史/测试兼容；用户取消次数上限，旧请求/费用保留，独立修订禁止顺带扩权；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开；2026-09-30后端工作区重新准入、展示消息与控制去重分离、固定SQLite分页/独立活动快照及工作树离线profile，Renderer已通过UI-P2正式分页接入，不重写原生Session；F01新增Thread内单Run安全historyEntry只读查询，Renderer按事件定向刷新，头部桥接与旧尾游标分离，整批成功发布/切换停止后续读取；2026-10-03已知模型错误码/HTTP状态经闭合产品DTO安全展示，未知正文不透传，原生错误落盘前收敛；IPC v8，旧结果JSON兼容，具体限定验证见model-errors-2026-10-03报告 2026-10-03默认及本机用量额度清理，API总超时/空闲独立保留；Pi模型默认输出，目录内绝对路径规范化与安全工具失败投影；限定实测见product-defaults-desktop报告，不扩大Gate。 2026-10-03真实Electron四场景限定补证：工具/审批/成果/取消/原Session恢复通过，代理操作与未覆盖范围分列，不晋级全部P0。 2026-10-03后续SQL v10和桌面权限入口：持久人工/工作目录自动审批、Run接收时固定模式、来源审计与确认丢失重试；原工具/清理复用。完全访问仍未实现。 2026-10-04限定Mac full模式贯通宿主固定Run、私有保护集、Pi目录外UTF-8工具/Bash IP策略及真实库重开核验；外部文件不自动登记workspace成果，详见full-access-product报告。",
+      "productDelta": "ProductCore持久Run/Operation/Approval、v2启动日志及v3原生落盘标记；Supervisor冷恢复先失效旧epoch授权，再按清理证据结算；C沿用同一核心，v4仅增有限展示缓存；D1复用产品取消与既有恢复，在宿主关闭时结算活动/排队工作并保留审计；D2-S SQL v5增加Shell意图/结果投影，取消与命令副作用分开，崩溃只对账原Operation；M1 SQL v6请求预留/模型结果及v7显式策略修订；语义摘要/旧账本证明、预算跨重开修订保留、独立HTTP清理及无工具结算；累计4/4真实请求；M2 SQL v8多请求预算/宿主文件意图，IPC v6逐HTTP关闭ACK和逐工具settlement；前成功后失败独立保留，真实文件和清理证据对账；guardian/supervisor关闭即拒绝排队消息；SQL v9逐Shell启动/恢复记录与可信Workspace选择，旧Thread绑定不变；2026-09-30产品默认无请求次数字段，旧数字限制仅历史/测试兼容；用户取消次数上限，旧请求/费用保留，独立修订禁止顺带扩权；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开；2026-09-30后端工作区重新准入、展示消息与控制去重分离、固定SQLite分页/独立活动快照及工作树离线profile，Renderer已通过UI-P2正式分页接入，不重写原生Session；F01新增Thread内单Run安全historyEntry只读查询，Renderer按事件定向刷新，头部桥接与旧尾游标分离，整批成功发布/切换停止后续读取；2026-10-03已知模型错误码/HTTP状态经闭合产品DTO安全展示，未知正文不透传，原生错误落盘前收敛；IPC v8，旧结果JSON兼容，具体限定验证见model-errors-2026-10-03报告 2026-10-03默认及本机用量额度清理，API总超时/空闲独立保留；Pi模型默认输出，目录内绝对路径规范化与安全工具失败投影；限定实测见product-defaults-desktop报告，不扩大Gate。 2026-10-03真实Electron四场景限定补证：工具/审批/成果/取消/原Session恢复通过，代理操作与未覆盖范围分列，不晋级全部P0。 2026-10-03后续SQL v10和桌面权限入口：持久人工/工作目录自动审批、Run接收时固定模式、来源审计与确认丢失重试；原工具/清理复用。完全访问仍未实现。 2026-10-04限定Mac full模式贯通宿主固定Run、私有保护集、Pi目录外UTF-8工具/Bash IP策略及真实库重开核验；外部文件不自动登记workspace成果，详见full-access-product报告。 2026-10-04会话持久命名：SQL v12名称修订/幂等事务、侧栏草稿/冲突与原请求确认、重连旧回调隔离；改名不派发Worker或双写Pi历史，Worker IPC仍v11。见thread-naming契约及报告。",
       "acceptanceGate": "幂等/绑定/取消/unknown；P0同Workspace写Run串行并覆盖等待审批与清理阶段；扩展通用持久任务/调度/观察流前对照durable，保持Session/审批/清理/预算权威边界",
       "implementationState": "in_progress",
       "adoption": {
@@ -1148,7 +1148,10 @@
           "EV-FULL-PRODUCT-SDK-20261004",
           "EV-FULL-PRODUCT-MAC-20261004",
           "EV-FULL-PRODUCT-UI-20261004",
-          "EV-FULL-PRODUCT-MODE-20261004"
+          "EV-FULL-PRODUCT-MODE-20261004",
+          "EV-THREAD-NAMING-STATIC-20261004",
+          "EV-THREAD-NAMING-MOCK-20261004",
+          "EV-THREAD-NAMING-MAC-20261004"
         ]
       }
     },
@@ -1231,7 +1234,7 @@
         "esbuild build"
       ],
       "reuse": "Electron公开窗口/沙盒/IPC，React渲染和esbuild构建；复用既有产品与Pi Worker链路",
-      "productDelta": "闭合产品桥、Thread/Run视图、审批/取消/成果与有界纯文本投影；显式无模型驱动；关闭结果/重连接管分离，未确认命令按意图保留身份并显式重试；D1正常退出/信号统一结算，关闭失败后原窗口显式恢复，候选新宿主不迟到发布；D2-S展示固定命令审批/profile/期限及stdout/stderr有界完成快照，交互终端尚未接入；M1正文流/最终快照、应用专用持久凭据加载及原生临时选择、策略待确认/预算耗尽准入和双时间限制显示；仅产品DTO；M2已有视图增加逐read/write/edit审批、有限版本/参数摘要、后续模型轮流式正文与重连展示；显式SYNTHETIC离线入口，不由Renderer选择工具或worker代码；原生目录选择无自由路径Renderer入口，实际cwd/阶段/逐命令有界结果、三尺寸核心动作核查；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开；UI-P2前端右栏折叠/三档宽度、常驻审批/停止、Thread滚动锚点、按需成果核验展示；现采用正式historyPage/operationPage/artifactPage和独立ThreadActivity；Renderer的thread-pages.ts维护只读已加载范围、事件衔接与重连，首屏错误也保留正确活动身份；F01新增Thread内单Run安全historyEntry只读查询，Renderer按事件定向刷新，头部桥接与旧尾游标分离，整批成功发布/切换停止后续读取；按reference-implementations.md对照pi-gui时间线/viewport/layout，Q1 operationPage已由Query 5.104.0承接缓存/异步状态/去重，原工具LoadedRange移除，产品仅存发布引用；queryScope绑定宿主连接，重连按位置重读，工具错误手动重试；后续Q2历史/成果未迁移，有实测布局瓶颈后采用Virtual，不并存两套缓存/滚动控制；2026-10-03已知模型错误码/HTTP状态经闭合产品DTO安全展示，未知正文不透传，原生错误落盘前收敛；IPC v8，旧结果JSON兼容，具体限定验证见model-errors-2026-10-03报告 2026-10-03默认及本机用量额度清理，API总超时/空闲独立保留；Pi模型默认输出，目录内绝对路径规范化与安全工具失败投影；限定实测见product-defaults-desktop报告，不扩大Gate。 2026-10-03真实Electron四场景限定补证：工具/审批/成果/取消/原Session恢复通过，代理操作与未覆盖范围分列，不晋级全部P0。 2026-10-03整体重构导航/会话/输入/审批与成果页及CSS；错误区分只读刷新/重连，成果版本就近预览和连接失效。该UI重构批次权限三档仅完成官方对照；后续接入见下句。 2026-10-03后续SQL v10和桌面权限入口：持久人工/工作目录自动审批、Run接收时固定模式、来源审计与确认丢失重试；原工具/清理复用。完全访问仍未实现。 2026-10-03局部适配C03固定提交的PaneResizeHandle；左右拖动/键盘/收起，本机宽度偏好和窄窗覆盖。单一布局与滚动所有者、原产品DTO/权限保留；审批仍在详情页，行内收口待做。 2026-10-03审批按Operation放入会话，历史失败用活动快照兜底且不重复；右栏只成果预览并默认关闭，Run固定模式与输入新模式分开；轮询不强制滚动，定位等待布局并过滤自身滚动。限定证据见inline-approval报告。 2026-10-04限定Mac full模式贯通宿主固定Run、私有保护集、Pi目录外UTF-8工具/Bash IP策略及真实库重开核验；外部文件不自动登记workspace成果，详见full-access-product报告。",
+      "productDelta": "闭合产品桥、Thread/Run视图、审批/取消/成果与有界纯文本投影；显式无模型驱动；关闭结果/重连接管分离，未确认命令按意图保留身份并显式重试；D1正常退出/信号统一结算，关闭失败后原窗口显式恢复，候选新宿主不迟到发布；D2-S展示固定命令审批/profile/期限及stdout/stderr有界完成快照，交互终端尚未接入；M1正文流/最终快照、应用专用持久凭据加载及原生临时选择、策略待确认/预算耗尽准入和双时间限制显示；仅产品DTO；M2已有视图增加逐read/write/edit审批、有限版本/参数摘要、后续模型轮流式正文与重连展示；显式SYNTHETIC离线入口，不由Renderer选择工具或worker代码；原生目录选择无自由路径Renderer入口，实际cwd/阶段/逐命令有界结果、三尺寸核心动作核查；2026-09-30原授权工具策略修订及限定真实项目任务通过，read/write/Bash、拒绝、活跃Shell取消、原生会话重连不重放；CLI模型证据与既有Electron离线UI证据分开；UI-P2前端右栏折叠/三档宽度、常驻审批/停止、Thread滚动锚点、按需成果核验展示；现采用正式historyPage/operationPage/artifactPage和独立ThreadActivity；Renderer的thread-pages.ts维护只读已加载范围、事件衔接与重连，首屏错误也保留正确活动身份；F01新增Thread内单Run安全historyEntry只读查询，Renderer按事件定向刷新，头部桥接与旧尾游标分离，整批成功发布/切换停止后续读取；按reference-implementations.md对照pi-gui时间线/viewport/layout，Q1 operationPage已由Query 5.104.0承接缓存/异步状态/去重，原工具LoadedRange移除，产品仅存发布引用；queryScope绑定宿主连接，重连按位置重读，工具错误手动重试；后续Q2历史/成果未迁移，有实测布局瓶颈后采用Virtual，不并存两套缓存/滚动控制；2026-10-03已知模型错误码/HTTP状态经闭合产品DTO安全展示，未知正文不透传，原生错误落盘前收敛；IPC v8，旧结果JSON兼容，具体限定验证见model-errors-2026-10-03报告 2026-10-03默认及本机用量额度清理，API总超时/空闲独立保留；Pi模型默认输出，目录内绝对路径规范化与安全工具失败投影；限定实测见product-defaults-desktop报告，不扩大Gate。 2026-10-03真实Electron四场景限定补证：工具/审批/成果/取消/原Session恢复通过，代理操作与未覆盖范围分列，不晋级全部P0。 2026-10-03整体重构导航/会话/输入/审批与成果页及CSS；错误区分只读刷新/重连，成果版本就近预览和连接失效。该UI重构批次权限三档仅完成官方对照；后续接入见下句。 2026-10-03后续SQL v10和桌面权限入口：持久人工/工作目录自动审批、Run接收时固定模式、来源审计与确认丢失重试；原工具/清理复用。完全访问仍未实现。 2026-10-03局部适配C03固定提交的PaneResizeHandle；左右拖动/键盘/收起，本机宽度偏好和窄窗覆盖。单一布局与滚动所有者、原产品DTO/权限保留；审批仍在详情页，行内收口待做。 2026-10-03审批按Operation放入会话，历史失败用活动快照兜底且不重复；右栏只成果预览并默认关闭，Run固定模式与输入新模式分开；轮询不强制滚动，定位等待布局并过滤自身滚动。限定证据见inline-approval报告。 2026-10-04限定Mac full模式贯通宿主固定Run、私有保护集、Pi目录外UTF-8工具/Bash IP策略及真实库重开核验；外部文件不自动登记workspace成果，详见full-access-product报告。 2026-10-04会话持久命名：SQL v12名称修订/幂等事务、侧栏草稿/冲突与原请求确认、重连旧回调隔离；改名不派发Worker或双写Pi历史，Worker IPC仍v11。见thread-naming契约及报告。",
       "acceptanceGate": "真实桌面进程/来源/CSP、Thread隔离、审批/取消/恢复；平台/模型/Gate分别验收；确认丢失/交错重试、异常关闭与受证据约束的恢复；Q1还须验证环境/连接缓存隔离、无网络本地读取、显式重试/焦点策略、IPC背压与整批一致性，删除被替代旧机制",
       "implementationState": "in_progress",
       "adoption": {
@@ -1432,7 +1435,10 @@
           "EV-FULL-PRODUCT-SDK-20261004",
           "EV-FULL-PRODUCT-MAC-20261004",
           "EV-FULL-PRODUCT-UI-20261004",
-          "EV-FULL-PRODUCT-MODE-20261004"
+          "EV-FULL-PRODUCT-MODE-20261004",
+          "EV-THREAD-NAMING-STATIC-20261004",
+          "EV-THREAD-NAMING-MOCK-20261004",
+          "EV-THREAD-NAMING-MAC-20261004"
         ]
       }
     }
@@ -3561,6 +3567,42 @@
       ],
       "locator": "docs/validation/full-access-product-2026-10-04.md",
       "scope": "实际Mac Electron第三档选择、固定Run与full-tools-v1/Bash策略、真实工具一次执行及重连恢复、1320/820按钮可达通过；原人工/自动确认丢失/冲突流程保留。合成Provider，真实模型0；其余命令的被测祖先SHA逐项记录在报告。"
+    },
+    {
+      "id": "EV-THREAD-NAMING-STATIC-20261004",
+      "kind": "static",
+      "result": "passed",
+      "commit": "98c323cab492256015484c131d1167e355715b82",
+      "recordedAt": "2026-10-03T17:35:01+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/thread-naming-2026-10-04.md",
+      "scope": "严格类型及现有声明补丁检查；产品DTO/命令边界。零真实模型，不构成完整UI或平台证明。"
+    },
+    {
+      "id": "EV-THREAD-NAMING-MOCK-20261004",
+      "kind": "mock",
+      "result": "passed",
+      "commit": "98c323cab492256015484c131d1167e355715b82",
+      "recordedAt": "2026-10-03T17:35:01+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/thread-naming-2026-10-04.md",
+      "scope": "ThreadPages名称事件只推进events水位，不重载历史/工具/成果；合成重复确认、并发冲突、IME及迟到回调测试，明确不冒充真实网络或人工输入法。"
+    },
+    {
+      "id": "EV-THREAD-NAMING-MAC-20261004",
+      "kind": "platform",
+      "result": "passed",
+      "commit": "98c323cab492256015484c131d1167e355715b82",
+      "recordedAt": "2026-10-03T17:35:01+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/thread-naming-2026-10-04.md",
+      "scope": "实际macOS SQLite v12名称事务/迁移/重开、独立Host与Pi Worker等待审批时改名不重放；真实Electron侧栏编辑、原请求重试、冲突/重连/重载及820/1320表单检查。集中回归见报告；Provider合成，其他平台/完整人工体验未验。"
     }
   ]
 }

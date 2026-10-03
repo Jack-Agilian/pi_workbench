@@ -125,3 +125,7 @@ React事件及清理经Context7查询 [DOM事件](https://react.dev/reference/re
 ## 完全访问平台策略（2026-10-04）
 
 `macos-access.ts` → [Anthropic sandbox-runtime固定Mac源码](https://github.com/anthropics/sandbox-runtime/blob/9e93406ab2e0b6e9794624896f729560dc9445db/src/sandbox/macos-sandbox-utils.ts) → 参考拒绝优先级、目录例外/祖先移动保护与同沙箱进程边界 → 保留本产品guardian/审批/收据/固定Node，不安装或移植其通用runtime。源码与Apache-2.0许可证blob已独立核对，具体映射、限定验证与不采用整包的原因见[平台报告](../validation/full-access-platform-2026-10-04.md)。Pi公开Operations、pi-gui主UI参考不变，产品full模式尚未开放。
+
+## 2026-10-04 会话命名采用
+
+[命名契约](thread-naming-contract.md)列出pi-gui固定sidebar/use-thread-actions、React身份/清理与Pi0.87.1公开类方法的逐模块映射。只借鉴行内编辑；产品Thread先于Session存在，继续用宿主事务命名，不调用Pi方法双写原生历史，也不移植社区驱动或新增依赖。
