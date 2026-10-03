@@ -351,3 +351,12 @@ h1 { font-size: 17px; font-weight: 600; line-height: 1.4; overflow: hidden; text
  .context-popover{max-height:60vh}
  .run-completion{padding:2px 10px;font-size:11px}
 }
+
+/* Cross-thread activity survives filtered directories without becoming a task dashboard. */
+.other-runs{display:flex;align-items:center;gap:8px;padding:6px 16px;border-bottom:1px solid var(--line);background:#f5f4e9;flex-shrink:0;font-size:12px;min-width:0}
+.other-run-identity{display:flex;flex:1;flex-direction:column;min-width:0;gap:2px}
+.other-run-identity strong{min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
+.other-run-identity span{font-size:11px;color:#5c5f48}
+.other-runs>button{flex-shrink:0;font-size:12px;padding:5px 8px}
+.stop-other-run{color:#923e33;background:#fffaf8;border-color:#dec6c0}
+@media(max-height:500px){.other-runs{padding:3px 8px;gap:4px}.other-runs>button{padding:3px 5px}.other-run-identity{gap:0}}

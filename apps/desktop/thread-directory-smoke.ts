@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import type { HostClient } from './host-client.ts';
 import type { DesktopHome, DesktopThread } from '../../packages/app-contracts/desktop.ts';
 import type { ThreadDirectoryPage } from '../../packages/app-contracts/thread-directory.ts';
-export async function runThreadDirectorySmoke(window:BrowserWindow,host:HostClient,activeThread:string) {
+export async function runThreadDirectorySmoke(window:BrowserWindow,host:HostClient,activeThread:string,profile:string) {
   const js=<T>(source:string):Promise<T>=>window.webContents.executeJavaScript(source,true);
   const wait=async(check:()=>Promise<boolean>,name:string)=>{const end=Date.now()+15000;while(!await check()){if(Date.now()>end)throw Error('directory_timeout:'+name);await new Promise(r=>setTimeout(r,35));}};
   const fill=(selector:string,text:string)=>js(`(()=>{const e=document.querySelector(${JSON.stringify(selector)});const p=e instanceof HTMLTextAreaElement?HTMLTextAreaElement.prototype:HTMLInputElement.prototype;Object.getOwnPropertyDescriptor(p,'value').set.call(e,${JSON.stringify(text)});e.dispatchEvent(new Event('input',{bubbles:true}));})()`);
@@ -98,6 +98,8 @@ export async function runThreadDirectorySmoke(window:BrowserWindow,host:HostClie
     const exact=await request({type:'thread-directory',search:{query:'SYNTHETIC fresh outside filter'}}) as ThreadDirectoryPage;assert.equal(exact.items.length,1);
     console.log('directory: actual 75-row catalog, whole-database search, no-result active approvals/draft, pinned rename conflict, explicit retry, all pages/no duplicates, late filter and actual host replacement passed; SYNTHETIC data and faults');
   } finally {release?.();host.request=request;}
+  const {runOtherRunsSmoke}=await import('./other-runs-smoke.ts');
+  await runOtherRunsSmoke(window,host,profile);
   // Explicit new synthetic intent for the existing shutdown test; never a replay.
   await request({type:'command',command:{type:'runs.start',requestId:'SYNTHETIC-directory-shutdown-run',threadId:activeThread,input:'SYNTHETIC pending task for final shutdown'}});
 }

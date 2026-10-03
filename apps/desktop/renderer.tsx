@@ -8,6 +8,7 @@ import { RunHistory } from './run-history.tsx';
 import { PaneResizeHandle } from './pane-resize-handle.tsx';
 import { usePaneLayout } from './pane-layout.ts';
 import { RunStatusNotice } from './run-status-notice.tsx';
+import { OtherRuns } from './other-runs.tsx';
 import { ThreadDirectory } from './thread-directory.tsx';
 import { PermissionPicker } from './permission-picker.tsx';
 import { ApprovalList } from './approval-list.tsx';
@@ -296,6 +297,7 @@ function App() {
       {home?.mode==='model' && <details className="model-settings" aria-label="模型配置" open={home.model?.status!=='ready'}><summary>模型配置 · {home.model?.provider} / {home.model?.model}</summary>{home.model?.limits && <p>{home.model.limits.endpoint} · {home.model.limits.requests===null?'LLM 请求次数不限':`本次授权最多 ${home.model.limits.requests} 次请求`} · {home.model.limits.estimatedUsd===null?'费用不限':`估算预算 $${home.model.limits.estimatedUsd}`}  · {home.model.limits.outputTokens===null?'输出长度使用模型默认':`输出上限 ${home.model.limits.outputTokens} token`}{home.model.limits.httpIdleTimeoutMs!==undefined && <> · 空闲等待 {home.model.limits.httpIdleTimeoutMs/1000} 秒</>}{home.model.limits.timeoutMs!==undefined && <> · 单次 LLM 请求总上限 {home.model.limits.timeoutMs/1000} 秒</>}</p>}{home.model?.status==='not_configured'?<p>尚未配置或配置无效。请先运行 model:config 创建非秘密配置，填写并检查后重新启动。本页不会使用全局 Pi 凭据。</p>:home.model?.status==='key_required'?<div><p>仅发送你批准的合成无敏感资料。请求与费用估算限额来自配置；估算不等于服务商硬预算。可在配置目录的 auth.json 保存 API key，重启后自动读取；也可临时选择私有 .key 文件。凭据内容不会传入页面。</p><button disabled={busy} onClick={()=>{setBusy(true);void api.selectModelCredential().then(()=>setTick(n=>n+1),failed).finally(()=>setBusy(false));}}>选择凭据并启用本次应用</button></div>:home.model?.status==='policy_required'?<p>授权策略待确认。请核对原配置并完成显式修订，已有请求记录继续保留。</p>:home.model?.status==='budget_exhausted'?<p>本授权的请求次数或预留预算不足。</p>:<p>{shellTools?'已就绪 · 文件与 Bash 由宿主按任务权限授权':home.model?.limits?.fileTools?'已就绪 · Markdown 工具由宿主按任务权限授权':'已就绪 · 无工具'}</p>}</details>}
       {disconnected ? <div className="notice error connection-problem" role="alert">与执行宿主的连接已断开。原宿主仍在运行时，重新连接会结束其未完成任务并保留记录；不会重发未确认操作。<button onClick={() => void reconnect()} disabled={busy || refreshing}>重新连接</button></div>
         : (problem || readProblem) && <div className="notice error request-problem" role="alert">{problem?.text ?? '状态暂时无法读取，已显示内容保留。刷新只读取状态，不会重发操作或结束任务。'}<button onClick={() => void refreshStatus()} disabled={busy || refreshing}>刷新状态</button></div>}
+      <OtherRuns key={home?.queryScope??''} home={home} selected={selected} disabled={busy||disconnected} command={command} select={threadId=>{setSelected(threadId);setInspectorChoices(all=>({...all,[threadId]:false}));requestAnimationFrame(()=>document.querySelector<HTMLButtonElement>('.sidebar-toggle')?.focus());}}/>
       <RunStatusNotice key={`${selected}:${queryScope.current}`} runs={currentRuns}/>
       <p className="sr-only approval-announcement" role="status" aria-live="polite" aria-atomic="true">{approvalNotice?.threadId === selected ? approvalNotice.text : ''}</p>
       {activity?.workspaceStatus === 'invalid' && <div className="notice error" role="alert">此会话的工作目录已不可用，发送已停用。历史仍可浏览，请恢复原目录后再继续。</div>}
