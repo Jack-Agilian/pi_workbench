@@ -18,9 +18,13 @@
 
 维护规则见 [状态、证据与验收](maintenance.md)；本次处理清单见 [R01–R08 修订](review-fixes.md)。该修订只核验维护脚本和接缝契约；后续实际接入证据分别登记如下。
 
+## 2026-10-04 工作流复审与恢复修正
+
+[逐项复审与实际验证](../validation/workflow-review-2026-10-04.md)：连接/读取/未确认请求分开，迟到成功不清除新错误；审批焦点接续且不抢用户新焦点。真实Electron/Worker/SQLite及24退出恢复场景限定通过，零真实模型。U01–U12的已实施/缺口/未测逐项保留，UI任务/Gate不扩大。唯一当前事项为会话查找与列表扩展，后续阅读/成果及完整体验收口见NEXT_STEPS。
+
 ## 2026-10-04 安全正文阅读
 
-[阅读契约](safe-reading-contract.md)、[实际验证](../validation/safe-reading-2026-10-04.md)及[发行输入](../validation/safe-reading-inputs-2026-10-04.json)：精确采用react-markdown/GFM和Pi公开解析器/内存Session树，SQL v13与Worker IPC v12记录Run原生范围；只读补读、长中文/emoji分页、整条消息过滤、失败重试及连接隔离已限定通过。旧Run缺范围和超过8MiB明确不可读，外链暂为地址文字；不声称全部历史/正文工具穿插/完整人工体验完成。零真实模型，UI任务与Gate不扩大。唯一当前事项为整套桌面工作流复审与收口，见NEXT_STEPS。
+[阅读契约](safe-reading-contract.md)、[实际验证](../validation/safe-reading-2026-10-04.md)及[发行输入](../validation/safe-reading-inputs-2026-10-04.json)：精确采用react-markdown/GFM和Pi公开解析器/内存Session树，SQL v13与Worker IPC v12记录Run原生范围；只读补读、长中文/emoji分页、整条消息过滤、失败重试及连接隔离已限定通过。旧Run缺范围和超过8MiB明确不可读，外链暂为地址文字；不声称全部历史/正文工具穿插/完整人工体验完成。零真实模型，UI任务与Gate不扩大。当时后续工作流复审已由上节接续，当前事项见NEXT_STEPS。
 
 ## 2026-10-04 会话持久命名
 

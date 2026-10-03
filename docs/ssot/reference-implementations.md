@@ -133,3 +133,7 @@ React事件及清理经Context7查询 [DOM事件](https://react.dev/reference/re
 ## 安全正文阅读采用（2026-10-04）
 
 模块→参考/API→采用范围→保留边界详见[安全阅读契约](safe-reading-contract.md)。继续固定pi-gui `163054227d370a49d09099c61eb65798481294ac`的message-markdown/timeline-item，采用同类Markdown/GFM渲染与memo行为；没有复制新社区组件。实际依赖为react-markdown10.1.0和remark-gfm4.0.1，MIT、registry/tarball/SRI/安装文件/实际import见[发行输入](../validation/safe-reading-inputs-2026-10-04.json)。Pi0.87.1公开parseSessionEntries、SessionManager.inMemory/getBranch/getEntry负责解析和原生分支；不采用有磁盘迁移行为的SessionManager.open作查看器，不使用未根导出的loadEntriesFromFile。宿主仍拥有路径/Run范围、过滤与连接隔离，Renderer没有SDK/导航权限。实际采用与未覆盖项见[被测报告](../validation/safe-reading-2026-10-04.md)。
+
+## 恢复与审批连续操作（2026-10-04）
+
+[本批映射及复审](../validation/workflow-review-2026-10-04.md)继续核对固定pi-gui `163054227d370a49d09099c61eb65798481294ac`的use-session-composer.tsx：保留失败输入、操作后的焦点处理。只借鉴行为，本项目仍保留产品requestId、宿主清理/替换和单一滚动所有者；不复制新组件或新增依赖。本机早期checkout为另一个提交，已明确不混作本次固定参考。恢复状态拆分属于业务逻辑修复，不另建通用错误/状态框架。
