@@ -21,19 +21,27 @@ export async function checkReadingCopy(window:BrowserWindow,row:string){
  assert.equal(await clipboard.readText(),"const value = '<script>SYNTHETIC_CODE</script>';\n");
  const partial=await js<string>(`[...document.querySelectorAll(${JSON.stringify(section+' .message')})].find(e=>e.textContent.includes('后续内容待加载'))?.querySelector('.markdown-body > .copy-action .copy-text')?.textContent`);
  assert.equal(partial,'复制已加载部分');
+ await js(`(()=>{const m=[...document.querySelectorAll(${JSON.stringify(section+' .message')})].find(e=>e.textContent.includes('后续内容待加载'));m.querySelector('.markdown-body > .copy-action .copy-text').click();})()`);
+ await wait(`[...document.querySelectorAll(${JSON.stringify(section+' .message')})].find(e=>e.textContent.includes('后续内容待加载'))?.querySelector('.markdown-body > .copy-action .copy-feedback')?.textContent==='已复制'`);
+ const copiedPartial=await clipboard.readText();assert.ok(copiedPartial.includes('SYNTHETIC 安全阅读'));assert.ok(!copiedPartial.includes('SYNTHETIC_COMPLETE_BODY'));assert.ok(!copiedPartial.includes('复制已加载部分'));
+
  const write=clipboard.writeText.bind(clipboard);let calls=0;
  clipboard.writeText=async()=>{calls++;throw Error('SYNTHETIC_CLIPBOARD_FAILURE');};
  try{await click(code);await wait(`document.querySelector(${JSON.stringify(section+' .markdown-code .copy-feedback')}).textContent.includes('复制失败')`);await new Promise(r=>setTimeout(r,250));assert.equal(calls,1);}
  finally{clipboard.writeText=write;}
  await click(code);await wait(`document.querySelector(${JSON.stringify(section+' .markdown-code .copy-feedback')}).textContent==='已复制'`);
- // Actual IPC backpressure while the public platform method is held synthetically.
+ // Hold the public platform method to verify bridge backpressure and disposed UI feedback.
  let release:(()=>void)|undefined;clipboard.writeText=async()=>{await new Promise<void>(r=>{release=r;});};
  try{
-  await js("void (globalThis.syntheticCopyPending=window.workbench.copyText('SYNTHETIC_HELD').then(()=>true,()=>false))");
+  await click(code);
   const end=Date.now()+12000;while(!release){if(Date.now()>end)throw Error('clipboard_not_held');await new Promise(r=>setTimeout(r,20));}
   assert.equal(await js<boolean>("window.workbench.copyText('SYNTHETIC_CONCURRENT').then(()=>false,()=>true)"),true);
-  release();assert.equal(await js<boolean>('globalThis.syntheticCopyPending'),true);
- }finally{ clipboard.writeText=write;release?.(); }
+  await click(row+' .read-native');await wait(`!document.querySelector(${JSON.stringify(section)})`);
+  release();clipboard.writeText=write;
+  await click(row+' .read-native');await wait(`!!document.querySelector(${JSON.stringify(code)})`);
+  await new Promise(r=>setTimeout(r,100));assert.equal(await js<string>(`document.querySelector(${JSON.stringify(section+' .markdown-code .copy-feedback')}).textContent`),'');
+ }finally{clipboard.writeText=write;release?.();}
+ console.log('reading copy: actual async Electron write/read of synthetic-only text, exact code, partial body, failure/manual retry, rejected concurrent write and disposed feedback passed');
 }
 export async function checkArtifactVersions(window:BrowserWindow,host:HostClient,threadId:string){
  const {js,wait,click}=harness(window);
