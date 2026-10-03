@@ -9,6 +9,7 @@ export function useTimelineScroll(threadId: string, snapshot: DesktopThread | nu
   const expectedScroll = useRef<number | null>(null);
   const positions = useRef(new Map<string, Position>());
   const [browsing, setBrowsing] = useState(false);
+  const [navigation, setNavigation] = useState<{threadId: string; operationId: string} | null>(null);
   const loaded = snapshot?.thread.id === threadId;
   const capturePosition = () => {
     const element = viewport.current;
@@ -54,13 +55,20 @@ export function useTimelineScroll(threadId: string, snapshot: DesktopThread | nu
     positions.current.set(threadId, {top: 0, following: true, offset: 0});
     restore(); setBrowsing(false);
   };
-  const revealApproval = (operationId: string) => {
+  useLayoutEffect(() => {
+    if (!navigation || navigation.threadId !== threadId) return;
+    const operationId = navigation.operationId;
+    setNavigation(null);
     const element = viewport.current;
     const target = Array.from(element?.querySelectorAll<HTMLElement>('[data-approval]') ?? []).find(item => item.dataset.approval === operationId);
     if (!element || !target) return;
     // The same scroll owner handles explicit navigation and passive reading anchors.
     element.scrollTop += target.getBoundingClientRect().bottom - element.getBoundingClientRect().bottom + 12;
     target.focus({preventScroll: true}); capturePosition(); expectedScroll.current = element.scrollTop;
+  }, [navigation, threadId]);
+  const revealApproval = (operationId: string) => {
+    // Commit the reading affordance before measuring: its height is part of the viewport.
+    setBrowsing(true); setNavigation({threadId, operationId});
   };
   return {viewport, content, onScroll, browsing, returnLatest, revealApproval};
 }

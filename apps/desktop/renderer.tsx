@@ -47,7 +47,6 @@ function App() {
   const draft = drafts[selected] ?? '';
   const scroll = useTimelineScroll(selected, thread);
   const inspectorRef = useRef<HTMLElement>(null);
-  const [approvalNavigation, setApprovalNavigation] = useState<{threadId: string; operationId: string} | null>(null);
   function failed(error: unknown) {
     const lost = error instanceof Error && error.message.includes('disconnected');
     setDisconnected(lost); setProblem({ kind: lost ? 'connection' : 'request', text: lost ? '与执行宿主的连接已断开。原宿主仍在运行时，重新连接会结束其未完成任务并保留记录；不会重发未确认操作。' : '请求未获确认，请刷新状态后检查。审批可能已过期，任务也可能正在停止。刷新只读取状态，不会重发操作或结束任务。' });
@@ -208,13 +207,8 @@ function App() {
   const openApprovals = () => {
     if (!pending[0]) return;
     setInspectorChoices(all => ({...all, [selected]: false}));
-    setApprovalNavigation({threadId: selected, operationId: pending[0].id});
+    scroll.revealApproval(pending[0].id);
   };
-  useEffect(() => {
-    if (!approvalNavigation || approvalNavigation.threadId !== selected || inspectorOpen) return;
-    scroll.revealApproval(approvalNavigation.operationId);
-    setApprovalNavigation(null);
-  }, [approvalNavigation, selected, inspectorOpen, scroll]);
   const layout = usePaneLayout(inspectorOpen);
   useEffect(() => {
     if (layout.overlay && inspectorOpen) inspectorRef.current?.querySelector<HTMLButtonElement>('.inspector-close')?.focus();

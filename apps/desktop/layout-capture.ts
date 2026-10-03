@@ -36,6 +36,7 @@ export async function captureLayout(window: BrowserWindow, label: string): Promi
         composer:box('.composer'),inspector:box('.inspector'),approval:box('.approval'),
         approve:box('.approval .primary'),stop:box('.stop')}; })()`));
     if (!metrics.approvalActionable || !metrics.stopVisible || metrics.bodyOverflow || metrics.composer.y+metrics.composer.height>metrics.viewport.height+1) throw new Error('critical_control_outside_viewport:'+width);
+    if (metrics.approval.y < metrics.timeline.y - 1 || metrics.approval.y + metrics.approval.height > metrics.timeline.y + metrics.timeline.height + 1) throw new Error('approval_card_clipped:'+width);
     records.push(metrics);
     console.log(`layout capture: ${label} ${width}x${height}`);
     try {
