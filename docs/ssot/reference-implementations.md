@@ -129,3 +129,7 @@ React事件及清理经Context7查询 [DOM事件](https://react.dev/reference/re
 ## 2026-10-04 会话命名采用
 
 [命名契约](thread-naming-contract.md)列出pi-gui固定sidebar/use-thread-actions、React身份/清理与Pi0.87.1公开类方法的逐模块映射。只借鉴行内编辑；产品Thread先于Session存在，继续用宿主事务命名，不调用Pi方法双写原生历史，也不移植社区驱动或新增依赖。
+
+## 安全正文阅读采用（2026-10-04）
+
+模块→参考/API→采用范围→保留边界详见[安全阅读契约](safe-reading-contract.md)。继续固定pi-gui `163054227d370a49d09099c61eb65798481294ac`的message-markdown/timeline-item，采用同类Markdown/GFM渲染与memo行为；没有复制新社区组件。实际依赖为react-markdown10.1.0和remark-gfm4.0.1，MIT、registry/tarball/SRI/安装文件/实际import见[发行输入](../validation/safe-reading-inputs-2026-10-04.json)。Pi0.87.1公开parseSessionEntries、SessionManager.inMemory/getBranch/getEntry负责解析和原生分支；不采用有磁盘迁移行为的SessionManager.open作查看器，不使用未根导出的loadEntriesFromFile。宿主仍拥有路径/Run范围、过滤与连接隔离，Renderer没有SDK/导航权限。实际采用与未覆盖项见[被测报告](../validation/safe-reading-2026-10-04.md)。

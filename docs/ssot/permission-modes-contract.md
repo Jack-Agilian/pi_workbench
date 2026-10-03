@@ -42,7 +42,7 @@
 
 ## 完全访问的宿主范围与恢复
 
-平台前置见[原报告](../validation/full-access-platform-2026-10-04.md)，产品接入见[本批报告](../validation/full-access-product-2026-10-04.md)。该产品接入批次SQL/IPC均为v11；当前SQL v12另增[名称修订](thread-naming-contract.md)，Worker IPC保持v11，权限语义不变。`DesktopHost`只从宿主配置提供profile、受保护目录、已登记凭据目录；Renderer只能选择模式，不传目录例外、可执行文件、环境、网络策略或数据库路径。不支持的平台、缺失/别名保护根、保护范围冲突直接拒绝，不静默放宽。
+平台前置见[原报告](../validation/full-access-platform-2026-10-04.md)，产品接入见[本批报告](../validation/full-access-product-2026-10-04.md)。该产品接入批次SQL/IPC均为v11；SQL v12另增[名称修订](thread-naming-contract.md)，当前SQL v13/Worker IPC v12另增[只读正文范围](safe-reading-contract.md)，权限语义不变。`DesktopHost`只从宿主配置提供profile、受保护目录、已登记凭据目录；Renderer只能选择模式，不传目录例外、可执行文件、环境、网络策略或数据库路径。不支持的平台、缺失/别名保护根、保护范围冲突直接拒绝，不静默放宽。
 
 Worker启动策略、Pi Operations与宿主核验共享同一Run绑定的文件范围。目录内保持相对路径，目录外用规范绝对路径；批准摘要包含范围、参数、版本、资源、绑定与期限。宿主独立复核，Worker直接伪造合法通道请求也不能绕过私有目标拒绝。重开对账合并原Run保护集与当前宿主保护集，不因配置变化丢失原拒绝。
 
@@ -60,4 +60,4 @@ Pi公开read/write/edit工厂与Operations不重写；本批原生文件接入�
 - 已测旧SQL v10权限/审批/请求迁移、真实Electron第三档选择及重连、1320/820宽度可达；原人工/自动流程回归。不是完整人工或无障碍验收。
 - 不宣称任意恶意进程、预存外部硬链接、TOCTOU或系统级通用沙箱；固定后代/端口/心跳证明沿用并重跑平台矩阵。其他平台未支持。
 
-UI-01/02与SEC-02保持in_progress，整个工作台目标、完整人工体验、会话命名/全文/Markdown等既定事项继续保留。唯一当前事项以NEXT_STEPS顶部为准。
+UI-01/02与SEC-02保持in_progress，整个工作台目标和完整人工体验继续保留；会话命名及Markdown/限定正文补读已由后续契约实施，不能据此关闭全部体验事项。唯一当前事项以NEXT_STEPS顶部为准。

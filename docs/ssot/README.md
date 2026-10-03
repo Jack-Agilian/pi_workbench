@@ -18,9 +18,13 @@
 
 维护规则见 [状态、证据与验收](maintenance.md)；本次处理清单见 [R01–R08 修订](review-fixes.md)。该修订只核验维护脚本和接缝契约；后续实际接入证据分别登记如下。
 
+## 2026-10-04 安全正文阅读
+
+[阅读契约](safe-reading-contract.md)、[实际验证](../validation/safe-reading-2026-10-04.md)及[发行输入](../validation/safe-reading-inputs-2026-10-04.json)：精确采用react-markdown/GFM和Pi公开解析器/内存Session树，SQL v13与Worker IPC v12记录Run原生范围；只读补读、长中文/emoji分页、整条消息过滤、失败重试及连接隔离已限定通过。旧Run缺范围和超过8MiB明确不可读，外链暂为地址文字；不声称全部历史/正文工具穿插/完整人工体验完成。零真实模型，UI任务与Gate不扩大。唯一当前事项为整套桌面工作流复审与收口，见NEXT_STEPS。
+
 ## 2026-10-04 会话持久命名
 
-[命名契约](thread-naming-contract.md)与[实际验证](../validation/thread-naming-2026-10-04.md)：产品Thread持久重命名、版本冲突、同请求确认、草稿与连接隔离贯通SQL v12和Electron；Worker IPC保持v11，改名不执行模型/工具或改原生Session。真实库重开、旧库迁移与审批回归限定通过；UI任务/Gate不扩大。唯一当前事项为安全Markdown和按需原生全文阅读，见NEXT_STEPS。
+[命名契约](thread-naming-contract.md)与[实际验证](../validation/thread-naming-2026-10-04.md)：产品Thread持久重命名、版本冲突、同请求确认、草稿与连接隔离贯通SQL v12和Electron；Worker IPC保持v11，改名不执行模型/工具或改原生Session。真实库重开、旧库迁移与审批回归限定通过；UI任务/Gate不扩大。当时后续安全阅读已由上节接续，唯一当前事项以NEXT_STEPS为准。
 
 ## 2026-10-04 完全访问产品接入
 

@@ -1,0 +1,37 @@
+{
+  "node": "24.21.0",
+  "npm": "11.19.0",
+  "lock": "package-lock.json",
+  "react": "19.3.0",
+  "pi": "0.87.1",
+  "packages": [
+    {
+      "package": "react-markdown",
+      "version": "10.1.0",
+      "tarball": "https://registry.npmjs.org/react-markdown/-/react-markdown-10.1.0.tgz",
+      "integrity": "sha512-qKxVopLT/TyA6BX3Ue5NwabOsAzm0Q7kAPwq6L+wWDwisYs7R8vZ0nRXqq6rkueboxpkjvLGU9fWifiX/ZZFxQ==",
+      "bytes": 15544,
+      "sha256": "205f5c607c68e1e42b8d7a036326bdb3a105ae55e6469ecfcaf998004609d5f7",
+      "license": "MIT",
+      "installedFilesVerified": 9,
+      "exports": "./index.js",
+      "rootRuntimeExport": "default",
+      "scriptsDisabled": true,
+      "signatureIndependentlyVerified": false
+    },
+    {
+      "package": "remark-gfm",
+      "version": "4.0.1",
+      "tarball": "https://registry.npmjs.org/remark-gfm/-/remark-gfm-4.0.1.tgz",
+      "integrity": "sha512-1quofZ2RQ9EWdeN34S79+KExV1764+wCUGop5CPL1WGdD0ocPpu91lzPGbwWMECpEpd42kJGQwzRfyov9j4yNg==",
+      "bytes": 7621,
+      "sha256": "a5c7441a02eb0c5f5b0a15b23f04c2a00b9faf698dc3dfb4e5c1a1d0991d4259",
+      "license": "MIT",
+      "installedFilesVerified": 8,
+      "exports": "./index.js",
+      "rootRuntimeExport": "default",
+      "scriptsDisabled": true,
+      "signatureIndependentlyVerified": false
+    }
+  ]
+}
