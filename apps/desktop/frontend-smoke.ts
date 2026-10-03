@@ -16,7 +16,12 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
     const end = Date.now() + 10000;
     while (!await check()) { if (Date.now() > end) throw Error('frontend_timeout:' + label); await new Promise(r => setTimeout(r, 35)); }
   };
-  const click = (selector: string) => js(`document.querySelector(${JSON.stringify(selector)}).click()`);
+  const click = async (selector: string) => {
+    // Like smoke.ts: a published page does not mean the async button is ready.
+    // Wait before the single click; never retry an already submitted action.
+    await wait(() => js<boolean>(`(() => { const b=document.querySelector(${JSON.stringify(selector)}); return Boolean(b && !b.disabled); })()`), `button_ready:${selector}`);
+    await js(`(() => { const b=document.querySelector(${JSON.stringify(selector)}); if(!b || b.disabled) throw Error('button_unavailable'); b.click(); })()`);
+  };
   const switchTo = (name: string) => js(`[...document.querySelectorAll('.thread-link')].find(b=>b.getAttribute('aria-label')===${JSON.stringify(name)}).click()`);
   const request = host.request.bind(host);
   const home = await request({type: 'home'}) as DesktopHome;
