@@ -16,6 +16,6 @@ ID：FEEDBACK。父：[WORK](README.md)。这是一组按需空间，不是永�
 
 出现/消失不使用toast滑过正文；状态反馈及时，避免对轮询内容每次重放动画/朗读。焦点已在错误动作上时，错误解除需合理接续，不抢用户已移走的焦点。危险后果不能藏于气泡。
 
-源码：renderer model-settings/notice、[other-runs](../../../../../apps/desktop/other-runs.tsx)、[run-status-notice](../../../../../apps/desktop/run-status-notice.tsx)。现状：模型配置就绪也常驻一行，多错误各自自然占高；需目标收敛。验收：所有上述状态单独及组合、长错误、低高度、迟到成功/断线；不因为收起提示改变业务状态。
+源码：renderer model-settings/notice、[other-runs](../../../../../apps/desktop/other-runs.tsx)、[run-status-notice](../../../../../apps/desktop/run-status-notice.tsx)。现状：就绪模型只保留输入栏名称入口；配置按需，连接/跨会话/终态/恢复信息合计最多25vh滚动。运行结果的权威来源不变。验收：所有上述状态单独及组合、长错误、低高度、迟到成功/断线；不因为收起提示改变业务状态。
 
-2026-10-08 v2：本节点已按全路径原型纠偏；产品源码尚未同步。具体样例与已测/未测范围由[规格根](../../README.md)的原型入口统一导航，不能据本节点更新宣称产品完成。
+2026-10-08 v2：本节点已按全路径方案同步到正式Renderer；限定实现和验收分开记录。具体样例与已测/未测范围由[规格根](../../README.md)的实现/原型入口统一导航；完整人工体验和VoiceOver尚未验收。

@@ -9,13 +9,15 @@ export async function runShellSmoke(window: BrowserWindow, host: HostClient) {
   const click=(text:string)=>js(`(()=>{const b=[...document.querySelectorAll('button')].find(b=>b.textContent.trim()===${JSON.stringify(text)});if(!b||b.disabled)throw Error('button unavailable');b.click()})()`);
   await wait(()=>js<boolean>("!!document.querySelector('.new-thread')"),'mounted');
   for(const mode of ['allow','deny','cancel']) {
-    await click('＋ 新建会话');
+    await click('＋ 新建会话');await click('创建会话');
     await wait(()=>js<boolean>("!document.querySelector('button.new-thread').disabled && !!document.querySelector('.thread-link.selected')"),'thread');
     await click(mode==='cancel'?'填入可停止命令演示':'填入只读命令演示');
     await wait(()=>js<boolean>("!document.querySelector('.composer button[type=submit]').disabled"),'composer');
     await js("document.querySelector('form.composer').requestSubmit()");
     await wait(()=>js<boolean>("!!document.querySelector('[aria-label=命令执行审批]')"),'approval');
-    assert.equal(await js<boolean>("document.querySelector('.approval').textContent.includes('restricted-bash-v1')"),true);
+    await js("document.querySelector('.approval-evidence').click()");
+    assert.equal(await js<boolean>("document.querySelector('.approval-meta').textContent.includes('restricted-bash-v1')"),true);
+    await js("document.querySelector('[aria-label=关闭操作详情]').click()");
     await click(mode==='deny'?'拒绝':'仅本次允许');
     if(mode==='cancel') {await wait(()=>js<boolean>("document.querySelector('.tool-status')?.textContent==='命令执行中'"),'executing');await click('停止');}
     const expected=mode==='allow'?'completed':mode==='deny'?'failed':'cancelled';

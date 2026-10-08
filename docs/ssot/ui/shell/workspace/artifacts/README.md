@@ -20,6 +20,6 @@ PREVIEW占整个面板的剩余高度，不嵌在某一版本行下。选择、�
 
 用户已打开别的文档、手动关闭，或正在旧记录/文档中阅读时，不覆盖选择/不抢焦点；后续版本只提示可主动切换。后台会话、恢复、补页不自动展开。展示不需要额外授权门槛，也不发明主文档识别字段。两种策略都是展示选择，不改变文件读取权限。
 
-源码归属：[artifact-panel](../../../../../../apps/desktop/artifact-panel.tsx)、renderer、run-history。产品仍是列表内嵌预览；[合成原型](../../../../../design/workbench-prototype/README.md)已演示对象入口/面板，但没有接入产品协议。实施复用artifactId、原分页与核验，选择态只由WORK持有。
+源码归属：[artifact-panel](../../../../../../apps/desktop/artifact-panel.tsx)、renderer、run-history。产品已改为独立全高阅读；[合成原型](../../../../../design/workbench-prototype/README.md)用于设计对照；产品已接入artifactId、原分页与核验，选择态和对象阅读位置由WORK持有。当前采用B：仅点击打开，未引入新到达识别字段或自动抢开。
 
 验收：Chat→文档→切换→关闭返回、0/多文件/同名、多登记版、核验失败、旧响应、切会话/重连、用户关闭后新结果不再抢开；正文足够宽高，版本记录不伪造历史字节。

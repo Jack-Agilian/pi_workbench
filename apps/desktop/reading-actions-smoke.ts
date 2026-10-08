@@ -47,22 +47,23 @@ export async function checkArtifactVersions(window:BrowserWindow,host:HostClient
  const {js,wait,click}=harness(window);
  const page=await host.request({type:'artifact-page',threadId,page:{limit:32}}) as ArtifactPage;
  const versions=page.items.filter(item=>item.path==='pagination-versions.md').sort((a,b)=>b.version-a.version);assert.equal(versions.length,3);
- await click(`[data-artifact="${versions[0]!.id}"]`);await wait("!!document.querySelector('.preview pre')");
- assert.equal(await js<string>("document.querySelector('.selected-artifact .file-icon').textContent"),'MD');
+ await click('.document-picker');await click(`[data-artifact="${versions[0]!.id}"]`);await wait("!!document.querySelector('.document-reading .markdown-body')");
+ assert.equal(await js<string>("document.querySelector('.document-picker .file-icon').textContent"),'MD');
+ await click('.document-versions');
  assert.equal(await js<number>("document.querySelectorAll('.artifact-version-picker option').length"),3);
  assert.equal(await js<string>("document.querySelector('.artifact-evidence code').textContent"),versions[0]!.digest);
- await click('.preview .copy-text');await wait("document.querySelector('.preview .copy-feedback').textContent==='已复制'");
+ await click('.action-panel header button');await click('.document-header .copy-text');await wait("document.querySelector('.document-header .copy-feedback').textContent==='已复制'");
  assert.equal(await clipboard.readText(),'# SYNTHETIC file 2');
- const select=async(id:string)=>{await js(`(()=>{const s=document.querySelector('.artifact-version-picker select');s.value=${JSON.stringify(id)};s.dispatchEvent(new Event('change',{bubbles:true}));})()`);};
+ const select=async(id:string)=>{if(!await js<boolean>("!!document.querySelector('.artifact-version-picker')"))await click('.document-versions');await js(`(()=>{const s=document.querySelector('.artifact-version-picker select');s.value=${JSON.stringify(id)};s.dispatchEvent(new Event('change',{bubbles:true}));})()`);await click('.action-panel header button');};
  await select(versions[2]!.id);await wait("document.querySelector('.preview')?.textContent.includes('历史记录保留，不展示不匹配的内容')");
- assert.equal(await js<boolean>("!!document.querySelector('.preview pre,.preview .copy-text')"),false);
+ assert.equal(await js<boolean>("!!document.querySelector('.document-reading .markdown-body,.document-header .copy-text')"),false);
  const original=host.request.bind(host);let fail=true,requests=0,commands=0;
  host.request=async(raw,scope)=>{if(raw.type==='command')commands++;if(raw.type==='preview'){requests++;if(fail){fail=false;throw Error('SYNTHETIC_PREVIEW_FAILURE');}}return original(raw,scope);};
  try{
   await select(versions[0]!.id);await wait("document.querySelector('.preview')?.textContent.includes('核验请求未获确认')");
-  assert.equal(await js<boolean>("!!document.querySelector('.preview .copy-text')"),false);
-  await js("[...document.querySelectorAll('.preview button')].find(b=>b.textContent==='重新核验文件').click()");await wait("!!document.querySelector('.preview pre')");assert.equal(requests,2);assert.equal(commands,0);
+  assert.equal(await js<boolean>("!!document.querySelector('.document-header .copy-text')"),false);
+  await js("[...document.querySelectorAll('.preview button')].find(b=>b.textContent==='重新核验文件').click()");await wait("!!document.querySelector('.document-reading .markdown-body')");assert.equal(requests,2);assert.equal(commands,0);
  }finally{host.request=original;}
- await click('.preview [aria-label="关闭预览"]');assert.equal(await js<string>("document.activeElement.dataset.artifact"),versions[0]!.id);
+ await click('.inspector-close');await wait("document.querySelector('.inspector').hidden&&document.activeElement.matches('.inspector-toggle')");
  console.log('reading artifacts: three real registered versions, digest, current checked copy, old mismatch no content, explicit retry and focus passed; SYNTHETIC files');
 }

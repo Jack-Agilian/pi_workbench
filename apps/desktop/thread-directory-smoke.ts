@@ -30,17 +30,17 @@ export async function runThreadDirectorySmoke(window:BrowserWindow,host:HostClie
     await search('SYNTHETIC retry B');
     await wait(()=>js<boolean>(`!!document.querySelector('[data-thread="${activeThread}"]')`),'active_found');
     await js(`document.querySelector('[data-thread="${activeThread}"] .thread-link').click()`);
-    await wait(()=>js<boolean>("!!document.querySelector('.show-approvals') && !!document.querySelector('.stop')"),'active_approval');
+    await wait(()=>js<boolean>("!!document.querySelector('.approval') && !!document.querySelector('.stop')"),'active_approval');
     await fill('#composer','SYNTHETIC retained while filtering');
     await search('SYNTHETIC no matches');
     await wait(()=>js<boolean>("document.querySelector('.directory-status')?.textContent.includes('没有匹配') === true"),'empty_filter');
-    assert.equal(await js<boolean>("document.querySelector('#composer').value === 'SYNTHETIC retained while filtering' && !!document.querySelector('.show-approvals') && !document.querySelector('.stop').disabled"),true);
+    assert.equal(await js<boolean>("document.querySelector('#composer').value === 'SYNTHETIC retained while filtering' && !!document.querySelector('.approval') && !document.querySelector('.stop').disabled"),true);
     assert.equal(await js<boolean>(`!!document.querySelector('[data-search-result="false"] [data-thread="${activeThread}"]')`),true);
 
     const size=window.getContentSize(),out=join(app.getAppPath(),'../../.artifacts/thread-directory-20261004');mkdirSync(out,{recursive:true});
     for(const width of [1320,820]) {
       window.setContentSize(width,640);await js('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))');
-      assert.equal(await js<boolean>("['#thread-search','#thread-workspace','.clear-thread-search','.show-approvals','.stop','.new-thread'].every(s=>{const e=document.querySelector(s),b=e?.getBoundingClientRect();return b&&b.width>0&&b.left>=0&&b.right<=innerWidth&&b.top>=0&&b.bottom<=innerHeight})"),true);
+      assert.equal(await js<boolean>("['#thread-search','.clear-thread-search','.approval','.stop','.new-thread'].every(s=>{const e=document.querySelector(s),b=e?.getBoundingClientRect();return b&&b.width>0&&b.left>=0&&b.right<=innerWidth&&b.top>=0&&b.bottom<=innerHeight})"),true);
       writeFileSync(join(out,`filtered-active-${width}.png`),(await window.webContents.capturePage(undefined,{stayAwake:true})).toPNG());
     }
     window.setContentSize(size[0]!,size[1]!);
@@ -91,7 +91,7 @@ export async function runThreadDirectorySmoke(window:BrowserWindow,host:HostClie
     assert.equal(commands,afterRenameCommands);
     assert.deepEqual((await request({type:'thread',threadId:activeThread}) as DesktopThread).runs.map(r=>r.id),runsBefore);
     // New Thread stays selected even outside a non-matching filter.
-    await fill('#title','SYNTHETIC fresh outside filter');await js("document.querySelector('.new-thread').click()");
+    await js("document.querySelector('.new-thread').click()");await fill('#title','SYNTHETIC fresh outside filter');await js("document.querySelector('.create-thread').click()");
     await wait(()=>js<boolean>("document.querySelector('h1')?.textContent==='SYNTHETIC fresh outside filter' && !!document.querySelector('[data-search-result=false] .thread-link.selected')"),'new_outside_filter');
     assert.equal(commands,afterRenameCommands+1);
     const bounded=await request({type:'home'}) as DesktopHome;assert.equal(bounded.threads.length,32);assert.equal(bounded.threadsHasMore,true);

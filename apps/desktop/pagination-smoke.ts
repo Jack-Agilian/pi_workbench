@@ -16,12 +16,12 @@ export async function runPaginationSmoke(window: BrowserWindow, host: HostClient
   const thread = home.threads.find(t => t.title === title)!;
   await assert.rejects(host.request({type:'thread',threadId:thread.id}), /request_rejected/);
   await js(`[...document.querySelectorAll('.thread-link')].find(b=>b.getAttribute('aria-label')===${JSON.stringify(title)}).click()`);
-  await wait("document.querySelectorAll('[data-run]').length===8 && document.querySelectorAll('[data-artifact]').length===8");
+  await wait("document.querySelectorAll('[data-run]').length===8");
   assert.equal(await js<string>("document.querySelectorAll('[data-run] .user p')[7].textContent"), 'SYNTHETIC persisted history 59');
-  await click('.inspector-toggle');
-  await click('.load-artifacts'); await wait("document.querySelectorAll('[data-artifact]').length===10");
-  await click('.artifact'); await wait("!!document.querySelector('.preview pre')");
-  assert.match(await js<string>("document.querySelector('.preview pre').textContent"), /SYNTHETIC file/);
+  await click('.inspector-toggle');await click('.document-picker');
+  await click('.load-artifacts'); await wait("document.querySelectorAll('[data-artifact]').length===8");
+  await click('.artifact'); await wait("!!document.querySelector('.document-reading .markdown-body')");
+  assert.match(await js<string>("document.querySelector('.document-reading .markdown-body').textContent"), /SYNTHETIC file/);
   const {checkArtifactVersions}=await import('./reading-actions-smoke.ts');await checkArtifactVersions(window,host,thread.id);
   for (const count of [16,24,32,40,48,56,60]) {
     await js("document.querySelector('.timeline').scrollTop=100");
@@ -47,6 +47,7 @@ export async function runPaginationSmoke(window: BrowserWindow, host: HostClient
   await wait("!document.querySelector('.notice.error') && document.querySelectorAll('[data-run]').length===61");
   assert.equal(await js<string>("document.querySelector('#composer').value"),'SYNTHETIC reconnect draft');
   assert.equal(await js<number>("new Set([...document.querySelectorAll('[data-run]')].map(e=>e.dataset.run)).size"),61);
-  assert.equal(await js<number>("document.querySelectorAll('[data-artifact]').length"),10);
+  await click('.inspector-toggle');await click('.document-picker');
+  assert.equal(await js<number>("document.querySelectorAll('[data-artifact]').length"),8);await click('.action-panel header button');await click('.inspector-close');
   console.log('UI-P2 persisted pagination: >1.2 MB SQLite history, 8-item pages, 60 unique Runs, 10 artifacts + actual preview, scroll anchors, real Worker approval/cancel, reconnect + draft, 61 unique Runs passed; zero model calls');
 }

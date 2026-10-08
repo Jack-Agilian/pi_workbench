@@ -21,9 +21,8 @@ export async function captureLayout(window: BrowserWindow, label: string): Promi
     await new Promise(r => setTimeout(r, 180));
     // Wait for the resized Renderer to produce a frame before asking Chromium to copy it.
     await phase(`${label}:${width}:frame`, () => window.webContents.executeJavaScript('new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))'));
-    // Approval is now in its operation record. Navigate explicitly instead of
-    // depending on a permanently visible inspector or stealing passive readers' focus.
-    await window.webContents.executeJavaScript("document.querySelector('.show-approvals')?.click()");
+    // Current approvals stay above the composer independently of history scrolling.
+    await window.webContents.executeJavaScript("document.querySelector('.return-approval')?.click()");
     await phase(`${label}:${width}:approval-frame`, () => window.webContents.executeJavaScript('new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))'));
     const metrics = await phase(`${label}:${width}:metrics`, () => window.webContents.executeJavaScript(`(() => {
       const actionable = selector => { const e=document.querySelector(selector); if(!e)return false; const b=e.getBoundingClientRect(); const top=document.elementFromPoint(b.x+b.width/2,b.y+b.height/2); return b.x>=0 && b.y>=0 && b.right<=innerWidth && b.bottom<=innerHeight && !!top && e.contains(top); };
@@ -36,7 +35,7 @@ export async function captureLayout(window: BrowserWindow, label: string): Promi
         composer:box('.composer'),inspector:box('.inspector'),approval:box('.approval'),
         approve:box('.approval .primary'),stop:box('.stop')}; })()`));
     if (!metrics.approvalActionable || !metrics.stopVisible || metrics.bodyOverflow || metrics.composer.y+metrics.composer.height>metrics.viewport.height+1) throw new Error('critical_control_outside_viewport:'+width);
-    if (metrics.approval.y < metrics.timeline.y - 1 || metrics.approval.y + metrics.approval.height > metrics.timeline.y + metrics.timeline.height + 1) throw new Error('approval_card_clipped:'+width);
+    if (metrics.approval.y < metrics.timeline.y + metrics.timeline.height - 1 || metrics.approval.y + metrics.approval.height > metrics.composer.y + 1) throw new Error('approval_card_clipped:'+width);
     records.push(metrics);
     console.log(`layout capture: ${label} ${width}x${height}`);
     try {

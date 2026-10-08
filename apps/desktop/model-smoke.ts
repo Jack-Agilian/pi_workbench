@@ -27,6 +27,7 @@ export async function runModelSmoke(window:BrowserWindow,host:HostClient){
   const original=dialog.showOpenDialog;let opened=0;
   dialog.showOpenDialog=async()=>{opened++;return {canceled:false,filePaths:[file]};};
   try {
+   await js("Array.from(document.querySelectorAll('button')).find(b=>b.textContent==='查看配置').click()");
    await wait(()=>js<boolean>("Array.from(document.querySelectorAll('button')).some(b=>b.textContent.includes('选择凭据'))"),'key_button');
    await js("Array.from(document.querySelectorAll('button')).find(b=>b.textContent.includes('选择凭据')).click()");
    await wait(async()=>(await host.request({type:'home'}) as DesktopHome).model?.status==='ready','credential_ready');
@@ -38,11 +39,13 @@ export async function runModelSmoke(window:BrowserWindow,host:HostClient){
   return;
  }
  if(home.mode==='model'){
-  assert.equal(await js<boolean>("document.querySelector('[aria-label=模型配置]').textContent.includes('尚未配置')"),true);
-  await click('.new-thread');await wait(()=>js<boolean>("!document.querySelector('#composer').disabled"),'thread');await fill('must not send');
+  await js("Array.from(document.querySelectorAll('button')).find(b=>b.textContent==='查看配置').click()");
+  assert.equal(await js<boolean>("document.querySelector('.model-settings').textContent.includes('尚未配置')"),true);
+  await click('[aria-label=关闭模型配置]');
+  await click('.new-thread');await click('.create-thread');await wait(()=>js<boolean>("!document.querySelector('#composer').disabled"),'thread');await fill('must not send');
   assert.equal(await js<boolean>("document.querySelector('.composer button[type=submit]').disabled"),true);console.log('desktop model not-configured: passed');return;
  }
- assert.equal(home.mode,'model-offline');await click('.new-thread');await wait(()=>js<boolean>("!document.querySelector('#composer').disabled"),'thread');
+ assert.equal(home.mode,'model-offline');await click('.new-thread');await click('.create-thread');await wait(()=>js<boolean>("!document.querySelector('#composer').disabled"),'thread');
  await fill('remember SYNTHETIC green-29');await wait(()=>js<boolean>("!document.querySelector('.composer button[type=submit]').disabled"),'send');await js("document.querySelector('form.composer').requestSubmit()");
  await wait(()=>js<boolean>("!!document.querySelector('[data-state=completed] .message.assistant')"),'complete');
  let current=await host.request({type:'home'}) as DesktopHome;const threadId=current.threads[0]!.id;
@@ -54,7 +57,7 @@ export async function runModelSmoke(window:BrowserWindow,host:HostClient){
  await wait(()=>js<boolean>("!!document.querySelector('[data-state=cancelled]')"),'cancelled');
  state=await host.request({type:'thread',threadId}) as DesktopThread;assert.equal(state.runs.length,3);assert.equal(state.operations.length,0);
  assert.equal(await js<boolean>("!document.body.textContent.includes('新建任务') && document.body.textContent.includes('新建会话')"),true);
- await click('.new-thread');await wait(()=>js<boolean>("document.querySelectorAll('.thread-link').length===2 && !!document.querySelector('.empty') && !document.querySelector('#composer').disabled"),'error-thread');
+ await click('.new-thread');await click('.create-thread');await wait(()=>js<boolean>("document.querySelectorAll('.thread-link').length===2 && !!document.querySelector('.empty') && !document.querySelector('#composer').disabled"),'error-thread');
  await fill('[error]');await wait(()=>js<boolean>("!document.querySelector('.composer button[type=submit]').disabled"),'error-send');await js("document.querySelector('form.composer').requestSubmit()");
  await wait(()=>js<boolean>("!!document.querySelector('[data-state=failed] .model-error[role=alert]')"),'safe-error');
  assert.equal(await js<boolean>("document.querySelector('.model-error').textContent.includes('原始错误正文未保存') && !document.body.textContent.includes('SYNTHETIC_PROVIDER_FAILURE')"),true);

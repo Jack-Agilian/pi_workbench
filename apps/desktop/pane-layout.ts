@@ -13,11 +13,11 @@ function readPreferences(): Preferences {
       collapsed: 'collapsed' in value && value.collapsed === true};
   } catch { return {}; }
 }
-export function usePaneLayout(inspectorOpen: boolean) {
+export function usePaneLayout() {
   const [preferences, setPreferences] = useState(readPreferences);
   const [viewport, setViewport] = useState(window.innerWidth);
   const [drawerOpen,setDrawerOpen]=useState(false);
-  const narrow=viewport<700;
+  const narrow=viewport<760;
   useEffect(() => {
     const resize = () => setViewport(window.innerWidth);
     window.addEventListener('resize', resize);
@@ -26,18 +26,18 @@ export function usePaneLayout(inspectorOpen: boolean) {
   useEffect(() => {
     try { localStorage.setItem(preferenceKey, JSON.stringify(preferences)); } catch { /* Read-only profiles still work in memory. */ }
   }, [preferences]);
-  const overlay = viewport < 1000;
   const sidebarOpen=narrow?drawerOpen:!preferences.collapsed;
   useEffect(()=>{setDrawerOpen(false);},[narrow]);
-  const sidebarMin = 180;
-  const sidebarMax = Math.max(sidebarMin, Math.min(360, narrow?viewport-32:viewport - 360 - (inspectorOpen && !overlay ? 280 : 0)));
-  const sidebarWidth = Math.min(sidebarMax, Math.max(sidebarMin, preferences.sidebar ?? (narrow?280:224)));
-  const mainWidth = viewport - (narrow||!sidebarOpen ? 0 : sidebarWidth);
-  const inspectorMax = Math.max(0, Math.min(640, mainWidth - (overlay ? 32 : 360)));
-  const inspectorMin = Math.min(280, inspectorMax);
-  const inspectorWidth = Math.min(inspectorMax, Math.max(inspectorMin, preferences.inspector ?? (overlay ? 380 : 328)));
+  const sidebarMin=200,sidebarMax=narrow?Math.max(200,Math.min(300,viewport-44)):300;
+  const sidebarWidth=Math.min(sidebarMax,Math.max(sidebarMin,preferences.sidebar??(narrow?280:232)));
+  const mainWidth=viewport-(narrow||!sidebarOpen?0:sidebarWidth);
+  const desired=Math.min(620,Math.max(360,preferences.inspector??440));
+  const overlay=mainWidth-desired<448;
+  const inspectorMin=360,inspectorMax=overlay?620:Math.min(620,mainWidth-448);
+  const inspectorWidth=overlay?mainWidth:desired;
   return {overlay, narrow, sidebarWidth, sidebarMin, sidebarMax, inspectorWidth, inspectorMin, inspectorMax,
     sidebarOpen,
+    showSidebar:()=>narrow?setDrawerOpen(true):setPreferences(p=>({...p,collapsed:false})),
     closeDrawer:()=>setDrawerOpen(false),
     toggleSidebar: () => narrow?setDrawerOpen(v=>!v):setPreferences(p => ({...p, collapsed: !p.collapsed})),
     resizeSidebar: (sidebar: number) => setPreferences(p => ({...p, sidebar})),

@@ -14,8 +14,8 @@ ID：MESSAGES。父：[CHAT](README.md)。职责是阅读有可信归属的输�
 
 正文补读、过滤、缺范围、超过现有限制等事实在相关消息附近可见；不能为了“清爽”伪称已完整载入。选择文字期间不自动收起动作，不因复制响应迟到将反馈写到新会话。
 
-源码：[run-history](../../../../../../apps/desktop/run-history.tsx)、[native-text](../../../../../../apps/desktop/native-text.tsx)、[copy-text](../../../../../../apps/desktop/copy-text.tsx)。现状：安全Markdown/补读/复制已有限接入；本轮只规划信息主次，未改结构。业务边界：[安全阅读](../../../../safe-reading-contract.md)、[复制契约](../../../../reading-actions-contract.md)。
+源码：[run-history](../../../../../../apps/desktop/run-history.tsx)、[native-text](../../../../../../apps/desktop/native-text.tsx)、[copy-text](../../../../../../apps/desktop/copy-text.tsx)。现状：安全Markdown/补读/复制已有限接入；本轮普通完成标记减重，工具摘要折叠；登记文档按Run关联入口，默认最多3个并提供展开。业务边界：[安全阅读](../../../../safe-reading-contract.md)、[复制契约](../../../../reading-actions-contract.md)。
 
 验收：中文/emoji/长路径、代码表格、部分正文、页失败、选择与复制、200%；不以CSS截断改变实际复制范围，阅读重排不重发请求/工具。
 
-2026-10-08 v2：本节点已按全路径原型纠偏；产品源码尚未同步。具体样例与已测/未测范围由[规格根](../../../README.md)的原型入口统一导航，不能据本节点更新宣称产品完成。
+2026-10-08 v2：本节点已按全路径方案同步到正式Renderer；限定实现和验收分开记录。具体样例与已测/未测范围由[规格根](../../../README.md)的实现/原型入口统一导航；完整人工体验和VoiceOver尚未验收。

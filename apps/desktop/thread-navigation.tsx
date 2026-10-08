@@ -6,10 +6,12 @@ import { shouldSubmit } from './composer-key.ts';
 type Rename = Extract<Command, {type: 'threads.rename'}>;
 /** Product title only; never sends a prompt or edits a Pi Session. Stable row identity
  * keeps an unconfirmed request when selecting another chat or reconnecting the host. */
-export function ThreadNavigation({thread, workspace, active, selected, select, api, scope, disconnected, changed, editingChanged}: {
+export function ThreadNavigation({thread, workspace, active, selected, select, api, scope, disconnected, changed, editingChanged, renameRequest}: {
   thread: ThreadView; workspace?: string; active: boolean; selected: boolean; select: () => void;
-  api: DesktopApi; scope: string; disconnected: boolean; changed: () => void; editingChanged?: (editing:boolean)=>void;
+  api: DesktopApi; scope: string; disconnected: boolean; changed: () => void; editingChanged?: (editing:boolean)=>void;renameRequest?:number;
 }) {
+  const handledRename=useRef(renameRequest??0);
+  useLayoutEffect(()=>{if(renameRequest&&handledRename.current!==renameRequest){handledRename.current=renameRequest;open();}},[renameRequest]);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState('');
   const [revision, setRevision] = useState(thread.titleRevision);
@@ -52,8 +54,8 @@ export function ThreadNavigation({thread, workspace, active, selected, select, a
   }
   return <div className="thread-row" data-thread={thread.id}>
     <button aria-label={thread.title} className={`thread-link ${selected ? 'selected' : ''}`} aria-current={selected ? 'page' : undefined} onClick={select}>
-      <span className="thread-identity"><span title={thread.title}>{thread.title}</span><small title={workspace}>{workspace?.split('/').at(-1) ?? '工作目录'}</small></span>
-      <small className="thread-short-id">{thread.id.slice(0,6)}</small>{active && <span className="activity-dot" aria-label="有活动任务" />}
+      <span className="thread-identity"><span title={thread.title}>{thread.title}</span>{workspace&&<small title={workspace}>{workspace.split('/').slice(-2).join(' / ')}</small>}</span>
+      {active && <span className="activity-dot" aria-label="有活动任务" />}
     </button>
     <button className="rename-thread" ref={opener} aria-label={`重命名会话：${thread.title}`} title="重命名会话" disabled={disconnected || editing} onClick={open}>✎</button>
     {editing && <form className="rename-form" ref={form} onSubmit={event => {event.preventDefault(); void save();}} onKeyDown={event => {

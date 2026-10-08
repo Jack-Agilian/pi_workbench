@@ -34,7 +34,7 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
   fixture.runs.at(-1)!.id = originalRun.id; // Preserve the already-browsed real head identity in this UI-only projection.
   fixture.inputs = fixture.runs.map((r, i) => ({id: r.id, text: `SYNTHETIC history ${i}\n` + '可读的旧记录，不是真实模型输出。'.repeat(12)}));
   fixture.presentations = [];
-  fixture.artifacts = Array.from({length:30}, (_, i) => ({...original.artifacts[0]!, id:i===0?original.artifacts[0]!.id:`SYNTHETIC-artifact-${i}`, version:i+1}));
+  fixture.artifacts = Array.from({length:30}, (_, i) => ({...original.artifacts[0]!, id:i===0?original.artifacts[0]!.id:`SYNTHETIC-artifact-${i}`, version:i+1,path:`SYNTHETIC-doc-${i}.md`}));
   fixture.operations = [{...original.operations[0]!, state: 'pending', runId: fixture.runs.at(-1)!.id, deadline: Date.now() + 120000}];
   fixture.operations.push(...Array.from({length:15},(_,i)=>({...fixture.operations[0]!,id:`SYNTHETIC-old-operation-${i}`,state:'succeeded' as const})));
   fixture.runs.at(-1)!.state = 'running';
@@ -47,10 +47,12 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
   let delayPreview = false;
   let commands = 0;
   let alternateSelection = false;
+  let combinedFeedback=false;
   let historyError = ''; let workspaceStatus: 'ready'|'invalid' = 'ready';
   let delayHistory = false; let releaseHistory: (() => void) | undefined;
   host.request = async raw => {
     if (raw.type === 'command') commands++;
+    if(raw.type==='home'&&combinedFeedback)return {...home,recovery:'blocked'};
     if (raw.type === 'home' && alternateSelection) return {...home, workspaces:{selectedId:'SYNTHETIC-other',items:[...home.workspaces.items,{id:'SYNTHETIC-other',path:'/SYNTHETIC-other'}]}};
     if (raw.type === 'thread' && raw.threadId === chosen.id) throw Error('unbounded_renderer_request');
     if (raw.type === 'thread-activity' && raw.threadId === chosen.id) return {thread: fixture.thread, snapshotSeq: revision + 500, activeRun: fixture.runs.at(-1)!, operations: structuredClone(fixture.operations.filter(op => op.state === 'pending')), workspaceStatus};
@@ -78,7 +80,7 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
     if (raw.type === 'events' && raw.threadId === chosen.id) return raw.cursor < revision ? [{seq: revision, runSeq: 1, threadId: chosen.id, runId: eventRun, kind: eventKind, entityId: chosen.id, eventType: null, sourceType: null}] : [];
     if (raw.type === 'preview' && fixture.artifacts.some(a => a.id === raw.artifactId)) {
       if (delayPreview) await new Promise<void>(resolve => {releasePreview = resolve;});
-      return {status: previewStatus, ...(previewStatus === 'ready' ? {text: 'SYNTHETIC <img onerror=unsafe()> UI preview'} : {})};
+      return {status: previewStatus, ...(previewStatus === 'ready' ? {text: 'SYNTHETIC <img onerror=unsafe()> UI preview\n\n'+Array.from({length:80},(_,i)=>'段落 '+i+'：合成文档阅读位置。').join('\n\n')} : {})};
     }
     return request(raw);
   };
@@ -88,19 +90,21 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
     await switchTo(other.title); await wait(() => js<boolean>("document.querySelectorAll('[data-run]').length===1"), 'before_failed_first_page');
     await switchTo(chosen.title);
     await wait(() => js<boolean>("!!document.querySelector('.retry-pages') && document.querySelector('h1').textContent==='SYNTHETIC allow'"), 'failed_first_page_activity');
-    await click('.show-approvals');
-    await wait(() => js<boolean>("document.activeElement.matches('.current-approvals .approval') && document.querySelectorAll('.approval').length===1"),'approval_without_history');
+    await js("document.querySelector('.approval-dock .approval').focus({preventScroll:true})");
+    await wait(() => js<boolean>("document.activeElement.matches('.approval-dock .approval') && document.querySelectorAll('.approval').length===1"),'approval_without_history');
     const expectedWorkspace = home.workspaces.items.find(w => w.id === chosen.workspaceId)!.path;
-    assert.equal(await js<string>("document.querySelector('.execution-summary span').title"), expectedWorkspace);
+    await click('.current-workspace');
+    assert.equal(await js<string>("document.querySelector('.workspace-full-path').textContent"), expectedWorkspace);
+    await click('.action-panel header button');
     assert.equal(await js<boolean>("!!document.querySelector('.view-toolbar .stop')"), true);
     alternateSelection = false; historyError = ''; await click('.retry-pages');
     await wait(() => js<boolean>("document.querySelectorAll('[data-run]').length===8"), 'first_page');
-    assert.equal(await js<boolean>("document.querySelectorAll('.approval').length===1 && document.querySelector('.approval').closest('[data-operation]').dataset.operation===document.querySelector('.approval').dataset.approval && !document.querySelector('.current-approvals')"),true);
+    assert.equal(await js<boolean>("document.querySelectorAll('.approval').length===1 && !!document.querySelector('.approval-dock [data-approval]') && !document.querySelector('.timeline [data-approval]')"),true);
     await wait(() => js<boolean>("!!document.querySelector('.load-operations')"), 'tools_first_page');
     operationError='page_item_too_large';await click('.load-operations');
     await wait(()=>js<boolean>("!!document.querySelector('.retry-pages')"),'query_tool_error');
     const failedReads=operationReads;await new Promise(r=>setTimeout(r,800));assert.equal(operationReads,failedReads);
-    assert.equal(await js<boolean>("!!document.querySelector('.view-toolbar .stop') && document.querySelector('.approval-indicator').textContent==='1 项待审批'"),true);
+    assert.equal(await js<boolean>("!!document.querySelector('.view-toolbar .stop') && document.querySelectorAll('.approval-dock .approval').length===1"),true);
     operationError='';await click('.retry-pages');
     await wait(()=>js<boolean>("!document.querySelector('.retry-pages') && !document.querySelector('.load-operations').disabled"),'query_manual_retry');
     delayOperation=true;await click('.load-operations');
@@ -118,10 +122,26 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
     revision++;
     await new Promise(r => setTimeout(r, 500));
     assert.deepEqual(await js("[document.activeElement.id,document.querySelector('#composer').selectionStart,document.querySelector('#composer').selectionEnd]"), ['composer', 3, 7]);
+    // Multiple current approvals and long commands are SYNTHETIC projection fixtures.
+    const savedOperation=structuredClone(fixture.operations[0]!);
+    fixture.operations[0]={...savedOperation,tool:'bash',artifactPath:null,shell:{intent:{command:'printf '+('SYNTHETIC_long_argument '.repeat(80)),cwd:'.',profile:'restricted-bash-v1',environmentPolicy:'sterile-v1',timeoutMs:null},outcome:null}};
+    delete fixture.operations[0]!.file;
+    const second={...savedOperation,id:'SYNTHETIC-next-approval'};fixture.operations.push(second);revision++;
+    await wait(()=>js<boolean>("document.querySelector('.approval-count')?.textContent.includes('1')===true"),'multiple_approvals_single_decision');
+    assert.equal(await js<number>("document.querySelectorAll('.approval-actions .primary').length"),1);
+    await click('.approval-evidence');
+    assert.equal(await js<boolean>("document.querySelector('.action-panel .target').textContent.length>1500&&!document.querySelector('.action-panel .approval-actions')"),true);
+    fixture.operations[0]!.state='denied';revision++;
+    await wait(()=>js<boolean>("!document.querySelector('.action-panel')&&document.querySelector('.approval')?.dataset.approval==='SYNTHETIC-next-approval'"),'old_evidence_removed_with_operation');
+    second.deadline=Date.now()-1000;revision++;
+    await wait(()=>js<boolean>("document.querySelector('.approval-actions .primary').disabled&&document.querySelector('.approval-unavailable')?.textContent.includes('过期')"),'expired_approval_blocked');
+    assert.equal(commands,0);
+    fixture.operations.pop();fixture.operations[0]=savedOperation;revision++;
+    await wait(()=>js<boolean>("!document.querySelector('.approval-count')&&!document.querySelector('.approval-actions .primary').disabled"),'restore_single_approval');
     await captureLayout(window, 'ui-p2-approval');
     await click('.inspector-toggle');
     const originalSize = window.getContentSize();
-    const frame = () => js('new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))');
+    const frame = async () => {let timer:ReturnType<typeof setTimeout>|undefined;try{return await Promise.race([js('new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))'),new Promise<never>((_,reject)=>{timer=setTimeout(()=>reject(Error('frontend_frame_timeout')),5000);})]);}finally{clearTimeout(timer);}};
     const rail = (name: string) => `[role=separator][aria-label="${name}"]`;
     const leftRail = rail('导航栏宽度'), rightRail = rail('详情栏宽度');
     const {runExperienceSmoke}=await import('./experience-smoke.ts');await runExperienceSmoke(window);
@@ -144,7 +164,7 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
     };
     for (const [width, height] of [[1320, 860], [1024, 720], [820, 640]]) {
       window.setContentSize(width!, height!); await frame();
-      for (const selector of [leftRail, rightRail]) {
+      for (const selector of [leftRail, ...(await js<boolean>("document.querySelector('.content-grid').dataset.overlay==='true'")?[]:[rightRail])]) {
         const pane = selector === leftRail ? '.sidebar' : '.inspector-pane';
         await key(selector, 'Home');
         const before = await paneWidth(pane);
@@ -158,17 +178,17 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
         await key(selector, 'Enter');
       }
       const boxes = await js<{overflow: boolean; rail: number; composerVisible: boolean; overlay: boolean}>("(()=>{const c=document.querySelector('.composer').getBoundingClientRect();return {overflow:document.body.scrollWidth>innerWidth,rail:document.querySelector('.inspector').getBoundingClientRect().width,composerVisible:c.bottom<=innerHeight&&c.width>200,overlay:document.querySelector('.content-grid').dataset.overlay==='true'}})()");
-      assert.equal(boxes.overflow, false); assert.equal(boxes.composerVisible, true); assert.equal(boxes.overlay, width!<1000);
+      assert.equal(boxes.overflow, false); assert.equal(boxes.composerVisible, true); assert.equal(boxes.overlay, width!<1120);
       metrics.push({width, height, ...boxes});
       if (boxes.overlay) {
-        assert.equal(await js<boolean>("document.querySelector('.conversation').inert && document.activeElement.className==='pane-resize'"), true);
-        await key(rightRail, 'Escape');
+        assert.equal(await js<boolean>("document.querySelector('.conversation').inert && !document.querySelector('[aria-label=详情栏宽度]')"), true);
+        await key('.inspector-close', 'Escape');
         assert.equal(await js<boolean>("document.activeElement.className==='inspector-toggle' && !document.querySelector('.conversation').inert"), true);
       } else await click('.inspector-toggle');
       assert.equal(await js<boolean>("document.querySelector('.inspector').hidden"), true);
-      assert.equal(await js<string>("document.querySelector('.approval-indicator').textContent"), '1 项待审批');
+      assert.equal(await js<number>("document.querySelectorAll('.approval-dock .approval').length"),1);
       assert.equal(await js<boolean>("(()=>{const e=document.querySelector('.view-toolbar .stop');const b=e.getBoundingClientRect();return e.contains(document.elementFromPoint(b.x+b.width/2,b.y+b.height/2))})()"), true);
-      await click('.show-approvals'); await frame();
+      await js("document.querySelector('.approval-dock .approval').focus({preventScroll:true})"); await frame();
       assert.equal(await js<boolean>("document.querySelector('.inspector').hidden && document.activeElement.matches('.approval') && !document.querySelector('.inspector .approval')"), true);
       await click('.inspector-toggle'); await frame();
       await click('.sidebar-toggle');
@@ -182,7 +202,7 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
     await key(rightRail, 'End');
     const preferred = await paneWidth('.inspector-pane');
     window.setContentSize(820,640); await frame();
-    assert.ok(await paneWidth('.inspector-pane') < preferred);
+    assert.equal(await paneWidth('.inspector-pane'),await paneWidth('.content-grid')); // Focused preview fills the content band.
     window.setContentSize(originalSize[0]!,originalSize[1]!); await frame();
     assert.equal(await paneWidth('.inspector-pane'),preferred);
     await key(rightRail,'Enter');
@@ -205,13 +225,13 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
     assert.ok(Math.abs(offset - anchor.offset) < 3, `anchor moved ${offset - anchor.offset}`);
     await click('.inspector-toggle');
     fixture.operations[0]!.state = 'denied'; revision++;
-    await wait(() => js<boolean>("document.querySelector('.approval-indicator').textContent==='暂无待审批'"), 'approval_removed');
+    await wait(() => js<boolean>("document.querySelectorAll('.approval-dock .approval').length===0"), 'approval_removed');
     await js("document.querySelector('#composer').focus()");
     fixture.operations[0]!.state = 'pending'; revision++;
-    await wait(() => js<boolean>("document.querySelector('.approval-indicator').textContent==='1 项待审批'"), 'approval_arrived_collapsed');
+    await wait(() => js<boolean>("document.querySelectorAll('.approval-dock .approval').length===1"), 'approval_arrived_collapsed');
     assert.equal(await js<boolean>("document.querySelector('.inspector').hidden && document.activeElement.id==='composer'"), true);
-    await click('.show-approvals');
-    // Explicit approval navigation remains owned by the timeline scroll hook.
+    await js("document.querySelector('.approval-dock .approval').focus({preventScroll:true})");
+    // Focusing a decision must not navigate the independently owned history viewport.
     await js('new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))');
     const saved = await js<number>("document.querySelector('.timeline').scrollTop");
     await switchTo(other.title); await wait(() => js<boolean>("document.querySelectorAll('[data-run]').length===1"), 'other');
@@ -226,28 +246,38 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
     // before paint; programmatic clicks can otherwise outrun that browser frame.
     await frame();
     await wait(() => js<boolean>("document.querySelector('.timeline').scrollHeight-document.querySelector('.timeline').clientHeight-document.querySelector('.timeline').scrollTop<3"), 'latest_after_inspector_layout');
-    assert.equal(await js<string>("document.querySelector('.artifact-status').dataset.status"), 'unchecked');
+    await click('.document-picker');await click('.artifact');
     for (const status of ['ready', 'changed', 'missing', 'unavailable'] as const) {
-      previewStatus = status; await click('.artifact');
-      await wait(() => js<boolean>(`document.querySelector('.artifact-status').dataset.status===${JSON.stringify(status)}`), status);
-      assert.equal(await js<boolean>("!!document.querySelector('.preview img')"), false);
-      assert.equal(await js<boolean>("!!document.querySelector('.preview pre')"), status === 'ready');
+      previewStatus=status;await click('.document-versions');await wait(()=>js<boolean>("!document.querySelector('.action-panel .recheck-document').disabled"),'preview_ready_to_check');await click('.action-panel .recheck-document');await click('[aria-label=关闭版本与来源]');
+      await wait(()=>js<boolean>(`document.querySelector('.preview').dataset.status===${JSON.stringify(status)}`),status);
+      assert.equal(await js<boolean>("!!document.querySelector('.preview img')"),false);
+      assert.equal(await js<boolean>("!!document.querySelector('.document-reading .markdown-body')"),status==='ready');
     }
-    assert.equal(await js<string>("document.querySelector('.artifacts-heading').textContent.trim()"), '成果版本 30');
-    for (const index of [0, 14, 29]) {
-      previewStatus = 'ready';
-      await js(`document.querySelectorAll('.artifact')[${index}].scrollIntoView({block:'nearest'})`);
-      const timelineBefore = await js<{top:number;height:number;width:number;client:number}>("(()=>{const t=document.querySelector('.timeline');return {top:t.scrollTop,height:t.scrollHeight,width:t.clientWidth,client:t.clientHeight}})()");
-      const timelineTop = timelineBefore.top;
+    for(const index of [0,14,29]){
+      previewStatus='ready';await click('.document-picker');
+      assert.equal(await js<number>("document.querySelectorAll('.artifact').length"),30);
+      const top=await js<number>("document.querySelector('.timeline').scrollTop");
       await click(`.artifact[data-artifact="${fixture.artifacts[index]!.id}"]`);
-      await wait(() => js<boolean>("Boolean(document.querySelector('.preview pre'))"), 'nearby_preview_'+index);
-      assert.equal(await js<boolean>(`(()=>{const p=document.querySelector('.preview');const b=p.getBoundingClientRect();const r=document.querySelector('.inspector').getBoundingClientRect();return p.previousElementSibling.dataset.artifact===${JSON.stringify(fixture.artifacts[index]!.id)} && p===document.activeElement && b.top>=r.top && b.top<r.bottom && p.querySelector('h3').textContent.includes('版本 ${index+1}');})()`), true);
-      const afterPreviewTop=await js<number>("document.querySelector('.timeline').scrollTop");
-      const timelineAfter = await js("(()=>{const t=document.querySelector('.timeline');return {top:t.scrollTop,height:t.scrollHeight,width:t.clientWidth,client:t.clientHeight,following:!document.querySelector('.return-latest')}})()");
-      assert.ok(Math.abs(afterPreviewTop-timelineTop)<3,`preview ${index} changed timeline ${JSON.stringify(timelineBefore)} -> ${JSON.stringify(timelineAfter)}`);
-      await click('.preview button[aria-label="关闭预览"]');
-      assert.equal(await js<string>("document.activeElement.dataset.artifact"), fixture.artifacts[index]!.id);
+      await wait(()=>js<boolean>("!!document.querySelector('.document-reading .markdown-body')"),'document_'+index);
+      assert.equal(await js<string>("document.querySelector('.document-picker strong').textContent"),fixture.artifacts[index]!.path);
+      assert.ok(Math.abs(await js<number>("document.querySelector('.timeline').scrollTop")-top)<3,'document selection preserves chat reading');
+      assert.equal(await js<boolean>("document.querySelector('.document-reading').clientHeight>260"),true,'document uses the whole panel');
     }
+    writeFileSync(join(app.getAppPath(),'../../.artifacts/ui-workflow-20261008/document-reading.png'),(await window.webContents.capturePage(undefined,{stayAwake:true})).toPNG());
+    await js("document.querySelector('.document-reading').scrollTop=600");await frame();
+    const documentTop=await js<number>("document.querySelector('.document-reading').scrollTop");assert.ok(documentTop>500);
+    await click('.inspector-close');await switchTo(other.title);await wait(()=>js<boolean>(`document.querySelector('h1').textContent===${JSON.stringify(other.title)}`),'document_other_thread');
+    await switchTo(chosen.title);await wait(()=>js<boolean>("document.querySelector('h1').textContent==='SYNTHETIC allow'"),'document_back_thread');await click('.inspector-toggle');
+    await wait(()=>js<boolean>("!!document.querySelector('.document-reading .markdown-body')"),'document_back_checked');await frame();
+    assert.ok(Math.abs(await js<number>("document.querySelector('.document-reading').scrollTop")-documentTop)<3,'document reading survives thread switch');
+    await click('.inspector-close');
+    combinedFeedback=true;workspaceStatus='invalid';revision++;
+    await wait(()=>js<boolean>("document.querySelector('.feedback-region').textContent.includes('清理尚未核实')&&document.querySelector('.feedback-region').textContent.includes('工作目录已不可用')"),'combined_feedback');
+    const feedbackSize=window.getContentSize();window.setContentSize(820,640);window.webContents.setZoomFactor(2);await frame();
+    assert.equal(await js<boolean>("(()=>{const f=document.querySelector('.feedback-region'),c=document.querySelector('.composer'),t=document.querySelector('.timeline');return f.clientHeight<=innerHeight*.25+1&&t.clientHeight>=60&&c.getBoundingClientRect().bottom<=innerHeight+1&&!!document.querySelector('.view-toolbar .stop');})()"),true,'combined errors leave reading and controls reachable');
+    window.webContents.setZoomFactor(1);window.setContentSize(feedbackSize[0]!,feedbackSize[1]!);combinedFeedback=false;workspaceStatus='ready';revision++;await frame();
+    await wait(()=>js<boolean>("!document.querySelector('.feedback-region').textContent.includes('清理尚未核实')"),'combined_feedback_cleared');
+    await click('.inspector-toggle');
     for (const code of ['page_cursor_invalid', 'page_item_too_large']) {
       historyError = code; revision++;
       await wait(() => js<boolean>("!!document.querySelector('.retry-pages')"), 'page_error');
@@ -263,13 +293,13 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
     delayHistory = true; revision++;
     await wait(async () => !!releaseHistory, 'delayed_history');
     fixture.operations[0]!.state = 'denied';
-    await wait(() => js<boolean>("document.querySelector('.approval-indicator').textContent==='暂无待审批'"), 'activity_during_slow_history');
+    await wait(() => js<boolean>("document.querySelectorAll('.approval-dock .approval').length===0"), 'activity_during_slow_history');
     await switchTo(other.title); await wait(() => js<boolean>("document.querySelectorAll('[data-run]').length===1"), 'switch_during_page');
     releaseHistory!();
     await new Promise(r => setTimeout(r, 400));
     assert.equal(await js<number>("document.querySelectorAll('[data-run]').length"), 1);
     await switchTo(chosen.title); await wait(() => js<boolean>("document.querySelectorAll('[data-run]').length===36"), 'restore_after_late_page');
-    delayPreview = true; await click('.artifact');
+    delayPreview = true; await click('.document-picker');await click('.artifact');
     await wait(async () => !!releasePreview, 'delayed_preview');
     await switchTo(other.title); await wait(() => js<boolean>("document.querySelectorAll('[data-run]').length===1"), 'switch_during_preview');
     releasePreview!(); delayPreview = false;
@@ -284,7 +314,7 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
     await js("window.dispatchEvent(new Event('blur'))"); await frame();
     window.webContents.sendInputEvent({type:'mouseMove',x:point.x+80,y:point.y});
     window.webContents.sendInputEvent({type:'mouseUp',button:'left',clickCount:1,x:point.x+80,y:point.y}); await frame();
-    assert.equal(await paneWidth('.sidebar'),180);
+    assert.equal(await paneWidth('.sidebar'),200);
     assert.equal(await js<boolean>("!!document.querySelector('[data-resizing=true]')"),false);
     await drag(leftRail,60);
     await click('.sidebar-toggle');
@@ -295,11 +325,13 @@ export async function runFrontendSmoke(window: BrowserWindow, host: HostClient) 
     await reload();
     assert.equal(await js<boolean>("document.querySelector('.sidebar').hidden"),true);
     await click('.sidebar-toggle'); await frame();
-    assert.equal(await paneWidth('.sidebar'),240);
+    console.log('frontend: restored sidebar after reload');
+    assert.equal(await paneWidth('.sidebar'),260);
     // Corrupted local UI preferences cannot break startup or create arbitrary widths.
     await js(`localStorage.setItem('pi-workbench.panes.v1','{"sidebar":"bad","inspector":999999,"collapsed":"true"}')`);
+    console.log('frontend: corrupt preferences reload');
     await reload(); await frame();
-    assert.equal(await paneWidth('.sidebar'),224);
+    assert.equal(await paneWidth('.sidebar'),232);
     assert.equal(await js<boolean>("document.querySelector('.sidebar').hidden"),false);
     assert.equal(commands, 0, 'view interactions must not submit execution commands');
     const directory = join(app.getAppPath(), '../../.artifacts/ui-p2-frontend'); mkdirSync(directory, {recursive: true});

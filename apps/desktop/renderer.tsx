@@ -1,3 +1,4 @@
+import { UiIcon } from './ui-icon.tsx';
 import { StrictMode, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { createRoot } from 'react-dom/client';
 import type { Command, RunState } from '../../packages/app-contracts/index.ts';
@@ -13,6 +14,7 @@ import { ThreadDirectory } from './thread-directory.tsx';
 import { PermissionPicker } from './permission-picker.tsx';
 import { ApprovalList } from './approval-list.tsx';
 import { ArtifactPanel } from './artifact-panel.tsx';
+import { ActionPanel } from './action-panel.tsx';
 import { useTimelineScroll } from './timeline-scroll.ts';
 import { shouldSubmit } from './composer-key.ts';
 declare global { interface Window { workbench: DesktopApi } }
@@ -20,6 +22,13 @@ const api = window.workbench;
 const active = new Set<RunState>(['queued','starting','running','cancelling','unknown']);
 const id = () => crypto.randomUUID();
 function App() {
+  const [renameRequest,setRenameRequest]=useState<{id:string;sequence:number}>();
+  const [newThreadOpen,setNewThreadOpen]=useState(false),[modelInfoOpen,setModelInfoOpen]=useState(false);
+  const [documentChoices,setDocumentChoices]=useState<Record<string,string>>({});
+  const documentOpener=useRef<HTMLButtonElement|null>(null);
+  const documentPositions=useRef(new Map<string,number>());
+  const [headerPanel,setHeaderPanel]=useState<'workspace'|'context'|null>(null);
+  const workspaceButton=useRef<HTMLButtonElement>(null),contextButton=useRef<HTMLButtonElement>(null);
   const [inspectorChoices, setInspectorChoices] = useState<Record<string, boolean>>({});
   const [home, setHome] = useState<DesktopHome | null>(null);
   const [selected, setSelected] = useState('');
@@ -184,7 +193,7 @@ function App() {
     const intent = pendingCreation.current ?? { type: 'threads.create', requestId: id(), workspaceId: home?.workspaces.selectedId ?? 'demo-workspace', title: title.trim() || '新的工作记录' };
     pendingCreation.current = intent;
     const response = await command(intent);
-    if (response && pendingCreation.current === intent) { pendingCreation.current = null; setTitle(''); setSelected(response.id); layout.closeDrawer(); const options=document.querySelector<HTMLDetailsElement>('.new-thread-options');if(options)options.open=false; setTick(n => n + 1); }
+    if (response && pendingCreation.current === intent) { pendingCreation.current = null; setTitle(''); setNewThreadOpen(false); setSelected(response.id); layout.closeDrawer(); setTick(n => n + 1); }
   }
   async function submit() {
     if (!selected || !draft.trim() || commandPending.current || busy || disconnected || permissionPending || !activity || !canSend) return;
@@ -231,11 +240,10 @@ function App() {
   const currentRuns = thread?.runs ?? [];
   const pending = activity?.operations.filter(op => op.state === 'pending') ?? [];
   const inspectorOpen = inspectorChoices[selected] ?? false;
-  const unplacedApprovals = pending.filter(op => !thread?.runs.some(run => run.id === op.runId));
   const openApprovals = () => {
     if (!pending[0]) return;
     setInspectorChoices(all => ({...all, [selected]: false}));
-    scroll.revealApproval(pending[0].id);
+    requestAnimationFrame(()=>document.querySelector<HTMLElement>('.approval-dock [data-approval]')?.focus({preventScroll:true}));
   };
   useLayoutEffect(() => {
     const focused = approvalFocus.current;
@@ -243,19 +251,26 @@ function App() {
     approvalFocus.current = null;
     if (focused.threadId !== selected || (document.activeElement !== document.body && document.activeElement !== null)) return;
     setApprovalNotice({threadId: selected, text: pending.length ? '审批列表已更新，已定位下一项待确认操作。' : '此操作已不再等待审批，请查看操作记录确认结果。'});
-    if (pending[0]) scroll.revealApproval(pending[0].id);
+    if (pending[0]) document.querySelector<HTMLElement>('.approval-dock [data-approval]')?.focus({preventScroll:true});
     else {
       const composer = document.querySelector<HTMLTextAreaElement>('#composer');
       (composer && !composer.disabled ? composer : scroll.viewport.current)?.focus({preventScroll: true});
     }
   });
-  const layout = usePaneLayout(inspectorOpen);
+  const layout = usePaneLayout();
   useEffect(() => {
     if (layout.overlay && inspectorOpen) inspectorRef.current?.querySelector<HTMLButtonElement>('.inspector-close')?.focus();
   }, [layout.overlay, inspectorOpen]);
   const closeDrawer=()=>{layout.closeDrawer();requestAnimationFrame(()=>document.querySelector<HTMLButtonElement>('.sidebar-toggle')?.focus());};
   useEffect(()=>{if(layout.narrow&&layout.sidebarOpen)sidebarRef.current?.querySelector<HTMLButtonElement>('.sidebar-close')?.focus();},[layout.narrow,layout.sidebarOpen]);
-  const closeInspector = () => { setInspectorChoices(all => ({...all, [selected]: false})); document.querySelector<HTMLButtonElement>('.inspector-toggle')?.focus(); };
+  const closeInspector = () => {
+    setInspectorChoices(all => ({...all, [selected]: false}));
+    requestAnimationFrame(()=>{const opener=documentOpener.current;(opener?.isConnected&&!opener.closest('[inert]')?opener:document.querySelector<HTMLButtonElement>('.inspector-toggle'))?.focus({preventScroll:true});});
+  };
+  const openDocument=(artifactId:string,opener?:HTMLButtonElement)=>{
+    if(opener)documentOpener.current=opener;
+    setDocumentChoices(all=>({...all,[selected]:artifactId}));setInspectorChoices(all=>({...all,[selected]:true}));
+  };
   const workspacePath=home?.workspaces.items.find(w=>w.id===(activity?.thread.workspaceId??home.workspaces.selectedId))?.path??'正在读取目录';
   const selectedWorkspace=home?.workspaces.items.find(w=>w.id===home.workspaces.selectedId)?.path??'正在读取目录';
   const shellTools=home?.model?.limits?.shellTools;
@@ -277,31 +292,37 @@ function App() {
     }}>
       {layout.sidebarOpen && !layout.narrow && <PaneResizeHandle label="导航栏宽度" controls="workspace-navigation" edge="right" width={layout.sidebarWidth} min={layout.sidebarMin} max={layout.sidebarMax} onResize={layout.resizeSidebar} onReset={layout.resetSidebar} />}
       <div className="brand"><span className="brand-mark">π</span><div>Pi Workbench</div>{layout.narrow&&<button className="sidebar-close" aria-label="关闭导航" onClick={closeDrawer}>×</button>}</div>
-      <button className="choose-workspace" title={selectedWorkspace} disabled={busy||disconnected||!!pendingCreation.current||Boolean(home?.activeRuns.length)} onClick={()=>{setBusy(true);void api.selectWorkspace().then(()=>setTick(n=>n+1),failed).finally(()=>setBusy(false));}}><span>工作目录</span><strong>{selectedWorkspace.split('/').at(-1)}</strong><small>切换目录 ↗</small></button>
-      <div className="new-thread-controls"><button className="new-thread primary" onClick={() => void createThread()} disabled={busy || disconnected}><span>＋</span> {pendingCreation.current ? '重试新建会话' : '新建会话'}</button>
-      <details className="new-thread-options"><summary aria-label="自定义会话名称" title="自定义会话名称">···</summary><div className="new-thread-popover"><label className="sr-only" htmlFor="title">新会话名称</label><input id="title" placeholder="留空使用默认名称" maxLength={160} value={title} disabled={pendingCreation.current !== null} onChange={event => setTitle(event.target.value)} /></div></details></div>
-      <ThreadDirectory api={api} home={home} current={activity?.thread??null} selected={selected} select={id=>{setSelected(id);if(layout.narrow)closeDrawer();}} disconnected={disconnected} changed={()=>setTick(n=>n+1)} />
-      <div className="sidebar-foot"><span className={`status-dot ${disconnected ? 'offline' : ''}`} />{disconnected ? '连接断开' : '本地连接'}</div>
+      <button className="new-thread" onClick={()=>setNewThreadOpen(true)} disabled={busy||disconnected}><span>＋</span> {pendingCreation.current?'重试新建会话':'新建会话'}</button>
+      {newThreadOpen&&<ActionPanel title="新建会话" close={()=>setNewThreadOpen(false)}><p>新会话的工作目录</p><p className="new-workspace-path">{pendingCreation.current?home?.workspaces.items.find(w=>w.id===pendingCreation.current?.workspaceId)?.path:selectedWorkspace}</p>
+        <button className="choose-workspace" disabled={busy||disconnected||!!pendingCreation.current||Boolean(home?.activeRuns.length)} onClick={()=>{setBusy(true);void api.selectWorkspace().then(()=>api.home()).then(value=>setHome(value),failed).finally(()=>setBusy(false));}}>选择其他目录</button>
+        {!!home?.activeRuns.length&&<p>活动任务结束后可切换新会话目录。</p>}
+        <label htmlFor="title">会话名称（可选）</label><input id="title" placeholder="留空使用默认名称" maxLength={160} value={title} disabled={pendingCreation.current!==null} onChange={e=>setTitle(e.target.value)}/>
+        <button className="create-thread primary" disabled={busy||disconnected} onClick={()=>void createThread()}>{pendingCreation.current?'重试同一次新建':'创建会话'}</button>
+      </ActionPanel>}
+      <ThreadDirectory renameRequest={renameRequest} api={api} home={home} current={activity?.thread??null} selected={selected} select={id=>{setSelected(id);if(layout.narrow)closeDrawer();}} disconnected={disconnected} changed={()=>setTick(n=>n+1)} />
+      <div className="sidebar-foot">{disconnected?'连接断开':'本地工作台'}</div>
     </aside>
     <main inert={layout.narrow&&layout.sidebarOpen}>
       <header className="thread-heading">
-        <button className="sidebar-toggle" aria-label={layout.sidebarOpen ? '收起导航' : '展开导航'} title={layout.sidebarOpen ? '收起导航' : '展开导航'} aria-controls="workspace-navigation" aria-expanded={layout.sidebarOpen} onClick={layout.toggleSidebar}>☰</button>
-        <div className="heading-copy"><h1>{activity?.thread.title ?? '开始一项工作'}</h1><div className="execution-summary"><span title={workspacePath}>{workspacePath}</span></div></div>
+        <button className="sidebar-toggle" aria-label={layout.sidebarOpen ? '收起导航' : '展开导航'} title={layout.sidebarOpen ? '收起导航' : '展开导航'} aria-controls="workspace-navigation" aria-expanded={layout.sidebarOpen} onClick={layout.toggleSidebar}><UiIcon name="sidebar"/></button>
+        <div className="heading-copy"><h1><button className="rename-current" title="重命名会话" disabled={!activity||disconnected} onClick={()=>{layout.showSidebar();setRenameRequest(old=>({id:selected,sequence:(old?.sequence??0)+1}));}}>{activity?.thread.title ?? '开始一项工作'}</button></h1><button className="current-workspace" ref={workspaceButton} title="查看当前会话目录" aria-haspopup="dialog" onClick={()=>setHeaderPanel('workspace')}>{workspacePath.split('/').at(-1)}</button>{headerPanel==='workspace'&&<ActionPanel title="当前会话目录" anchor={workspaceButton.current} close={()=>setHeaderPanel(null)}><p className="workspace-full-path">{workspacePath}</p><p>当前会话固定目录；新建会话时可选择其他目录。</p></ActionPanel>}</div>
         <div className="view-toolbar">
-          {pending.length > 0 ? <button className="show-approvals" onClick={openApprovals}><span className="approval-indicator" role="status">{pending.length} 项待审批</span></button> : <span className="approval-indicator sr-only" role="status">暂无待审批</span>}
           {stoppableRun && <button className="stop" aria-label={`停止执行 ${stoppableRun.id}`} disabled={busy || disconnected} onClick={() => void command({type: 'runs.cancel', requestId: id(), runId: stoppableRun.id})}>停止</button>}
-          <button className="inspector-toggle" aria-controls="task-inspector" aria-expanded={inspectorOpen} onClick={() => setInspectorChoices(all => ({...all, [selected]: !inspectorOpen}))}>{inspectorOpen ? '隐藏详情' : '查看详情'}</button>
-          <details className="context-details"><summary aria-label="会话说明">···</summary><div className="context-popover"><strong>{modeLabel}</strong><p>{modelMode?(shellTools?"文件与 Bash 经宿主授权，按每个任务接收时的权限模式执行。人工与自动模式限定工作目录且 Bash 禁网；完全访问可操作目录外文件并让 Bash 联网。所有模式保留应用私有数据保护与隔离环境。":home?.model?.limits?.fileTools?"文件工具按任务固定模式授权：人工与自动模式限定工作目录内 Markdown，完全访问允许目录外文本文件。应用私有数据始终受保护。":"本模式不提供工具。"):"无模型演示：使用合成记录；真实工具依照任务固定的权限模式授权。"}</p><p>{modelMode?'模型请求仅走配置端点；停止不回滚文件改动或服务端已发生的费用。':'停止不回滚已发生的文件改动。'}</p></div></details>
+          <button className="inspector-toggle" aria-label={inspectorOpen?'关闭文档':'打开文档'} title={inspectorOpen?'关闭文档':'打开文档'} aria-controls="task-inspector" aria-expanded={inspectorOpen} onClick={() => setInspectorChoices(all => ({...all, [selected]: !inspectorOpen}))}><UiIcon name="file"/></button>
+          <button className="context-details" ref={contextButton} aria-label="会话说明" aria-haspopup="dialog" onClick={()=>setHeaderPanel('context')}><UiIcon name="more"/></button>{headerPanel==='context'&&<ActionPanel title="会话说明" anchor={contextButton.current} close={()=>setHeaderPanel(null)}><div className="context-popover"><strong>{modeLabel}</strong><p>当前会话目录：{workspacePath}</p><p>{modelMode?(shellTools?"文件与 Bash 经宿主授权，按每个任务接收时的权限模式执行。人工与自动模式限定工作目录且 Bash 禁网；完全访问可操作目录外文件并让 Bash 联网。所有模式保留应用私有数据保护与隔离环境。":home?.model?.limits?.fileTools?"文件工具按任务固定模式授权：人工与自动模式限定工作目录内 Markdown，完全访问允许目录外文本文件。应用私有数据始终受保护。":"本模式不提供工具。"):"无模型演示：使用合成记录；真实工具依照任务固定的权限模式授权。"}</p><p>{modelMode?'模型请求仅走配置端点；停止不回滚文件改动或服务端已发生的费用。':'停止不回滚已发生的文件改动。'}</p></div></ActionPanel>}
         </div>
       </header>
-      {home?.mode==='model' && <details className="model-settings" aria-label="模型配置" open={home.model?.status!=='ready'}><summary>模型配置 · {home.model?.provider} / {home.model?.model}</summary>{home.model?.limits && <p>{home.model.limits.endpoint} · {home.model.limits.requests===null?'LLM 请求次数不限':`本次授权最多 ${home.model.limits.requests} 次请求`} · {home.model.limits.estimatedUsd===null?'费用不限':`估算预算 $${home.model.limits.estimatedUsd}`}  · {home.model.limits.outputTokens===null?'输出长度使用模型默认':`输出上限 ${home.model.limits.outputTokens} token`}{home.model.limits.httpIdleTimeoutMs!==undefined && <> · 空闲等待 {home.model.limits.httpIdleTimeoutMs/1000} 秒</>}{home.model.limits.timeoutMs!==undefined && <> · 单次 LLM 请求总上限 {home.model.limits.timeoutMs/1000} 秒</>}</p>}{home.model?.status==='not_configured'?<p>尚未配置或配置无效。请先运行 model:config 创建非秘密配置，填写并检查后重新启动。本页不会使用全局 Pi 凭据。</p>:home.model?.status==='key_required'?<div><p>仅发送你批准的合成无敏感资料。请求与费用估算限额来自配置；估算不等于服务商硬预算。可在配置目录的 auth.json 保存 API key，重启后自动读取；也可临时选择私有 .key 文件。凭据内容不会传入页面。</p><button disabled={busy} onClick={()=>{setBusy(true);void api.selectModelCredential().then(()=>setTick(n=>n+1),failed).finally(()=>setBusy(false));}}>选择凭据并启用本次应用</button></div>:home.model?.status==='policy_required'?<p>授权策略待确认。请核对原配置并完成显式修订，已有请求记录继续保留。</p>:home.model?.status==='budget_exhausted'?<p>本授权的请求次数或预留预算不足。</p>:<p>{shellTools?'已就绪 · 文件与 Bash 由宿主按任务权限授权':home.model?.limits?.fileTools?'已就绪 · Markdown 工具由宿主按任务权限授权':'已就绪 · 无工具'}</p>}</details>}
+      {home && modelMode && modelInfoOpen && <ActionPanel title="模型配置" close={()=>setModelInfoOpen(false)}><div className="model-settings"><p>{home.model?.provider} / {home.model?.model}</p>{home.model?.limits && <p>{home.model.limits.endpoint} · {home.model.limits.requests===null?'LLM 请求次数不限':`本次授权最多 ${home.model.limits.requests} 次请求`} · {home.model.limits.estimatedUsd===null?'费用不限':`估算预算 $${home.model.limits.estimatedUsd}`}  · {home.model.limits.outputTokens===null?'输出长度使用模型默认':`输出上限 ${home.model.limits.outputTokens} token`}{home.model.limits.httpIdleTimeoutMs!==undefined && <> · 空闲等待 {home.model.limits.httpIdleTimeoutMs/1000} 秒</>}{home.model.limits.timeoutMs!==undefined && <> · 单次 LLM 请求总上限 {home.model.limits.timeoutMs/1000} 秒</>}</p>}{home.model?.status==='not_configured'?<p>尚未配置或配置无效。请先运行 model:config 创建非秘密配置，填写并检查后重新启动。本页不会使用全局 Pi 凭据。</p>:home.model?.status==='key_required'?<div><p>仅发送你批准的合成无敏感资料。请求与费用估算限额来自配置；估算不等于服务商硬预算。可在配置目录的 auth.json 保存 API key，重启后自动读取；也可临时选择私有 .key 文件。凭据内容不会传入页面。</p><button disabled={busy} onClick={()=>{setBusy(true);void api.selectModelCredential().then(()=>setTick(n=>n+1),failed).finally(()=>setBusy(false));}}>选择凭据并启用本次应用</button></div>:home.model?.status==='policy_required'?<p>授权策略待确认。请核对原配置并完成显式修订，已有请求记录继续保留。</p>:home.model?.status==='budget_exhausted'?<p>本授权的请求次数或预留预算不足。</p>:<p>{shellTools?'已就绪 · 文件与 Bash 由宿主按任务权限授权':home.model?.limits?.fileTools?'已就绪 · Markdown 工具由宿主按任务权限授权':'已就绪 · 无工具'}</p>}</div></ActionPanel>}
+      <div className="feedback-region">
       {disconnected ? <div className="notice error connection-problem" role="alert">与执行宿主的连接已断开。原宿主仍在运行时，重新连接会结束其未完成任务并保留记录；不会重发未确认操作。<button onClick={() => void reconnect()} disabled={busy || refreshing}>重新连接</button></div>
         : (problem || readProblem) && <div className="notice error request-problem" role="alert">{problem?.text ?? '状态暂时无法读取，已显示内容保留。刷新只读取状态，不会重发操作或结束任务。'}<button onClick={() => void refreshStatus()} disabled={busy || refreshing}>刷新状态</button></div>}
+      {home?.recovery === 'blocked' && <div className="notice" role="status">执行结果或清理尚未核实，新任务暂不执行。<button disabled={busy} onClick={() => { void api.recover().then(value => { setHome(value); setTick(n => n + 1); }, failed); }}>核验并恢复</button></div>}
+      {home?.mode==='model'&&home.model?.status!=='ready'&&<div className="notice error" role="status">模型尚未就绪<button onClick={()=>setModelInfoOpen(true)}>查看配置</button></div>}
+      {activity?.workspaceStatus === 'invalid' && <div className="notice error" role="alert">此会话的工作目录已不可用，发送已停用。历史仍可浏览，请恢复原目录后再继续。</div>}
       <OtherRuns key={home?.queryScope??''} home={home} selected={selected} disabled={busy||disconnected} command={command} select={threadId=>{setSelected(threadId);setInspectorChoices(all=>({...all,[threadId]:false}));requestAnimationFrame(()=>document.querySelector<HTMLButtonElement>('.sidebar-toggle')?.focus());}}/>
       <RunStatusNotice key={`${selected}:${queryScope.current}`} runs={currentRuns}/>
       <p className="sr-only approval-announcement" role="status" aria-live="polite" aria-atomic="true">{approvalNotice?.threadId === selected ? approvalNotice.text : ''}</p>
-      {activity?.workspaceStatus === 'invalid' && <div className="notice error" role="alert">此会话的工作目录已不可用，发送已停用。历史仍可浏览，请恢复原目录后再继续。</div>}
-      {home?.recovery === 'blocked' && <div className="notice" role="status">执行结果或清理尚未核实，新任务暂不执行。<button disabled={busy} onClick={() => { void api.recover().then(value => { setHome(value); setTick(n => n + 1); }, failed); }}>核验并恢复</button></div>}
+      </div>
       <div className="content-grid" data-inspector={inspectorOpen ? 'open' : 'closed'} data-overlay={layout.overlay}>
         <section className="conversation" aria-label="会话记录" inert={layout.overlay && inspectorOpen}>
           <div className="timeline" ref={scroll.viewport} onScroll={scroll.onScroll} onWheel={scroll.onUserScroll} onKeyDown={event => { if (['ArrowUp','ArrowDown','PageUp','PageDown','Home','End',' '].includes(event.key)) scroll.onUserScroll(); }} onPointerDown={event => { if (event.target === event.currentTarget && event.clientX >= event.currentTarget.getBoundingClientRect().right - 18) scroll.onUserScroll(); }} tabIndex={0} aria-label="执行记录"><div className="timeline-content" ref={scroll.content}>
@@ -309,25 +330,25 @@ function App() {
             {selected && !pages && !pageProblem && !toolsProblem && <p role="status">正在读取最近记录…</p>}
             {pages?.history.hasMore && <button className="load-history" disabled={pageBusy || toolsBusy || disconnected} onClick={() => { scroll.onScroll(); void loadPages('history'); }}>{pageBusy ? '正在加载…' : '加载更早记录'}</button>}
             {!currentRuns.length && (!selected || pages) && <div className="empty"><div className="empty-mark">π</div><h2>今天想完成什么？</h2><p>{modelMode?'从一个目标开始，在同一会话中持续推进。':'无模型演示 · 体验真实文件操作、审批与成果。'}</p><div className="suggestions">{['整理本周工作记录','记录一次项目讨论','起草下一步行动清单'].map(text => <button key={text} disabled={!selected || !!unconfirmedRun} onClick={() => setDrafts(all => ({ ...all, [selected]: text }))}>{text}<span>↗</span></button>)}</div>{!selected && <p className="hint">先在左侧新建一个会话</p>}</div>}
-            {thread && <RunHistory onRead={scroll.holdReading} api={api} scope={queryScope.current} thread={thread} pending={pending} workspacePath={workspacePath} mode={home?.mode} busy={busy} disconnected={disconnected} command={command} operationPages={pages?.operations} loading={pageBusy || toolsBusy} loadMore={runId => void loadPages(runId)} />}
-            {unplacedApprovals.length > 0 && <section className="current-approvals" aria-label="当前待审批操作"><h3 className="run-section-title">当前任务等待确认 · 历史尚未载入</h3><ApprovalList pending={unplacedApprovals} workspacePath={workspacePath} modelMode={modelMode} busy={busy} disconnected={disconnected} command={command} /></section>}
+            {thread && <RunHistory onRead={scroll.holdReading} api={api} scope={queryScope.current} thread={thread} pending={pending} openDocument={openDocument} mode={home?.mode} busy={busy} disconnected={disconnected} command={command} operationPages={pages?.operations} loading={pageBusy || toolsBusy} loadMore={runId => void loadPages(runId)} />}
+
           </div></div>
           {scroll.browsing && <button className="return-latest" onClick={scroll.returnLatest}>返回最新 ↓</button>}
+          <div className="composer-region" data-pending={pending.length>0}>
+          <div className="approval-dock"><ApprovalList pending={pending} workspacePath={workspacePath} modelMode={modelMode} busy={busy} disconnected={disconnected} command={command}/></div>
           {!modelMode && !currentRuns.length && <details className="demo-options"><summary>命令演示</summary><div className="suggestions"><button disabled={!selected || !!unconfirmedRun || busy || disconnected} onClick={() => setDrafts(all => ({ ...all, [selected]: '/demo-shell' }))}>填入只读命令演示</button><button disabled={!selected || !!unconfirmedRun || busy || disconnected} onClick={() => setDrafts(all => ({ ...all, [selected]: '/demo-shell-wait' }))}>填入可停止命令演示</button></div></details>}<form className="composer" onSubmit={event => { event.preventDefault(); void submit(); }}>
             <label className="sr-only" htmlFor="composer">你的消息</label><textarea id="composer" placeholder={selected ? '描述你想完成的工作…' : '新建会话后，在这里描述你的目标…'} disabled={!selected || !!unconfirmedRun} value={draft} maxLength={16384} onChange={event => setDrafts(all => ({ ...all, [selected]: event.target.value }))} onKeyDown={event => { if (shouldSubmit(event.nativeEvent)) { event.preventDefault(); void submit(); } }} />
-            <div className="composer-footer">{activity && <PermissionPicker key={`${selected}:${queryScope.current}`} thread={activity.thread} api={api} disabled={disconnected || !!unconfirmedRun} changed={() => setTick(n => n + 1)} pending={setPermissionPending} />}<span>{modelMode?(shellTools?'Pi · 文件与 Bash':home?.model?.limits?.fileTools?'Pi · 文件工具':'Pi · 无工具'):'无模型演示'}</span><button className="primary" type="submit" disabled={!selected || !draft.trim() || busy || disconnected || permissionPending || !activity || !canSend}>{unconfirmedRun ? '重试未确认请求' : isWorking ? '加入队列' : '发送'} <span>↑</span></button></div>
+            <div className="composer-footer">{activity && <PermissionPicker key={`${selected}:${queryScope.current}`} thread={activity.thread} api={api} disabled={disconnected || !!unconfirmedRun} changed={() => setTick(n => n + 1)} pending={setPermissionPending} />}<button type="button" className="composer-model" onClick={()=>setModelInfoOpen(true)} disabled={!modelMode}>{modelMode?home?.model?.model:'无模型演示'}</button><button className="primary" type="submit" disabled={!selected || !draft.trim() || busy || disconnected || permissionPending || !activity || !canSend}>{unconfirmedRun ? '重试未确认请求' : isWorking ? '加入队列' : '发送'} <span>↑</span></button></div>
             {unconfirmedRun && <p role="status">尚未收到确认；重试会核对同一次提交，原内容已保留。</p>}
-          </form><p className="composer-hint">Enter 发送 · Shift + Enter 换行</p>
+          </form><p className="composer-hint">{isWorking?'新消息加入队列，当前任务结束后执行。':'Enter 发送 · Shift + Enter 换行'}</p></div>
         </section>
         {inspectorOpen && layout.overlay && <button className="inspector-backdrop" tabIndex={-1} aria-label="关闭详情" onClick={closeInspector} />}
         <div className="inspector-pane" hidden={!inspectorOpen} style={{width: layout.inspectorWidth}} onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); closeInspector(); } }}>
-        {inspectorOpen && <PaneResizeHandle label="详情栏宽度" controls="task-inspector" edge="left" width={layout.inspectorWidth} min={layout.inspectorMin} max={layout.inspectorMax} onResize={layout.resizeInspector} onReset={layout.resetInspector} />}
-        <aside id="task-inspector" ref={inspectorRef} className="inspector" aria-label="成果与预览" hidden={!inspectorOpen}>
-          <div className="inspector-nav"><h2>成果与预览</h2><button className="inspector-close" aria-label="关闭详情" onClick={closeInspector}>×</button></div>
-          <section className="inspector-panel" aria-label="成果浏览">
-            <ArtifactPanel key={`${selected}:${queryScope.current}`} thread={thread} api={api} disconnected={disconnected} hasMore={pages?.artifacts.hasMore ?? false} loading={pageBusy} loadMore={() => void loadPages('artifacts')} />
-            <p className="inspector-foot">{shellTools?'Bash 成功不代表成果已登记；只有核验过的文件版本才列入这里。':'成果由宿主核验后登记，打开时重新检查文件。'}</p>
-          </section>
+        {inspectorOpen && !layout.overlay && <PaneResizeHandle label="详情栏宽度" controls="task-inspector" edge="left" width={layout.inspectorWidth} min={layout.inspectorMin} max={layout.inspectorMax} onResize={layout.resizeInspector} onReset={layout.resetInspector} />}
+        <aside id="task-inspector" ref={inspectorRef} className="inspector" aria-label="文档阅读" hidden={!inspectorOpen}>
+          {layout.overlay&&pending.length>0&&<div className="document-notice">输入区有操作等待决定。<button className="return-approval" onClick={openApprovals}>返回处理审批</button></div>}
+          <ArtifactPanel key={`${selected}:${queryScope.current}`} thread={thread} api={api} disconnected={disconnected} hasMore={pages?.artifacts.hasMore??false} loading={pageBusy} loadMore={()=>void loadPages('artifacts')} selectedId={documentChoices[selected]} select={id=>openDocument(id)} open={inspectorOpen} close={closeInspector} positions={documentPositions.current}/>
+
         </aside>
         </div>
       </div>

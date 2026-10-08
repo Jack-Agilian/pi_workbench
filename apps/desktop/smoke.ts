@@ -25,6 +25,7 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
     await js(`(() => { const b = [...document.querySelectorAll('button')].find(b => (b.textContent.trim() === ${JSON.stringify(text)} || b.getAttribute('aria-label') === ${JSON.stringify(text)})); if (!b || b.disabled) throw new Error('button_unavailable'); b.click(); })()`);
   };
   const fill = async (selector: string, value: string) => {
+    if(selector==='#title'&&!await js<boolean>("!!document.querySelector('#title')"))await click('＋ 新建会话');
     await js(`(() => { const e = document.querySelector(${JSON.stringify(selector)}); const disclosure=e.closest('details'); if(disclosure)disclosure.open=true; const proto = e instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype; Object.getOwnPropertyDescriptor(proto, 'value').set.call(e, ${JSON.stringify(value)}); e.dispatchEvent(new Event('input', { bubbles: true })); })()`);
   };
   await wait(() => js<boolean>("Boolean(document.querySelector('.new-thread'))"), 'render');
@@ -38,9 +39,9 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
   const counts = [];
   for (const scenario of ['allow','deny','cancel','crash']) {
     console.log(`desktopSmoke scenario: ${scenario}`);
-    await fill('#title', `SYNTHETIC ${scenario}`); await click('＋ 新建会话');
+    await fill('#title', `SYNTHETIC ${scenario}`); await click('创建会话');
     await wait(() => js<boolean>(`document.querySelector('h1')?.textContent === ${JSON.stringify(`SYNTHETIC ${scenario}`)}`), 'thread');
-    await wait(() => js<boolean>("document.querySelector('.inspector').hidden && document.querySelectorAll('h1').length === 1 && !document.querySelector('.topbar') && !document.querySelector('.context-details').open"), 'compact_empty_state');
+    await wait(() => js<boolean>("document.querySelector('.inspector').hidden && document.querySelectorAll('h1').length === 1 && !document.querySelector('.topbar') && !document.querySelector('.context-popover')"), 'compact_empty_state');
     const text = `SYNTHETIC ${scenario} 中文任务 <img src=x onerror="globalThis.injection=true"> sk-syntheticSecret123456789`;
     await fill('#composer', text);
     // IME and Shift+Enter do not submit. Plain Enter does.
@@ -119,10 +120,9 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
       await wait(() => js<boolean>("Boolean(document.querySelector('.run-conversation .message.assistant')) && Boolean(document.querySelector('.run-operations .tool-card'))"), 'separate_body_operations');
       assert.equal(await js<boolean>("document.querySelector('.run-conversation').getAttribute('aria-label') === '会话正文' && document.querySelector('.run-operations').getAttribute('aria-label') === '操作记录' && !document.querySelector('.run-conversation .tool-card') && !document.querySelector('.run-operations .message') && !document.querySelector('[aria-label=会话时间线]')"), true);
       const artifact = snapshot.artifacts[0]!; assert.ok(artifact); assert.ok(readFileSync(join(profile, 'workspace', artifact.path), 'utf8').includes(text));
-      await wait(() => js<boolean>("Boolean(document.querySelector('.artifact'))"), 'artifact');
-      await js("document.querySelector('.inspector-toggle').click()");
-      await js("document.querySelector('.artifact').click()");
-      await wait(() => js<boolean>("Boolean(document.querySelector('.preview pre'))"), 'preview');
+      await wait(() => js<boolean>("Boolean(document.querySelector('.chat-document'))"), 'artifact');
+      await js("document.querySelector('.chat-document').click()");
+      await wait(() => js<boolean>("Boolean(document.querySelector('.document-reading .markdown-body'))"), 'preview');
       assert.equal(await js<boolean>("Boolean(globalThis.injection) || !!document.querySelector('.preview img')"), false);
       assert.equal(await js<boolean>("document.querySelector('.preview').textContent.includes('sk-syntheticSecret123456789')"), false);
       const root = join(profile, 'evidence'); mkdirSync(root, { recursive: true });
@@ -181,7 +181,7 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
     return result;
   };
   const create = async (title: string) => {
-    await fill('#title', title); await click('＋ 新建会话');
+    await fill('#title', title); await click('创建会话');
     await wait(() => js<boolean>(`document.querySelector('h1')?.textContent === ${JSON.stringify(title)}`), 'retry_thread_created');
     return (await host.request({ type: 'home' }) as DesktopHome).threads.find(t => t.title === title)!;
   };
@@ -198,13 +198,13 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
   };
   const retryThreadCount = (await host.request({type:'home'}) as DesktopHome).threads.length;
   const b = await create('SYNTHETIC retry B');
-  loseAck = 'threads.create'; await fill('#title', 'SYNTHETIC retry A'); await click('＋ 新建会话');
+  loseAck = 'threads.create'; await fill('#title', 'SYNTHETIC retry A'); await click('创建会话');
   await wait(() => js<boolean>("document.querySelector('.new-thread').textContent.includes('重试新建会话') && !!document.querySelector('.notice.error')"), 'create_ack_lost');
   assert.equal(await js<boolean>("document.querySelector('#title').disabled"), true);
   const beforeRetry = await request({ type: 'home' }) as DesktopHome; assert.equal(beforeRetry.threads.length, retryThreadCount + 2);
   const a = beforeRetry.threads.find(t => t.title === 'SYNTHETIC retry A')!;
-  await reconnectUi(); await click('＋ 重试新建会话');
-  await wait(() => js<boolean>("document.querySelector('h1')?.textContent === 'SYNTHETIC retry A' && !document.querySelector('#title').disabled"), 'create_retry_ack');
+  await js("document.querySelector('[aria-label=关闭新建会话]').click()");await reconnectUi(); await click('＋ 重试新建会话');await click('重试同一次新建');
+  await wait(() => js<boolean>("document.querySelector('h1')?.textContent === 'SYNTHETIC retry A' && !document.querySelector('#title')"), 'create_retry_ack');
   const creations = attempts.filter(c => c.type === 'threads.create' && c.title === a.title);
   assert.equal(creations.length, 2); assert.deepEqual(creations[0], creations[1]);
   assert.equal((await host.request({ type: 'home' }) as DesktopHome).threads.length, retryThreadCount + 2);
