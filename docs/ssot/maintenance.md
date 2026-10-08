@@ -109,3 +109,7 @@ UI-P2的[后端前置报告](../validation/backend-history-2026-09-30.md)区分�
 [F01/F02报告](../validation/ui-targeted-refresh-2026-09-30.md)将SYNTHETIC方法调用计数、真实SQLite/IPC和Electron离线平台验证分列。两次方法查询不是LLM次数或延迟证据；历史UI超时没有复现不等于根因已解决，固定durable源码复核也不等于实际发行或兼容采用。
 
 [Q1报告](../validation/ui-query-tools-2026-09-30.md)区分发行完整性、合成查询语义、真实IPC/SQLite及Electron离线平台；方法查询次数、单次IPC时延与UI行为分别记录。首轮安装和重连浏览深度失败保留，后续修正不关闭其他工作树历史超时。Q1通过不代表Q2或完整UI任务完成。
+
+## UI空间规格维护
+
+界面位置、大小、布局、动效与控件状态的详细权威集中在[UI规格树](ui/README.md)。业务契约保留数据/权限/进程语义，历史验证保留原结果；旧设计入口不再累积新的呈现规则。变更先检查共享/父/目标/受影响兄弟，实施同批更新节点与差距，新增删除同步父子索引。交付列更新节点ID或无规格变化理由，按[设计Skill](../../.agents/skills/workbench-ui-design/SKILL.md)执行；规格完整不构成Gate完成证据。

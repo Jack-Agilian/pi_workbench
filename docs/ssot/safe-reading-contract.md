@@ -1,5 +1,7 @@
 # 安全正文阅读
 
+2026-10-08文档归位：本文件保留业务/数据/进程契约及既有实施记录；位置、大小、布局、动效和控件呈现的唯一规格见[MESSAGES](ui/shell/workspace/conversation/messages.md)，后续相关改动在该节点维护。早期阶段的未实现/下一步陈述只属于当时范围，当前顺序以NEXT_STEPS顶部为准。
+
 2026-10-04。继承[会话界面](ui-experience-contract.md)、[宿主历史边界](backend-history-contract.md)和[指定参考](reference-implementations.md)。只增加正文展示及原生记录的只读投影，不改变执行、审批、取消、成果或原生Session的所有权。
 
 ## 实施前参考与采用

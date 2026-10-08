@@ -4,7 +4,7 @@
 
 ## 当前实施基线
 
-前端设计：[信息层级与交互准则](ssot/ui-design-principles.md) · [项目开发Skill](../.agents/skills/workbench-ui-design/SKILL.md)；设计标准不等于界面已实施。
+前端设计：[空间与控件规格树](ssot/ui/README.md) · [项目开发Skill](../.agents/skills/workbench-ui-design/SKILL.md)；设计标准不等于界面已实施。
 
 **[复用优先 SSOT](ssot/README.md)** · [架构与替代决策](ssot/reuse-first.md) · [模块接入](ssot/integration-contracts.md) · [上游证据](ssot/upstream-evidence.md) · [复用清单](ssot/reuse-map.json) · [模块到参考实现的映射](ssot/reference-implementations.md)
 

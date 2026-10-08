@@ -1111,10 +1111,12 @@
         },
         {
           "id": "UI-01-A08",
-          "requirement": "导航/顶部/会话/输入/成果按用户任务分层，区分常驻、悬停聚焦、点击展开与异常展示；默认/展开/异常及宽窄窗口设计审查与行为回归分别留证，不以功能通过替代设计质量",
+          "requirement": "导航/顶部/会话/输入/成果按用户任务分层，区分常驻、悬停聚焦、点击展开与异常展示；默认/展开/异常及宽窄窗口设计审查与行为回归分别留证，不以功能通过替代设计质量；空间与父子控件规格集中于docs/ssot/ui，覆盖位置/尺寸/滚动/开合动效与减少动态效果，UI变更同批维护唯一节点",
           "plannedChecks": [
             "ui-information-hierarchy-state-design-review",
-            "ui-default-expanded-error-wide-narrow-review"
+            "ui-default-expanded-error-wide-narrow-review",
+            "ui-space-parent-child-spec-sync",
+            "ui-pane-motion-interruption-reduced-motion-review"
           ],
           "evidenceRefs": []
         }
