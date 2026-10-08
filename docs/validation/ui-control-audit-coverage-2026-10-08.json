@@ -1,0 +1,358 @@
+{
+  "reviewedOn": "2026-10-08",
+  "codeBaseline": "07ed0897fee696790db16a1eee970f927813decc",
+  "agentModel": "gpt-6-sol",
+  "scope": "Existing UI specification IDs; coverage does not imply defects, implementation or acceptance.",
+  "items": [
+    {
+      "id": "FOUNDATIONS",
+      "spec": "docs/ssot/ui/foundations.md",
+      "report": "docs/validation/ui-control-audit-navigation-2026-10-08.md"
+    },
+    {
+      "id": "MOTION",
+      "spec": "docs/ssot/ui/motion.md",
+      "report": "docs/validation/ui-control-audit-navigation-2026-10-08.md"
+    },
+    {
+      "id": "SHELL",
+      "spec": "docs/ssot/ui/shell/README.md",
+      "report": "docs/validation/ui-control-audit-navigation-2026-10-08.md"
+    },
+    {
+      "id": "NAV",
+      "spec": "docs/ssot/ui/shell/navigation.md",
+      "report": "docs/validation/ui-control-audit-navigation-2026-10-08.md"
+    },
+    {
+      "id": "NAV.BRAND",
+      "spec": "docs/ssot/ui/shell/navigation.md",
+      "report": "docs/validation/ui-control-audit-navigation-2026-10-08.md"
+    },
+    {
+      "id": "NAV.WORKSPACE",
+      "spec": "docs/ssot/ui/shell/navigation.md",
+      "report": "docs/validation/ui-control-audit-navigation-2026-10-08.md"
+    },
+    {
+      "id": "NAV.CREATE",
+      "spec": "docs/ssot/ui/shell/navigation.md",
+      "report": "docs/validation/ui-control-audit-navigation-2026-10-08.md"
+    },
+    {
+      "id": "NAV.SEARCH",
+      "spec": "docs/ssot/ui/shell/navigation.md",
+      "report": "docs/validation/ui-control-audit-navigation-2026-10-08.md"
+    },
+    {
+      "id": "NAV.FILTER",
+      "spec": "docs/ssot/ui/shell/navigation.md",
+      "report": "docs/validation/ui-control-audit-navigation-2026-10-08.md"
+    },
+    {
+      "id": "NAV.RESULTS",
+      "spec": "docs/ssot/ui/shell/navigation.md",
+      "report": "docs/validation/ui-control-audit-navigation-2026-10-08.md"
+    },
+    {
+      "id": "NAV.LIST",
+      "spec": "docs/ssot/ui/shell/navigation.md",
+      "report": "docs/validation/ui-control-audit-navigation-2026-10-08.md"
+    },
+    {
+      "id": "NAV.ROW",
+      "spec": "docs/ssot/ui/shell/navigation.md",
+      "report": "docs/validation/ui-control-audit-navigation-2026-10-08.md"
+    },
+    {
+      "id": "NAV.RENAME",
+      "spec": "docs/ssot/ui/shell/navigation.md",
+      "report": "docs/validation/ui-control-audit-navigation-2026-10-08.md"
+    },
+    {
+      "id": "NAV.CONNECTION",
+      "spec": "docs/ssot/ui/shell/navigation.md",
+      "report": "docs/validation/ui-control-audit-navigation-2026-10-08.md"
+    },
+    {
+      "id": "WORK",
+      "spec": "docs/ssot/ui/shell/workspace/README.md",
+      "report": "docs/validation/ui-control-audit-documents-2026-10-08.md"
+    },
+    {
+      "id": "ARTIFACTS",
+      "spec": "docs/ssot/ui/shell/workspace/artifacts/README.md",
+      "report": "docs/validation/ui-control-audit-documents-2026-10-08.md"
+    },
+    {
+      "id": "ARTIFACTS.HEAD",
+      "spec": "docs/ssot/ui/shell/workspace/artifacts/README.md",
+      "report": "docs/validation/ui-control-audit-documents-2026-10-08.md"
+    },
+    {
+      "id": "ARTIFACTS.EMPTY",
+      "spec": "docs/ssot/ui/shell/workspace/artifacts/README.md",
+      "report": "docs/validation/ui-control-audit-documents-2026-10-08.md"
+    },
+    {
+      "id": "ARTIFACTS.ROW",
+      "spec": "docs/ssot/ui/shell/workspace/artifacts/README.md",
+      "report": "docs/validation/ui-control-audit-documents-2026-10-08.md"
+    },
+    {
+      "id": "ARTIFACTS.PAGING",
+      "spec": "docs/ssot/ui/shell/workspace/artifacts/README.md",
+      "report": "docs/validation/ui-control-audit-documents-2026-10-08.md"
+    },
+    {
+      "id": "ARTIFACTS.NOTE",
+      "spec": "docs/ssot/ui/shell/workspace/artifacts/README.md",
+      "report": "docs/validation/ui-control-audit-documents-2026-10-08.md"
+    },
+    {
+      "id": "PREVIEW",
+      "spec": "docs/ssot/ui/shell/workspace/artifacts/preview.md",
+      "report": "docs/validation/ui-control-audit-documents-2026-10-08.md"
+    },
+    {
+      "id": "PREVIEW.HEAD",
+      "spec": "docs/ssot/ui/shell/workspace/artifacts/preview.md",
+      "report": "docs/validation/ui-control-audit-documents-2026-10-08.md"
+    },
+    {
+      "id": "PREVIEW.VERSION",
+      "spec": "docs/ssot/ui/shell/workspace/artifacts/preview.md",
+      "report": "docs/validation/ui-control-audit-documents-2026-10-08.md"
+    },
+    {
+      "id": "PREVIEW.CHECK",
+      "spec": "docs/ssot/ui/shell/workspace/artifacts/preview.md",
+      "report": "docs/validation/ui-control-audit-documents-2026-10-08.md"
+    },
+    {
+      "id": "PREVIEW.CONTENT",
+      "spec": "docs/ssot/ui/shell/workspace/artifacts/preview.md",
+      "report": "docs/validation/ui-control-audit-documents-2026-10-08.md"
+    },
+    {
+      "id": "PREVIEW.COPY",
+      "spec": "docs/ssot/ui/shell/workspace/artifacts/preview.md",
+      "report": "docs/validation/ui-control-audit-documents-2026-10-08.md"
+    },
+    {
+      "id": "PREVIEW.SOURCE",
+      "spec": "docs/ssot/ui/shell/workspace/artifacts/preview.md",
+      "report": "docs/validation/ui-control-audit-documents-2026-10-08.md"
+    },
+    {
+      "id": "PREVIEW.RECHECK",
+      "spec": "docs/ssot/ui/shell/workspace/artifacts/preview.md",
+      "report": "docs/validation/ui-control-audit-documents-2026-10-08.md"
+    },
+    {
+      "id": "CHAT",
+      "spec": "docs/ssot/ui/shell/workspace/conversation/README.md",
+      "report": "docs/validation/ui-control-audit-conversation-2026-10-08.md"
+    },
+    {
+      "id": "COMPOSER",
+      "spec": "docs/ssot/ui/shell/workspace/conversation/composer/README.md",
+      "report": "docs/validation/ui-control-audit-conversation-2026-10-08.md"
+    },
+    {
+      "id": "COMPOSER.DRAFT",
+      "spec": "docs/ssot/ui/shell/workspace/conversation/composer/README.md",
+      "report": "docs/validation/ui-control-audit-conversation-2026-10-08.md"
+    },
+    {
+      "id": "COMPOSER.BAR",
+      "spec": "docs/ssot/ui/shell/workspace/conversation/composer/README.md",
+      "report": "docs/validation/ui-control-audit-conversation-2026-10-08.md"
+    },
+    {
+      "id": "COMPOSER.SEND",
+      "spec": "docs/ssot/ui/shell/workspace/conversation/composer/README.md",
+      "report": "docs/validation/ui-control-audit-conversation-2026-10-08.md"
+    },
+    {
+      "id": "COMPOSER.HINT",
+      "spec": "docs/ssot/ui/shell/workspace/conversation/composer/README.md",
+      "report": "docs/validation/ui-control-audit-conversation-2026-10-08.md"
+    },
+    {
+      "id": "COMPOSER.DEMO",
+      "spec": "docs/ssot/ui/shell/workspace/conversation/composer/README.md",
+      "report": "docs/validation/ui-control-audit-conversation-2026-10-08.md"
+    },
+    {
+      "id": "PERMISSION",
+      "spec": "docs/ssot/ui/shell/workspace/conversation/composer/permissions.md",
+      "report": "docs/validation/ui-control-audit-conversation-2026-10-08.md"
+    },
+    {
+      "id": "PERMISSION.TRIGGER",
+      "spec": "docs/ssot/ui/shell/workspace/conversation/composer/permissions.md",
+      "report": "docs/validation/ui-control-audit-conversation-2026-10-08.md"
+    },
+    {
+      "id": "PERMISSION.TIP",
+      "spec": "docs/ssot/ui/shell/workspace/conversation/composer/permissions.md",
+      "report": "docs/validation/ui-control-audit-conversation-2026-10-08.md"
+    },
+    {
+      "id": "PERMISSION.PANEL",
+      "spec": "docs/ssot/ui/shell/workspace/conversation/composer/permissions.md",
+      "report": "docs/validation/ui-control-audit-conversation-2026-10-08.md"
+    },
+    {
+      "id": "PERMISSION.OPTION",
+      "spec": "docs/ssot/ui/shell/workspace/conversation/composer/permissions.md",
+      "report": "docs/validation/ui-control-audit-conversation-2026-10-08.md"
+    },
+    {
+      "id": "PERMISSION.SAVE",
+      "spec": "docs/ssot/ui/shell/workspace/conversation/composer/permissions.md",
+      "report": "docs/validation/ui-control-audit-conversation-2026-10-08.md"
+    },
+    {
+      "id": "MESSAGES",
+      "spec": "docs/ssot/ui/shell/workspace/conversation/messages.md",
+      "report": "docs/validation/ui-control-audit-conversation-2026-10-08.md"
+    },
+    {
+      "id": "MESSAGES.EMPTY",
+      "spec": "docs/ssot/ui/shell/workspace/conversation/messages.md",
+      "report": "docs/validation/ui-control-audit-conversation-2026-10-08.md"
+    },
+    {
+      "id": "MESSAGES.PAGING",
+      "spec": "docs/ssot/ui/shell/workspace/conversation/messages.md",
+      "report": "docs/validation/ui-control-audit-conversation-2026-10-08.md"
+    },
+    {
+      "id": "MESSAGES.RUN",
+      "spec": "docs/ssot/ui/shell/workspace/conversation/messages.md",
+      "report": "docs/validation/ui-control-audit-conversation-2026-10-08.md"
+    },
+    {
+      "id": "MESSAGES.BODY",
+      "spec": "docs/ssot/ui/shell/workspace/conversation/messages.md",
+      "report": "docs/validation/ui-control-audit-conversation-2026-10-08.md"
+    },
+    {
+      "id": "MESSAGES.CODE",
+      "spec": "docs/ssot/ui/shell/workspace/conversation/messages.md",
+      "report": "docs/validation/ui-control-audit-conversation-2026-10-08.md"
+    },
+    {
+      "id": "MESSAGES.COPY",
+      "spec": "docs/ssot/ui/shell/workspace/conversation/messages.md",
+      "report": "docs/validation/ui-control-audit-conversation-2026-10-08.md"
+    },
+    {
+      "id": "MESSAGES.LATEST",
+      "spec": "docs/ssot/ui/shell/workspace/conversation/messages.md",
+      "report": "docs/validation/ui-control-audit-conversation-2026-10-08.md"
+    },
+    {
+      "id": "TOOLS",
+      "spec": "docs/ssot/ui/shell/workspace/conversation/tools.md",
+      "report": "docs/validation/ui-control-audit-conversation-2026-10-08.md"
+    },
+    {
+      "id": "TOOLS.SUMMARY",
+      "spec": "docs/ssot/ui/shell/workspace/conversation/tools.md",
+      "report": "docs/validation/ui-control-audit-conversation-2026-10-08.md"
+    },
+    {
+      "id": "TOOLS.OUTPUT",
+      "spec": "docs/ssot/ui/shell/workspace/conversation/tools.md",
+      "report": "docs/validation/ui-control-audit-conversation-2026-10-08.md"
+    },
+    {
+      "id": "TOOLS.APPROVAL",
+      "spec": "docs/ssot/ui/shell/workspace/conversation/tools.md",
+      "report": "docs/validation/ui-control-audit-conversation-2026-10-08.md"
+    },
+    {
+      "id": "TOOLS.EVIDENCE",
+      "spec": "docs/ssot/ui/shell/workspace/conversation/tools.md",
+      "report": "docs/validation/ui-control-audit-conversation-2026-10-08.md"
+    },
+    {
+      "id": "TOOLS.DECISION",
+      "spec": "docs/ssot/ui/shell/workspace/conversation/tools.md",
+      "report": "docs/validation/ui-control-audit-conversation-2026-10-08.md"
+    },
+    {
+      "id": "TOOLS.RESULT",
+      "spec": "docs/ssot/ui/shell/workspace/conversation/tools.md",
+      "report": "docs/validation/ui-control-audit-conversation-2026-10-08.md"
+    },
+    {
+      "id": "FEEDBACK",
+      "spec": "docs/ssot/ui/shell/workspace/feedback.md",
+      "report": "docs/validation/ui-control-audit-documents-2026-10-08.md"
+    },
+    {
+      "id": "FEEDBACK.MODEL",
+      "spec": "docs/ssot/ui/shell/workspace/feedback.md",
+      "report": "docs/validation/ui-control-audit-documents-2026-10-08.md"
+    },
+    {
+      "id": "FEEDBACK.CONNECTION",
+      "spec": "docs/ssot/ui/shell/workspace/feedback.md",
+      "report": "docs/validation/ui-control-audit-documents-2026-10-08.md"
+    },
+    {
+      "id": "FEEDBACK.READ",
+      "spec": "docs/ssot/ui/shell/workspace/feedback.md",
+      "report": "docs/validation/ui-control-audit-documents-2026-10-08.md"
+    },
+    {
+      "id": "FEEDBACK.OTHER_RUN",
+      "spec": "docs/ssot/ui/shell/workspace/feedback.md",
+      "report": "docs/validation/ui-control-audit-documents-2026-10-08.md"
+    },
+    {
+      "id": "FEEDBACK.RECOVERY",
+      "spec": "docs/ssot/ui/shell/workspace/feedback.md",
+      "report": "docs/validation/ui-control-audit-documents-2026-10-08.md"
+    },
+    {
+      "id": "FEEDBACK.TERMINAL",
+      "spec": "docs/ssot/ui/shell/workspace/feedback.md",
+      "report": "docs/validation/ui-control-audit-documents-2026-10-08.md"
+    },
+    {
+      "id": "FEEDBACK.WORKSPACE",
+      "spec": "docs/ssot/ui/shell/workspace/feedback.md",
+      "report": "docs/validation/ui-control-audit-documents-2026-10-08.md"
+    },
+    {
+      "id": "HEAD",
+      "spec": "docs/ssot/ui/shell/workspace/header.md",
+      "report": "docs/validation/ui-control-audit-navigation-2026-10-08.md"
+    },
+    {
+      "id": "HEAD.NAV",
+      "spec": "docs/ssot/ui/shell/workspace/header.md",
+      "report": "docs/validation/ui-control-audit-navigation-2026-10-08.md"
+    },
+    {
+      "id": "HEAD.IDENTITY",
+      "spec": "docs/ssot/ui/shell/workspace/header.md",
+      "report": "docs/validation/ui-control-audit-navigation-2026-10-08.md"
+    },
+    {
+      "id": "HEAD.ACTIONS",
+      "spec": "docs/ssot/ui/shell/workspace/header.md",
+      "report": "docs/validation/ui-control-audit-navigation-2026-10-08.md"
+    },
+    {
+      "id": "HEAD.CONTEXT",
+      "spec": "docs/ssot/ui/shell/workspace/header.md",
+      "report": "docs/validation/ui-control-audit-navigation-2026-10-08.md"
+    }
+  ]
+}

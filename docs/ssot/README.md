@@ -20,6 +20,8 @@
 
 ## 2026-10-08 前端设计方法修订
 
+最新[全量逐控件审核](../validation/ui-control-audit-2026-10-08.md)由三位指定gpt-6-sol及主代理覆盖70项，重新核对pi-gui、WorkBuddy、Claude Code Desktop与Conductor的具体呈现，区分文档/图片/源码/判断。规格树v1标记待纠偏：先完成对象、阅读主次和全路径状态原型，再成组实施。UI-01/02、ART-01保持in_progress，adoption/evidenceRecords不因研究或覆盖数新增实现通过；本批零产品Provider调用。
+
 后续同日按用户要求集中收口：通用原则、共享尺寸/动效与SHELL→NAV/WORK→子区域均归入UI树；旧设计页改为入口，业务契约保留产品语义。见[迁移表](ui/migration.md)与[本轮维护验证](../validation/ui-space-spec-2026-10-08.md)。规格仍待成组实施，不能扩大现有验证范围。
 
 [空间与控件规格树](ui/README.md)和[项目开发Skill](../../.agents/skills/workbench-ui-design/SKILL.md)把常驻、悬停/聚焦、点击展开及异常展示分层，分别验收设计与行为。权限标签只是示例，当前整批调整为信息层级重构与日常体验复审；本轮未改产品代码，现有UI不能据Skill建立而宣称已修正。试用与验证见[记录](../validation/workbench-ui-skill-2026-10-08.md)。

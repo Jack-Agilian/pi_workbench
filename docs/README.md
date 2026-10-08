@@ -6,6 +6,8 @@
 
 前端设计：[空间与控件规格树](ssot/ui/README.md) · [项目开发Skill](../.agents/skills/workbench-ui-design/SKILL.md)；设计标准不等于界面已实施。
 
+2026-10-08最新：[70项控件/区域社区对照与交叉审核](validation/ui-control-audit-2026-10-08.md)。三位指定gpt-6-sol分别审查导航、会话、文档与反馈；现有规格本身需要纠偏，下一步先做连贯状态原型，尚未修改产品UI。
+
 **[复用优先 SSOT](ssot/README.md)** · [架构与替代决策](ssot/reuse-first.md) · [模块接入](ssot/integration-contracts.md) · [上游证据](ssot/upstream-evidence.md) · [复用清单](ssot/reuse-map.json) · [模块到参考实现的映射](ssot/reference-implementations.md)
 
 当前设计不再把 Pi 已提供的 Session、工具、模型、技能解析和包管理列为自研引擎；自有实现聚焦产品治理和桌面体验。`ssot/` 指定的替代范围优先于原始快照。
