@@ -590,6 +590,8 @@ h1 {
   box-shadow: 0 2px 7px #243c2310;
 }
 .composer-region {
+  display: flex;
+  flex-direction: column;
   width: 100%;
   max-width: 816px;
   padding: 0 28px 16px;
@@ -599,7 +601,18 @@ h1 {
   max-height: calc(100% - 60px);
   overflow: auto;
 }
+.approval-dock {
+  min-height: 0;
+  overflow: auto;
+  flex: 0 1 auto;
+}
+.approval footer {
+  position: sticky;
+  bottom: 0;
+  background: #fffefb;
+}
 .composer {
+  flex-shrink: 0;
   padding: 12px 12px 8px;
   border: 1px solid #d8dcd1;
   border-radius: 13px;
