@@ -1522,7 +1522,8 @@
           "EV-CROSS-THREAD-STATIC-20261004",
           "EV-CROSS-THREAD-MAC-20261004",
           "EV-CROSS-THREAD-MOCK-20261004",
-          "EV-DAILY-READINESS-REVIEW-20261004"
+          "EV-DAILY-READINESS-REVIEW-20261004",
+          "EV-NATIVE-DAILY-MAC-20261008"
         ]
       }
     }
@@ -3963,6 +3964,18 @@
       ],
       "locator": "docs/validation/daily-readiness-2026-10-04.md",
       "scope": "逐七项目标核对当前代码/原实测SHA和测试断言，区分30项合成定位/3个真实版本和历史模型；完成审查不等于产品验收。Mac锁屏仍在，原生连续操作/VoiceOver未验证，无新增运行套件或模型。"
+    },
+    {
+      "id": "EV-NATIVE-DAILY-MAC-20261008",
+      "kind": "platform",
+      "result": "passed",
+      "commit": "51a902da8aec4f23187854fcba05858c8e940bc9",
+      "recordedAt": "2026-10-08T01:08:12.647389+00:00",
+      "platforms": [
+        "darwin"
+      ],
+      "locator": "docs/validation/native-daily-review-2026-10-08.md",
+      "scope": "仅原生创建/改名、SYNTHETIC驱动的两条真实Bash人工批准及失败展示、关闭重开和SQLite/文件一致性通过。首轮未及时审批经对账failed；操作工具异常与未测清单见报告，不代表完整连续体验、VoiceOver或真实模型通过。"
     }
   ]
 }
