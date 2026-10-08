@@ -20,7 +20,7 @@
 
 ## 2026-10-08 前端设计方法修订
 
-最新[交互原型与规格v2验证](../validation/ui-prototype-2026-10-08.md)已承接[70项逐控件审核](../validation/ui-control-audit-2026-10-08.md)：单次审批固定输入区，右侧以文档正文为主，目录/权限按对象分层。新增OpenCode/T3 Code固定源码修正此前审批位置依据不足；[来源与取舍](../design/workbench-prototype/README.md)可复核。下一步按规格成组实施正式UI。UI-01/02、ART-01保持in_progress，adoption/evidenceRecords不因原型检查新增产品实现通过；本批零产品Provider调用。
+最新[正式UI整组实现与限定验证](../validation/ui-workflow-2026-10-08.md)已承接[原型](../design/workbench-prototype/README.md)与[70项审核](../validation/ui-control-audit-2026-10-08.md)：当前审批在输入区、右侧全高文档、目录与权限分层。复用原宿主/分页/核验，React原生dialog薄适配不引入新状态框架。下一步为新正式界面的连续日常体验复审；UI-01/02、ART-01保持in_progress，不扩大Gate，零真实模型。具体失败、被测SHA及未覆盖项见实现报告。
 
 后续同日按用户要求集中收口：通用原则、共享尺寸/动效与SHELL→NAV/WORK→子区域均归入UI树；旧设计页改为入口，业务契约保留产品语义。见[迁移表](ui/migration.md)与[本轮维护验证](../validation/ui-space-spec-2026-10-08.md)。规格仍待成组实施，不能扩大现有验证范围。
 

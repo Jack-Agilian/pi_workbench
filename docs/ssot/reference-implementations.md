@@ -163,3 +163,7 @@ Electron44.4.5的webContents缩放/键盘/debugger实例方法仅用于真实窗
 ## 跨会话执行可达（2026-10-04）
 
 `other-runs/renderer` → C03固定pi-gui sidebar的selectedSession与显式onSelectSession → 借鉴选择不依赖当前列表，用既有宿主activeRuns和runs.cancel展示/停止实际执行任务 → 不移植driver、调度或修改activeRuns的无queued语义。没有新依赖/API；实际证据及锁屏限制见[报告](../validation/cross-thread-2026-10-04.md)。
+
+## 2026-10-08 信息层级整组实施
+
+[本批逐模块映射](../validation/ui-workflow-2026-10-08.md)复用前次OpenCode `a697115b203395c54a7496dc3d1863fe7b319c0c`、T3 Code `9fba2093e50f208c52d9041c70a793296e311477` 的composer审批源码及固定pi-gui参考：仅借鉴稳定操作区、对象阅读与按需信息；未移植新社区组件或依赖。React19.3.0公开useId/useLayoutEffect与react-dom19.3.0根级createPortal承接浏览器原生dialog；Context7官方示例和本机声明/实际Electron运行分开核对。产品继续由原ThreadPages/Query、timeline-scroll、宿主审批/文件核验拥有状态，删除旧审批历史跳转逻辑，不新建第二套消息树、滚动或权限系统。详细呈现权威仍为[空间树](ui/README.md)。

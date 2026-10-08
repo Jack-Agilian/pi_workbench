@@ -1027,7 +1027,8 @@
             "EV-UI-TARGETED-MAC-20260930",
             "EV-UI-TARGETED-REGRESSION-20260930",
             "EV-REFERENCE-MAPPING-REVIEW-20260930",
-            "EV-Q1-PLAN-REREVIEW-20260930"
+            "EV-Q1-PLAN-REREVIEW-20260930",
+            "EV-UI-WORKFLOW-MAC-20261008"
           ]
         },
         {
@@ -1062,7 +1063,8 @@
           "evidenceRefs": [
             "EV-THREAD-NAMING-STATIC-20261004",
             "EV-THREAD-NAMING-MOCK-20261004",
-            "EV-THREAD-NAMING-MAC-20261004"
+            "EV-THREAD-NAMING-MAC-20261004",
+            "EV-UI-WORKFLOW-MAC-20261008"
           ]
         },
         {
@@ -1078,7 +1080,8 @@
             "EV-THREAD-DIRECTORY-CORE-20261004",
             "EV-THREAD-DIRECTORY-SDK-20261004",
             "EV-THREAD-DIRECTORY-MAC-20261004",
-            "EV-THREAD-DIRECTORY-MOCK-20261004"
+            "EV-THREAD-DIRECTORY-MOCK-20261004",
+            "EV-UI-WORKFLOW-MAC-20261008"
           ]
         },
         {
@@ -1092,7 +1095,8 @@
           ],
           "evidenceRefs": [
             "EV-EXPERIENCE-STATIC-20261004",
-            "EV-EXPERIENCE-MAC-20261004"
+            "EV-EXPERIENCE-MAC-20261004",
+            "EV-UI-WORKFLOW-MAC-20261008"
           ]
         },
         {
@@ -1106,7 +1110,8 @@
           "evidenceRefs": [
             "EV-CROSS-THREAD-STATIC-20261004",
             "EV-CROSS-THREAD-MAC-20261004",
-            "EV-CROSS-THREAD-MOCK-20261004"
+            "EV-CROSS-THREAD-MOCK-20261004",
+            "EV-UI-WORKFLOW-MAC-20261008"
           ]
         },
         {
@@ -1118,10 +1123,12 @@
             "ui-space-parent-child-spec-sync",
             "ui-pane-motion-interruption-reduced-motion-review"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-UI-WORKFLOW-MAC-20261008"
+          ]
         }
       ],
-      "statusReason": "会话查找、目录分页与阅读/成果动作已限定验证；整体布局密度、键盘/缩放/辅助技术和日常体验仍待集中复审，保持in_progress。 最新d4d50e0已限定通过侧栏收拢、窄窗/200%导航与审批停止可达、真实键盘和宿主终态通知；会话查找/阅读成果已由前批完成限定验证。唯一当前事项以NEXT_STEPS顶部为准，继续完整日常工作流体验复审；VoiceOver和完整用户人工验收未完成，不扩大Gate。 后续24e59d8补齐跨会话实际执行入口，原生连续体验因锁屏未验证，整体目标与唯一NEXT事项保持。 2026-10-04整体验收核对已对照七项目标与实际断言，具体接续清单见daily-readiness报告；Mac仍锁屏，连续原生操作及VoiceOver未验证，不以旧回归替代。 2026-10-08已解锁并在51a902d完成限定原生创建/改名、两次Bash批准及失败展示、关闭重开和只读数据/文件一致性核验，零真实模型。原生工具仍有窗口定位/AX延迟问题，其余连续操作及VoiceOver未验证；保持in_progress，详见native-daily-review-2026-10-08.md。 2026-10-08用户纠正页面信息平铺；新增workbench-ui-design项目Skill与ui-design-principles准则，唯一当前事项调整为信息层级重构与日常体验复审。规范和源码试用已交付，产品呈现尚未按新准则修改，设计验收与行为回归分开，不晋级任务/Gate。 2026-10-08三位指定gpt-6-sol与主代理完成70项区域/控件社区对照，见docs/validation/ui-control-audit-2026-10-08.md；v1规格需纠偏，下一步先做完整路径状态原型，再同步父子节点并成组实施。仅审核与计划，无产品修复、无Gate晋级。 2026-10-08后续已完成合成交互原型和规格v2（docs/validation/ui-prototype-2026-10-08.md）：当前审批集中输入区，文档正文优先，目录与权限分层；41项原型检查限定通过。下一步成组修改正式UI，产品源码尚未同步；保持in_progress，adoption/evidenceRecords和Gate不因设计验证晋级。"
+      "statusReason": "会话查找、目录分页与阅读/成果动作已限定验证；整体布局密度、键盘/缩放/辅助技术和日常体验仍待集中复审，保持in_progress。 最新d4d50e0已限定通过侧栏收拢、窄窗/200%导航与审批停止可达、真实键盘和宿主终态通知；会话查找/阅读成果已由前批完成限定验证。唯一当前事项以NEXT_STEPS顶部为准，继续完整日常工作流体验复审；VoiceOver和完整用户人工验收未完成，不扩大Gate。 后续24e59d8补齐跨会话实际执行入口，原生连续体验因锁屏未验证，整体目标与唯一NEXT事项保持。 2026-10-04整体验收核对已对照七项目标与实际断言，具体接续清单见daily-readiness报告；Mac仍锁屏，连续原生操作及VoiceOver未验证，不以旧回归替代。 2026-10-08已解锁并在51a902d完成限定原生创建/改名、两次Bash批准及失败展示、关闭重开和只读数据/文件一致性核验，零真实模型。原生工具仍有窗口定位/AX延迟问题，其余连续操作及VoiceOver未验证；保持in_progress，详见native-daily-review-2026-10-08.md。 2026-10-08用户纠正页面信息平铺；新增workbench-ui-design项目Skill与ui-design-principles准则，唯一当前事项调整为信息层级重构与日常体验复审。规范和源码试用已交付，产品呈现尚未按新准则修改，设计验收与行为回归分开，不晋级任务/Gate。 2026-10-08三位指定gpt-6-sol与主代理完成70项区域/控件社区对照，见docs/validation/ui-control-audit-2026-10-08.md；v1规格需纠偏，下一步先做完整路径状态原型，再同步父子节点并成组实施。仅审核与计划，无产品修复、无Gate晋级。 2026-10-08后续已完成合成交互原型和规格v2（docs/validation/ui-prototype-2026-10-08.md）：当前审批集中输入区，文档正文优先，目录与权限分层；41项原型检查限定通过。下一步成组修改正式UI，产品源码尚未同步；保持in_progress，adoption/evidenceRecords和Gate不因设计验证晋级。 2026-10-08后续正式Renderer已按v2成组实施（ui-workflow-2026-10-08.md）：输入区当前审批、Chat文档→全高正文、目录/权限按需层次；沿用原宿主与查询/阅读所有者。前文“尚未同步”仅为当时历史；当前接续为新UI连续日常体验复审。限定回归、开发失败和未测范围分别记录；保持in_progress和原Gate。"
     },
     {
       "id": "UI-02",
@@ -1234,7 +1241,8 @@
             "EV-THREAD-DIRECTORY-MAC-20261004",
             "EV-THREAD-DIRECTORY-MOCK-20261004",
             "EV-DAILY-READINESS-REVIEW-20261004",
-            "EV-NATIVE-DAILY-MAC-20261008"
+            "EV-NATIVE-DAILY-MAC-20261008",
+            "EV-UI-WORKFLOW-MAC-20261008"
           ]
         },
         {
@@ -1265,7 +1273,8 @@
             "EV-SAFE-READING-RELEASE-20261004",
             "EV-SAFE-READING-SDK-20261004",
             "EV-SAFE-READING-MAC-20261004",
-            "EV-SAFE-READING-STATIC-20261004"
+            "EV-SAFE-READING-STATIC-20261004",
+            "EV-UI-WORKFLOW-MAC-20261008"
           ]
         },
         {
@@ -1279,7 +1288,8 @@
           "evidenceRefs": [
             "EV-READING-ACTIONS-STATIC-20261004",
             "EV-READING-ACTIONS-MAC-20261004",
-            "EV-READING-ACTIONS-IDENTITY-20261004"
+            "EV-READING-ACTIONS-IDENTITY-20261004",
+            "EV-UI-WORKFLOW-MAC-20261008"
           ]
         },
         {
@@ -1291,7 +1301,8 @@
           ],
           "evidenceRefs": [
             "EV-EXPERIENCE-MAC-20261004",
-            "EV-EXPERIENCE-MOCK-20261004"
+            "EV-EXPERIENCE-MOCK-20261004",
+            "EV-UI-WORKFLOW-MAC-20261008"
           ]
         },
         {
@@ -1301,10 +1312,12 @@
             "permission-value-trigger-hover-focus-keyboard",
             "permission-choice-scope-save-error-run-identity"
           ],
-          "evidenceRefs": []
+          "evidenceRefs": [
+            "EV-UI-WORKFLOW-MAC-20261008"
+          ]
         }
       ],
-      "statusReason": "2026-09-30前后端分页组合已集成develop，F01定向刷新与F02复用修正已进入develop@4644902。历史169df60另一工作树两次UI超时根因仍未定位；本轮当前树通过不关闭该项。Q1工具查询5b10b19已限定采用Query5.104.0，缓存/异步状态/去重交由库承担，重连隔离与浏览位置、审批/停止及原F01断言通过离线验证，复审通过并集成develop@ee409b1；真实桌面已检查旧历史/成果和重开，10月1日请求401/403失败保留，10月3日单次真实文本回复成功，安全错误诊断已按Pi公开入口完成限定离线验证，真实桌面工具闭环待续验。Q2历史/成果尚未迁移，是否实施依维护收益及使用反馈决定；虚拟列表、原生全部正文、完整真实人工体验和另存为未完成，保持in_progress，不扩大Gate。 2026-10-03取消产品默认与本机请求/费用/输出/工具验证额度，保留API检测和历史用量。真实桌面首次工具流程发现路径/展示问题已离线修正，完整真实续验仍待执行；当前前后端共同完成同一功能链路，既有状态不扩大。 最新ebaf316已完成真实Electron read/write/edit/Bash、逐项允许/拒绝、活跃取消、成果和原Session重开继续，8次HTTP；前述待续验范围已限定补证。1a75141修正无依据原因措辞，68c63de离线UI回归通过；非用户人工验收，完整P0状态不扩大。 2026-10-03基线d045ce4完成UI布局交叉审核（docs/validation/ui-layout-review-2026-10-03.md），12项发现未修复；建议先展示顺序与恢复语义，再一个完整布局状态组和安全阅读。只补review证据，不改变实现/Gate状态。 2026-10-03用户要求整套UI重构，5468a3d完成导航/正文/输入/审批成果页与样式重整；U01最小分区/U02只读恢复、U03/U05/U06及U09收敛通过限定离线验证（ui-refactor-2026-10-03.md）。权限三档为下一接入设计；持久重命名/Markdown/全文与完整无障碍未完成，状态/Gate不扩大。 2026-10-03人工/工作目录自动审批贯通宿主SQL v10与桌面；权限按Run固定，确认丢失/旧版本拒绝/取消和重开限定通过。完全访问未实现，整体任务不晋级。 2026-10-03三栏拖动/收起与窄窗覆盖在f742f98限定通过；复用固定MIT分隔条，审批仍在详情页，下一批就近审批与模式文案收口，不扩大Gate。 2026-10-03后续68e6596/e99c562已完成会话内审批、历史失败兜底及权限说明；滚动恢复与整卡可达修正经限定Electron验证，开发失败保留，后续唯一事项回到完全访问范围/platform接入。 2026-10-04完全访问在bded873限定接通SQL/IPC v11、固定Run权限、Pi目录外文本/Bash IP与私有数据保护、原生Session及产品库恢复；新增11真实进程/合成Provider测试通过。外部文件仅记Operation；无真实模型/其他平台/完整人工体验，任务与Gate仍不晋级。桌面最终复核及首轮滚动基线失败见full-access-product-2026-10-04.md。 同批75aed17修正布局滚动与阅读意图区分；5eb203a最终Electron完全访问选择/真实Bash/重连通过，旧文件工具文案断言另行更新并验证。下一事项为会话持久重命名，随后Markdown/按需全文。 2026-10-04后续98c323c已限定完成宿主持久命名/重命名、冲突及确认丢失/重连隔离；原Run/审批/原生引用不变，零真实模型。UI任务/Gate保持，当前下一批为安全Markdown及按需全文。 2026-10-04后续41345e8已限定完成安全Markdown/按Run原生正文补读与连接隔离；旧Run缺范围及8MiB上限保留，零真实模型，任务/Gate不扩大。唯一当前事项为整套桌面工作流复审与收口，优先核对已恢复连接的残留错误提示，其后会话查找、复制及完整体验。 2026-10-04后续4dcec38完成工作流复审与限定恢复/审批焦点修正，连接恢复不再保留重启动作，未确认意图独立保留；24退出恢复场景通过，零真实模型。唯一当前事项为会话查找与列表扩展，其后阅读/成果与最终体验，任务/Gate不晋级。 最新d4d50e0已限定通过侧栏收拢、窄窗/200%导航与审批停止可达、真实键盘和宿主终态通知；会话查找/阅读成果已由前批完成限定验证。唯一当前事项以NEXT_STEPS顶部为准，继续完整日常工作流体验复审；VoiceOver和完整用户人工验收未完成，不扩大Gate。 2026-10-04整体验收核对已对照七项目标与实际断言，具体接续清单见daily-readiness报告；Mac仍锁屏，连续原生操作及VoiceOver未验证，不以旧回归替代。 2026-10-08已解锁并在51a902d完成限定原生创建/改名、两次Bash批准及失败展示、关闭重开和只读数据/文件一致性核验，零真实模型。原生工具仍有窗口定位/AX延迟问题，其余连续操作及VoiceOver未验证；保持in_progress，详见native-daily-review-2026-10-08.md。 2026-10-08用户纠正页面信息平铺；新增workbench-ui-design项目Skill与ui-design-principles准则，唯一当前事项调整为信息层级重构与日常体验复审。规范和源码试用已交付，产品呈现尚未按新准则修改，设计验收与行为回归分开，不晋级任务/Gate。 2026-10-08三位指定gpt-6-sol与主代理完成70项区域/控件社区对照，见docs/validation/ui-control-audit-2026-10-08.md；v1规格需纠偏，下一步先做完整路径状态原型，再同步父子节点并成组实施。仅审核与计划，无产品修复、无Gate晋级。 2026-10-08后续已完成合成交互原型和规格v2（docs/validation/ui-prototype-2026-10-08.md）：当前审批集中输入区，文档正文优先，目录与权限分层；41项原型检查限定通过。下一步成组修改正式UI，产品源码尚未同步；保持in_progress，adoption/evidenceRecords和Gate不因设计验证晋级。"
+      "statusReason": "2026-09-30前后端分页组合已集成develop，F01定向刷新与F02复用修正已进入develop@4644902。历史169df60另一工作树两次UI超时根因仍未定位；本轮当前树通过不关闭该项。Q1工具查询5b10b19已限定采用Query5.104.0，缓存/异步状态/去重交由库承担，重连隔离与浏览位置、审批/停止及原F01断言通过离线验证，复审通过并集成develop@ee409b1；真实桌面已检查旧历史/成果和重开，10月1日请求401/403失败保留，10月3日单次真实文本回复成功，安全错误诊断已按Pi公开入口完成限定离线验证，真实桌面工具闭环待续验。Q2历史/成果尚未迁移，是否实施依维护收益及使用反馈决定；虚拟列表、原生全部正文、完整真实人工体验和另存为未完成，保持in_progress，不扩大Gate。 2026-10-03取消产品默认与本机请求/费用/输出/工具验证额度，保留API检测和历史用量。真实桌面首次工具流程发现路径/展示问题已离线修正，完整真实续验仍待执行；当前前后端共同完成同一功能链路，既有状态不扩大。 最新ebaf316已完成真实Electron read/write/edit/Bash、逐项允许/拒绝、活跃取消、成果和原Session重开继续，8次HTTP；前述待续验范围已限定补证。1a75141修正无依据原因措辞，68c63de离线UI回归通过；非用户人工验收，完整P0状态不扩大。 2026-10-03基线d045ce4完成UI布局交叉审核（docs/validation/ui-layout-review-2026-10-03.md），12项发现未修复；建议先展示顺序与恢复语义，再一个完整布局状态组和安全阅读。只补review证据，不改变实现/Gate状态。 2026-10-03用户要求整套UI重构，5468a3d完成导航/正文/输入/审批成果页与样式重整；U01最小分区/U02只读恢复、U03/U05/U06及U09收敛通过限定离线验证（ui-refactor-2026-10-03.md）。权限三档为下一接入设计；持久重命名/Markdown/全文与完整无障碍未完成，状态/Gate不扩大。 2026-10-03人工/工作目录自动审批贯通宿主SQL v10与桌面；权限按Run固定，确认丢失/旧版本拒绝/取消和重开限定通过。完全访问未实现，整体任务不晋级。 2026-10-03三栏拖动/收起与窄窗覆盖在f742f98限定通过；复用固定MIT分隔条，审批仍在详情页，下一批就近审批与模式文案收口，不扩大Gate。 2026-10-03后续68e6596/e99c562已完成会话内审批、历史失败兜底及权限说明；滚动恢复与整卡可达修正经限定Electron验证，开发失败保留，后续唯一事项回到完全访问范围/platform接入。 2026-10-04完全访问在bded873限定接通SQL/IPC v11、固定Run权限、Pi目录外文本/Bash IP与私有数据保护、原生Session及产品库恢复；新增11真实进程/合成Provider测试通过。外部文件仅记Operation；无真实模型/其他平台/完整人工体验，任务与Gate仍不晋级。桌面最终复核及首轮滚动基线失败见full-access-product-2026-10-04.md。 同批75aed17修正布局滚动与阅读意图区分；5eb203a最终Electron完全访问选择/真实Bash/重连通过，旧文件工具文案断言另行更新并验证。下一事项为会话持久重命名，随后Markdown/按需全文。 2026-10-04后续98c323c已限定完成宿主持久命名/重命名、冲突及确认丢失/重连隔离；原Run/审批/原生引用不变，零真实模型。UI任务/Gate保持，当前下一批为安全Markdown及按需全文。 2026-10-04后续41345e8已限定完成安全Markdown/按Run原生正文补读与连接隔离；旧Run缺范围及8MiB上限保留，零真实模型，任务/Gate不扩大。唯一当前事项为整套桌面工作流复审与收口，优先核对已恢复连接的残留错误提示，其后会话查找、复制及完整体验。 2026-10-04后续4dcec38完成工作流复审与限定恢复/审批焦点修正，连接恢复不再保留重启动作，未确认意图独立保留；24退出恢复场景通过，零真实模型。唯一当前事项为会话查找与列表扩展，其后阅读/成果与最终体验，任务/Gate不晋级。 最新d4d50e0已限定通过侧栏收拢、窄窗/200%导航与审批停止可达、真实键盘和宿主终态通知；会话查找/阅读成果已由前批完成限定验证。唯一当前事项以NEXT_STEPS顶部为准，继续完整日常工作流体验复审；VoiceOver和完整用户人工验收未完成，不扩大Gate。 2026-10-04整体验收核对已对照七项目标与实际断言，具体接续清单见daily-readiness报告；Mac仍锁屏，连续原生操作及VoiceOver未验证，不以旧回归替代。 2026-10-08已解锁并在51a902d完成限定原生创建/改名、两次Bash批准及失败展示、关闭重开和只读数据/文件一致性核验，零真实模型。原生工具仍有窗口定位/AX延迟问题，其余连续操作及VoiceOver未验证；保持in_progress，详见native-daily-review-2026-10-08.md。 2026-10-08用户纠正页面信息平铺；新增workbench-ui-design项目Skill与ui-design-principles准则，唯一当前事项调整为信息层级重构与日常体验复审。规范和源码试用已交付，产品呈现尚未按新准则修改，设计验收与行为回归分开，不晋级任务/Gate。 2026-10-08三位指定gpt-6-sol与主代理完成70项区域/控件社区对照，见docs/validation/ui-control-audit-2026-10-08.md；v1规格需纠偏，下一步先做完整路径状态原型，再同步父子节点并成组实施。仅审核与计划，无产品修复、无Gate晋级。 2026-10-08后续已完成合成交互原型和规格v2（docs/validation/ui-prototype-2026-10-08.md）：当前审批集中输入区，文档正文优先，目录与权限分层；41项原型检查限定通过。下一步成组修改正式UI，产品源码尚未同步；保持in_progress，adoption/evidenceRecords和Gate不因设计验证晋级。 2026-10-08后续正式Renderer已按v2成组实施（ui-workflow-2026-10-08.md）：输入区当前审批、Chat文档→全高正文、目录/权限按需层次；沿用原宿主与查询/阅读所有者。前文“尚未同步”仅为当时历史；当前接续为新UI连续日常体验复审。限定回归、开发失败和未测范围分别记录；保持in_progress和原Gate。"
     },
     {
       "id": "GIT-01",
@@ -1391,7 +1404,8 @@
             "EV-UI-REFACTOR-MOCK-20261003",
             "EV-UI-REFACTOR-REGRESSION-20261003",
             "EV-FULL-PRODUCT-SDK-20261004",
-            "EV-FULL-PRODUCT-MAC-20261004"
+            "EV-FULL-PRODUCT-MAC-20261004",
+            "EV-UI-WORKFLOW-MAC-20261008"
           ]
         },
         {
@@ -1416,11 +1430,12 @@
           ],
           "evidenceRefs": [
             "EV-READING-ACTIONS-MAC-20261004",
-            "EV-EXPERIENCE-MAC-20261004"
+            "EV-EXPERIENCE-MAC-20261004",
+            "EV-UI-WORKFLOW-MAC-20261008"
           ]
         }
       ],
-      "statusReason": "2026-09-30前端分支采用已提交后端共享契约，历史/工具/成果分页、独立活动/审批、页错误与重连已限定Mac无模型组合验证；超过旧传输上限的60条持久合成Run可浏览，实际新Worker执行取消后61条不重放。本分页组合与后端完整分支已合入develop@169df60；组合类型/后端/桌面及三套模型模式离线Electron通过，总UI套件在集成树两次超时，在前端工作树同一SHA完整通过；环境差异未定位，未宣称所有环境稳定；虚拟列表、原生全部正文、完整人工体验及另存为未完成，保持in_progress，不扩大Gate。 F01在e7764e4限定修正：64/256历史正文更新均2次方法查询，真实SQLite/IPC与四套Mac离线Electron通过，尚未合入develop；durable事实依据已更新但不迁移。 最新ebaf316已完成真实Electron read/write/edit/Bash、逐项允许/拒绝、活跃取消、成果和原Session重开继续，8次HTTP；前述待续验范围已限定补证。1a75141修正无依据原因措辞，68c63de离线UI回归通过；非用户人工验收，完整P0状态不扩大。 2026-10-03基线d045ce4完成UI布局交叉审核（docs/validation/ui-layout-review-2026-10-03.md），12项发现未修复；建议先展示顺序与恢复语义，再一个完整布局状态组和安全阅读。只补review证据，不改变实现/Gate状态。 2026-10-03用户要求整套UI重构，5468a3d完成导航/正文/输入/审批成果页与样式重整；U01最小分区/U02只读恢复、U03/U05/U06及U09收敛通过限定离线验证（ui-refactor-2026-10-03.md）。权限三档为下一接入设计；持久重命名/Markdown/全文与完整无障碍未完成，状态/Gate不扩大。 2026-10-04完全访问在bded873限定接通SQL/IPC v11、固定Run权限、Pi目录外文本/Bash IP与私有数据保护、原生Session及产品库恢复；新增11真实进程/合成Provider测试通过。外部文件仅记Operation；无真实模型/其他平台/完整人工体验，任务与Gate仍不晋级。桌面最终复核及首轮滚动基线失败见full-access-product-2026-10-04.md。 2026-10-08三位指定gpt-6-sol与主代理完成70项区域/控件社区对照，见docs/validation/ui-control-audit-2026-10-08.md；v1规格需纠偏，下一步先做完整路径状态原型，再同步父子节点并成组实施。仅审核与计划，无产品修复、无Gate晋级。 2026-10-08后续已完成合成交互原型和规格v2（docs/validation/ui-prototype-2026-10-08.md）：当前审批集中输入区，文档正文优先，目录与权限分层；41项原型检查限定通过。下一步成组修改正式UI，产品源码尚未同步；保持in_progress，adoption/evidenceRecords和Gate不因设计验证晋级。"
+      "statusReason": "2026-09-30前端分支采用已提交后端共享契约，历史/工具/成果分页、独立活动/审批、页错误与重连已限定Mac无模型组合验证；超过旧传输上限的60条持久合成Run可浏览，实际新Worker执行取消后61条不重放。本分页组合与后端完整分支已合入develop@169df60；组合类型/后端/桌面及三套模型模式离线Electron通过，总UI套件在集成树两次超时，在前端工作树同一SHA完整通过；环境差异未定位，未宣称所有环境稳定；虚拟列表、原生全部正文、完整人工体验及另存为未完成，保持in_progress，不扩大Gate。 F01在e7764e4限定修正：64/256历史正文更新均2次方法查询，真实SQLite/IPC与四套Mac离线Electron通过，尚未合入develop；durable事实依据已更新但不迁移。 最新ebaf316已完成真实Electron read/write/edit/Bash、逐项允许/拒绝、活跃取消、成果和原Session重开继续，8次HTTP；前述待续验范围已限定补证。1a75141修正无依据原因措辞，68c63de离线UI回归通过；非用户人工验收，完整P0状态不扩大。 2026-10-03基线d045ce4完成UI布局交叉审核（docs/validation/ui-layout-review-2026-10-03.md），12项发现未修复；建议先展示顺序与恢复语义，再一个完整布局状态组和安全阅读。只补review证据，不改变实现/Gate状态。 2026-10-03用户要求整套UI重构，5468a3d完成导航/正文/输入/审批成果页与样式重整；U01最小分区/U02只读恢复、U03/U05/U06及U09收敛通过限定离线验证（ui-refactor-2026-10-03.md）。权限三档为下一接入设计；持久重命名/Markdown/全文与完整无障碍未完成，状态/Gate不扩大。 2026-10-04完全访问在bded873限定接通SQL/IPC v11、固定Run权限、Pi目录外文本/Bash IP与私有数据保护、原生Session及产品库恢复；新增11真实进程/合成Provider测试通过。外部文件仅记Operation；无真实模型/其他平台/完整人工体验，任务与Gate仍不晋级。桌面最终复核及首轮滚动基线失败见full-access-product-2026-10-04.md。 2026-10-08三位指定gpt-6-sol与主代理完成70项区域/控件社区对照，见docs/validation/ui-control-audit-2026-10-08.md；v1规格需纠偏，下一步先做完整路径状态原型，再同步父子节点并成组实施。仅审核与计划，无产品修复、无Gate晋级。 2026-10-08后续已完成合成交互原型和规格v2（docs/validation/ui-prototype-2026-10-08.md）：当前审批集中输入区，文档正文优先，目录与权限分层；41项原型检查限定通过。下一步成组修改正式UI，产品源码尚未同步；保持in_progress，adoption/evidenceRecords和Gate不因设计验证晋级。 2026-10-08后续正式Renderer已按v2成组实施（ui-workflow-2026-10-08.md）：输入区当前审批、Chat文档→全高正文、目录/权限按需层次；沿用原宿主与查询/阅读所有者。前文“尚未同步”仅为当时历史；当前接续为新UI连续日常体验复审。限定回归、开发失败和未测范围分别记录；保持in_progress和原Gate。"
     },
     {
       "id": "SKL-01",
