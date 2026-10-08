@@ -1,0 +1,182 @@
+{
+  "retrievedOn": "2026-10-08",
+  "scope": "Downloaded reference files; adoption and reviewed sections are defined in ui-design-skills-research-2026-10-08.md, not inferred from inclusion here.",
+  "sources": [
+    {
+      "repo": "Dammyjay93/interface-design",
+      "commit": "2f9be3206855bcb2d1d0af262c8bae25cba6658d",
+      "path": ".claude/skills/interface-design/SKILL.md",
+      "url": "https://raw.githubusercontent.com/Dammyjay93/interface-design/2f9be3206855bcb2d1d0af262c8bae25cba6658d/.claude/skills/interface-design/SKILL.md",
+      "bytes": 29614,
+      "sha256": "720b31a31276e899fbe3006a33cbfeaceb77a73ba4c27b80d29afd38c8b7b208"
+    },
+    {
+      "repo": "Dammyjay93/interface-design",
+      "commit": "2f9be3206855bcb2d1d0af262c8bae25cba6658d",
+      "path": "reference/system-template.md",
+      "url": "https://raw.githubusercontent.com/Dammyjay93/interface-design/2f9be3206855bcb2d1d0af262c8bae25cba6658d/reference/system-template.md",
+      "bytes": 1272,
+      "sha256": "d76b413d43abb064746c3e16ced8b56046f7e73da14b2064db7377fee63d4856"
+    },
+    {
+      "repo": "Dammyjay93/interface-design",
+      "commit": "2f9be3206855bcb2d1d0af262c8bae25cba6658d",
+      "path": "LICENSE",
+      "url": "https://raw.githubusercontent.com/Dammyjay93/interface-design/2f9be3206855bcb2d1d0af262c8bae25cba6658d/LICENSE",
+      "bytes": 1072,
+      "sha256": "54c405ef24e71634b73c994133d028e7a96d1906f42615366296d6583dcaba8f"
+    },
+    {
+      "repo": "pbakaus/impeccable",
+      "commit": "778c8a7b71ccd5bfe3ca6ac68c15d9d872d0f87d",
+      "path": ".agents/skills/impeccable/SKILL.md",
+      "url": "https://raw.githubusercontent.com/pbakaus/impeccable/778c8a7b71ccd5bfe3ca6ac68c15d9d872d0f87d/.agents/skills/impeccable/SKILL.md",
+      "bytes": 12263,
+      "sha256": "e1a965737ca8255934bad358d5cfb8788ce013867910efd97d1daac68375e941"
+    },
+    {
+      "repo": "pbakaus/impeccable",
+      "commit": "778c8a7b71ccd5bfe3ca6ac68c15d9d872d0f87d",
+      "path": "skill/reference/mode-operate.md",
+      "url": "https://raw.githubusercontent.com/pbakaus/impeccable/778c8a7b71ccd5bfe3ca6ac68c15d9d872d0f87d/skill/reference/mode-operate.md",
+      "bytes": 4716,
+      "sha256": "7a52dd7a94ee75f6ae89542c86a1b6e1d306812b16e0d9dbf12d4acad44d148b"
+    },
+    {
+      "repo": "pbakaus/impeccable",
+      "commit": "778c8a7b71ccd5bfe3ca6ac68c15d9d872d0f87d",
+      "path": "skill/reference/mode-read.md",
+      "url": "https://raw.githubusercontent.com/pbakaus/impeccable/778c8a7b71ccd5bfe3ca6ac68c15d9d872d0f87d/skill/reference/mode-read.md",
+      "bytes": 4396,
+      "sha256": "a569989e6a3d6453b4c45e9474e162a15cc54e11732ac6baa7990a6e7cccc0b5"
+    },
+    {
+      "repo": "pbakaus/impeccable",
+      "commit": "778c8a7b71ccd5bfe3ca6ac68c15d9d872d0f87d",
+      "path": "skill/reference/shape.md",
+      "url": "https://raw.githubusercontent.com/pbakaus/impeccable/778c8a7b71ccd5bfe3ca6ac68c15d9d872d0f87d/skill/reference/shape.md",
+      "bytes": 3547,
+      "sha256": "a55f016c046cb6a27c55bd7f346375aeb506a755c4fbca19a5f92dbd42309c23"
+    },
+    {
+      "repo": "pbakaus/impeccable",
+      "commit": "778c8a7b71ccd5bfe3ca6ac68c15d9d872d0f87d",
+      "path": "skill/reference/component-review.md",
+      "url": "https://raw.githubusercontent.com/pbakaus/impeccable/778c8a7b71ccd5bfe3ca6ac68c15d9d872d0f87d/skill/reference/component-review.md",
+      "bytes": 7864,
+      "sha256": "1ed71eaa66595b794af0fa2b59effa9a8522650742c818896313dd3c4c29dec7"
+    },
+    {
+      "repo": "pbakaus/impeccable",
+      "commit": "778c8a7b71ccd5bfe3ca6ac68c15d9d872d0f87d",
+      "path": "skill/reference/distill.md",
+      "url": "https://raw.githubusercontent.com/pbakaus/impeccable/778c8a7b71ccd5bfe3ca6ac68c15d9d872d0f87d/skill/reference/distill.md",
+      "bytes": 5610,
+      "sha256": "048e5a7671024592cba6cd4ede70b6c535db0c1be84d6837638e40f51fb3fad7"
+    },
+    {
+      "repo": "pbakaus/impeccable",
+      "commit": "778c8a7b71ccd5bfe3ca6ac68c15d9d872d0f87d",
+      "path": "skill/reference/polish.md",
+      "url": "https://raw.githubusercontent.com/pbakaus/impeccable/778c8a7b71ccd5bfe3ca6ac68c15d9d872d0f87d/skill/reference/polish.md",
+      "bytes": 6612,
+      "sha256": "c504e12ea076fd1a57b8c9ece79fbb532c54226b2b6298c5c62fa889ae1dd34d"
+    },
+    {
+      "repo": "pbakaus/impeccable",
+      "commit": "778c8a7b71ccd5bfe3ca6ac68c15d9d872d0f87d",
+      "path": "LICENSE",
+      "url": "https://raw.githubusercontent.com/pbakaus/impeccable/778c8a7b71ccd5bfe3ca6ac68c15d9d872d0f87d/LICENSE",
+      "bytes": 10766,
+      "sha256": "02bb8c3b4e70190e3986c0404ad2fd8d639b4f534252d82379cc1b502b6d1812"
+    },
+    {
+      "repo": "vercel-labs/agent-skills",
+      "commit": "063bee94c3f4df8453406c830b0a7df0f2860278",
+      "path": "skills/web-design-guidelines/SKILL.md",
+      "url": "https://raw.githubusercontent.com/vercel-labs/agent-skills/063bee94c3f4df8453406c830b0a7df0f2860278/skills/web-design-guidelines/SKILL.md",
+      "bytes": 1231,
+      "sha256": "f4647ca866a3accf763777f83e7682954f0187cd6bea7eea0399796652414e8f"
+    },
+    {
+      "repo": "anthropics/skills",
+      "commit": "683bc88e56f3e09ba94f7055977f3d3aa499f202",
+      "path": "skills/frontend-design/SKILL.md",
+      "url": "https://raw.githubusercontent.com/anthropics/skills/683bc88e56f3e09ba94f7055977f3d3aa499f202/skills/frontend-design/SKILL.md",
+      "bytes": 9390,
+      "sha256": "d91970639e9f5c37682ac7ab60094d35f1c7c1f38d731bd56396563aee10c1d3"
+    },
+    {
+      "repo": "anthropics/skills",
+      "commit": "683bc88e56f3e09ba94f7055977f3d3aa499f202",
+      "path": "skills/frontend-design/LICENSE.txt",
+      "url": "https://raw.githubusercontent.com/anthropics/skills/683bc88e56f3e09ba94f7055977f3d3aa499f202/skills/frontend-design/LICENSE.txt",
+      "bytes": 10174,
+      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+    },
+    {
+      "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "commit": "477bcb28c9812b385cb51a4605ddf30d7b2266e2",
+      "path": ".claude/skills/ui-ux-pro-max/SKILL.md",
+      "url": "https://raw.githubusercontent.com/nextlevelbuilder/ui-ux-pro-max-skill/477bcb28c9812b385cb51a4605ddf30d7b2266e2/.claude/skills/ui-ux-pro-max/SKILL.md",
+      "bytes": 15969,
+      "sha256": "ea087c341bfb5b23195c7302027268ede86da802554c18a5c4896a6017b439f9"
+    },
+    {
+      "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "commit": "477bcb28c9812b385cb51a4605ddf30d7b2266e2",
+      "path": ".claude/skills/design-system/references/states-and-variants.md",
+      "url": "https://raw.githubusercontent.com/nextlevelbuilder/ui-ux-pro-max-skill/477bcb28c9812b385cb51a4605ddf30d7b2266e2/.claude/skills/design-system/references/states-and-variants.md",
+      "bytes": 4771,
+      "sha256": "8dacb95d57d4bb37d8a99cc55515ff26da272056f837d29abc74aedcaa3ba104"
+    },
+    {
+      "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "commit": "477bcb28c9812b385cb51a4605ddf30d7b2266e2",
+      "path": "LICENSE",
+      "url": "https://raw.githubusercontent.com/nextlevelbuilder/ui-ux-pro-max-skill/477bcb28c9812b385cb51a4605ddf30d7b2266e2/LICENSE",
+      "bytes": 1075,
+      "sha256": "738f69dfa83db5c347c678fb9d90e560877059f0de93a327c39001bff92dc014"
+    },
+    {
+      "repo": "szilu/ux-designer-skill",
+      "commit": "c869d32fd8df7bd7fcd1db68e93bd3e89eed5161",
+      "path": "SKILL.md",
+      "url": "https://raw.githubusercontent.com/szilu/ux-designer-skill/c869d32fd8df7bd7fcd1db68e93bd3e89eed5161/SKILL.md",
+      "bytes": 16037,
+      "sha256": "da23126b3af8e25e36f245ae3098b1322285a5618d96795f7460c92550de34bd"
+    },
+    {
+      "repo": "szilu/ux-designer-skill",
+      "commit": "c869d32fd8df7bd7fcd1db68e93bd3e89eed5161",
+      "path": "references/14-ai-ux-patterns.md",
+      "url": "https://raw.githubusercontent.com/szilu/ux-designer-skill/c869d32fd8df7bd7fcd1db68e93bd3e89eed5161/references/14-ai-ux-patterns.md",
+      "bytes": 21401,
+      "sha256": "c229438a2e33be662732200089a2b495811a3c8716b7e1d8daa25a23ca3035ea"
+    },
+    {
+      "repo": "szilu/ux-designer-skill",
+      "commit": "c869d32fd8df7bd7fcd1db68e93bd3e89eed5161",
+      "path": "LICENSE",
+      "url": "https://raw.githubusercontent.com/szilu/ux-designer-skill/c869d32fd8df7bd7fcd1db68e93bd3e89eed5161/LICENSE",
+      "bytes": 1071,
+      "sha256": "311bce427930791e38cee5f4e81b83240e8ae2b57629e5fec57e1283769f0912"
+    },
+    {
+      "repo": "vercel-labs/web-interface-guidelines",
+      "commit": "434b7f91364665f2f733b310ec54809bf8f37937",
+      "path": "LICENSE",
+      "url": "https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/434b7f91364665f2f733b310ec54809bf8f37937/LICENSE",
+      "bytes": 1068,
+      "sha256": "6cd1609c9c12233507cdd2ce0d32e9a721e3c27494951be06b90090deeeb7af2"
+    },
+    {
+      "repo": "vercel-labs/web-interface-guidelines",
+      "commit": "434b7f91364665f2f733b310ec54809bf8f37937",
+      "path": "command.md",
+      "url": "https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/434b7f91364665f2f733b310ec54809bf8f37937/command.md",
+      "bytes": 8055,
+      "sha256": "d246b026f4f29b5823a9cc857f9edf3d2507002e055e32040cadeaf3b38e0234"
+    }
+  ]
+}
