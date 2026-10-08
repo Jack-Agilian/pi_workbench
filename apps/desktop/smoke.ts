@@ -131,7 +131,9 @@ export async function runSmoke(window: BrowserWindow, host: HostClient, profile:
       const evidence = join(app.getAppPath(), '../../.artifacts/c-desktop'); mkdirSync(evidence, { recursive: true });
       writeFileSync(join(evidence, 'desktop.png'), screenshot.toPNG());
       writeFileSync(join(profile, 'workspace', artifact.path), 'EXTERNAL SYNTHETIC edit');
+      await js("document.querySelector('.document-versions').click()");
       await click('重新核验文件');
+      await js("document.querySelector('[aria-label=关闭版本与来源]').click()");
       await wait(() => js<boolean>("document.querySelector('.preview').textContent.includes('当前内容与此登记版本不同')"), 'changed');
     } else assert.equal(existsSync(join(profile, 'workspace', op.artifactPath!)), false);
     const cursor = snapshot.cursor;
