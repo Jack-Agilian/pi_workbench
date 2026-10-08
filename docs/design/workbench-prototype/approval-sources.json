@@ -1,0 +1,62 @@
+{
+  "readOn": "2026-10-08",
+  "scope": "Read-only fixed source review; MIT licenses read; no component adoption or release verification.",
+  "sources": [
+    {
+      "repo": "anomalyco/opencode",
+      "sha": "a697115b203395c54a7496dc3d1863fe7b319c0c",
+      "path": "LICENSE",
+      "url": "https://raw.githubusercontent.com/anomalyco/opencode/a697115b203395c54a7496dc3d1863fe7b319c0c/LICENSE",
+      "sha256": "625f0f619133f89bbbb2abe37369613dfa1885eba1e50d02170deb62bb42cb6b"
+    },
+    {
+      "repo": "anomalyco/opencode",
+      "sha": "a697115b203395c54a7496dc3d1863fe7b319c0c",
+      "path": "README.md",
+      "url": "https://raw.githubusercontent.com/anomalyco/opencode/a697115b203395c54a7496dc3d1863fe7b319c0c/README.md",
+      "sha256": "400890a3082e225c440561825270a911cd7df90a9f64f85166aed330201e50ba"
+    },
+    {
+      "repo": "anomalyco/opencode",
+      "sha": "a697115b203395c54a7496dc3d1863fe7b319c0c",
+      "path": "packages/app/src/pages/session/composer/session-composer-region.tsx",
+      "url": "https://raw.githubusercontent.com/anomalyco/opencode/a697115b203395c54a7496dc3d1863fe7b319c0c/packages/app/src/pages/session/composer/session-composer-region.tsx",
+      "sha256": "85d871ac8d64e0a586afa613d66d3b822a298d8eb2f9ce62ffcef52d3f8658fc"
+    },
+    {
+      "repo": "anomalyco/opencode",
+      "sha": "a697115b203395c54a7496dc3d1863fe7b319c0c",
+      "path": "packages/app/src/pages/session/composer/session-permission-dock.tsx",
+      "url": "https://raw.githubusercontent.com/anomalyco/opencode/a697115b203395c54a7496dc3d1863fe7b319c0c/packages/app/src/pages/session/composer/session-permission-dock.tsx",
+      "sha256": "4ef47d46b780e31346ad6f691585a14ca7889940063b79c36ea9fab45715c197"
+    },
+    {
+      "repo": "pingdotgg/t3code",
+      "sha": "9fba2093e50f208c52d9041c70a793296e311477",
+      "path": "LICENSE",
+      "url": "https://raw.githubusercontent.com/pingdotgg/t3code/9fba2093e50f208c52d9041c70a793296e311477/LICENSE",
+      "sha256": "935d8f2af0c703f9c39517ee57cc4930b19d02d533be930b63f0e82f93614b43"
+    },
+    {
+      "repo": "pingdotgg/t3code",
+      "sha": "9fba2093e50f208c52d9041c70a793296e311477",
+      "path": "README.md",
+      "url": "https://raw.githubusercontent.com/pingdotgg/t3code/9fba2093e50f208c52d9041c70a793296e311477/README.md",
+      "sha256": "144e0a78e62d2ed7f33e1696d24d6d06a251931a8063f8a2022df102125ac941"
+    },
+    {
+      "repo": "pingdotgg/t3code",
+      "sha": "9fba2093e50f208c52d9041c70a793296e311477",
+      "path": "apps/web/src/components/chat/ChatComposer.tsx",
+      "url": "https://raw.githubusercontent.com/pingdotgg/t3code/9fba2093e50f208c52d9041c70a793296e311477/apps/web/src/components/chat/ChatComposer.tsx",
+      "sha256": "2e397351472336109a6368838d564ab8ba743699d286dbafa64db782a4e17aca"
+    },
+    {
+      "repo": "pingdotgg/t3code",
+      "sha": "9fba2093e50f208c52d9041c70a793296e311477",
+      "path": "apps/web/src/components/chat/ComposerPendingApprovalPanel.tsx",
+      "url": "https://raw.githubusercontent.com/pingdotgg/t3code/9fba2093e50f208c52d9041c70a793296e311477/apps/web/src/components/chat/ComposerPendingApprovalPanel.tsx",
+      "sha256": "88dacf42e67951e35d0b8175233dedb62ccf9cc182a60f7c3c319c9c5be8f236"
+    }
+  ]
+}

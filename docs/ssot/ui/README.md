@@ -2,9 +2,9 @@
 
 2026-10-08建立。这里是**界面空间、尺寸、布局与交互呈现的详细权威**；[通用原则](principles.md)管原则，业务契约管权限/身份/副作用，[当前计划](../../planning/NEXT_STEPS.md)管顺序，Skill管维护方法。详细空间规则不再分散新增到历史契约中。冲突时先报告并同步修订，不用视觉规格覆盖业务边界。
 
-本树 v1 是本项目的目标规格，**待成组实施和渲染复审**。各节点的“现状/差距”基于 `c128dab39884a34d81bf8f32c5d022adb9b9a0d4` 源码审读；不是本轮实机尺寸/动画测量。具体数值是设计起点，有理由可修订，变更需同批更新唯一持有节点。
+本树v2已根据[70项审核](../../validation/ui-control-audit-2026-10-08.md)和[可交互的完整流程原型](../../design/workbench-prototype/README.md)纠偏：文档正文成为右栏主角，当前审批集中在输入区，目录对象与普通记录分层。**这是设计候选和合成原型，产品源码尚未同步。** 本批不扩大产品/Gate验收。
 
-**2026-10-08逐控件复审：v1需要产品设计纠偏，不能直接照单实施。** [三位gpt-6-sol与主代理的全量审核](../../validation/ui-control-audit-2026-10-08.md)覆盖70项，发现成果列表主导预览、正文/操作固定分区、目录对象混淆及隐藏失败反馈等问题。下一步先形成完整工作路径的状态原型，再修订对应父子节点；右侧围绕当前文档阅读，保留Chat可信入口。现有尺寸/时长是待验证候选，协议不足的降级呈现不是永久产品目标。审核建议不自动成为第二套规格；业务权限/身份/恢复不变量与用户已明确的权限值＋提示交互继续生效。本次仅更新根的审核状态，叶节点暂保留v1便于对照，未声称产品已经修复。
+打开[交互原型](../../design/workbench-prototype/index.html)查看默认、待批、未确认、断线、未知、文档改变与长内容状态。共享参数及各节点已同批修订；具体产品实现差距仍对照代码基线bbc4e170a74a0974ce5dd8f5c6fdbfc0216b1e17。候选数值不冒充社区标准，审批位置新增固定OpenCode/T3 Code源码依据，原型说明列出采用边界。业务权限/身份/恢复不变量继续生效。
 
 ## 阅读树
 
@@ -15,15 +15,15 @@
 - [SHELL 工作台窗口](shell/README.md)
   - [NAV 导航侧栏](shell/navigation.md)：品牌/关闭、目录、新建、查找、会话行/改名、连接状态。
   - [WORK 主工作区](shell/workspace/README.md)
-    - [HEAD 会话顶部](shell/workspace/header.md)：导航开关、标题/目录、审批/停止、成果入口、上下文。
+    - [HEAD 会话顶部](shell/workspace/header.md)：导航开关、标题/目录、停止、文档入口、上下文。
     - [FEEDBACK 配置与反馈](shell/workspace/feedback.md)：模型配置、连接、跨会话运行、恢复与终态。
     - [CHAT 会话区](shell/workspace/conversation/README.md)
       - [MESSAGES 阅读记录](shell/workspace/conversation/messages.md)：空态、分页、正文、代码、复制、返回最新。
-      - [TOOLS 工具与审批](shell/workspace/conversation/tools.md)：摘要、输出、目标/风险、决策与结果。
+      - [TOOLS 工具与审批](shell/workspace/conversation/tools.md)：历史摘要/输出、输入区当前审批、目标/风险与结果。
       - [COMPOSER 输入区](shell/workspace/conversation/composer/README.md)：草稿、工具栏、发送、提示、演示入口。
         - [PERMISSION 权限选择器](shell/workspace/conversation/composer/permissions.md)：当前值、气泡、选择面板、保存反馈。
-    - [ARTIFACTS 成果栏](shell/workspace/artifacts/README.md)：标题/关闭、版本列表、分页、说明。
-      - [PREVIEW 成果预览](shell/workspace/artifacts/preview.md)：版本、核验、内容、复制、来源。
+    - [ARTIFACTS 文档面板](shell/workspace/artifacts/README.md)：当前文件/关闭、文档选择、登记分页、按需说明。
+      - [PREVIEW 文档阅读](shell/workspace/artifacts/preview.md)：正文优先、异常核验、复制、次级版本/来源。
 
 这是一棵**产品空间树**，不要求一比一复制React组件树。简单子控件放父文档的子节点表；有独立布局/多状态/复用职责时才拆文件。共用气泡、分隔条和反馈规则引用共享节点，不复制成多份。新增实际区域必须在父节点和此索引登记，不能只新增一个孤立文档。
 

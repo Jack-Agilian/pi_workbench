@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Pi Workbench · 交互设计原型</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="lab" aria-label="设计原型控制，不属于产品界面">
+    <strong>交互原型 <span>· 合成内容</span></strong>
+    <label>场景 <select id="scenario">
+      <option value="complete">文档已生成</option><option value="empty">新会话</option>
+      <option value="approval">等待审批</option><option value="running">执行中 / 排队</option>
+      <option value="permission-error">权限未确认</option><option value="disconnected">连接中断</option>
+      <option value="unknown">结果待核实</option><option value="changed">文件已改变</option>
+      <option value="long">长内容 / 长名称</option>
+    </select></label>
+    <label>文档打开 <select id="open-policy"><option value="auto">A · 前台首次自动</option><option value="click">B · 仅点击</option></select></label>
+    <button id="advance" type="button">模拟结果到达</button>
+    <button id="reset" type="button">重置</button>
+  </div>
+  <div id="shell" class="shell">
+    <aside id="navigation" class="navigation" aria-label="会话导航">
+      <div class="brand"><span class="brand-mark">π</span><strong>Pi Workbench</strong><button class="icon nav-close" data-action="nav" aria-label="关闭导航" type="button"></button></div>
+      <button id="new-thread" class="new-thread" type="button"><span data-icon="plus"></span>新建会话</button>
+      <div class="search-row"><span data-icon="search"></span><input id="search" type="search" placeholder="搜索会话" aria-label="搜索会话"><button id="filter" class="icon" aria-label="筛选目录" title="筛选目录" type="button"></button></div>
+      <div id="filter-status" class="filter-status" hidden><span>研究项目</span><button id="clear-filter" type="button">清除</button></div>
+      <div class="nav-list"><div class="section-label">会话</div><div id="thread-list"></div><p id="no-results" class="muted" hidden>没有匹配的会话</p></div>
+      <div class="nav-footer"><span class="avatar">本</span><span>本地工作台</span><span class="muted">设计样例</span></div>
+    </aside>
+    <button id="nav-scrim" class="scrim" aria-label="关闭导航" hidden type="button"></button>
+    <div id="nav-resize" class="resize nav-resize" role="separator" tabindex="0" aria-label="调整导航宽度" aria-orientation="vertical" aria-valuemin="200" aria-valuemax="300" aria-valuenow="232"></div>
+    <main id="workspace" class="workspace">
+      <header class="header">
+        <button id="nav-toggle" class="icon" data-action="nav" aria-label="切换导航" aria-controls="navigation" aria-expanded="true" title="切换导航" type="button"></button>
+        <div class="identity"><button id="thread-info" class="project" type="button"><span data-icon="folder"></span><span id="workspace-name">研究项目</span><span data-icon="chevron"></span></button><button id="rename" class="thread-title" type="button" title="更改会话名称">整理秋季客户访谈</button></div>
+        <div class="head-actions"><button id="stop" class="stop" type="button" hidden><span data-icon="stop"></span>停止</button><button id="documents-toggle" class="icon" aria-label="打开文档" aria-controls="documents" aria-expanded="true" title="打开文档" type="button"></button><button id="context" class="icon" aria-label="会话信息" title="会话信息" type="button"></button></div>
+      </header>
+      <div id="notice" class="notice" hidden role="status"></div>
+      <div id="content" class="content">
+        <section id="chat" class="chat" aria-label="会话">
+          <div id="timeline" class="timeline" tabindex="-1"><div id="messages" class="reading"></div></div>
+          <button id="latest" class="latest" type="button" hidden><span data-icon="down"></span>回到最新</button>
+          <div class="composer-wrap">
+            <div id="approval-dock" class="approval-dock" hidden></div>
+            <div id="queue" class="queue" hidden></div>
+            <div class="composer">
+              <label for="draft" class="sr-only">下一条任务</label><textarea id="draft" rows="2" placeholder="继续这项工作…"></textarea>
+              <div id="permission-warning" class="inline-warning" hidden><span>权限设置未获确认</span><button id="retry-permission" type="button">核对同次设置</button></div>
+              <div class="composer-bar">
+                <div class="composer-context">
+                  <div class="tip"><button id="permission" type="button" aria-haspopup="dialog" aria-describedby="permission-tip"><span id="permission-value">人工审批</span><span data-icon="chevron"></span></button><span id="permission-tip" class="tooltip" role="tooltip">更改权限</span></div>
+                  <button id="model" class="model" type="button" title="模型信息">gpt-6-luna</button>
+                </div>
+                <button id="send" class="send" type="button" aria-label="发送任务" title="发送 · Enter"><span data-icon="up"></span></button>
+              </div>
+            </div>
+            <p id="composer-hint" class="composer-hint" hidden></p>
+          </div>
+        </section>
+        <div id="doc-resize" class="resize doc-resize" role="separator" tabindex="0" aria-label="调整文档宽度" aria-orientation="vertical" aria-valuemin="360" aria-valuemax="620" aria-valuenow="440"></div>
+        <aside id="documents" class="documents" aria-label="文档预览">
+          <header class="doc-header"><span class="doc-badge">MD</span><button id="document-picker" type="button" aria-haspopup="dialog"><span id="document-name">秋季客户访谈总结.md</span><span data-icon="chevron"></span></button><button id="doc-copy" class="icon" aria-label="复制文档内容" title="复制展示内容" type="button"></button><button id="doc-details" class="icon" aria-label="版本与来源" title="版本与来源" type="button"></button><button id="close-document" class="icon" aria-label="关闭文档预览" title="关闭文档预览" type="button"></button></header>
+          <div id="doc-notice" class="doc-notice" hidden role="status"></div>
+          <div id="doc-scroll" class="doc-scroll"><article id="document-body" class="document-body"></article></div>
+        </aside>
+      </div>
+    </main>
+  </div>
+  <dialog id="panel" class="panel" aria-labelledby="panel-title"><div class="panel-heading"><h2 id="panel-title"></h2><button id="close-panel" class="icon" aria-label="关闭面板" type="button"></button></div><div id="panel-body"></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div>
+</body>
+</html>
