@@ -2,6 +2,12 @@
 
 2026-09-30采纳。本文是[复用优先架构](reuse-first.md)的模块级补充；当前实施顺序只由[NEXT_STEPS](../planning/NEXT_STEPS.md)决定。除下文Q1工具查询已限定采用Query 5.104.0外，其余参考方向不等于已安装、移植或完成任务；[Q1证据](../validation/ui-query-tools-2026-09-30.md)列出实际范围。
 
+## 输入区审批位置补充（2026-10-08）
+
+`apps/desktop/approval-list.tsx`、Composer → OpenCode `session-composer-region.tsx` / `session-permission-dock.tsx`（固定a697115b203395c54a7496dc3d1863fe7b319c0c）和T3 Code `ChatComposer.tsx` / `ComposerPendingApprovalPanel.tsx`（固定9fba2093e50f208c52d9041c70a793296e311477）→ 借鉴**当前单次审批与输入区同处、目标/影响/决定集中** → 保留宿主有效审批身份、摘要、版本、期限、一次领取及固定Run权限；不复制始终允许、Provider或Harness。
+
+两仓MIT已读，固定文件及SHA-256见[来源摘要](../design/workbench-prototype/approval-sources.json)，具体链接与采用/不采用范围见[原型说明](../design/workbench-prototype/README.md)。仅查阅并用于合成设计稿，未移植上游代码或安装依赖；不是发行版验证。该补查纠正前次审核遗漏，不能概括成所有社区产品都如此；产品实施和验证仍待下一批。
+
 ## 本项目模块与具体接缝
 
 下表上游文件路径相对相应上游仓库；本项目路径相对本仓库。来源编号见[上游证据](upstream-evidence.md)。

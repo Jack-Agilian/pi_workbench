@@ -20,7 +20,7 @@
 
 ## 2026-10-08 前端设计方法修订
 
-最新[全量逐控件审核](../validation/ui-control-audit-2026-10-08.md)由三位指定gpt-6-sol及主代理覆盖70项，重新核对pi-gui、WorkBuddy、Claude Code Desktop与Conductor的具体呈现，区分文档/图片/源码/判断。规格树v1标记待纠偏：先完成对象、阅读主次和全路径状态原型，再成组实施。UI-01/02、ART-01保持in_progress，adoption/evidenceRecords不因研究或覆盖数新增实现通过；本批零产品Provider调用。
+最新[交互原型与规格v2验证](../validation/ui-prototype-2026-10-08.md)已承接[70项逐控件审核](../validation/ui-control-audit-2026-10-08.md)：单次审批固定输入区，右侧以文档正文为主，目录/权限按对象分层。新增OpenCode/T3 Code固定源码修正此前审批位置依据不足；[来源与取舍](../design/workbench-prototype/README.md)可复核。下一步按规格成组实施正式UI。UI-01/02、ART-01保持in_progress，adoption/evidenceRecords不因原型检查新增产品实现通过；本批零产品Provider调用。
 
 后续同日按用户要求集中收口：通用原则、共享尺寸/动效与SHELL→NAV/WORK→子区域均归入UI树；旧设计页改为入口，业务契约保留产品语义。见[迁移表](ui/migration.md)与[本轮维护验证](../validation/ui-space-spec-2026-10-08.md)。规格仍待成组实施，不能扩大现有验证范围。
 

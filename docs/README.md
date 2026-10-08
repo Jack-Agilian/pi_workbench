@@ -6,7 +6,7 @@
 
 前端设计：[空间与控件规格树](ssot/ui/README.md) · [项目开发Skill](../.agents/skills/workbench-ui-design/SKILL.md)；设计标准不等于界面已实施。
 
-2026-10-08最新：[70项控件/区域社区对照与交叉审核](validation/ui-control-audit-2026-10-08.md)。三位指定gpt-6-sol分别审查导航、会话、文档与反馈；现有规格本身需要纠偏，下一步先做连贯状态原型，尚未修改产品UI。
+2026-10-08最新：[可交互的完整流程原型](design/workbench-prototype/README.md) · [规格v2验证与未覆盖范围](validation/ui-prototype-2026-10-08.md)。承接[70项控件社区审核](validation/ui-control-audit-2026-10-08.md)，已纠正输入区审批、文档阅读主次与目录对象；下一步成组实施正式UI。合成原型不代表产品链路通过。
 
 **[复用优先 SSOT](ssot/README.md)** · [架构与替代决策](ssot/reuse-first.md) · [模块接入](ssot/integration-contracts.md) · [上游证据](ssot/upstream-evidence.md) · [复用清单](ssot/reuse-map.json) · [模块到参考实现的映射](ssot/reference-implementations.md)
 
